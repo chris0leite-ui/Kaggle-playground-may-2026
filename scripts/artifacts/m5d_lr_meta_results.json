@@ -1,0 +1,25 @@
+{
+  "strat": {
+    "oof": 0.9502259763130039,
+    "delta_bp": 94.75976313003898
+  },
+  "groupkf": {
+    "oof": 0.9299408144476502,
+    "delta_bp": 93.5081444765018
+  },
+  "pool": [
+    "baseline",
+    "d2a_te",
+    "m2_xgb",
+    "m3_catboost",
+    "m4_relstate",
+    "e1_cb_sub",
+    "e3_hgbc",
+    "e5_optuna_lgbm",
+    "a_horizon",
+    "b_lapsuntilpit",
+    "f1_hgbc_deep",
+    "f2_hgbc_shallow"
+  ],
+  "K": 12
+}
