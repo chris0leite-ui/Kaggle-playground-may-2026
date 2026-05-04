@@ -82,10 +82,10 @@ They override the kickoff-time defaults.
 ```yaml
 day: 2
 lb_best_today: 0.95435            # leader (still); not refreshed since kickoff
-our_lb_best: 0.94693              # M5 LR meta-stacker, Day-2 (+58.0bp over Day-1)
-submissions_used_today: 2         # baseline (D1) + M5 (D2)
-submissions_used_total: 2
-saturation_count: 1               # D2-A null both anchors (2026-05-04)
+our_lb_best: 0.94891              # M5b expanded stack, Day-2 (+78bp over Day-1)
+submissions_used_today: 3         # baseline (D1) + M5 + M5b
+submissions_used_total: 3
+saturation_count: 1               # D2-A null both anchors
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -94,9 +94,14 @@ mechanism_families_explored:
   - relative_state_fe
   - lr_meta_stacker_3view
   - dirichlet_random_search
+  - hgbc_label_encoded_driver       # E3 -- BEST single-model
+  - row_subsample_catboost          # E1 -- dominated by M3
+  - l1_meta_sweep                   # E2 -- null on 'fixes gap'
+  - realmlp_cpu_singlefold          # E4 -- 0.94722 fold-0, 39.5min, not pursued
+  - lr_meta_stacker_expanded        # M5b -- new PRIMARY, LB 0.94891
 plateau_days: 0
 gate_status: cleared
-headroom_to_top5pct: 0.00652      # 0.95345 − 0.94693 = 65.2bp (was 123bp)
+headroom_to_top5pct: 0.00454      # 0.95345 − 0.94891 = 45.4bp (was 65bp)
 ```
 
 ## Calibration ladder
@@ -105,14 +110,19 @@ Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 
 | Mechanism | Strat OOF | GroupKF OOF | LB | Notes |
 |---|---:|---:|---:|---|
-| baseline_two_anchor | 0.94075 | 0.92059 | 0.94113 | LB-proxy ✓ Strat+3.8bp gap |
-| d2a_te | 0.93670 | 0.91628 | n/a | NULL G1 standalone; +2-4bp in blend (M1) |
-| m1_blend (50/50 base+te) | 0.94097 | 0.92098 | n/a | best-w 80/20; closes d2a postmortem #3 |
-| m2_xgb | 0.94507 | 0.91084 | pending | Strat PASS; Race-overfit |
-| m3_catboost | 0.94612 | 0.91645 | pending | Strat PASS strongest single; Race-overfit |
-| m4_relstate | 0.94244 | 0.92195 | pending | only B1 lifting BOTH anchors |
-| **m5_lr_meta** | **0.94737** | **0.92483** | **0.94693** | PRIMARY; OOF→LB gap −4.4bp (stack overshoot) |
-| m6_dirichlet | 0.94696 | 0.92459 | not submitted | held; PI directive single-shot M5 only |
+| baseline_two_anchor | 0.94075 | 0.92059 | 0.94113 | LB-proxy ✓ gap +3.8bp |
+| d2a_te | 0.93670 | 0.91628 | n/a | NULL G1; +2-4bp in M1 blend |
+| m1_blend (50/50 base+te) | 0.94097 | 0.92098 | n/a | best-w 80/20 |
+| m2_xgb | 0.94507 | 0.91084 | n/a | Race-overfit |
+| m3_catboost | 0.94612 | 0.91645 | n/a | best single before E3; Race-overfit |
+| m4_relstate | 0.94244 | 0.92195 | n/a | only B1 lifting both anchors |
+| m5_lr_meta | 0.94737 | 0.92483 | 0.94693 | gap −4.4bp |
+| m6_dirichlet | 0.94696 | 0.92459 | n/a | held |
+| e1_cb_subsample | 0.94596 | 0.91638 | n/a | dominated by M3 |
+| e2_l1_meta | 0.94738 | 0.92489 | n/a | null on "L1 fixes gap" |
+| e3_hgbc | 0.94876 | 0.92785 | n/a | BEST single, both anchors lift |
+| e4_realmlp_cpu_f0 | 0.94722 (f0) | n/a | n/a | not pursued (3.3h proj for 5-fold) |
+| **m5b_lr_meta_expanded** | **0.94926** | **0.92871** | **0.94891** | **D2 PRIMARY; gap −3.5bp** |
 
 ## Hypothesis board
 
