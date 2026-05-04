@@ -2,22 +2,13 @@
 
 Running log + ⚠️ rules. Cap ≤50k tokens; archive when bloated.
 
-## ⚠️ Reference branch — check `origin/main` FIRST every session
+## ⚠️ Reference branch
 
-Truth lives on `origin/main`. Feature branches (`claude/*`) often start
-behind. Before planning, executing, or answering "what's next?" — run:
+Truth lives on `origin/main` (now the GitHub default). At session start:
+`git fetch origin && git log --oneline HEAD..origin/main` — if non-empty,
+ff-merge before reading state below.
 
-```
-git fetch origin && git log --oneline HEAD..origin/main
-```
-
-If non-empty, fast-forward (`git merge origin/main --ff-only`) before
-reading `CLAUDE.md`, `audit/`, or `scripts/`. The state below is only
-authoritative once you've synced.
-
-## ⚠️ Top-level rules (inherited from kaggle-comp framework)
-
-These eleven invariants are LOAD-BEARING. Do not skip.
+## ⚠️ Top-level rules (inherited from kaggle-comp framework, LOAD-BEARING)
 
 1. **Ask-first / no-loop on submissions.** Every `kaggle competitions
    submit` is single-shot, explicitly approved. Never wrap in retry
@@ -52,17 +43,22 @@ These eleven invariants are LOAD-BEARING. Do not skip.
     are calibration probes — measured OOF→LB gap per mechanism family
     is the load-bearing data, not just rank. Do NOT intentionally
     underspend. Each submit still single-shot + PI-approved (Rule 1).
+13. **Kaggle GPU is part of the compute budget.** The local sandbox is
+    CPU-only; the Kaggle notebook runtime (P100 or T4×2) is the GPU
+    path. Before declaring a mechanism "not cost-justified" on local
+    CPU, port it to a Kaggle notebook. Mandatory for: any NN
+    (RealMLP / PyTabKit / TabNet / similar), deep CatBoost (depth ≥ 8)
+    5-fold, and any 5-fold whose local-CPU projection > 1h. See
+    `comp-context.md` → `gpu_workflow` for the artifact-roundtrip path.
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
-These were the R1/R2/R7 changes from irrigation-water postmortem-07.
-They override the kickoff-time defaults.
-
 - **R1 — Two-anchor OOF.** Every gated candidate must pass under
-  TWO CV schemes: (a) standard 5-fold StratifiedKFold seed=42, AND
-  (b) GroupKFold on a row-id hash (or repeated stratified with a
-  different seed). Mechanisms that overfit one fold geometry will
-  diverge.
+  TWO CV schemes: (a) 5-fold StratifiedKFold seed=42, AND (b)
+  GroupKFold on a row-id hash. Mechanisms that overfit one fold
+  geometry will diverge.
+  *s6e5: GroupKF dropped Day-3+ (U3 confirms i.i.d. test → Strat
+  is LB proxy, gap +3.8bp). General qualifier lives in skill.*
 - **R2 — Final selection along the public-LB axis.** PRIMARY = best
   public LB. HEDGE = best OOF that *regressed ≤30bp on public*. NOT
   another orthogonal-mechanism hedge. (Last comp: 5 of our subs
@@ -80,11 +76,11 @@ They override the kickoff-time defaults.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 2
+day: 2                            # CLOSED 2026-05-04 (5/5 used)
 lb_best_today: 0.95435            # leader (still); not refreshed since kickoff
-our_lb_best: 0.94891              # M5b expanded stack, Day-2 (+78bp over Day-1)
-submissions_used_today: 3         # baseline (D1) + M5 + M5b
-submissions_used_total: 3
+our_lb_best: 0.94963              # M5d 12-base stack, Day-2 (+85.0bp over Day-1)
+submissions_used_today: 5         # baseline + M5 + M5b + E3 + M5d
+submissions_used_total: 5
 saturation_count: 1               # D2-A null both anchors
 mechanism_families_explored:
   - baseline_lgbm_raw_features
@@ -101,7 +97,7 @@ mechanism_families_explored:
   - lr_meta_stacker_expanded        # M5b -- new PRIMARY, LB 0.94891
 plateau_days: 0
 gate_status: cleared
-headroom_to_top5pct: 0.00454      # 0.95345 − 0.94891 = 45.4bp (was 65bp)
+headroom_to_top5pct: 0.00382      # 0.95345 − 0.94963 = 38.2bp (was 45.4bp)
 ```
 
 ## Calibration ladder
@@ -122,32 +118,33 @@ Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 | e2_l1_meta | 0.94738 | 0.92489 | n/a | null on "L1 fixes gap" |
 | e3_hgbc | 0.94876 | 0.92785 | n/a | BEST single, both anchors lift |
 | e4_realmlp_cpu_f0 | 0.94722 (f0) | n/a | n/a | not pursued (3.3h proj for 5-fold) |
-| **m5b_lr_meta_expanded** | **0.94926** | **0.92871** | **0.94891** | **D2 PRIMARY; gap −3.5bp** |
+| m5b_lr_meta_expanded | 0.94926 | 0.92871 | 0.94891 | gap −3.5bp |
+| e3_hgbc_standalone | 0.94876 | 0.92785 | 0.94870 | gap −0.6bp (single-model gap≈0) |
+| f1_hgbc_deep | 0.94870 | 0.92739 | n/a | β: ~E3 clone |
+| f2_hgbc_shallow | 0.94861 | 0.92711 | n/a | β: ~E3 clone |
+| e5_optuna_lgbm | 0.94736 | 0.92585 | n/a | tuned hp via Optuna |
+| zeta_catboost_deep_f0 | 0.94992 (f0) | n/a | n/a | best single fold; 5-fold not pursued |
+| **m5d_lr_meta_expanded** | **0.95023** | **0.92994** | **0.94963** | **D2 PRIMARY; gap −6.0bp (widened)** |
 
-## Hypothesis board
+## Hypothesis board (Day 3)
 
 ```
-- pending: 4 LB submits today (slots 2-5): M5 / M6 / M3 / M4-hedge
-- D3 next: deepen the meta-stacker -- add CatBoost-shrunk-deeper variant
-           (depth=8 if probe fits in budget) for diversity
-- D3 next: LGBM Optuna sweep (30 trials, 1h cap) -- now justified post-blend
-- D3 next: row-subsample CatBoost (80%) to bound Race-overfit; probe lift
-- D3+ : RealMLP/PyTabKit if GPU becomes available (BLOCKED on CPU)
-- D3+ : Day-3 blend re-optimisation after LB calibration data lands
-- queued: TE-only-replace-raw, TE-Driver-Race-only (D2-A postmortem closure)
-- queued: D2-C concat external (aadigupta1601, low priority since join missed)
+- H1: pseudo-labeling on M5d high-conf test rows (~2h, +10-30bp est)
+- H2: more reformulations (stint-stratified, residual-from-baseline,
+      driver-recent-pit-history) (~3h, +10-25bp est)
+- H3: pairwise correlation gate on pool (drop ρ ≥ 0.97) → M5e refit
+      (~10min, +2-8bp est, addresses gap-widening from M5d)
+- H4: HGBC multi-seed bagging (proper variance reduction, not β
+      architectural variants) (~1h, +3-8bp est)
+- H5: hill-climb / Ridge meta drop-in (~30min, +0-5bp est, low EV)
+- See audit/2026-05-04-day-2-wrap.md for ranked plan + sequence.
 ```
-
-## Friction log pointer
-
-Friction one-liners go in `audit/friction.md`, NOT here. Distill
-weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
 ## Pointers
 
 - `comp-context.md` — settled-once facts.
 - `brief.md` — verbatim host material.
-- `LEARNINGS.md` — portable patterns from this comp.
-- `REPORT.md` — structured work report.
+- `LEARNINGS.md` / `REPORT.md` — portable patterns + structured report.
 - `audit/` — timestamped per-experiment results.
-- `audit/friction.md` — friction one-liners (rotated weekly).
+- `audit/friction.md` — friction one-liners (NOT here; distilled weekly
+  per `~/.claude/skills/kaggle-comp/self-improvement.md`).
