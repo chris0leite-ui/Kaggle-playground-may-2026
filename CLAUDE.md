@@ -92,6 +92,7 @@ mechanism_families_explored:
   - corr_pool_prune                 # M5g (ρ≥0.97) -- TOO aggressive
   - l1coef_pool_prune               # M5h -- only prune that preserves OOF
   - unified_te_2way_keys            # d3a -- +2.2bp Strat std-alone, +0.1bp stacked (null)
+  - sequence_fe_race_driver         # d3b -- +18bp Strat std-alone, +0.2bp stacked (null)
 plateau_days: 0
 gate_status: cleared
 headroom_to_top5pct: 0.00354      # 0.95345 − 0.94991 = 35.4bp
@@ -119,6 +120,8 @@ headroom_to_top5pct: 0.00354      # 0.95345 − 0.94991 = 35.4bp
 | d3a_te_unified | 0.93692 | 0.91284 | n/a | +2.2bp Strat vs d2a; std-alone redundant w/ d2a |
 | m5i (M5h+d3a, 14) | 0.95043 | 0.93096 | n/a | d3a L1=0.079 last; tie M5h Strat |
 | m5j (d3a swaps d2a, 13) | 0.95044 | 0.93092 | n/a | d3a L1=1.065 (3rd); +0.1bp Strat tie |
+| d3b_seqfe | 0.94254 | 0.92136 | n/a | +18bp Strat over baseline; FAIL gate by 35bp |
+| m5k (M5h+d3a+d3b, 15) | 0.95045 | 0.93102 | n/a | d3b L1=0.316 (mid-tier); +0.2bp Strat tie |
 
 ## Hypothesis board (Day 3)
 
@@ -127,11 +130,14 @@ headroom_to_top5pct: 0.00354      # 0.95345 − 0.94991 = 35.4bp
         preserves M5f OOF; submit candidate alongside M5f.
 - DONE: 2-way TE (Driver×Compound + Race×LapBin via d3a unified)
         -- standalone +2.2bp Strat, stacked +0.1bp (null). M5j swap viable.
-- ACTIVE: Step 2 sequence-FE base (laps_since_last_pitstop,
-        cumulative_pitstops_this_race, rolling_target_rate(window=5))
+- DONE: Step 2 sequence-FE (cum_pits, laps_since_last_pit, rolling_TE)
+        -- standalone +18bp Strat over baseline (FAIL ≥0.946 gate),
+        stacked +0.2bp (null). d3b L1=0.316 mid-tier (orthogonal but
+        absorbed by pool). M5h's 0.95043 is the GBDT-pool OOF ceiling.
+- ACTIVE: Step 3 RealMLP on Kaggle GPU (yekenot 56-vote — NN family
+        genuinely orthogonal to 13× GBDTs).
 - H1: pseudo-labeling guarded by multi-base agreement (≥10/13 of M5h)
 - H4: HGBC multi-seed bagging (echo cb_slow-wide-bag pattern)
-- Kaggle-GPU port of RealMLP (per yekenot 56-vote notebook)
 ```
 
 ## Pointers
@@ -142,4 +148,5 @@ headroom_to_top5pct: 0.00354      # 0.95345 − 0.94991 = 35.4bp
 - `audit/2026-05-04-catboost-research.md` — CatBoost lever map.
 - `audit/2026-05-04-m5h-l1coef-prune.md` — Day-3 submit candidate.
 - `audit/2026-05-04-d3a-te-unified.md` — Step 1 result + M5i/M5j.
+- `audit/2026-05-04-d3b-seqfe.md` — Step 2 result + M5k.
 - `audit/friction.md` — friction one-liners.

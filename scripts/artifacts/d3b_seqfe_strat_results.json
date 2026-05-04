@@ -1,0 +1,20 @@
+{
+  "oof_score": 0.9425358371632466,
+  "fold_std": 0.0007702777377127631,
+  "fold_scores": [
+    0.9433154417516912,
+    0.9417123414661979,
+    0.9425100646818383,
+    0.9416900335079896,
+    0.9435184686566866
+  ],
+  "cv": "StratifiedKFold(5)",
+  "metric": "roc_auc",
+  "delta_vs_baseline_bp": 17.858371632466508,
+  "roll_window": 5,
+  "features_added": [
+    "cum_pits_this_race",
+    "laps_since_last_pit",
+    "rolling_target_rate"
+  ]
+}

@@ -144,6 +144,19 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   REQUIRE direct execution + log read + summary in one tool call,
   not delegate to Monitor and exit early.
 
+- `tag: rule-R1-miss-groupkf-day3` — Day-3 mid-session, ran GroupKF
+  anchor on d3a, d3b, M5i, M5j, M5k despite Rule R1 ("GroupKF dropped
+  Day-3+ — U3 confirmed i.i.d. test, Strat is LB proxy, gap +3.8bp").
+  Cause: copied two-anchor pattern from baseline_two_anchor.py and
+  d2a_target_encoding.py without re-checking R1. Burned ~50% of
+  per-run compute on artifacts that informed no decision (Strat alone
+  drives both LB-proxy and stack inclusion). Fix: agent rule —
+  before writing any new probe / base / stack script, grep CLAUDE.md
+  for rules tagged R1..R8 and apply current verdicts; never copy
+  two-anchor scaffolding from pre-R1-update scripts. Codify by
+  amending common.py with a `STRAT_ONLY = True` flag (s6e5-specific)
+  and removing GroupKF blocks from new scripts.
+
 - `tag: bootstrap-env-var-mismatch` — `bootstrap.sh` gates on
   `KAGGLE_API_TOKEN` and prompts interactively when unset; the sandbox
   provides the same secret under `KAGGLE_KEY` (alongside
