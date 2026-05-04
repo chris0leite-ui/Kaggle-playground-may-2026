@@ -30,8 +30,10 @@ ff-merge before reading state below.
    mechanisms with citations BEFORE declaring ceiling.
 8. **Settled-once facts** live in `comp-context.md`. Never re-ask.
 9. **File-size cap ≤150 lines** for any committed doc.
-10. **Pull-style updates.** No proactive minute-level chatter.
+10. **Pull-style updates.** No proactive minute-level chatter; on PI
+    pull, 1-2 sentences with the latest fact.
 11. **Model routing.** Haiku read-only; Sonnet default; Opus hard.
+    10/day budget.
 12. **Spend the full 5/day submission budget.** Submissions are
     calibration probes — measured OOF→LB gap per mechanism family is
     load-bearing data. Each submit single-shot + PI-approved (Rule 1).
@@ -42,6 +44,10 @@ ff-merge before reading state below.
     OOF→LB gap drift ≥2bp on consecutive submits, before adding a new
     mechanism family, at 50% comp checkpoint, or at any plateau (before
     Research-loop). Output: `audit/YYYY-MM-DD-strategy-critique.md`.
+15. **Handover protocol.** PI says **"handover"** → read `HANDOVER.md`
+    and proceed per its instructions (skip the usual read-order;
+    HANDOVER.md is the latest synthesis). PI says **"prepare handover"**
+    → update `HANDOVER.md` with the next-session brief.
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
@@ -61,7 +67,7 @@ ff-merge before reading state below.
 ```yaml
 day: 3                            # 2026-05-05 budget opens at UTC 00:00
 lb_best_today: 0.95435            # leader (still); not refreshed
-our_lb_best: 0.94963              # M5d 12-base stack, Day-2 (held)
+our_lb_best: 0.94963              # M5d 12-base stack, Day-2
 submissions_used_today: 0         # Day-2 closed 5/5; Day-3 fresh
 submissions_used_total: 5
 saturation_count: 1
@@ -101,7 +107,7 @@ headroom_to_top5pct: 0.00382      # 0.95345 − 0.94963 = 38.2bp
 | e5_optuna_lgbm | 0.94736 | 0.92585 | n/a | LGBM Optuna 30 trials |
 | f1_hgbc_deep / f2_hgbc_shallow | 0.94870 / 0.94861 | 0.92739 / 0.92711 | n/a | β E3 clones (~99% corr) |
 | **cb_year-cat** | **0.94679** | **0.91992** | n/a | Year ∈ CAT_COLS; +60bp/+34bp vs M3 |
-| **cb_lossguide** | **0.94697** | **0.92377** | n/a | grow_policy=Lossguide; BEST CB GroupKF (+31.8bp) |
+| **cb_lossguide** | **0.94697** | **0.92377** | n/a | Lossguide; BEST CB GroupKF (+31.8bp) |
 | **cb_slow-wide-bag** | **0.94790** | **0.92322** | n/a | GPU 3-seed bag; BEST CB Strat (+71.5bp) |
 | m5b_lr_meta_expanded | 0.94926 | 0.92871 | 0.94891 | gap −3.5bp (anchor) |
 | m5d_lr_meta_expanded | 0.95023 | 0.92994 | 0.94963 | D2 PRIMARY; gap −6.0bp (widened) |
@@ -125,8 +131,9 @@ headroom_to_top5pct: 0.00382      # 0.95345 − 0.94963 = 38.2bp
 
 ## Pointers
 
+- `HANDOVER.md` — next-session brief (Rule 15).
 - `comp-context.md` — settled-once facts.
-- `audit/2026-05-04-strategy-critique.md` — Day-2 critique + Rule 14 origin.
+- `audit/2026-05-04-strategy-critique.md` — Rule 14 origin.
 - `audit/2026-05-04-catboost-research.md` — CatBoost lever map.
 - `audit/2026-05-04-m5h-l1coef-prune.md` — Day-3 submit candidate.
 - `audit/friction.md` — friction one-liners.
