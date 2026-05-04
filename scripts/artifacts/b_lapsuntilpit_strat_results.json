@@ -1,0 +1,14 @@
+{
+  "oof_score": 0.8983979163580443,
+  "fold_scores": [
+    0.8991259622205132,
+    0.8962485432928504,
+    0.9003814274508729,
+    0.8964676036684743,
+    0.8997663359517895
+  ],
+  "cv": "StratKF",
+  "delta_vs_baseline_bp": -423.5208364195564,
+  "target_used": "log(LapsUntilPit+1) regression",
+  "proba_proxy": "1/(1+exp(log_laps_pred)-1)"
+}
