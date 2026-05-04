@@ -103,7 +103,7 @@ def score(y, pred, metric: str, n_class: int | None = None) -> float:
         return float(log_loss(y, pred))
     if metric == "rmse":
         return float(np.sqrt(mean_squared_error(y, pred)))
-    if metric == "auc":
+    if metric in ("auc", "roc_auc"):
         return float(roc_auc_score(y, pred))
     raise ValueError(f"unknown metric {metric}")
 

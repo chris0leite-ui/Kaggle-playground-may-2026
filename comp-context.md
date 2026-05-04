@@ -10,7 +10,7 @@ on session start.
 slug: playground-series-s6e5
 url: https://www.kaggle.com/competitions/playground-series-s6e5
 title: Predicting F1 Pit Stops
-task: binary
+task: classification
 metric: roc_auc                 # to confirm — scores ~0.95 consistent with AUC
 train_rows: 439140
 test_rows: 188165

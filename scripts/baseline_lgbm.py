@@ -14,6 +14,7 @@ from pathlib import Path
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
+from sklearn.metrics import roc_auc_score
 
 from common import N_FOLDS, SEED, fast_bal_acc, folds, save_oof, tune_log_bias
 
@@ -97,7 +98,10 @@ def main():
             if objective == "binary":
                 tp = np.column_stack([1 - tp, tp])
             test_proba += tp / N_FOLDS
-            fold_scores.append(fast_bal_acc(y[va], p.argmax(1), n_class))
+            if metric == "roc_auc" and objective == "binary":
+                fold_scores.append(float(roc_auc_score(y[va], p[:, 1])))
+            else:
+                fold_scores.append(fast_bal_acc(y[va], p.argmax(1), n_class))
         else:
             p = model.predict(feat.iloc[va])
             oof[va, 0] = p
@@ -107,11 +111,14 @@ def main():
     fold_std = float(np.std(fold_scores))
     print(f"per-fold scores: {fold_scores}")
 
-    # Tune log-bias for classification + bal_acc
+    # Tune log-bias for bal_acc; roc_auc is threshold-independent — skip bias
     if task == "classification" and metric == "bal_acc":
         bias = tune_log_bias(y, oof, metric="bal_acc")
         log_p = np.log(np.clip(oof, 1e-12, None))
         oof_score = fast_bal_acc(y, (log_p + bias).argmax(1), n_class)
+    elif metric == "roc_auc" and objective == "binary":
+        bias = None
+        oof_score = float(roc_auc_score(y, oof[:, 1]))
     else:
         bias = None
         oof_score = float(np.mean(fold_scores))
@@ -119,7 +126,10 @@ def main():
     print(f"OOF {metric}: {oof_score:.5f}  fold_std={fold_std:.5f}  bias={bias}")
 
     # Build submission
-    if task == "classification":
+    if metric == "roc_auc" and objective == "binary":
+        # Submit positive-class probability for AUC scoring
+        sub[target_col] = test_proba[:, 1]
+    elif task == "classification":
         log_p = np.log(np.clip(test_proba, 1e-12, None))
         if bias is not None:
             pred_idx = (log_p + bias).argmax(1)
