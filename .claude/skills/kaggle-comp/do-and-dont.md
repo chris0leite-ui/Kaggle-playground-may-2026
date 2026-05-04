@@ -15,6 +15,12 @@
 - ✅ Re-rank queue by *expected learning per slot* at every replan,
   not by speculative lift. Best slot reduces uncertainty about
   OOF→LB gap per family or about a pool member's behaviour.
+- ✅ **Auto-recognize day-end from context.** When `submissions_used_today`
+  hits 5, OR the PI says any of {"the day is done", "let's wrap up",
+  "stop for today", "EOD", "we're done", or any close paraphrase},
+  IMMEDIATELY execute the EOD wrap (loops.md Day-loop steps 5-7) in
+  one batch without prompting. Don't ask "should I write the wrap?"
+  — write it. Don't run slash commands; the PI doesn't use them.
 - ✅ Run the Research-loop at every plateau (3+ nulls or 5+
   saturations).
 - ✅ Persona-rotate when stuck. Subagent invocation = fresh context.
@@ -35,6 +41,12 @@
   budget remains.
 - ❌ Don't write end-of-day audit until 5/5 slots are used or PI
   declares EOD. "Experiments done" is NOT a day-end trigger.
+- ❌ Don't ASK whether to write the EOD wrap once a day-end cue
+  fires. The wrap is non-LB-touching; Rule 1 doesn't gate it. Just
+  write it, commit, push, then announce in 1 sentence.
+- ❌ Don't propose slash commands or hooks as the automation
+  mechanism. The PI explicitly does not run them. Recognize cues
+  from natural-language conversation context and act on them.
 - ❌ Don't pipe long-running scripts through `tail -N`; the pipe
   buffers all output until process exit. Use `> file 2>&1` and
   tail the file separately.
