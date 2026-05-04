@@ -1,0 +1,12 @@
+{
+  "oof_score": 0.9343549967551803,
+  "partial_folds": 1,
+  "fold_scores": [
+    0.9343549967551802
+  ],
+  "fold_walls": [
+    163.9480345249176
+  ],
+  "cv": "StratifiedKFold(5)",
+  "metric": "roc_auc"
+}
