@@ -81,10 +81,10 @@ They override the kickoff-time defaults.
 
 ```yaml
 day: 2
-lb_best_today: 0.95435            # leader at kickoff (2026-05-04); refresh post-submit
-our_lb_best: 0.94113              # baseline; awaiting M5/M6/M3/M4 submits
-submissions_used_today: 1         # baseline only; 4 slots queued for B2 candidates
-submissions_used_total: 1
+lb_best_today: 0.95435            # leader (still); not refreshed since kickoff
+our_lb_best: 0.94693              # M5 LR meta-stacker, Day-2 (+58.0bp over Day-1)
+submissions_used_today: 2         # baseline (D1) + M5 (D2)
+submissions_used_total: 2
 saturation_count: 1               # D2-A null both anchors (2026-05-04)
 mechanism_families_explored:
   - baseline_lgbm_raw_features
@@ -96,7 +96,7 @@ mechanism_families_explored:
   - dirichlet_random_search
 plateau_days: 0
 gate_status: cleared
-headroom_to_top5pct: 0.01232      # before today's submits
+headroom_to_top5pct: 0.00652      # 0.95345 − 0.94693 = 65.2bp (was 123bp)
 ```
 
 ## Calibration ladder
@@ -111,8 +111,8 @@ Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 | m2_xgb | 0.94507 | 0.91084 | pending | Strat PASS; Race-overfit |
 | m3_catboost | 0.94612 | 0.91645 | pending | Strat PASS strongest single; Race-overfit |
 | m4_relstate | 0.94244 | 0.92195 | pending | only B1 lifting BOTH anchors |
-| **m5_lr_meta** | **0.94737** | **0.92483** | pending | best two-anchor; PRIMARY candidate |
-| m6_dirichlet | 0.94696 | 0.92459 | pending | second-best blend |
+| **m5_lr_meta** | **0.94737** | **0.92483** | **0.94693** | PRIMARY; OOF→LB gap −4.4bp (stack overshoot) |
+| m6_dirichlet | 0.94696 | 0.92459 | not submitted | held; PI directive single-shot M5 only |
 
 ## Hypothesis board
 
