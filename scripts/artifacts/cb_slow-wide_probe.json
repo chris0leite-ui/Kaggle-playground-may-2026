@@ -1,0 +1,8 @@
+{
+  "mode": "probe",
+  "variant": "slow-wide",
+  "auc_fold0": 0.9485852736132748,
+  "best_iter_fold0": 2498,
+  "wall_fold0": 359.25020003318787,
+  "two_anchor_proj_s": 3592.5020003318787
+}

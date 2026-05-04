@@ -1,0 +1,7 @@
+{
+  "mode": "smoke",
+  "variant": "m3-baseline",
+  "auc": 0.9404205072717468,
+  "best_iter": 789,
+  "wall": 18.34347653388977
+}

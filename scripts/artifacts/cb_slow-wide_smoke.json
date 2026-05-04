@@ -1,0 +1,7 @@
+{
+  "mode": "smoke",
+  "variant": "slow-wide",
+  "auc": 0.9404560963757967,
+  "best_iter": 2158,
+  "wall": 58.02790975570679
+}

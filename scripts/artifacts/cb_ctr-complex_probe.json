@@ -1,0 +1,8 @@
+{
+  "mode": "probe",
+  "variant": "ctr-complex",
+  "auc_fold0": 0.9473109117823164,
+  "best_iter_fold0": 799,
+  "wall_fold0": 98.80178022384644,
+  "two_anchor_proj_s": 988.0178022384644
+}

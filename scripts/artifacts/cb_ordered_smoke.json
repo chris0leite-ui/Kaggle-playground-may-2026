@@ -1,0 +1,7 @@
+{
+  "mode": "smoke",
+  "variant": "ordered",
+  "auc": 0.9390845325478077,
+  "best_iter": 499,
+  "wall": 19.089665412902832
+}

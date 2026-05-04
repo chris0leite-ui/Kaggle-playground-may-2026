@@ -1,0 +1,8 @@
+{
+  "mode": "probe",
+  "variant": "mvs",
+  "auc_fold0": 0.947917068100673,
+  "best_iter_fold0": 799,
+  "wall_fold0": 115.5665636062622,
+  "two_anchor_proj_s": 1155.665636062622
+}

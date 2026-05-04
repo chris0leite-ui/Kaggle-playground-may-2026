@@ -1,0 +1,7 @@
+{
+  "mode": "smoke",
+  "variant": "year-cat",
+  "auc": 0.9396513173250274,
+  "best_iter": 627,
+  "wall": 16.735286951065063
+}

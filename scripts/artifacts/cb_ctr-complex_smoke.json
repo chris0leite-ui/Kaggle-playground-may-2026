@@ -1,0 +1,7 @@
+{
+  "mode": "smoke",
+  "variant": "ctr-complex",
+  "auc": 0.939568003609716,
+  "best_iter": 595,
+  "wall": 14.572438955307007
+}

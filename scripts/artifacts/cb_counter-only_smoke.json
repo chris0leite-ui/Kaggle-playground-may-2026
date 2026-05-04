@@ -1,0 +1,7 @@
+{
+  "mode": "smoke",
+  "variant": "counter-only",
+  "auc": 0.940380202297019,
+  "best_iter": 656,
+  "wall": 14.82751178741455
+}

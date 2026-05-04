@@ -1,0 +1,7 @@
+{
+  "mode": "smoke",
+  "variant": "lossguide",
+  "auc": 0.9384707148203594,
+  "best_iter": 327,
+  "wall": 14.171925067901611
+}

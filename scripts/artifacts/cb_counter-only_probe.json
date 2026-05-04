@@ -1,0 +1,8 @@
+{
+  "mode": "probe",
+  "variant": "counter-only",
+  "auc_fold0": 0.9474106812519634,
+  "best_iter_fold0": 795,
+  "wall_fold0": 98.3472158908844,
+  "two_anchor_proj_s": 983.472158908844
+}
