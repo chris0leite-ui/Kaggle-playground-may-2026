@@ -2,22 +2,13 @@
 
 Running log + ⚠️ rules. Cap ≤50k tokens; archive when bloated.
 
-## ⚠️ Reference branch — check `origin/main` FIRST every session
+## ⚠️ Reference branch
 
-Truth lives on `origin/main`. Feature branches (`claude/*`) often start
-behind. Before planning, executing, or answering "what's next?" — run:
+Truth lives on `origin/main` (now the GitHub default). At session start:
+`git fetch origin && git log --oneline HEAD..origin/main` — if non-empty,
+ff-merge before reading state below.
 
-```
-git fetch origin && git log --oneline HEAD..origin/main
-```
-
-If non-empty, fast-forward (`git merge origin/main --ff-only`) before
-reading `CLAUDE.md`, `audit/`, or `scripts/`. The state below is only
-authoritative once you've synced.
-
-## ⚠️ Top-level rules (inherited from kaggle-comp framework)
-
-These eleven invariants are LOAD-BEARING. Do not skip.
+## ⚠️ Top-level rules (inherited from kaggle-comp framework, LOAD-BEARING)
 
 1. **Ask-first / no-loop on submissions.** Every `kaggle competitions
    submit` is single-shot, explicitly approved. Never wrap in retry
@@ -62,21 +53,12 @@ These eleven invariants are LOAD-BEARING. Do not skip.
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
-These were the R1/R2/R7 changes from irrigation-water postmortem-07.
-They override the kickoff-time defaults.
-
 - **R1 — Two-anchor OOF.** Every gated candidate must pass under
-  TWO CV schemes: (a) standard 5-fold StratifiedKFold seed=42, AND
-  (b) GroupKFold on a row-id hash (or repeated stratified with a
-  different seed). Mechanisms that overfit one fold geometry will
-  diverge.
-  *Qualifier (added 2026-05-04 per s6e5 friction):* if a U3-equivalent
-  split-structure probe confirms test is an i.i.d. row split (not
-  held-out by group), GroupKF is diagnostic-only, NOT predictive of
-  LB. In that case, single-anchor Strat is sufficient for routine
-  bases; reserve GroupKF for the final PRIMARY/HEDGE sanity check
-  only. **s6e5 status: GroupKF dropped Day-3+ (test confirmed i.i.d.
-  by U3, baseline gap +3.8bp confirms Strat = LB proxy).**
+  TWO CV schemes: (a) 5-fold StratifiedKFold seed=42, AND (b)
+  GroupKFold on a row-id hash. Mechanisms that overfit one fold
+  geometry will diverge.
+  *s6e5: GroupKF dropped Day-3+ (U3 confirms i.i.d. test → Strat
+  is LB proxy, gap +3.8bp). General qualifier lives in skill.*
 - **R2 — Final selection along the public-LB axis.** PRIMARY = best
   public LB. HEDGE = best OOF that *regressed ≤30bp on public*. NOT
   another orthogonal-mechanism hedge. (Last comp: 5 of our subs
@@ -141,8 +123,6 @@ Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 | f1_hgbc_deep | 0.94870 | 0.92739 | n/a | β: ~E3 clone |
 | f2_hgbc_shallow | 0.94861 | 0.92711 | n/a | β: ~E3 clone |
 | e5_optuna_lgbm | 0.94736 | 0.92585 | n/a | tuned hp via Optuna |
-| a_horizon_shift | 0.90640 | 0.87474 | n/a | reformulation; stack diversifier |
-| b_lapsuntilpit | 0.89840 | 0.86948 | n/a | reformulation; stack diversifier |
 | zeta_catboost_deep_f0 | 0.94992 (f0) | n/a | n/a | best single fold; 5-fold not pursued |
 | **m5d_lr_meta_expanded** | **0.95023** | **0.92994** | **0.94963** | **D2 PRIMARY; gap −6.0bp (widened)** |
 
@@ -157,20 +137,14 @@ Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 - H4: HGBC multi-seed bagging (proper variance reduction, not β
       architectural variants) (~1h, +3-8bp est)
 - H5: hill-climb / Ridge meta drop-in (~30min, +0-5bp est, low EV)
-- D3+: GPU-only (RealMLP/PyTabKit) — blocked on hardware
 - See audit/2026-05-04-day-2-wrap.md for ranked plan + sequence.
 ```
-
-## Friction log pointer
-
-Friction one-liners go in `audit/friction.md`, NOT here. Distill
-weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
 ## Pointers
 
 - `comp-context.md` — settled-once facts.
 - `brief.md` — verbatim host material.
-- `LEARNINGS.md` — portable patterns from this comp.
-- `REPORT.md` — structured work report.
+- `LEARNINGS.md` / `REPORT.md` — portable patterns + structured report.
 - `audit/` — timestamped per-experiment results.
-- `audit/friction.md` — friction one-liners (rotated weekly).
+- `audit/friction.md` — friction one-liners (NOT here; distilled weekly
+  per `~/.claude/skills/kaggle-comp/self-improvement.md`).
