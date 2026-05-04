@@ -45,6 +45,13 @@ Run `batch-B-context` from kickoff-bash.md. Pulls from
 
 PI replies any format. Apply edits, write final `comp-context.md`.
 
+### Q3.5 — chat (problem statement, 1-turn)
+
+PI fills the worksheet from [problem-solving.md](problem-solving.md):
+L1/L2/L3 questions, criteria, constraints, boundary. Write the
+answer to `audit/<date>-problem-statement.md`. Step 1 of the
+7-step framework. Re-read at every plateau.
+
 ### Q4 — chat (4 strategic questions in one batch)
 
 > "Strategic questions — answer in any format, one paragraph fine:
@@ -74,6 +81,21 @@ non-id column.
 > is understood — guardrail #6.)"
 
 Capture any FE notes in `audit/<date>-day-1-kickoff.md`.
+
+### Pre-baseline understanding gate (mandatory)
+
+Full spec: [pre-baseline-gate.md](pre-baseline-gate.md). 7 items;
+PI signs off before Bash batch D. Spawn 3 `general-purpose`
+research agents in parallel (web / domain / metric); local Bash
+for schema / target-rate / group-keys.
+
+### Q5b — chat (gate sign-off)
+
+> "Gate done: brief / prior_art / domain_notes / metric_notes /
+> schema / target-rate / group-keys. Cleared? [yes / fix what]"
+
+Wait for explicit "cleared". Friction-log thin output
+(`audit/friction.md`, `tag: research-thin`).
 
 ### Bash batch D — baseline LGBM
 

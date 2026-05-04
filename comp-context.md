@@ -25,14 +25,19 @@ external_data_allowed: yes      # Playground default — confirm
 ## Schema (auto-filled by kickoff EDA)
 
 ```yaml
-target_col: PitNextLap
+target_col: PitNextLap                  # float64 {0.0, 1.0}
 id_col: id
 feature_count:
   numeric: 11
   categorical: 3
+categorical_cols: [Driver, Compound, Race]
+categorical_levels:
+  Driver: 887   # 801 also in test (full overlap)
+  Compound: 5   # MEDIUM HARD SOFT INTERMEDIATE WET
+  Race: 26      # 26 grand prix names; ALL overlap train↔test
 class_priors: "pos=0.199, neg=0.801"
 missingness_train: 0.0
-missingness_test: TBD           # run after test EDA if needed
+missingness_test: 0.0
 ```
 
 ## LB context (auto-filled from leaderboard download)
@@ -68,6 +73,26 @@ current-state, NOT here.
 # - our_lb_best
 # - submissions_used_today
 # - saturation_count
+```
+
+## Pre-baseline gate (2026-05-04)
+
+```yaml
+gate_artifacts:
+  brief: brief.md                                    # 149 lines, host verbatim
+  schema_target_groups: audit/2026-05-04-pre-baseline-gate.md
+  prior_art: audit/2026-05-04-pre-baseline-gate.md   # appended block
+  domain_notes: audit/2026-05-04-pre-baseline-gate.md
+  metric_notes: audit/2026-05-04-pre-baseline-gate.md
+gate_status: cleared                                 # PI signed off 2026-05-04
+group_key_for_R1_anchor_b: Race                      # 26 levels; 5-fold ≈ 5 races/fold
+forbidden_columns:
+  - Normalized_TyreLife    # host-removed from original; do NOT reintroduce
+structural_findings:
+  pitstop_pitnextlap_match_rate: 0.724    # ≈ chance (independent baseline 0.719 at priors 0.136 / 0.199)
+  lead_pitstop_single_feature_auc: 0.512  # U2 probe — basically random; lead_PitStop is NOT a leak signal
+  train_test_split_structure: iid_row_level   # U3 probe — alt-ratio 0.447, 0/13185 contiguous groups
+  test_lead_pitstop_computable_pct: 0.974     # 97.4% of test rows have a same-(Race, Driver) successor in test
 ```
 
 ## Anti-patterns
