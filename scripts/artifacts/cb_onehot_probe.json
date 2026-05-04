@@ -1,0 +1,8 @@
+{
+  "mode": "probe",
+  "variant": "onehot",
+  "auc_fold0": 0.9474857200214046,
+  "best_iter_fold0": 799,
+  "wall_fold0": 95.07542777061462,
+  "two_anchor_proj_s": 950.7542777061462
+}
