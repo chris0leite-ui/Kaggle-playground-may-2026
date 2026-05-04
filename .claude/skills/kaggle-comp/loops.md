@@ -6,23 +6,51 @@ human triggers Calibration / Research / Weekly when conditions hit.
 ## Day-loop
 
 **Trigger**: every session start.
-**Stop**: PI says stop, or daily LB budget exhausted.
+
+**Day boundary** (load-bearing):
+- **A "day" = a Kaggle UTC submission-quota day** (5 submits/day,
+  resets at UTC midnight). NOT a work-session boundary.
+- **Day ends when EITHER** (a) `submissions_used_today == 5`, OR
+  (b) PI explicitly declares EOD. Default = drive toward (a).
+  Compute may continue past EOD; LB submits cannot.
+- **A day is NOT done because experiments are conducted, even if
+  the queue is empty.** If slots remain and PI hasn't called EOD,
+  pick a new hypothesis and keep going.
+
+**Stop**: 5/5 submissions used, OR PI declares EOD.
 
 ```
 1. Load state (Haiku): comp-context.md, last 3 audit/, lb_status.py
-2. Pick experiment (Sonnet): from queue or new hypothesis
-                             (heuristic-first if novel)
-3. Execute Experiment-loop (see below)
-4. End-of-day audit: write audit/YYYY-MM-DD-<topic>.md, update
-                     calibration ladder, 3-bullet PI summary
-5. Append any friction one-liners to audit/friction.md
+2. Pick experiment (Sonnet): from queue or new hypothesis.
+   *RE-RANK THE QUEUE BY EXPECTED LEARNING-PER-SLOT* at every
+   replan, not by speculative lift. Best slot is the one that
+   most reduces uncertainty about (a) OOF→LB calibration per
+   mechanism family, (b) a pool member's behaviour, or (c) a
+   structural-overfit signature. Heuristic-first if novel.
+3. Execute Experiment-loop (see below). If gate-passing candidate
+   ready and slot remains, propose to PI for single-shot submit.
+4. After each LB result lands: update calibration ladder; if
+   slots still remain and PI hasn't called EOD, return to step 2.
+5. End-of-day audit: write audit/YYYY-MM-DD-<topic>.md, update
+                     calibration ladder, 3-bullet PI summary.
+   Trigger ONLY when day-end condition fires (5/5 used or
+   PI EOD). Don't prematurely close the day.
+6. Append any friction one-liners to audit/friction.md
    (NOT CLAUDE.md — see self-improvement.md)
-6. Queue next session's first 3 experiments
+7. Queue next session's first 3 experiments
 ```
 
 ## Experiment-loop
 
 **Trigger**: an experiment is selected.
+
+**1-hour cap (revised 2026-05-04):** the cap applies to a
+**SINGLE FOLD's actual wall time on full data**, not to the
+extrapolated 5-fold-both-anchor projection. If one fold completes
+within 1h on the production hardware, run it, see the result,
+then decide whether to pursue the full 5-fold or shrink. This
+unblocks heavyweight mechanisms (NN architectures, deep CatBoost
+on CPU) for at least an exploratory single-fold probe.
 
 ```
 1. Heuristic baseline (skip if N/A):

@@ -10,7 +10,11 @@
 - ✅ 4-gate leakage filter before every LB probe.
 - ✅ Minimal-input meta sanity check on every stacking candidate.
 - ✅ Ask PI before every submit. Single-shot.
-- ✅ Use the daily 10/day submission budget. Don't sit on slots.
+- ✅ Use the full daily 5/day submission budget. Slots not used by
+  Kaggle UTC midnight are forfeit. Don't sit on slots.
+- ✅ Re-rank queue by *expected learning per slot* at every replan,
+  not by speculative lift. Best slot reduces uncertainty about
+  OOF→LB gap per family or about a pool member's behaviour.
 - ✅ Run the Research-loop at every plateau (3+ nulls or 5+
   saturations).
 - ✅ Persona-rotate when stuck. Subagent invocation = fresh context.
@@ -29,6 +33,28 @@
   `while` / `for` loop. Ever.
 - ❌ Don't recommend "lock final selection and stop" while LB
   budget remains.
+- ❌ Don't write end-of-day audit until 5/5 slots are used or PI
+  declares EOD. "Experiments done" is NOT a day-end trigger.
+- ❌ Don't pipe long-running scripts through `tail -N`; the pipe
+  buffers all output until process exit. Use `> file 2>&1` and
+  tail the file separately.
+- ❌ Don't use `df.groupby(K).transform(lambda s: s.rolling(...))`
+  on >1k groups. It calls the lambda per group. Use
+  `df.groupby(K).rolling(W).mean().reset_index(level=K, drop=True)
+  .reindex(df.index)` instead.
+- ❌ Don't scope FE features without first checking
+  `train.columns` and the data dictionary. 4 of 6 cross-comp-cited
+  features for s6e5's RelState pack already existed in the dataset;
+  re-deriving them was no-op.
+- ❌ Don't spawn subagents that launch python via Monitor + early
+  exit. The agent's completion event fires before its child
+  process finishes; artifacts are half-written. Subagent contract:
+  `python script.py > log 2>&1`; wait for exit; read log; summarise.
+- ❌ Don't extrapolate 5-fold wall time from a downsampled probe
+  for tree models with high-cardinality native categoricals. M2
+  XGB probe predicted 481s; actual >1200s (~5× drift). Either
+  multiply by 2-3× safety factor, or apply the new
+  "1-fold-actual within 1h" gate per `loops.md`.
 - ❌ Don't declare a "structural ceiling" without first running the
   Research-loop.
 - ❌ Don't re-recommend a CSV that's already in the LB submissions

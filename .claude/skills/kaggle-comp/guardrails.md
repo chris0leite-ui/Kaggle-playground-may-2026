@@ -11,13 +11,20 @@ wrap in retry / `until` / `while` / `for`.
 **Prevents**: a case-mismatched success-marker loop burning multiple
 slots on the same CSV.
 
-## 2. Smoke + 1-fold time-probe + 1h GPU cap
+## 2. Smoke + 1-fold time-probe + 1h SINGLE-FOLD cap
 
 **Trigger**: any new pipeline, GPU kernel, or Optuna sweep.
 **Rule**: smoke at 1 fold / 50k rows first. Then 1-fold full-data
-time-probe. If projected wall time ≥ 1h, shrink config.
+time-probe. **The 1h cap applies to a single full-data fold's
+actual wall time, not to the extrapolated 5-fold projection.**
+If one fold completes within 1h on production hardware, run it,
+inspect the result, then decide whether to pursue the full 5-fold
+or shrink. Probe-extrapolation under-predicts by 2-5× on tree
+models with high-cardinality native categoricals.
 **Prevents**: a kernel that ate 3h34min of CPU preprocessing before
-training started.
+training started; *also unblocks* heavyweight mechanisms (NN
+architectures, deep CatBoost on CPU) for at least an exploratory
+single-fold probe.
 
 ## 3. 4-gate leakage filter pre-LB-probe
 
@@ -102,10 +109,28 @@ hour with no signal.
 - **Opus**: hard reasoning — leakage diagnosis, novel mechanism
   brainstorm, plan design, persona rotations on stuck loops.
 
-Pair with submission-budget discipline: use the daily 10/day, don't
+Pair with submission-budget discipline: use the daily 5/day, don't
 sit on slots.
 **Prevents**: top-tier model for routine `ls` calls. Disproportionate
 cost vs lift.
+
+## 12. Day-end discipline / spend-the-budget
+
+**Trigger**: end of work session OR end of experiment queue OR
+PI pause.
+**Rule**: a "day" is a Kaggle UTC submission-quota day, not a
+work-session boundary. The day ends when EITHER (a) all 5 slots
+are used, OR (b) the PI explicitly declares EOD. **A day is not
+done because the queue is empty** — pick a new hypothesis. Default
+behaviour: drive toward (a). Re-rank queue by *expected learning
+per slot* at every replan (calibration-data-yield, not speculative
+lift). Compute may continue past EOD; LB submits cannot until UTC
+midnight refresh.
+**Prevents**: forfeiting Kaggle slots to UTC quota by closing the
+day too early on "experiments done"; under-spending the budget
+that exists specifically to gather mechanism-vs-LB calibration
+data; locking onto a single submitted candidate when 4 slots could
+have probed pool/stack/recipe variants.
 
 ## How to check yourself
 
