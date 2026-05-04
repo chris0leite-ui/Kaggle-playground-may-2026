@@ -80,42 +80,52 @@ They override the kickoff-time defaults.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 1
-lb_best_today: 0.95435            # leader at kickoff (2026-05-04)
-our_lb_best: 0.94113              # baseline_two_anchor (StratKFold), Day-1
-submissions_used_today: 1
+day: 2
+lb_best_today: 0.95435            # leader at kickoff (2026-05-04); refresh post-submit
+our_lb_best: 0.94113              # baseline; awaiting M5/M6/M3/M4 submits
+submissions_used_today: 1         # baseline only; 4 slots queued for B2 candidates
 submissions_used_total: 1
 saturation_count: 1               # D2-A null both anchors (2026-05-04)
-mechanism_families_explored: [baseline_lgbm_raw_features, oof_target_encoding]
+mechanism_families_explored:
+  - baseline_lgbm_raw_features
+  - oof_target_encoding
+  - xgb_native_categorical
+  - catboost_native_categorical
+  - relative_state_fe
+  - lr_meta_stacker_3view
+  - dirichlet_random_search
 plateau_days: 0
-gate_status: cleared              # pre-baseline gate cleared 2026-05-04; see audit/2026-05-04-pre-baseline-gate.md
-headroom_to_top5pct: 0.01232      # 0.95345 − 0.94113 = 123bp
+gate_status: cleared
+headroom_to_top5pct: 0.01232      # before today's submits
 ```
 
 ## Calibration ladder
 
 Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 
-| Mechanism | OOF | LB | Gap | Notes |
+| Mechanism | Strat OOF | GroupKF OOF | LB | Notes |
 |---|---:|---:|---:|---|
-| baseline_two_anchor (StratKFold) | 0.94075 | 0.94113 | +3.8bp | calibration ✓ ; anchor A confirmed right proxy |
-| baseline_two_anchor (GroupKFold Race) | 0.92059 | n/a | n/a | race-robustness; not LB proxy |
-| d2a_te (StratKFold) | 0.93670 | n/a | n/a | NULL G1; −40.5bp; not submitted |
-| d2a_te (GroupKFold Race) | 0.91628 | n/a | n/a | NULL G1; −43.1bp; not submitted |
+| baseline_two_anchor | 0.94075 | 0.92059 | 0.94113 | LB-proxy ✓ Strat+3.8bp gap |
+| d2a_te | 0.93670 | 0.91628 | n/a | NULL G1 standalone; +2-4bp in blend (M1) |
+| m1_blend (50/50 base+te) | 0.94097 | 0.92098 | n/a | best-w 80/20; closes d2a postmortem #3 |
+| m2_xgb | 0.94507 | 0.91084 | pending | Strat PASS; Race-overfit |
+| m3_catboost | 0.94612 | 0.91645 | pending | Strat PASS strongest single; Race-overfit |
+| m4_relstate | 0.94244 | 0.92195 | pending | only B1 lifting BOTH anchors |
+| **m5_lr_meta** | **0.94737** | **0.92483** | pending | best two-anchor; PRIMARY candidate |
+| m6_dirichlet | 0.94696 | 0.92459 | pending | second-best blend |
 
 ## Hypothesis board
 
 ```
-- next: blend-G2 — 0.5·baseline + 0.5·d2a_te on existing OOF .npy
-        FREE; tests cause #3 of d2a null (TE may only help in stack)
-- next: TE-only-replace-raw — drop raw Driver/Race when adding TE
-        cheap edit; tests cause #1 of d2a null
-- next: TE on (Driver, Race) only (drop Compound + interactions)
-        cheap; tests cause #2 of d2a null (high-card noise)
-- D2-C (queued): concat external (aadigupta1601) rows; lower priority
-                  since probe 1 join missed
-- D3+ : RealMLP/PyTabKit (Source 1 #1: standalone ~0.946 on this DGP)
-- D3+ : LGBM hyperparam sweep (Optuna, 30 trials) — only after research
+- pending: 4 LB submits today (slots 2-5): M5 / M6 / M3 / M4-hedge
+- D3 next: deepen the meta-stacker -- add CatBoost-shrunk-deeper variant
+           (depth=8 if probe fits in budget) for diversity
+- D3 next: LGBM Optuna sweep (30 trials, 1h cap) -- now justified post-blend
+- D3 next: row-subsample CatBoost (80%) to bound Race-overfit; probe lift
+- D3+ : RealMLP/PyTabKit if GPU becomes available (BLOCKED on CPU)
+- D3+ : Day-3 blend re-optimisation after LB calibration data lands
+- queued: TE-only-replace-raw, TE-Driver-Race-only (D2-A postmortem closure)
+- queued: D2-C concat external (aadigupta1601, low priority since join missed)
 ```
 
 ## Friction log pointer
