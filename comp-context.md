@@ -89,8 +89,10 @@ group_key_for_R1_anchor_b: Race                      # 26 levels; 5-fold ≈ 5 r
 forbidden_columns:
   - Normalized_TyreLife    # host-removed from original; do NOT reintroduce
 structural_findings:
-  pitstop_pitnextlap_match_rate: 0.724    # NOT a deterministic 1-step lag
-  test_lead_pitstop_recoverable: 0.927    # 174,514 / 188,165 test rows have next-lap row in test
+  pitstop_pitnextlap_match_rate: 0.724    # ≈ chance (independent baseline 0.719 at priors 0.136 / 0.199)
+  lead_pitstop_single_feature_auc: 0.512  # U2 probe — basically random; lead_PitStop is NOT a leak signal
+  train_test_split_structure: iid_row_level   # U3 probe — alt-ratio 0.447, 0/13185 contiguous groups
+  test_lead_pitstop_computable_pct: 0.974     # 97.4% of test rows have a same-(Race, Driver) successor in test
 ```
 
 ## Anti-patterns

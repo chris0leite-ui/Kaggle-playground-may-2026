@@ -335,3 +335,25 @@ metric_notes:
   column mapping table built.
 - **metric_notes**: AUC rank-only → skip class-weighting & calibration; blend
   at rank level; probe floor ≈14bp; LGBM hyperparam priors logged.
+
+---
+
+## 2026-05-04 retraction — structural lag claim was wrong
+
+The "CRITICAL — PitStop vs PitNextLap" section above asserted a
+"strong structural relationship" based on a 0.724 match rate. That
+was a stats error: at marginal priors P(PitStop=1)=0.136 and
+P(PitNextLap=1)=0.199, the independent-baseline match rate is
+already 0.719. Observed 0.724 is ≈ chance.
+
+Confirmed by U2 probe (`audit/2026-05-04-u2-lead-pitstop-probe.md`):
+single-feature LGBM with `lead_PitStop` gets OOF AUC 0.512. Not a
+leak signal; not a dominant feature; not even useful.
+
+U3 probe confirmed the train/test split is i.i.d. row-level
+(alt-ratio 0.447; 0/13,185 contiguous groups). So `lead_PitStop` IS
+computable on test (97.4% coverage), but the underlying signal is
+just noise — the comp is a normal feature/model engineering race,
+not a leak race.
+
+Friction logged: `audit/friction.md`, `tag: stats-error`.
