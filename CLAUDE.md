@@ -63,6 +63,13 @@ They override the kickoff-time defaults.
   (b) GroupKFold on a row-id hash (or repeated stratified with a
   different seed). Mechanisms that overfit one fold geometry will
   diverge.
+  *Qualifier (added 2026-05-04 per s6e5 friction):* if a U3-equivalent
+  split-structure probe confirms test is an i.i.d. row split (not
+  held-out by group), GroupKF is diagnostic-only, NOT predictive of
+  LB. In that case, single-anchor Strat is sufficient for routine
+  bases; reserve GroupKF for the final PRIMARY/HEDGE sanity check
+  only. **s6e5 status: GroupKF dropped Day-3+ (test confirmed i.i.d.
+  by U3, baseline gap +3.8bp confirms Strat = LB proxy).**
 - **R2 — Final selection along the public-LB axis.** PRIMARY = best
   public LB. HEDGE = best OOF that *regressed ≤30bp on public*. NOT
   another orthogonal-mechanism hedge. (Last comp: 5 of our subs
