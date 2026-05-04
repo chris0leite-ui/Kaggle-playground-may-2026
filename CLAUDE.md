@@ -45,9 +45,8 @@ ff-merge before reading state below.
     underspend. Each submit still single-shot + PI-approved (Rule 1).
 13. **Kaggle GPU is part of the compute budget.** Local sandbox is
     CPU-only; Kaggle notebooks (P100 / T4×2) are the GPU path. Port
-    NN / deep-CatBoost-depth≥8 5-fold / any 5-fold > 1h-CPU projection
-    to Kaggle before declaring "not cost-justified". See
-    `comp-context.md` → `gpu_workflow`.
+    NN / deep-CatBoost-depth≥8 5-fold / any 5-fold>1h-CPU projection
+    to Kaggle before declaring "not cost-justified". See `comp-context.md`.
 14. **Strategy-critic-loop fires automatically.** At end-of-day audit,
     on OOF→LB gap drift ≥2bp on consecutive submits, before adding a
     new mechanism family, at 50% comp checkpoint, or at any plateau
@@ -55,6 +54,11 @@ ff-merge before reading state below.
     covering per-segment OOFs, calibration, disagreement localization,
     unexploited structural-finding scout, headroom math vs realistic
     H-list lift. Spec: `.claude/skills/kaggle-comp/strategy-critic.md`.
+15. **Handover protocol.** PI says **"handover"** → read `HANDOVER.md`
+    and proceed per its instructions (skip the usual read-order;
+    HANDOVER.md is the latest synthesis). PI says **"prepare handover"**
+    → update `HANDOVER.md` with the next-session brief. Day-loop step 7
+    auto-refreshes it at EOD.
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
@@ -107,8 +111,6 @@ headroom_to_top5pct: 0.00382      # 0.95345 − 0.94963 = 38.2bp (was 45.4bp)
 
 ## Calibration ladder
 
-Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
-
 | Mechanism | Strat OOF | GroupKF OOF | LB | Notes |
 |---|---:|---:|---:|---|
 | baseline_two_anchor | 0.94075 | 0.92059 | 0.94113 | LB-proxy ✓ gap +3.8bp |
@@ -116,12 +118,10 @@ Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 | m3_catboost | 0.94612 | 0.91645 | n/a | best single before E3; Race-overfit |
 | m4_relstate | 0.94244 | 0.92195 | n/a | only B1 lifting both anchors |
 | m5_lr_meta | 0.94737 | 0.92483 | 0.94693 | gap −4.4bp |
-| e3_hgbc | 0.94876 | 0.92785 | n/a | BEST single, both anchors lift |
 | e4_realmlp_cpu_f0 | 0.94722 (f0) | n/a | n/a | not pursued (3.3h proj for 5-fold) |
 | m5b_lr_meta_expanded | 0.94926 | 0.92871 | 0.94891 | gap −3.5bp |
 | e3_hgbc_standalone | 0.94876 | 0.92785 | 0.94870 | gap −0.6bp (single-model gap≈0) |
 | f1_hgbc_deep | 0.94870 | 0.92739 | n/a | β: ~E3 clone |
-| f2_hgbc_shallow | 0.94861 | 0.92711 | n/a | β: ~E3 clone |
 | e5_optuna_lgbm | 0.94736 | 0.92585 | n/a | tuned hp via Optuna |
 | zeta_catboost_deep_f0 | 0.94992 (f0) | n/a | n/a | best single fold; 5-fold not pursued |
 | **m5d_lr_meta_expanded** | **0.95023** | **0.92994** | **0.94963** | **D2 PRIMARY; gap −6.0bp (widened)** |

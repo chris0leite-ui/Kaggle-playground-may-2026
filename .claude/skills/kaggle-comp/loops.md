@@ -64,8 +64,10 @@ artifacts. Don't ask "should I write the wrap?" — just write it.
 6. Append friction one-liners distilled from the day to
    audit/friction.md (NOT CLAUDE.md — see self-improvement.md).
 7. Queue next session's first 3 experiments in CLAUDE.md
-   hypothesis board. Then commit + push to feature branch AND
-   merge to main (PI authorized 2026-05-04).
+   hypothesis board AND rewrite HANDOVER.md with the next-session
+   prompt (read order, state recap, today's plan, workflow-rule
+   reminders, anti-patterns, open PI questions). Then commit + push
+   to feature branch AND merge to main (PI authorized 2026-05-04).
 ```
 
 ## Experiment-loop
