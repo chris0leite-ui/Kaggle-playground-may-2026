@@ -16,7 +16,7 @@ train_rows: TBD                 # filled after batch-C download
 test_rows: 188165
 deadline: 2026-05-31 23:59:00 UTC
 team_size_limit: TBD            # confirm from comp rules
-submission_budget: 5/day         # inferred from LB (max ~3.5/day observed); rules page blocked — confirm
+submission_budget: 5/day
 final_submissions: 2            # Playground default — confirm
 data_license: CC BY 4.0         # Playground default — confirm
 external_data_allowed: yes      # Playground default — confirm
