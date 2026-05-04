@@ -1,0 +1,93 @@
+{
+  "M5n_3": {
+    "K": 3,
+    "pool": [
+      "a_horizon",
+      "b_lapsuntilpit",
+      "cb_slow-wide-bag"
+    ],
+    "strat": 0.9480629549064684,
+    "delta_m5h_bp": -23.670450935315834,
+    "spearman_vs_m5h": 0.9870689944853746,
+    "rank_shift_mean": 6176.39371827917
+  },
+  "M5n_3b": {
+    "K": 4,
+    "pool": [
+      "a_horizon",
+      "b_lapsuntilpit",
+      "cb_slow-wide-bag",
+      "baseline"
+    ],
+    "strat": 0.9480832401952489,
+    "delta_m5h_bp": -23.46759804751075,
+    "spearman_vs_m5h": 0.9866452139975856,
+    "rank_shift_mean": 6259.615093136343
+  },
+  "M5n_4": {
+    "K": 4,
+    "pool": [
+      "a_horizon",
+      "b_lapsuntilpit",
+      "cb_slow-wide-bag",
+      "cb_lossguide"
+    ],
+    "strat": 0.9485035943497203,
+    "delta_m5h_bp": -19.264056502796834,
+    "spearman_vs_m5h": 0.9893382307758859,
+    "rank_shift_mean": 5625.6283474610045
+  },
+  "M5n_5": {
+    "K": 5,
+    "pool": [
+      "a_horizon",
+      "b_lapsuntilpit",
+      "cb_slow-wide-bag",
+      "cb_lossguide",
+      "d2a_te"
+    ],
+    "strat": 0.9485751859556947,
+    "delta_m5h_bp": -18.548140443053196,
+    "spearman_vs_m5h": 0.9878264694159044,
+    "rank_shift_mean": 5934.70746419366
+  },
+  "M5n_6": {
+    "K": 6,
+    "pool": [
+      "a_horizon",
+      "b_lapsuntilpit",
+      "cb_slow-wide-bag",
+      "cb_lossguide",
+      "d2a_te",
+      "baseline"
+    ],
+    "strat": 0.9486669493067086,
+    "delta_m5h_bp": -17.630506932914123,
+    "spearman_vs_m5h": 0.9887559798208223,
+    "rank_shift_mean": 5708.145042914463
+  },
+  "M5n_7": {
+    "K": 7,
+    "pool": [
+      "a_horizon",
+      "b_lapsuntilpit",
+      "cb_slow-wide-bag",
+      "cb_lossguide",
+      "d2a_te",
+      "baseline",
+      "cb_year-cat"
+    ],
+    "strat": 0.9486888843958035,
+    "delta_m5h_bp": -17.411156041965413,
+    "spearman_vs_m5h": 0.9894329221712552,
+    "rank_shift_mean": 5551.574394813063
+  },
+  "candidates": [
+    "M5n_3",
+    "M5n_3b",
+    "M5n_4",
+    "M5n_5",
+    "M5n_6",
+    "M5n_7"
+  ]
+}

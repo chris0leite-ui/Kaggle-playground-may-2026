@@ -1,0 +1,16 @@
+{
+  "oof_score": 0.896837250092458,
+  "fold_std": 0.001151719563307771,
+  "fold_scores": [
+    0.8982173755544265,
+    0.8953835078243437,
+    0.8973842251211357,
+    0.8955718757451981,
+    0.8976824654500016
+  ],
+  "cv": "StratifiedKFold(5)",
+  "metric": "roc_auc",
+  "delta_vs_baseline_bp": -439.12749907542013,
+  "feature_count": 28,
+  "notes": "LR with FE (numeric+nonlinear+onehot+TE+interactions); linear family base for stack diversity"
+}

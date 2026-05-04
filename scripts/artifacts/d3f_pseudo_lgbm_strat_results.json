@@ -1,0 +1,20 @@
+{
+  "oof_score": 0.9426477009121877,
+  "fold_std": 0.0006991671537291814,
+  "fold_scores": [
+    0.9435608602186804,
+    0.9417236625902834,
+    0.9427585763285722,
+    0.9420109030713057,
+    0.9432300032591564
+  ],
+  "cv": "StratifiedKFold(5)",
+  "metric": "roc_auc",
+  "delta_vs_baseline_bp": 18.97700912187772,
+  "n_pseudo_pos": 33314,
+  "n_pseudo_neg": 146964,
+  "agree_hi": 10,
+  "agree_lo": 3,
+  "pool_size": 13,
+  "notes": "H1 pseudo-label with multi-base agreement guard"
+}
