@@ -144,6 +144,20 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   REQUIRE direct execution + log read + summary in one tool call,
   not delegate to Monitor and exit early.
 
+- `tag: posthoc-isotonic-overfits-OOF` — per-(Year,Race) isotonic
+  fit on M5h OOF showed +24.6bp Strat OOF lift in-sample; inner-CV
+  (5-fold split on the OOF rows themselves, fit isotonic on 4 folds,
+  eval on 5th) gave **−10.9bp**. Per-Race alone: +11.8 in-sample,
+  **−5.3 inner-CV**. The OOF predictions are out-of-fold but fitting
+  per-group isotonic on the same OOF rows we evaluate on is just
+  fitting noise. Fix: any post-hoc transformation of OOF (isotonic,
+  Platt, per-group rescaling) MUST be inner-CV validated before
+  treating its OOF lift as a real candidate. Reliability bins on
+  M5h showed it is already globally well-calibrated (gap ≤0.003
+  across all 10 deciles), so the "miscalibration to fix" was
+  imaginary. Add to do-and-dont.md: "post-hoc calibration on OOF
+  must use a held-out inner CV; never trust the in-sample lift."
+
 - `tag: kaggle-p100-torch-sm60-incompat` — RealMLP kernel v1 failed
   in 39s on Kaggle P100 with `torch.AcceleratorError: CUDA error: no
   kernel image is available for execution on the device`. Cause:
