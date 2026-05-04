@@ -17,6 +17,10 @@ if [[ -f data/train.csv && -f data/test.csv ]]; then
     exit 0
 fi
 
+if [[ -z "${KAGGLE_API_TOKEN:-}" && -n "${KAGGLE_KEY:-}" ]]; then
+    KAGGLE_API_TOKEN="$KAGGLE_KEY"
+    export KAGGLE_API_TOKEN
+fi
 if [[ -z "${KAGGLE_API_TOKEN:-}" ]]; then
     read -rsp "Kaggle API token (KGAT_...): " KAGGLE_API_TOKEN
     echo

@@ -144,6 +144,20 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   REQUIRE direct execution + log read + summary in one tool call,
   not delegate to Monitor and exit early.
 
+- `tag: bootstrap-env-var-mismatch` — `bootstrap.sh` gates on
+  `KAGGLE_API_TOKEN` and prompts interactively when unset; the sandbox
+  provides the same secret under `KAGGLE_KEY` (alongside
+  `KAGGLE_USERNAME`). The patched kaggle CLI here also reads
+  `KAGGLE_API_TOKEN` (vanilla CLI uses `KAGGLE_USERNAME`+`KAGGLE_KEY`).
+  Result: agent surfaced a false "missing token" blocker and asked PI
+  despite the secret being present under a different name. Workaround
+  used: `KAGGLE_API_TOKEN="$KAGGLE_KEY" kaggle competitions download …`.
+  Fix: (a) update `bootstrap.sh` to fall back `KAGGLE_API_TOKEN ←
+  KAGGLE_KEY` when the latter is set, skipping the prompt; (b) agent
+  rule: before asking PI for a credential, `env | grep -i <service>`
+  for any standard CLI var name, not just the one the local script
+  references; (c) update the skill template `bootstrap.sh` mirror.
+
 - `tag: eod-auto-recognition` — PI had to redirect agent twice on
   day-end behavior in one session: first to clarify the day-end
   definition (slot-exhaustion-or-PI-EOD), then to clarify the
