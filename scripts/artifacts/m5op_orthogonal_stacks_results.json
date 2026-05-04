@@ -1,0 +1,62 @@
+{
+  "M5o": {
+    "K": 14,
+    "strat": 0.9505066349353437,
+    "delta_m5h_bp": 0.7663493534371124,
+    "spearman_vs_m5h": 0.9997381890524057,
+    "l1_per_base": {
+      "baseline": 0.34633456456304434,
+      "d2a_te": 0.1558542138226376,
+      "m2_xgb": 0.21572716870809455,
+      "e1_cb_sub": 0.27374886185431346,
+      "e3_hgbc": 0.3501724094529126,
+      "e5_optuna_lgbm": 0.6748123319739235,
+      "a_horizon": 0.16473183906694433,
+      "b_lapsuntilpit": 0.8634907021209903,
+      "f1_hgbc_deep": 0.37128850385666673,
+      "f2_hgbc_shallow": 0.2618403250100247,
+      "cb_year-cat": 0.43175747664515846,
+      "cb_lossguide": 0.3485574091433455,
+      "cb_slow-wide-bag": 0.3123797859641904,
+      "d3g_lr_fe": 0.2746246506468467
+    },
+    "pool": [
+      "baseline",
+      "d2a_te",
+      "m2_xgb",
+      "e1_cb_sub",
+      "e3_hgbc",
+      "e5_optuna_lgbm",
+      "a_horizon",
+      "b_lapsuntilpit",
+      "f1_hgbc_deep",
+      "f2_hgbc_shallow",
+      "cb_year-cat",
+      "cb_lossguide",
+      "cb_slow-wide-bag",
+      "d3g_lr_fe"
+    ]
+  },
+  "M5p": {
+    "K": 6,
+    "strat": 0.9483855095750068,
+    "delta_m5h_bp": -20.444904249932172,
+    "spearman_vs_m5h": 0.9875074259455714,
+    "l1_per_base": {
+      "a_horizon": 0.23776044381415004,
+      "b_lapsuntilpit": 1.0957990091622039,
+      "cb_slow-wide-bag": 9.792046649915553,
+      "baseline": 3.5854714428146273,
+      "d3g_lr_fe": 2.090726234938164,
+      "d3e_ebm": 2.5220395127918227
+    },
+    "pool": [
+      "a_horizon",
+      "b_lapsuntilpit",
+      "cb_slow-wide-bag",
+      "baseline",
+      "d3g_lr_fe",
+      "d3e_ebm"
+    ]
+  }
+}
