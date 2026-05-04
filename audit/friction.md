@@ -144,6 +144,23 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   REQUIRE direct execution + log read + summary in one tool call,
   not delegate to Monitor and exit early.
 
+- `tag: pre-submit-rank-diff-check` — Day-3 burned 3 slots (M5h, M5h2,
+  M5j) all landing at LB 0.94991. Post-hoc diff of the submissions:
+  predictions differ noticeably in ABSOLUTE values (M5h vs M5j: 44%
+  of rows differ >1e-3, max abs diff 6%), BUT Spearman rank
+  correlation ≥0.9997 across all pairs. AUC depends only on rank,
+  so near-identical rank → identical LB. The LR meta over highly
+  correlated GBDT bases produces near-identical RANKINGS regardless
+  of which marginal base is included/swapped/dropped. Fix:
+  ALWAYS pre-submit-diff against the most recent same-class submission.
+  If Spearman > 0.999 vs the prior submission, the LB will tie within
+  Kaggle's quantization (5 decimals) — the slot is wasted as a
+  calibration probe. Add to do-and-dont.md: "Before any submit, run
+  `pre_submit_diff(new, last_submitted)` printing Spearman + rank-shift
+  stats; if rho > 0.999, abort and propose a structurally different
+  candidate." Today's signal: in-pool tweaks (LR-meta-on-correlated-
+  GBDTs) cannot move LB — only different MECHANISM FAMILIES can.
+
 - `tag: posthoc-isotonic-overfits-OOF` — per-(Year,Race) isotonic
   fit on M5h OOF showed +24.6bp Strat OOF lift in-sample; inner-CV
   (5-fold split on the OOF rows themselves, fit isotonic on 4 folds,
