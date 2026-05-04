@@ -1,0 +1,21 @@
+{
+  "fold0_auc": 0.949922202724973,
+  "best_iter": 1999,
+  "fit_secs": 340.90536642074585,
+  "proj_5fold_singleanchor_secs": 1704.5268321037292,
+  "proj_5fold_twoanchor_secs": 3409.0536642074585,
+  "delta_vs_baseline_bp": 91.72202724972989,
+  "params": {
+    "iterations": 2000,
+    "learning_rate": 0.05,
+    "depth": 8,
+    "l2_leaf_reg": 3.0,
+    "random_seed": 42,
+    "eval_metric": "AUC",
+    "od_type": "Iter",
+    "od_wait": 100,
+    "verbose": 0,
+    "thread_count": -1,
+    "allow_writing_files": false
+  }
+}

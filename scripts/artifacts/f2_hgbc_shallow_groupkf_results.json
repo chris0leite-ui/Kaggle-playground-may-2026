@@ -1,0 +1,26 @@
+{
+  "oof_score": 0.9271128198447265,
+  "fold_std": 0.011369794064499223,
+  "fold_scores": [
+    0.9205085278819672,
+    0.9167477333911292,
+    0.9155881630617999,
+    0.943569870884077,
+    0.9367467241175744
+  ],
+  "cv": "GroupKF(Race)",
+  "metric": "roc_auc",
+  "delta_vs_baseline_bp": 65.22819844726469,
+  "hp": {
+    "max_iter": 1500,
+    "learning_rate": 0.05,
+    "max_leaf_nodes": 31,
+    "min_samples_leaf": 400,
+    "l2_regularization": 0.1,
+    "early_stopping": true,
+    "validation_fraction": 0.1,
+    "n_iter_no_change": 50,
+    "random_state": 7,
+    "categorical_features": "from_dtype"
+  }
+}

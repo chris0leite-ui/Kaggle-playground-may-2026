@@ -41,11 +41,18 @@ These eleven invariants are LOAD-BEARING. Do not skip.
 These were the R1/R2/R7 changes from irrigation-water postmortem-07.
 They override the kickoff-time defaults.
 
-- **R1 — Two-anchor OOF.** Every gated candidate must pass under
-  TWO CV schemes: (a) standard 5-fold StratifiedKFold seed=42, AND
-  (b) GroupKFold on a row-id hash (or repeated stratified with a
-  different seed). Mechanisms that overfit one fold geometry will
-  diverge.
+- **R1 — Two-anchor OOF (qualified).** Every gated candidate must
+  pass under TWO CV schemes: (a) standard 5-fold StratifiedKFold
+  seed=42, AND (b) GroupKFold on a row-id hash (or repeated
+  stratified with a different seed). Mechanisms that overfit one
+  fold geometry will diverge.
+  *Qualifier (added 2026-05-04 per s6e5 friction):* if a
+  U3-equivalent split-structure probe confirms test is an i.i.d.
+  row split (not held-out by group), GroupKF is diagnostic-only,
+  NOT predictive of LB. In that case, single-anchor Strat is
+  sufficient for routine bases; reserve GroupKF for the final
+  PRIMARY/HEDGE sanity check only. Run U3 on Day 1 BEFORE deciding
+  whether to enable two-anchor across all bases.
 - **R2 — Final selection along the public-LB axis.** PRIMARY = best
   public LB. HEDGE = best OOF that *regressed ≤30bp on public*. NOT
   another orthogonal-mechanism hedge. (Last comp: 5 of our subs
