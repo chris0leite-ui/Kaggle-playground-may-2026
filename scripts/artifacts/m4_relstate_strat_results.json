@@ -1,0 +1,18 @@
+{
+  "oof_score": 0.9424389753403953,
+  "fold_std": 0.0007981271739728609,
+  "fold_scores": [
+    0.9433020715415198,
+    0.9418177965292198,
+    0.9423180301450358,
+    0.9414279054420935,
+    0.9434490372006591
+  ],
+  "cv": "StratifiedKFold(5, seed=42)",
+  "metric": "roc_auc",
+  "delta_vs_baseline_bp": 16.8897534039536,
+  "features_added": [
+    "Recent_Degradation",
+    "Traffic_Pressure_Proxy"
+  ]
+}

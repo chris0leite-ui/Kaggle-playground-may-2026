@@ -2,6 +2,19 @@
 
 Running log + ⚠️ rules. Cap ≤50k tokens; archive when bloated.
 
+## ⚠️ Reference branch — check `origin/main` FIRST every session
+
+Truth lives on `origin/main`. Feature branches (`claude/*`) often start
+behind. Before planning, executing, or answering "what's next?" — run:
+
+```
+git fetch origin && git log --oneline HEAD..origin/main
+```
+
+If non-empty, fast-forward (`git merge origin/main --ff-only`) before
+reading `CLAUDE.md`, `audit/`, or `scripts/`. The state below is only
+authoritative once you've synced.
+
 ## ⚠️ Top-level rules (inherited from kaggle-comp framework)
 
 These eleven invariants are LOAD-BEARING. Do not skip.
@@ -35,6 +48,10 @@ These eleven invariants are LOAD-BEARING. Do not skip.
     PI pull, 1-2 sentences with the latest fact.
 11. **Model routing.** Haiku for routine read-only checks; Sonnet
     default; Opus for hard reasoning. Use the daily 10/day budget.
+12. **Spend the full 5/day submission budget every day.** Submissions
+    are calibration probes — measured OOF→LB gap per mechanism family
+    is the load-bearing data, not just rank. Do NOT intentionally
+    underspend. Each submit still single-shot + PI-approved (Rule 1).
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
@@ -63,36 +80,52 @@ They override the kickoff-time defaults.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 1
-lb_best_today: 0.95435            # leader at kickoff (2026-05-04)
-our_lb_best: 0.94113              # baseline_two_anchor (StratKFold), Day-1
-submissions_used_today: 1
-submissions_used_total: 1
-saturation_count: 0
-mechanism_families_explored: [baseline_lgbm_raw_features]
+day: 2
+lb_best_today: 0.95435            # leader (still); not refreshed since kickoff
+our_lb_best: 0.94693              # M5 LR meta-stacker, Day-2 (+58.0bp over Day-1)
+submissions_used_today: 2         # baseline (D1) + M5 (D2)
+submissions_used_total: 2
+saturation_count: 1               # D2-A null both anchors (2026-05-04)
+mechanism_families_explored:
+  - baseline_lgbm_raw_features
+  - oof_target_encoding
+  - xgb_native_categorical
+  - catboost_native_categorical
+  - relative_state_fe
+  - lr_meta_stacker_3view
+  - dirichlet_random_search
 plateau_days: 0
-gate_status: cleared              # pre-baseline gate cleared 2026-05-04; see audit/2026-05-04-pre-baseline-gate.md
-headroom_to_top5pct: 0.01232      # 0.95345 − 0.94113 = 123bp
+gate_status: cleared
+headroom_to_top5pct: 0.00652      # 0.95345 − 0.94693 = 65.2bp (was 123bp)
 ```
 
 ## Calibration ladder
 
 Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 
-| Mechanism | OOF | LB | Gap | Notes |
+| Mechanism | Strat OOF | GroupKF OOF | LB | Notes |
 |---|---:|---:|---:|---|
-| baseline_two_anchor (StratKFold) | 0.94075 | 0.94113 | +3.8bp | calibration ✓ ; anchor A confirmed right proxy |
-| baseline_two_anchor (GroupKFold Race) | 0.92059 | n/a | n/a | race-robustness; not LB proxy |
+| baseline_two_anchor | 0.94075 | 0.92059 | 0.94113 | LB-proxy ✓ Strat+3.8bp gap |
+| d2a_te | 0.93670 | 0.91628 | n/a | NULL G1 standalone; +2-4bp in blend (M1) |
+| m1_blend (50/50 base+te) | 0.94097 | 0.92098 | n/a | best-w 80/20; closes d2a postmortem #3 |
+| m2_xgb | 0.94507 | 0.91084 | pending | Strat PASS; Race-overfit |
+| m3_catboost | 0.94612 | 0.91645 | pending | Strat PASS strongest single; Race-overfit |
+| m4_relstate | 0.94244 | 0.92195 | pending | only B1 lifting BOTH anchors |
+| **m5_lr_meta** | **0.94737** | **0.92483** | **0.94693** | PRIMARY; OOF→LB gap −4.4bp (stack overshoot) |
+| m6_dirichlet | 0.94696 | 0.92459 | not submitted | held; PI directive single-shot M5 only |
 
 ## Hypothesis board
 
 ```
-- Day-2 (a): external-data join (aadigupta1601, minus Normalized_TyreLife)
-             expected lift +10-30bp; cheap
-- Day-2 (b): FE — interactions (TyreLife×Compound, LapNumber×RaceProgress,
-             Compound×Stint) + target encoding for Driver, Race×Compound
-             expected lift +30-60bp; needs OOF discipline (proper inner CV)
-- Day-3+ : top-notebook replication (RealMLP/PyTabKit; Driver-FE ladder)
+- pending: 4 LB submits today (slots 2-5): M5 / M6 / M3 / M4-hedge
+- D3 next: deepen the meta-stacker -- add CatBoost-shrunk-deeper variant
+           (depth=8 if probe fits in budget) for diversity
+- D3 next: LGBM Optuna sweep (30 trials, 1h cap) -- now justified post-blend
+- D3 next: row-subsample CatBoost (80%) to bound Race-overfit; probe lift
+- D3+ : RealMLP/PyTabKit if GPU becomes available (BLOCKED on CPU)
+- D3+ : Day-3 blend re-optimisation after LB calibration data lands
+- queued: TE-only-replace-raw, TE-Driver-Race-only (D2-A postmortem closure)
+- queued: D2-C concat external (aadigupta1601, low priority since join missed)
 ```
 
 ## Friction log pointer

@@ -1,0 +1,41 @@
+{
+  "oof_score": 0.9164490362643297,
+  "fold_std": 0.015671033845087626,
+  "fold_scores": [
+    0.9103087901288128,
+    0.897575423517283,
+    0.907294433933838,
+    0.9357145271637384,
+    0.9360296601915779
+  ],
+  "cv": "GroupKFold(5) on Race",
+  "metric": "roc_auc",
+  "delta_vs_baseline_bp": -41.409637356703,
+  "params_used": {
+    "iterations": 800,
+    "learning_rate": 0.08,
+    "depth": 6,
+    "l2_leaf_reg": 3.0,
+    "random_seed": 42,
+    "eval_metric": "AUC",
+    "od_type": "Iter",
+    "od_wait": 50,
+    "verbose": 0,
+    "thread_count": -1,
+    "allow_writing_files": false
+  },
+  "best_iters": [
+    292,
+    133,
+    343,
+    375,
+    421
+  ],
+  "fold_walls": [
+    31.69595217704773,
+    17.626813650131226,
+    36.05695605278015,
+    39.6528697013855,
+    43.71158409118652
+  ]
+}

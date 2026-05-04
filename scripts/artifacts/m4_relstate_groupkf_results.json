@@ -1,0 +1,18 @@
+{
+  "oof_score": 0.9219526952037486,
+  "fold_std": 0.012892779893230165,
+  "fold_scores": [
+    0.9172557213074386,
+    0.9094286077384458,
+    0.908213414857498,
+    0.939962248449835,
+    0.933757580734918
+  ],
+  "cv": "GroupKFold(5) on Race",
+  "metric": "roc_auc",
+  "delta_vs_baseline_bp": 13.62695203748543,
+  "features_added": [
+    "Recent_Degradation",
+    "Traffic_Pressure_Proxy"
+  ]
+}

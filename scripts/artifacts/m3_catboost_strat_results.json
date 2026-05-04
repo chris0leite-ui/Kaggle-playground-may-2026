@@ -1,0 +1,41 @@
+{
+  "oof_score": 0.9461189417425512,
+  "fold_std": 0.0007504749194636136,
+  "fold_scores": [
+    0.9470932032162059,
+    0.9453525110925056,
+    0.946683597604705,
+    0.945161407036769,
+    0.9463283978448652
+  ],
+  "cv": "StratifiedKFold(5, seed=42)",
+  "metric": "roc_auc",
+  "delta_vs_baseline_bp": 53.68941742551203,
+  "params_used": {
+    "iterations": 800,
+    "learning_rate": 0.08,
+    "depth": 6,
+    "l2_leaf_reg": 3.0,
+    "random_seed": 42,
+    "eval_metric": "AUC",
+    "od_type": "Iter",
+    "od_wait": 50,
+    "verbose": 0,
+    "thread_count": -1,
+    "allow_writing_files": false
+  },
+  "best_iters": [
+    799,
+    799,
+    799,
+    799,
+    797
+  ],
+  "fold_walls": [
+    72.08761239051819,
+    71.71926426887512,
+    71.57231426239014,
+    71.63081336021423,
+    71.31361818313599
+  ]
+}

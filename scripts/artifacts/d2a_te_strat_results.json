@@ -1,0 +1,22 @@
+{
+  "oof_score": 0.9367043989165098,
+  "fold_std": 0.0007598564252091675,
+  "fold_scores": [
+    0.9374235311552701,
+    0.936090834414036,
+    0.9371126831895986,
+    0.9355345746950637,
+    0.937381303068979
+  ],
+  "cv": "StratifiedKFold(5)",
+  "metric": "roc_auc",
+  "delta_vs_baseline_bp": -40.45601083490169,
+  "alpha": 80.0,
+  "te_keys": [
+    "Driver",
+    "Race",
+    "Compound",
+    "Driver_Race",
+    "Race_Compound"
+  ]
+}

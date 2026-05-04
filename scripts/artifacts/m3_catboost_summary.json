@@ -1,0 +1,67 @@
+{
+  "auc_strat": 0.9461189417425512,
+  "auc_groupkf": 0.9164490362643297,
+  "std_strat": 0.0007504749194636136,
+  "std_groupkf": 0.015671033845087626,
+  "total_wall_s": 531.9274053573608,
+  "best_iters_strat": [
+    799,
+    799,
+    799,
+    799,
+    797
+  ],
+  "best_iters_groupkf": [
+    292,
+    133,
+    343,
+    375,
+    421
+  ],
+  "g1_pass_strat": true,
+  "g1_pass_groupkf": false,
+  "delta_strat_bp": 53.68941742551203,
+  "delta_groupkf_bp": -41.409637356703,
+  "top_features": [
+    [
+      "Year",
+      48.717758358519056
+    ],
+    [
+      "Stint",
+      13.148213429725098
+    ],
+    [
+      "TyreLife",
+      9.83254491028461
+    ],
+    [
+      "LapTime_Delta",
+      5.259787195791303
+    ],
+    [
+      "RaceProgress",
+      4.376542433614632
+    ],
+    [
+      "Race",
+      3.9904791528234904
+    ],
+    [
+      "Compound",
+      3.3347940505533225
+    ],
+    [
+      "LapNumber",
+      2.1138510018113976
+    ],
+    [
+      "Cumulative_Degradation",
+      1.9981060850052352
+    ],
+    [
+      "Position_Change",
+      1.8362069370358416
+    ]
+  ]
+}
