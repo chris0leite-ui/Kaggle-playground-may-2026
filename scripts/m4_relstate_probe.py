@@ -60,7 +60,7 @@ def main():
     dval = lgb.Dataset(X.iloc[va], y[va], categorical_feature=cat_cols)
     model = lgb.train(make_lgb_params(), dtrain, num_boost_round=2000,
                       valid_sets=[dval],
-                      callbacks=[lgb.early_stopping(100), lgb.log_evaluation(0)])
+                      callbacks=[lgb.early_stopping(100), lgb.log_evaluation(50)])
     p_va = model.predict(X.iloc[va])
     _ = model.predict(X_test)  # include test predict cost
     fold_secs = time.time() - t1
