@@ -62,10 +62,20 @@ def main():
     y = train[TARGET].astype(int).values
     X = train.drop(columns=[TARGET, ID_COL], errors="ignore")
     X_test = test.drop(columns=[ID_COL], errors="ignore")
-    cat_cols = X.select_dtypes(include="object").columns.tolist()
-    for c in cat_cols:
-        X[c] = X[c].astype("category")
-        X_test[c] = X_test[c].astype("category")
+    # HGBC caps native categorical cardinality at 255. Driver=874 -> label-encode to int
+    # numeric column. Compound (5) and Race (26) stay as pandas category for native cat-handling.
+    HIGH_CARD = ["Driver"]
+    LOW_CARD = ["Compound", "Race"]
+    for c in HIGH_CARD:
+        if c in X.columns:
+            uniq = pd.concat([X[c], X_test[c]], ignore_index=True).astype(str).unique()
+            mapping = {v: i for i, v in enumerate(sorted(uniq))}
+            X[c] = X[c].astype(str).map(mapping).astype(np.int32)
+            X_test[c] = X_test[c].astype(str).map(mapping).astype(np.int32)
+    for c in LOW_CARD:
+        if c in X.columns:
+            X[c] = X[c].astype("category")
+            X_test[c] = X_test[c].astype("category")
 
     print("=== Anchor A: StratifiedKFold(5, seed=42) ===")
     skf = StratifiedKFold(n_splits=N_FOLDS, shuffle=True, random_state=SEED)
