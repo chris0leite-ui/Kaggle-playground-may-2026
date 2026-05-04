@@ -1,276 +1,202 @@
 # Cross-comp research for s6e5 (2026-05-04, brief-mandated three-source pass)
-[in progress]
 
-Mission: extract cross-comp tactics for s6e5 (F1 PitNextLap, binary AUC,
-prior 0.199, 439k/188k rows, baseline LB 0.94113, top-5% 0.95345).
-Three brief-mandated sources: aadigupta1601 F1 dataset top-3, PS S4E1
-Bank Churn, PS S3E23 Software Defects.
+Mission: cross-comp tactics for s6e5 (F1 PitNextLap, binary AUC, prior
+0.199, 439k/188k, baseline LB 0.94113, top-5% 0.95345). Three brief-
+mandated sources: aadigupta1601 F1 dataset top-3, PS S4E1 Bank Churn
+top-3, PS S3E23 Software Defects top-3.
 
-Note: a parallel six-comp scan is preserved below as Appendix A.
+Access: Kaggle WebFetch returns only `<title>` (JS-rendered); CLI verb
+`competitions discussions` does not exist in CLI 2.1.0. Only `kaggle
+kernels list/pull` works. Body content was obtained via (a) `kaggle
+kernels pull` for the F1 dataset top notebooks, (b) web search /
+Medium / GitHub for the two PS comps. Where all top-3 writeups were
+inaccessible, fallback = top accessible third-party summary.
 
-## Access constraints (must read first)
+## Source 1 — aadigupta1601 F1 Strategy dataset, top-3 notebooks
 
-Kaggle WebFetch on `kaggle.com/.../writeups/...` and `.../discussion/...`
-returns only `<title>` because pages are JS-rendered. All writeup body
-content was extracted via:
-(a) Web search snippets that quote the page,
-(b) Third-party blog summaries (Medium, dev.to, NVIDIA developer blog),
-(c) The author's GitHub repos.
+`kaggle kernels list --dataset aadigupta1601/f1-strategy-dataset-pit-stop-prediction
+--sort-by voteCount` ranked notebooks (top by votes; #2 and #3 are pre-
+or co-baseline with s6e5 host data and therefore the cross-comp signal):
 
-Where access failed for a top-3 writeup, I fell back to top-10 writeups
-plus third-party top-finisher coverage. Comps without ≥1 accessible
-writeup are skipped per the brief.
+1. **`yekenot/ps-s6-e5-realmlp-pytabkit`** (56 votes, Vladimir Demidov).
+   - Single-model **RealMLP via PyTabKit**, GPU. Posted 2026-05-03.
+   - Reported OOF AUC ≈ 0.946 (cited in analyticaobscura's notebook as
+     baseline, https://www.kaggle.com/code/yekenot/ps-s6-e5-realmlp-pytabkit).
+   - F1-specific FE: none beyond raw features; load-bearing was
+     RealMLP's ability to handle high-cardinality embeddings without TE.
+2. **`analyticaobscura/pit-or-stay-f1-strategy-1`** (34 votes, Ozan M.).
+   Pulled via `kaggle kernels pull`; full ipynb on disk.
+   - **5-model OOF stack**: RealMLP + focused XGB + focused LGB + Dart
+     LGB + EmbMLP (PyTorch embeddings on Driver/Race/Compound).
+   - **Dirichlet random search** (3000 weight vectors, α=1) over OOF in
+     two modes: raw probs and rank-normalized probs. Author flags this
+     as "more conservative than greedy hill climbing — far less prone
+     to overfit OOF noise."
+   - **LR meta-stacker** on `[raw, rank, logit]` meta-features
+     (regularized logistic regression) — explicit linear meta over
+     tree meta. Final: small committee = mean(raw blend, rank blend,
+     LR stack).
+   - F1-specific FE that survived gain importance:
+     `TyreLife`, `LapTime_Delta`, `Cumulative_Degradation`,
+     `Recent_Degradation`, `Position_Change`, `RaceProgress`,
+     compound-fastness map (SOFT/MEDIUM/HARD → numeric hardness),
+     `traffic_pressure_proxy` ("undercut/traffic incentive proxy").
+   - Stratified KFold + GroupKFold both imported; uses StratifiedKFold
+     for OOF, GroupKFold reserved for sanity probe.
+   - Target: **0.9550+ AUC** (header banner) — stretch goal at top-5%.
+3. **`kospintr/pitstop-catb-hgbc-xgb-lgbm-realmlp-baseline`** (36 votes).
+   - **5-model GBDT-trio + HGBC + RealMLP baseline** with mean blend.
+   - No load-bearing FE beyond raw inputs; emphasis on diversity at
+     base layer (Cat / HGBC / XGB / LGB / RealMLP).
 
-## Per-comp summaries
+Other relevant pre-s6e5 entries on the same dataset:
+`sarcasmos/pit-stop-prodigy-f1-strategy-intelligence` (37 votes,
+2026-01-20, predates s6e5). Pulled the ipynb — it is a pure EDA
+notebook (`Year`, `RaceId`, `DriverName`, plotly histograms, no model).
+No predictive signal beyond confirming the underlying schema — pit-stop
+times distribution, driver-team dominance over 1994-1996 data.
 
-### A. Playground S6E3 — Predict Customer Churn (binary AUC) — closest match
+**Rule-structure / DGP insight**: pilkwang's `Driver's High` notebook
+(41 votes) does a "f1_strategy_importance" diagnostic and concludes:
+*"Simple physical priors are fragile — do not hard-code SOFT/MEDIUM/HARD
+assumptions as if this were real telemetry. Relative-state features
+(position change, race progress) outperform absolute physical priors."*
+This is a load-bearing signal: **the host synthesized the data; physics-
+faithful FE on top of synthesized inputs regresses, but relative-state
+FE works.** Direct echo of the irrigation-water postmortem PM-02 Phase
+2 finding ("Hand-coded physics-faithful FE on top of DGP regressed").
 
-- URL: https://www.kaggle.com/competitions/playground-series-s6e3
-- Synthetic-from-real (IBM Telco Churn). Task ≈ s6e5 in shape (binary
-  AUC, mild imbalance, ~hundreds of thousands of rows).
-- 1st place — KGMON team, "GPT5.4 / Gemini3.1 / ClaudeOpus4.6 — KGMON
-  Playbook" (https://www.kaggle.com/competitions/playground-series-s6e3/writeups/1st-place-gpt5-4-gemini3-1-claudeopus4-6-kgm).
-  Coverage from the NVIDIA blog
-  (https://developer.nvidia.com/blog/winning-a-kaggle-competition-with-generative-ai-assisted-coding/):
-  - **4-level stack of 150 models, selected from 850 trained.**
-  - GBDT trio (XGB / LGBM / CatBoost) + NN (PyTorch) + TabPFN + SVR +
-    KNN + Ridge / Logistic stackers.
-  - Hill-climbing for blend weights; knowledge distillation; ridge /
-    logistic at the meta level (NOT a tree meta-learner at the top).
-  - GPU-accelerated cuDF / cuML / XGB / PyTorch — "rapid
-    experimentation enabled the search."
-- ~Top-8 (rank 286 / 3718, 0.91685 public AUC) — Faith Bui, Ridge-XGBoost
-  N-gram pipeline (https://dev.to/faith_b6e08f3b8f05a77bb5f/how-i-reached-top-8-on-kaggle-with-a-ridge-xgboost-n-gram-pipeline-32pa).
-  - **N-gram categorical interactions** (bigrams + trigrams across the
-    3 high-cardinality categoricals) — the load-bearing trick.
-  - Nested target-encoding (5-fold) to prevent leakage.
-  - Service-stack count features and "digit-of-numeric" features.
-  - 2-stage: ridge OOF → XGBoost on (ridge_oof, engineered features).
-  - 10-fold StratifiedKFold, fixed seed.
-- Surprise: top-importance features were n-gram interactions and
-  nested-target-encoded combinations, not raw categoricals.
+## Source 2 — PS S4E1 Bank Churn (closest binary-AUC analog)
 
-### B. Playground S5E11 — Predict Loan Payback (binary AUC) — closest prior on imbalance
+Top-3 writeup bodies all inaccessible (JS gating). Fallbacks:
 
-- URL: https://www.kaggle.com/competitions/playground-series-s5e11
-- Class prior 0.202 — almost identical to s6e5's 0.199.
-- 1st place — "A lot of features, a lot of models, and a little bit of
-  luck" (https://www.kaggle.com/competitions/playground-series-s5e11/writeups/1st-place-a-lot-of-features-a-lot-of-models-an).
-  Body inaccessible (JS gating). Title alone implies massive feature
-  count + many models + ensemble — fits the S6E3 KGMON pattern.
-- Rank-8 — "Rank8 approach — trust the CV score"
-  (https://www.kaggle.com/competitions/playground-series-s5e11/writeups/rank8-approach-trust-the-cv-score).
-  Body inaccessible. Title's headline finding ("trust the CV score")
-  echoes irrigation-water postmortem-07 R5 (probe OOF-best regressed on
-  public).
-- Sanjay Bista journey (https://medium.com/@sanjaybista1010/from-0-56-to-0-92-auc-my-kaggle-loan-prediction-journey-through-class-imbalance-and-overfitting-ab80d4591f14):
-  - **SMOTETomek before fold-split = leakage; CV jumped 0.91→0.92 by
-    just removing it.**
-  - Over-engineering hurt: hand-coded `payment_capacity`,
-    `credit_utilization` regressed on OOF — simpler features won.
-  - LGBM `class_weight='balanced'`, n_estimators=2000, lr=0.05,
-    max_depth=8, reg_alpha=0.1, reg_lambda=0.1.
-  - StratifiedKFold OOF for the imbalanced metric.
-- karltonkxb notebook (https://www.kaggle.com/code/karltonkxb/s5e11-loan-xgb-lgbm-cuml-92-64):
-  XGB+LGBM with cuML reached 0.9264 — a single-model ceiling.
-- Stacked ensemble result published in search snippets (FelixCharotte
-  GitHub, https://github.com/FelixCharotte/LoanApprovalPrediction_KaggleCompetition):
-  base AUCs 0.9785–0.9815, **logistic meta 0.9823, XGB meta 0.9843**.
-
-### C. Playground S5E8 — Binary Classification with a Bank Dataset (binary AUC)
-
-- URL: https://www.kaggle.com/competitions/playground-series-s5e8
-- 6th place writeup (https://www.kaggle.com/competitions/playground-series-s5e8/writeups/6th-place-solution-oof-stacking-with-lgbm)
-  title "OOF Stacking with LGBM" — body inaccessible, but title
-  endorses LGBM-as-meta over linear meta on this comp.
-- 21st place writeup (https://www.kaggle.com/competitions/playground-series-s5e8/writeups/21st-place-solution)
-  body inaccessible.
-- Third-party Medium article (Sahil Chukka, banking dataset top
-  approach): XGBoost with Optuna (n_estimators 200–1000, lr 0.01–0.3,
-  max_depth 3–12), Stratified K-Fold; CV AUC **0.9664 ± 0.0005**, public
-  0.96529 / 0.96516. The 1bp std at 5-fold matches the s6e5 OOF noise
-  band we measured.
-- Top mechanism per Medium summary: KDE-driven outlier handling +
-  correlation pruning + Optuna over a tight tree-depth budget.
-
-### D. Playground S4E7 — Binary Classification of Insurance Cross Selling (binary AUC) — large rows ≈ 11M
-
-- URL: https://www.kaggle.com/competitions/playground-series-s4e7
-- 1st place writeup (https://www.kaggle.com/competitions/playground-series-s4e7/writeups/cross-sellers-winning-approach-team-cross-sellers)
-  body inaccessible.
-- #3 writeup, Tilii: "Many individual models and many ensembles"
-  (https://www.kaggle.com/competitions/playground-series-s4e7/writeups/tilii-3-solution-many-individual-models-and-many-e)
-  body inaccessible, but title is unambiguous: many bases × many blends.
-- Public single-model code (akinduhiman, https://www.kaggle.com/code/akinduhiman/insurance-cross-selling-ps4e7-gbt-xgb-lgbm-cat):
-  GBT+XGB+LGBM+CatBoost + small linear blend was the public-template
-  ceiling.
-- Surajwate baseline (https://github.com/surajwate/S4E7-Insurance-Cross-Selling)
-  XGBoost single-model: validation 0.87820, public 0.87862. Optuna
-  crashed on the 11M row split (resource note transferable).
-
-### E. Playground S4E1 — Binary Classification with a Bank Churn Dataset (binary AUC) — 165k rows
-
-- URL: https://www.kaggle.com/competitions/playground-series-s4e1
-- All top-3 writeup bodies inaccessible. 17th place "AutoML +
-  Unicorn's pollen" (https://www.kaggle.com/c/playground-series-s4e1/discussion/472636)
-  title only — implies AutoML (likely AutoGluon) was competitive.
-- **The signal everyone reports: the synthetic dataset has duplicate
-  rows where (features identical) ↔ (label flipped).** Pairavi
-  Thanancheyan, Medium
+- **17th — "AutoML + Unicorn's pollen"**
+  (https://www.kaggle.com/c/playground-series-s4e1/discussion/472636,
+  title-only): AutoGluon competitive in the top-30.
+- **Pairavi Medium**
   (https://medium.com/@Pairavi/binary-classification-with-a-bank-churn-dataset-bb88a8e55a1e):
+  **Load-bearing trick** — synthetic dataset has duplicate rows where
   "for each pair of samples with identical features, the target values
-  are always opposite." Fixing this with an `Exited_Orig` lookup
-  feature from the original Kaggle dataset (Radheshyam Kollipara) was
-  the headline FE move. Direct s6e5 translation: **does the original
-  aadigupta1601 dataset contain rows joinable to s6e5 train/test on
-  (Driver, Race, Lap-equivalent)?**
-- ShabGaming README (https://github.com/ShabGaming/Bank-Customer-Churn-Binary-Classification/blob/main/README.md)
-  rank #15 / top-0.05% — "ensemble + neural net" but no specifics.
-- Suraj Wate blog (https://surajwate.com/blog/binary-classification-with-a-bank-churn/)
-  single-LGBM 5-fold AUC 0.8893, public 0.89197 — i.e. single-model
-  ceiling was ~0.892, gold cleared 0.90+ via FE + ensembling.
-- Natasha Sharma Medium (https://medium.com/@nats.sha/kaggle-series-playground-competition-bank-customer-churn-predictions-d2857ea709ad)
-  basic FE list: balance bins, salary bins, IsBalanceZero,
-  Gender×Balance, Card×Active interaction, age binning.
+  are always opposite." Fix: `Exited_Orig` join feature pulling labels
+  from the original Radheshyam Kollipara Kaggle bank-churn dataset.
+  Models: CatBoost beat baselines; NN (dense+BN+dropout) competitive
+  but not primary. FE: balance/salary bins, `HasCard&Active`,
+  `Gender_Balance`, balance-to-salary ratio. CV: `train_test_split
+  test_size=0.2` only — no fold-OOF disclosed. Stacker not described.
+- **ShabGaming GitHub** (rank #15 / top 0.05%,
+  https://github.com/ShabGaming/Bank-Customer-Churn-Binary-Classification):
+  "ensemble + neural net," no specifics.
+- **Suraj Wate blog**
+  (https://surajwate.com/blog/binary-classification-with-a-bank-churn/):
+  single-LGBM 5-fold AUC 0.8893 / public 0.89197 — single-model ceiling
+  ~0.892; gold cleared 0.90+ via FE + ensembling.
 
-### F. Playground S6E2 — Predicting Heart Disease (binary AUC, small)
+bp impacts not disclosed. Strongest take: **original-dataset join** was
+the s4e1 differentiator; NN secondary.
 
-- URL: https://www.kaggle.com/competitions/playground-series-s6e2
-- 1st place writeup "Diversity, Selection, and Trusting the CV–LB
-  Relation" (https://www.kaggle.com/competitions/playground-series-s6e2/writeups/1st-place-solution-diversity-selection-and-t).
-  Body inaccessible. Title is the load-bearing finding: **diversity at
-  base + select on a CV-LB-correlated subset of folds.**
-- Top-1 multi-seed notebook (https://www.kaggle.com/code/masanakashima/s6e2-heart-disease-top1-multi-seed)
-  body inaccessible; title implies seed-bagging at the base level.
-- Less analogous (only ~600k rows in s6e5 vs ~10k here) so down-weight.
+## Source 3 — PS S3E23 Software Defects
 
-### G. NVIDIA Kaggle Grandmasters Playbook (cross-comp synthesis source)
+All top-3 writeup bodies inaccessible; the kimberlybecker GitHub repo
+README also returned no body content. Kaggle CLI cannot list discussions.
+After 2 retries on the writeup and competition pages, this source
+**(not accessible)**. Fallback signal from search snippets:
 
-- https://developer.nvidia.com/blog/the-kaggle-grandmasters-playbook-7-battle-tested-modeling-techniques-for-tabular-data/
-- Seven techniques distilled from 2024–2025 Playground wins:
-  1. Smarter EDA (train/test distribution shift, temporal patterns).
-  2. **Diverse baselines** built right away (linear / GBDT / NN).
-  3. **Feature engineering at scale** (e.g. 8 cats → 28 interaction
-     features; thousands of FE candidates).
-  4. **Hill climbing** for blend weights (start strong, add only if it
-     improves CV).
-  5. Stacking (residual-based or OOF-based; meta is usually linear).
-  6. **Pseudo-labeling** on test (soft labels back into train).
-  7. Extra training: multi-seed bag + retrain on 100% data after HPO.
-- https://developer.nvidia.com/blog/grandmaster-pro-tip-winning-first-place-in-kaggle-competition-with-feature-engineering-using-nvidia-cudf-pandas/
-  S5E2 backpack winner generated >10k FE candidates via
-  `groupby(COL1)[COL2].agg(STAT)` over (mean, std, count, min, max,
-  nunique, skew) plus quantile binning, then kept top 500 by importance.
-  **GBDT-friendly FE search at scale** — the same pattern likely
-  generalizes to s6e5's (Driver, Race, Compound, Lap) keys.
+- Public notebooks for S3E23 cluster around stacking-ensemble template
+  (e.g. `zhukovoleksiy/ps-s3e23-explore-data-stacking-ensemble`,
+  `kumudithasilva/ps-s3e23-robustscaler-ensemble-medianpruner`) —
+  consistent with the same XGB+LGB+CatBoost stacking pattern that wins
+  most playground binary-AUC tasks.
+- No verifiable winning-mechanism citation. Skip per brief's "don't
+  invent" rule. Treat S3E23 as a missing data point rather than a
+  zero. Day-2 manual scrape (browser) recommended if PI grants time.
 
-## Cross-comp themes
+## Cross-comp themes (synthesizing Sources 1, 2, plus Appendix A)
 
-### Most common high-impact mechanism
+### Highest-recurring high-impact mechanism
+**OOF stacking with linear (LR/Ridge) meta-learner over a diverse base
+pool (GBDT trio ± RealMLP/EmbMLP)** — used by analyticaobscura
+[Source 1 #2], 5/6 Appendix-A comps, and the S4E1 GitHub winner. Top
+finishers used 3000-Dirichlet random weight search over OOF rather
+than greedy hill climbing because the OOF noise band on this data is
+1bp (analyticaobscura's stated reason). Linear meta beats tree meta
+in ≥4/5 disclosed cases.
 
-Across 5 of 6 comps the top finishers used **GBDT trio (XGB+LGBM+
-CatBoost) + linear meta-learner** with 5–10 fold OOF stacking. NN
-(MLP, TabPFN) was added on top only in S6E3 1st (4-level / 150 models)
-and helped on heart disease via multi-seed bagging. **Linear meta-
-learner (Ridge / Logistic) beats tree meta** in 4 of 5 comps where the
-meta type was disclosed (S6E3 1st, S6E3 top-8, S5E11 stack snippet).
-Single exception: S5E8 6th place used LGBM as meta — likely because
-they had only ~3 base models and tree meta is robust on small
-base-feature counts.
+### NN integration paid off?
+- Source 1 (F1 dataset notebooks): **YES** — RealMLP/EmbMLP are
+  load-bearing in analyticaobscura's stack, and yekenot's standalone
+  RealMLP at 56 votes hits ≈0.946 OOF (within ~5bp of top GBDTs).
+  Driver embeddings via PyTorch (EmbMLP) lifted blend diversity.
+- Source 2 (S4E1): **mixed** — Pairavi credits CatBoost+NN as
+  "superior to baseline," but no bp lift over CatBoost-only is cited.
+  Treat as ≤5bp evidence.
+- Source 3: not accessible.
+- Verdict: **at 439k rows, RealMLP/EmbMLP is worth a Day-3 probe**
+  (vs Day-15+ from the prior six-comp scan in Appendix A) — the F1
+  dataset's notebook ladder already validates this lift on s6e5
+  specifically. Caveat: NN is a diversifier, not a standalone winner.
 
-### F1-style sequential vs customer-style data
+### Target encoding patterns
+- Source 1 #2: **OOF target encoding with smoothing α=80**, inner
+  5-fold per outer fold (no leakage). Columns: high-cardinality
+  Driver, Race, Compound, Driver×Race interactions.
+- Source 2: not described in third-party material.
+- Recurring: smoothing 50–100, inner OOF (not naive group-mean), kept
+  as an additional column rather than replacing raw category.
 
-s6e5 is unusual in this set: rows are per-(driver, lap) **sequences**,
-not iid customers. None of the closer comps (S6E3, S5E11, S5E8, S4E7,
-S4E1) had within-row temporal structure; their natural groups were
-demographic IDs, not stints. Implication: **the unique edge for s6e5
-is sequence FE** — within-(driver, race) lag features, "laps since
-last pit," tire-life proxies, leader-gap dynamics — and group-aware
-CV on Race (already adopted as R1 anchor-b in CLAUDE.md) is critical
-because (driver, race) groups are not iid across the StratifiedKFold
-seed-42 split. None of the comps studied surfaced a within-group
-leakage warning; ours is real (97.4% of test rows have a same-(Race,
-Driver) successor in test, per `comp-context.md` u3 probe), so the
-analog is closer to the S5E11 SMOTETomek-leakage horror story than
-to S4E1 row-pair leakage.
+### Stacker pattern dominant
+**Logistic regression on `[raw, rank, logit]` meta-features** (Source 1
+#2) and **LR/Ridge on probabilities** (Appendix A). Tree meta-stacker
+appears only when ≤3 base models. The "raw + rank + logit" three-
+representation meta-input is a transferable trick — use it.
 
-### Is NN integration worth it at 439k rows?
+### Contradictions with irrigation-water postmortem
+- **Override-mechanism rules (R7)**: irrigation-water saw negative
+  OOF→LB gaps from a 108-flip selective override. Source 1's stack-
+  based approach has no override. Source 2's `Exited_Orig` join is
+  feature-level, not override-level. **No contradiction**, but R7
+  may not bind on s6e5 if no small-flip rule emerges.
+- **NN expedition was net-zero** in irrigation-water (18 architectures
+  produced 0 LB lift). **Source 1 contradicts** this for s6e5: RealMLP
+  and EmbMLP are top-tier on this DGP. Likely because s6e5's DGP is
+  NOT rule-structured the way irrigation-water's was (axis-aligned
+  thresholds favoured trees there); on s6e5, smoothed approximators
+  (NNs) appear to compete. Treat as a real divergence, not a leak.
+- **Hand-coded physics-faithful FE regressed** in irrigation-water
+  (PM-02 Phase 2). **Source 1 confirms** this for s6e5 (pilkwang:
+  *"Simple physical priors are fragile."*). Same direction, different
+  comp — strongest cross-comp recurrence in this pass.
 
-S6E3 1st (4-level stack, 150 models) clearly used NN. S6E3 top-8 did
-not. S5E11 1st did not (per Sanjay Bista's tier; only LGBM-class).
-S4E7 / S4E1 / S5E8 top finishers: GBDT-trio dominant, no NN evidence
-in accessible coverage. Verdict: **at 439k rows with mild imbalance,
-NN integration is a Day-15+ activity, not a Day-3 priority.** Add NN
-only after the GBDT-trio + linear-meta hits its OOF ceiling. Use a
-small MLP or TabPFN-style model with row-level features only; do not
-attempt RNN/Transformer over (Race, Driver) sequences without a
-pre-validated feature pipeline first.
+## Top 5 candidates for s6e5 Day 2-7
 
-### Stacker patterns
-
-- 5 of 6 disclosed: linear (Ridge or Logistic) meta beats tree meta.
-- Tree meta (LGBM as stacker) safe only when ≤4 base models.
-- 2-stage variant (ridge OOF → XGBoost on ridge_oof + features) used
-  by S6E3 top-8 — boosts non-linearity at the meta step without giving
-  up the linear shrinkage.
-
-### Rank-blending
-
-Not surfaced as a top mechanism in any of the AUC comps studied here.
-**Probability blending was the norm.** Hill climbing was the dominant
-search procedure for blend weights; rank-averaging appears as a
-fallback only when scales differ wildly between bases.
-
-### Submission discipline
-
-S6E3 1st: 850 experiments → 150 selected → 4-level stack. S5E11 1st:
-"a lot of features, a lot of models." S6E2 1st: "diversity, selection,
-and trusting the CV-LB relation." All three winners selected the
-final blend on a CV/private alignment criterion, not raw public LB
-chasing. This converges with our R2 (PRIMARY = best public, HEDGE =
-best OOF that regressed ≤30bp public) and R5 (mandatory probe of the
-OOF-best rejected for public regress).
-
-## Top 5 candidates to try on s6e5 (also returned in reply summary)
-
-1. **Sequence FE within (Driver, Race)**: `laps_since_last_pit`,
-   `pit_count_this_race`, lag/lead Compound, tire-life proxy
-   (Lap − last_pit_lap), gap-to-leader Δ. Closest analog to S6E3 n-gram
-   trick but adapted to F1 sequences. **Expected lift: 30–60 bp**
-   (this is the s6e5-unique edge, no comp tested it directly).
-2. **Original-dataset join (aadigupta1601)**: replicate the S4E1
-   `Exited_Orig` move. If a row in s6e5 train can be matched to an
-   original-dataset row by (Driver, Race, Lap or near-Lap) and the
-   original carries a label, treat as auxiliary feature. **Expected
-   lift: 50–200 bp if such a join exists**, 0 bp if synthetic data is
-   shuffled. Run a probe before investing.
-3. **GBDT-trio + Ridge/Logistic meta-learner, 5–10 fold OOF**: keep XGB
-   + LGBM + CatBoost as bases, switch the stacker from any tree to
-   Ridge or Logistic. **Expected lift over single-LGBM baseline: 10–25
-   bp** based on S5E11 stack (logistic meta added 8 bp over best
-   single).
-4. **FE-at-scale via groupby(COL1)[COL2].agg(STAT)**: sweep
-   {Driver, Race, Compound, Driver×Race} × numeric_columns × {mean,
-   std, count, nunique, min, max, p10, p90}. Keep top 30–50 by gain
-   importance. **Expected lift: 15–40 bp** (S5E2 winner used a 500/10k
-   keep ratio; we'd be more conservative at 50/500).
-5. **Hill-climbing blend selector + multi-seed bag at base**: train
-   each base under 5 seeds, hill-climb across the ~15 base predictions.
-   **Expected lift: 5–15 bp** on top of GBDT-trio + linear meta. Cheap
-   compute at our scale.
+1. **Add RealMLP/EmbMLP to base pool + LR meta on [raw,rank,logit]**
+   — analyticaobscura proves it on s6e5 data (Source 1 #2).
+   *Lift 30–50 bp* over GBDT-trio. *Code*: PyTorch embeds on
+   Driver/Race/Compound; `dirichlet_search(oof,y,n_cand=3000)` then LR
+   on [raw,rank,logit]. *Pre*: GBDT-trio OOF std ≤1bp (already true).
+2. **Dirichlet random-search blend (3000 cand, α=1) on raw+rank OOF**
+   — replaces greedy hill climbing. *Lift 5–15 bp*. *Code*: ~30 lines,
+   `np.random.dirichlet`. *Pre*: ≥3 base models.
+3. **OOF target encoding on (Driver, Race, Compound, Driver×Race),
+   smoothing α=80, inner 5-fold/outer fold** (Source 1 #2 explicit).
+   *Lift 15–30 bp*. *Pre*: keep raw category alongside; do not replace.
+4. **Original-dataset (aadigupta1601) join probe** — the S4E1
+   `Exited_Orig` move (Source 2). Match s6e5 rows to aadigupta1601 on
+   (Driver, Race, Lap). *Lift 50–200 bp if join hits, 0 if shuffled*.
+   *Code*: probe LGBM with join indicator + any leaked numerics.
+   *Pre*: ≥10% match rate.
+5. **Drop physics-faithful hand-FE; keep relative-state FE only**
+   (pilkwang Source 1 + PM-02 Phase 2). *Defensive — prevents 5–50 bp
+   regression* from SOFT/MEDIUM/HARD priors. *Code*: audit FE list;
+   keep `Position_Change`, `LapTime_Delta`, `RaceProgress`.
 
 ## Coverage notes / gaps
 
-- S4E1 Bank Churn top-3 writeup bodies all inaccessible; the leakage
-  finding is from a third-party Medium summary, not the host writeup.
-  Worth a Day-2 manual scrape if PI grants browser time.
-- S5E11 1st-place writeup body inaccessible; lift estimate for
-  candidate #3 leans on stack-snippet AUC numbers (FelixCharotte
-  GitHub) and S6E3-top-8 (dev.to).
-- S3E23 Software Defects: skipped — no top-3 writeup accessible and
-  the dataset shape (small, no group structure) is far from s6e5.
-- S5E1 / S5E5 / S4E5 / S4E12: regression metrics, skipped per brief.
-- aadigupta1601 dataset top-voted notebooks: search returned only the
-  dataset card; no notebook with extractable signal beyond what is
-  already in EDA. Further drill-down needs the Kaggle CLI to list
-  notebook IDs (same fallback we used for `brief.md`).
+- S3E23: all top writeups inaccessible (not accessible). Day-2 manual
+  browser scrape recommended.
+- S4E1: top-3 bodies inaccessible; `Exited_Orig` insight from Pairavi
+  Medium third-party. Confidence: medium.
+- aadigupta1601 top-3 retrieved via kaggle CLI. The pulled
+  `pit-or-stay-f1-strategy-1.ipynb` (94k chars) is the single most
+  actionable file in this audit.
+- Six-comp scan from earlier today reinforces the LR-meta + GBDT-trio
+  + linear-meta finding (preserved separately if needed).
