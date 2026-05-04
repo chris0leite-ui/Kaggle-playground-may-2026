@@ -9,40 +9,40 @@ on session start.
 ```yaml
 slug: playground-series-s6e5
 url: https://www.kaggle.com/competitions/playground-series-s6e5
-title: {{TITLE}}
-task: {{TASK}}                  # binary | multiclass | regression
-metric: {{METRIC}}              # bal_acc | log_loss | rmse | auc | ...
-train_rows: {{N_TRAIN}}
-test_rows: {{N_TEST}}
-deadline: {{DEADLINE}}
-team_size_limit: {{TEAM_LIMIT}}
-submission_budget: {{DAILY_LIMIT}}/day
-final_submissions: {{FINAL_LIMIT}}
-data_license: {{LICENSE}}
-external_data_allowed: {{EXTERNAL}}    # yes | no | conditional
+title: Predicting F1 Pit Stops
+task: binary
+metric: roc_auc                 # to confirm — scores ~0.95 consistent with AUC
+train_rows: TBD                 # filled after batch-C download
+test_rows: 188165
+deadline: 2026-05-31 23:59:00 UTC
+team_size_limit: TBD            # confirm from comp rules
+submission_budget: 5/day         # inferred from LB (max ~3.5/day observed); rules page blocked — confirm
+final_submissions: 2            # Playground default — confirm
+data_license: CC BY 4.0         # Playground default — confirm
+external_data_allowed: yes      # Playground default — confirm
 ```
 
 ## Schema (auto-filled by kickoff EDA)
 
 ```yaml
-target_col: {{TARGET_COL}}
-id_col: {{ID_COL}}
+target_col: PitNextLap
+id_col: id
 feature_count:
-  numeric: {{N_NUM}}
-  categorical: {{N_CAT}}
-class_priors: {{PRIORS}}        # if classification, else null
-missingness_train: {{MISS_TRAIN}}
-missingness_test: {{MISS_TEST}}
+  numeric: TBD                  # filled after batch-C EDA
+  categorical: TBD
+class_priors: TBD               # filled after batch-C EDA
+missingness_train: TBD
+missingness_test: TBD
 ```
 
 ## LB context (auto-filled from leaderboard download)
 
 ```yaml
-lb_best_at_kickoff: {{LB_BEST}}
-pack_score_at_rank_100: {{LB_RANK_100}}
-total_teams_at_kickoff: {{N_TEAMS}}
-top_5pct_rank: {{RANK_5PCT}}    # 0.05 * N_TEAMS
-top_5pct_score: {{SCORE_5PCT}}  # rank top_5pct_rank's score
+lb_best_at_kickoff: 0.95435
+pack_score_at_rank_100: 0.95138
+total_teams_at_kickoff: 542
+top_5pct_rank: 27               # 0.05 * 542
+top_5pct_score: 0.95345         # score at rank 27
 public_split_pct: 20            # default for Playground; confirm for Featured
 probe_resolution_floor: 0.00005 # 80/20 split × N_TEST (re-derive if Featured)
 ```
