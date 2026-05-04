@@ -1,0 +1,25 @@
+{
+  "oof_score": 0.9128414245048602,
+  "fold_std": 0.01651738808642088,
+  "fold_scores": [
+    0.9019303627309481,
+    0.9000714207936514,
+    0.8943380285405937,
+    0.9337209698040649,
+    0.9303499297305587
+  ],
+  "cv": "GroupKFold(Race)",
+  "metric": "roc_auc",
+  "delta_vs_baseline_bp": -77.48575495139853,
+  "delta_vs_d2a_bp": -34.38575495139817,
+  "alpha": 80.0,
+  "te_keys": [
+    "Driver",
+    "Race",
+    "Compound",
+    "Driver_Race",
+    "Race_Compound",
+    "Driver_Compound",
+    "Race_LapBin"
+  ]
+}

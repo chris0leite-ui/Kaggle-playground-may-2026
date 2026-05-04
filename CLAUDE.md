@@ -91,6 +91,7 @@ mechanism_families_explored:
   - catboost_gpu_multi_seed_bag     # cb_slow-wide-bag -- BEST CB on Strat
   - corr_pool_prune                 # M5g (ρ≥0.97) -- TOO aggressive
   - l1coef_pool_prune               # M5h -- only prune that preserves OOF
+  - unified_te_2way_keys            # d3a -- +2.2bp Strat std-alone, +0.1bp stacked (null)
 plateau_days: 0
 gate_status: cleared
 headroom_to_top5pct: 0.00354      # 0.95345 − 0.94991 = 35.4bp
@@ -114,18 +115,22 @@ headroom_to_top5pct: 0.00354      # 0.95345 − 0.94991 = 35.4bp
 | m5e (CB-only 13-base) | 0.95027 | 0.93084 | n/a | held; M5c + 3 CB winners |
 | **m5f (combined 15-base)** | **0.95042** | **0.93105** | n/a | held; M5d + M5e new bases |
 | m5g (corr ρ≥0.97 prune) | 0.94961 | 0.92915 | n/a | TOO aggressive; 5/15 surv |
-| **m5h (L1coef top-13)** | **0.95043** | **0.93087** | **0.94991** | **NEW PRIMARY**; gap −5.2bp; drop m3+m4 dead weight |
+| **m5h (L1coef top-13)** | **0.95043** | **0.93087** | **0.94991** | **CURRENT PRIMARY**; gap −5.2bp; drop m3+m4 dead weight |
+| d3a_te_unified | 0.93692 | 0.91284 | n/a | +2.2bp Strat vs d2a; std-alone redundant w/ d2a |
+| m5i (M5h+d3a, 14) | 0.95043 | 0.93096 | n/a | d3a L1=0.079 last; tie M5h Strat |
+| m5j (d3a swaps d2a, 13) | 0.95044 | 0.93092 | n/a | d3a L1=1.065 (3rd); +0.1bp Strat tie |
 
 ## Hypothesis board (Day 3)
 
 ```
 - DONE: H3 corr-prune sweep -- L1coef-13 (M5h) is the only prune that
         preserves M5f OOF; submit candidate alongside M5f.
-- ACTIVE: 4 cheap diagnostics from strategy-critique
-        (per-Race/Stint/Year OOF; reliability; agreement matrix; sequence-FE)
+- DONE: 2-way TE (Driver×Compound + Race×LapBin via d3a unified)
+        -- standalone +2.2bp Strat, stacked +0.1bp (null). M5j swap viable.
+- ACTIVE: Step 2 sequence-FE base (laps_since_last_pitstop,
+        cumulative_pitstops_this_race, rolling_target_rate(window=5))
 - H1: pseudo-labeling guarded by multi-base agreement (≥10/13 of M5h)
 - H4: HGBC multi-seed bagging (echo cb_slow-wide-bag pattern)
-- 2-way TE (Driver×Race, Driver×Compound) — Day-1 lever, never executed
 - Kaggle-GPU port of RealMLP (per yekenot 56-vote notebook)
 ```
 
@@ -136,4 +141,5 @@ headroom_to_top5pct: 0.00354      # 0.95345 − 0.94991 = 35.4bp
 - `audit/2026-05-04-strategy-critique.md` — Rule 14 origin.
 - `audit/2026-05-04-catboost-research.md` — CatBoost lever map.
 - `audit/2026-05-04-m5h-l1coef-prune.md` — Day-3 submit candidate.
+- `audit/2026-05-04-d3a-te-unified.md` — Step 1 result + M5i/M5j.
 - `audit/friction.md` — friction one-liners.

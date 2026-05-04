@@ -1,0 +1,36 @@
+{
+  "strat": 0.9504356185634331,
+  "groupkf": 0.9309178375807761,
+  "delta_m5h_strat_bp": 0.05618563433062995,
+  "delta_m5h_groupkf_bp": 0.47837580776088906,
+  "pool": [
+    "baseline",
+    "d3a_te_unified",
+    "m2_xgb",
+    "e1_cb_sub",
+    "e3_hgbc",
+    "e5_optuna_lgbm",
+    "a_horizon",
+    "b_lapsuntilpit",
+    "f1_hgbc_deep",
+    "f2_hgbc_shallow",
+    "cb_year-cat",
+    "cb_lossguide",
+    "cb_slow-wide-bag"
+  ],
+  "l1_strat": {
+    "baseline": 0.4759571401603544,
+    "d3a_te_unified": 1.065333790427942,
+    "m2_xgb": 0.3206644138698386,
+    "e1_cb_sub": 0.2915706387972636,
+    "e3_hgbc": 0.44902166682662814,
+    "e5_optuna_lgbm": 1.2091648892045224,
+    "a_horizon": 0.8822882872293066,
+    "b_lapsuntilpit": 0.7581356364441351,
+    "f1_hgbc_deep": 0.30009825097099585,
+    "f2_hgbc_shallow": 0.28897818773669115,
+    "cb_year-cat": 0.510314271597582,
+    "cb_lossguide": 0.4077745107475225,
+    "cb_slow-wide-bag": 1.5070710683023691
+  }
+}
