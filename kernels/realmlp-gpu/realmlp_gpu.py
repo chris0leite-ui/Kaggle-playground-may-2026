@@ -52,16 +52,37 @@ def gpu_boot():
 def install_pytabkit():
     """Install pytabkit (RealMLP) into the kernel runtime.
 
-    Kaggle's GPU base image does not include pytabkit. Internet enabled.
-    Requires T4 GPU (sm_75) — pre-installed and pulled torch only support
-    sm_70+, so machine_shape="GpuT4x2" must take effect (P100 = sm_60).
+    P100 (sm_60) compat: Kaggle silently ignores machine_shape=GpuT4x2 —
+    every push (v1, v2, fresh-slug v1) ran on P100. Kaggle's pre-installed
+    torch and pytabkit's pulled torch both lack sm_60. Fix: --force-reinstall
+    torch 2.4 (last release with sm_60 wheels) before pytabkit.
     """
-    print("[setup] installing pytabkit ...")
+    print("[setup] force-reinstall torch 2.4 (sm_60 P100 support) ...")
     subprocess.check_call([
-        sys.executable, "-m", "pip", "install", "--quiet", "--no-warn-script-location",
+        sys.executable, "-m", "pip", "install", "--quiet",
+        "--force-reinstall", "--no-deps",
+        "torch==2.4.*", "torchvision==0.19.*",
+    ])
+    print("[setup] installing pytabkit (--no-deps to preserve torch pin) ...")
+    subprocess.check_call([
+        sys.executable, "-m", "pip", "install", "--quiet", "--no-deps",
         "pytabkit",
     ])
-    print("[setup] pytabkit installed.")
+    print("[setup] installing pytabkit transitive deps ...")
+    subprocess.check_call([
+        sys.executable, "-m", "pip", "install", "--quiet",
+        "pytorch-lightning>=2.0,<2.5", "skorch", "torchmetrics<1.5",
+    ])
+    # Sanity-check torch is the pinned version with sm_60 support
+    import importlib
+    if "torch" in sys.modules:
+        importlib.reload(sys.modules["torch"])
+    import torch
+    print(f"[setup] torch version: {torch.__version__}")
+    if torch.cuda.is_available():
+        print(f"[setup] CUDA: {torch.version.cuda}, "
+              f"device 0: {torch.cuda.get_device_name(0)}, "
+              f"capability: {torch.cuda.get_device_capability(0)}")
 
 
 def find_data_dir():
