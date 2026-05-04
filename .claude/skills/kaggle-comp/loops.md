@@ -19,6 +19,26 @@ human triggers Calibration / Research / Weekly when conditions hit.
 
 **Stop**: 5/5 submissions used, OR PI declares EOD.
 
+**Auto-trigger recognition (load-bearing — added 2026-05-04):** the
+agent MUST recognize day-end from CONTEXT and execute steps 5-7
+WITHOUT being prompted, asked, or invoked via slash command. The
+PI does not run commands; the agent listens and acts. Day-end cues
+the agent must catch:
+
+- The most recent LB submit pushed `submissions_used_today` to 5
+  (parse `kaggle competitions submissions` output or CLAUDE.md
+  state block).
+- PI's natural-language EOD signals: "the day is done", "let's
+  wrap up", "stop submitting today", "no more LB submits", "EOD",
+  "we're done for today", "let's call it", or any close paraphrase.
+- Kaggle UTC midnight passes during an active session (slots reset).
+
+When ANY cue fires, immediately execute the EOD workflow (steps 5-7)
+in one batch without asking permission. The wrap is non-LB-touching
+and Rule 1 does not apply. After the wrap, give the PI a 1-sentence
+"day-N closed; wrap committed" notice and stop. Don't sit on
+artifacts. Don't ask "should I write the wrap?" — just write it.
+
 ```
 1. Load state (Haiku): comp-context.md, last 3 audit/, lb_status.py
 2. Pick experiment (Sonnet): from queue or new hypothesis.
@@ -31,13 +51,19 @@ human triggers Calibration / Research / Weekly when conditions hit.
    ready and slot remains, propose to PI for single-shot submit.
 4. After each LB result lands: update calibration ladder; if
    slots still remain and PI hasn't called EOD, return to step 2.
-5. End-of-day audit: write audit/YYYY-MM-DD-<topic>.md, update
-                     calibration ladder, 3-bullet PI summary.
-   Trigger ONLY when day-end condition fires (5/5 used or
-   PI EOD). Don't prematurely close the day.
-6. Append any friction one-liners to audit/friction.md
-   (NOT CLAUDE.md — see self-improvement.md)
-7. Queue next session's first 3 experiments
+5. End-of-day audit (auto-trigger; no prompting): write
+   audit/YYYY-MM-DD-day-N-wrap.md with FOUR REQUIRED SECTIONS:
+   (a) 3-bullet PI summary,
+   (b) Calibration ladder snapshot (today's submits + OOF→LB gaps),
+   (c) Problems to address (load-bearing constraints surfaced today),
+   (d) Hypotheses ranked by predicted-lift × CPU-feasibility +
+       next-steps sequence (compute window + slot plan).
+   Update CLAUDE.md state block (day, our_lb_best, headroom).
+6. Append friction one-liners distilled from the day to
+   audit/friction.md (NOT CLAUDE.md — see self-improvement.md).
+7. Queue next session's first 3 experiments in CLAUDE.md
+   hypothesis board. Then commit + push to feature branch AND
+   merge to main (PI authorized 2026-05-04).
 ```
 
 ## Experiment-loop
