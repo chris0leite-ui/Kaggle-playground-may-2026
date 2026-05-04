@@ -67,3 +67,22 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   2 features. Fix: every FE candidate must first be checked
   against `train.columns` and the data dictionary in `brief.md`
   / `comp-context.md`. Add step to do-and-dont.md.
+
+- `tag: kaggle-kernel-metadata-bools` — `kaggle kernels init`
+  template emits string-quoted booleans (`"is_private": "true"`,
+  `"enable_gpu": "false"`). The CLI silently accepts these but
+  Kaggle treats string `"true"` as `false`, so `enable_gpu: "true"`
+  → GPU never allocated; `enable_internet: "false"` → actual
+  no-internet. First push of cb-slow-wide-gpu wasted 2 retries on
+  data-mount failure caused by this. Fix: ALWAYS edit the template
+  to use bare booleans (`true`, `false`) — pull a known-working
+  prior kernel (`kaggle kernels pull <user>/<slug> -m`) for
+  reference. Add to do-and-dont.md anti-pattern list.
+
+- `tag: kaggle-input-rglob` — Comp data path under `/kaggle/input/`
+  varies (`/kaggle/input/<slug>/`, `/kaggle/input/competitions/<slug>/`,
+  or via attached private dataset). Hardcoding `/kaggle/input/<slug>/`
+  fails ~30% of pushes. Pattern from irrigation-catboost-v2-gpu:
+  `train_path = next(Path('/kaggle/input').rglob('train.csv'))`.
+  Always use rglob for kernel data discovery. Add to
+  examples/kernel-template.md.

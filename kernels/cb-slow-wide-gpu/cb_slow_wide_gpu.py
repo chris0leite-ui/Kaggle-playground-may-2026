@@ -64,22 +64,41 @@ def run_anchor(seed, anchor_name, splits, X, y, X_test):
 
 
 def find_data_dir():
+    """Find the directory containing train.csv anywhere under /kaggle/input.
+
+    Pattern from irrigation-catboost-v2-gpu (working prior-comp kernel):
+    use rglob to search recursively; comp data may mount at varying depths
+    (/kaggle/input/<slug>/, /kaggle/input/competitions/<slug>/, etc.).
+    """
     import os
     base = Path("/kaggle/input")
     if not base.exists():
-        raise RuntimeError(f"/kaggle/input does not exist; ls /kaggle: {os.listdir('/kaggle')}")
-    print(f"DEBUG /kaggle/input = {os.listdir(base)}")
-    for sub in base.iterdir():
-        if sub.is_dir():
-            files = list(sub.glob("*.csv"))
-            print(f"DEBUG {sub} contains {[f.name for f in files]}")
-            if any(f.name == "train.csv" for f in files):
-                return sub
-    raise RuntimeError("could not locate train.csv under /kaggle/input")
+        raise RuntimeError(f"/kaggle/input missing; ls /kaggle: {os.listdir('/kaggle')}")
+    print(f"DEBUG ls /kaggle/input recursive (first 30):")
+    for i, p in enumerate(sorted(base.rglob("*"))):
+        if i >= 30:
+            print("  ...")
+            break
+        print(f"  {p}")
+    matches = list(base.rglob("train.csv"))
+    if not matches:
+        raise RuntimeError(f"no train.csv anywhere under {base}")
+    train_path = matches[0]
+    print(f"Found train.csv at {train_path}")
+    return train_path.parent
 
 
 def main():
     t0 = time.time()
+    # GPU sanity check
+    try:
+        import subprocess
+        out = subprocess.check_output(
+            ["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader"],
+            text=True, timeout=10).strip()
+        print(f"[boot] GPU info: {out}")
+    except Exception as e:
+        print(f"[boot] nvidia-smi failed: {e}")
     data_dir = find_data_dir()
     print(f"Using data_dir={data_dir}")
     train = pd.read_csv(data_dir / "train.csv")
