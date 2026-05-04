@@ -58,6 +58,8 @@ artifacts. Don't ask "should I write the wrap?" — just write it.
    (c) Problems to address (load-bearing constraints surfaced today),
    (d) Hypotheses ranked by predicted-lift × CPU-feasibility +
        next-steps sequence (compute window + slot plan).
+   **Step 5.5: run Strategy-critic-loop** (see `strategy-critic.md`)
+   if any auto-trigger cue is live. Output drives the (d) re-rank.
    Update CLAUDE.md state block (day, our_lb_best, headroom).
 6. Append friction one-liners distilled from the day to
    audit/friction.md (NOT CLAUDE.md — see self-improvement.md).
@@ -140,6 +142,25 @@ entry > 5bp (LB above OOF), OR after any leakage incident.
    meta on the refit
 4. Commit calibration_ladder.md
 ```
+
+## Strategy-critic-loop
+
+**Trigger** (auto-fire, see `strategy-critic.md` for full spec):
+end-of-day audit, OOF→LB gap drift ≥2bp on consecutive submits in
+the same family, before adding a new mechanism family, mid-comp
+50%-checkpoint, OR plateau (in which case it runs BEFORE Research).
+
+```
+1. Per-segment OOF-AUC failure map (Race / Stint / TyreLife / Year)
+2. Probability calibration (Brier, ECE, reliability diagram)
+3. Model-disagreement localization (residual-difficulty rows)
+4. Unexploited structural-finding scout (sequence FE, etc.)
+5. Headroom math vs realistic-discount H-list lift
+→ emit audit/YYYY-MM-DD-strategy-critique.md and re-rank H-list
+```
+
+Strategy-critic interrogates OUR data; Research-loop scouts EXTERNAL
+writeups. Orthogonal — at plateau, both fire, critic first.
 
 ## Research-loop
 
