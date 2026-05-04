@@ -91,8 +91,7 @@ Top-3 writeup bodies all inaccessible (JS gating). Fallbacks:
   single-LGBM 5-fold AUC 0.8893 / public 0.89197 — single-model ceiling
   ~0.892; gold cleared 0.90+ via FE + ensembling.
 
-bp impacts not disclosed. Strongest take: **original-dataset join** was
-the s4e1 differentiator; NN secondary.
+Strongest take: **original-dataset join** was s4e1's differentiator.
 
 ## Source 3 — PS S3E23 Software Defects
 
@@ -198,5 +197,4 @@ representation meta-input is a transferable trick — use it.
 - aadigupta1601 top-3 retrieved via kaggle CLI. The pulled
   `pit-or-stay-f1-strategy-1.ipynb` (94k chars) is the single most
   actionable file in this audit.
-- Six-comp scan from earlier today reinforces the LR-meta + GBDT-trio
-  + linear-meta finding (preserved separately if needed).
+- Six-comp scan from earlier today reinforces LR-meta + GBDT-trio.
