@@ -2,6 +2,19 @@
 
 Running log + ⚠️ rules. Cap ≤50k tokens; archive when bloated.
 
+## ⚠️ Reference branch — check `origin/main` FIRST every session
+
+Truth lives on `origin/main`. Feature branches (`claude/*`) often start
+behind. Before planning, executing, or answering "what's next?" — run:
+
+```
+git fetch origin && git log --oneline HEAD..origin/main
+```
+
+If non-empty, fast-forward (`git merge origin/main --ff-only`) before
+reading `CLAUDE.md`, `audit/`, or `scripts/`. The state below is only
+authoritative once you've synced.
+
 ## ⚠️ Top-level rules (inherited from kaggle-comp framework)
 
 These eleven invariants are LOAD-BEARING. Do not skip.
