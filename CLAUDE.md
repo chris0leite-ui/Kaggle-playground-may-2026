@@ -65,13 +65,14 @@ They override the kickoff-time defaults.
 ```yaml
 day: 1
 lb_best_today: 0.95435            # leader at kickoff (2026-05-04)
-our_lb_best: null                 # update after first submit
-submissions_used_today: 0
-submissions_used_total: 0
+our_lb_best: 0.94113              # baseline_two_anchor (StratKFold), Day-1
+submissions_used_today: 1
+submissions_used_total: 1
 saturation_count: 0
-mechanism_families_explored: []
+mechanism_families_explored: [baseline_lgbm_raw_features]
 plateau_days: 0
 gate_status: cleared              # pre-baseline gate cleared 2026-05-04; see audit/2026-05-04-pre-baseline-gate.md
+headroom_to_top5pct: 0.01232      # 0.95345 − 0.94113 = 123bp
 ```
 
 ## Calibration ladder
@@ -80,15 +81,18 @@ Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 
 | Mechanism | OOF | LB | Gap | Notes |
 |---|---:|---:|---:|---|
-| baseline_two_anchor (StratKFold) | 0.94075 | TBD | TBD | i.i.d. anchor; matches test (U3) |
+| baseline_two_anchor (StratKFold) | 0.94075 | 0.94113 | +3.8bp | calibration ✓ ; anchor A confirmed right proxy |
 | baseline_two_anchor (GroupKFold Race) | 0.92059 | n/a | n/a | race-robustness; not LB proxy |
 
 ## Hypothesis board
 
 ```
-- (queued for next session)
-- (queued for next session)
-- (queued for next session)
+- Day-2 (a): external-data join (aadigupta1601, minus Normalized_TyreLife)
+             expected lift +10-30bp; cheap
+- Day-2 (b): FE — interactions (TyreLife×Compound, LapNumber×RaceProgress,
+             Compound×Stint) + target encoding for Driver, Race×Compound
+             expected lift +30-60bp; needs OOF discipline (proper inner CV)
+- Day-3+ : top-notebook replication (RealMLP/PyTabKit; Driver-FE ladder)
 ```
 
 ## Friction log pointer
