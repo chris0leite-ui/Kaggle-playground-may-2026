@@ -1,0 +1,32 @@
+[
+  {
+    "name": "d3e_ebm",
+    "label": "EBM (GA\u00b2M)",
+    "oof": 0.9336098887516584,
+    "delta_m5h_bp": -168.20111248341595,
+    "rho_consensus": 0.9410343869606782,
+    "rho_m5h_test": 0.9308144035363867,
+    "diff_hi_disagreement": 0.040866139897861045,
+    "diff_stint2": 0.06639865672209742
+  },
+  {
+    "name": "d3f_pseudo_lgbm",
+    "label": "H1 pseudo-label LGBM",
+    "oof": 0.9426477009121877,
+    "delta_m5h_bp": -77.8229908781225,
+    "rho_consensus": 0.9798559661367916,
+    "rho_m5h_test": 0.9653947921758824,
+    "diff_hi_disagreement": 0.03170146286981827,
+    "diff_stint2": 0.05657045784019539
+  },
+  {
+    "name": "d3g_lr_fe",
+    "label": "LR with FE",
+    "oof": 0.896837250092458,
+    "delta_m5h_bp": -535.9274990754203,
+    "rho_consensus": 0.8815789609563143,
+    "rho_m5h_test": 0.8691632612838358,
+    "diff_hi_disagreement": 0.23902875738618642,
+    "diff_stint2": 0.15395018952684095
+  }
+]
