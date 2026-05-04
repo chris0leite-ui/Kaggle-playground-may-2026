@@ -57,8 +57,16 @@ probe_resolution_floor: 0.00005 # 80/20 split × N_TEST (re-derive if Featured)
 ```yaml
 lb_stability: stable
 external_data_strategy: use               # https://www.kaggle.com/datasets/aadigupta1601/f1-strategy-dataset-pit-stop-prediction/data
-time_budget_total_days: 27               # 2026-05-04 → 2026-05-31
-compute_budget: cpu_and_gpu_kaggle
+time_budget_total_days: 27                # 2026-05-04 → 2026-05-31
+compute_budget:
+  local_sandbox: cpu_only                 # ~8-core, no GPU; for FE, light GBDT, smoke probes, stacking
+  kaggle_notebook: gpu_available          # P100 (single) or T4 x2; USE for heavy training
+gpu_workflow: kaggle_notebook             # heavy training runs on Kaggle; pull artifacts back via
+                                          # kaggle kernels output / dataset upload, then stack locally
+gpu_when_required:                        # mechanisms that MUST go to Kaggle GPU, not local CPU
+  - RealMLP / PyTabKit (any NN)
+  - deep CatBoost (depth >= 8) for 5-fold
+  - any 5-fold whose local-CPU projection > 1h
 model_preferences: trees first, GPU if NN shows clear edge
 ```
 

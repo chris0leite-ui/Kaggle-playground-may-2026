@@ -52,6 +52,13 @@ These eleven invariants are LOAD-BEARING. Do not skip.
     are calibration probes — measured OOF→LB gap per mechanism family
     is the load-bearing data, not just rank. Do NOT intentionally
     underspend. Each submit still single-shot + PI-approved (Rule 1).
+13. **Kaggle GPU is part of the compute budget.** The local sandbox is
+    CPU-only; the Kaggle notebook runtime (P100 or T4×2) is the GPU
+    path. Before declaring a mechanism "not cost-justified" on local
+    CPU, port it to a Kaggle notebook. Mandatory for: any NN
+    (RealMLP / PyTabKit / TabNet / similar), deep CatBoost (depth ≥ 8)
+    5-fold, and any 5-fold whose local-CPU projection > 1h. See
+    `comp-context.md` → `gpu_workflow` for the artifact-roundtrip path.
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
