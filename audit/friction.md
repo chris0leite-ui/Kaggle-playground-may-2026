@@ -144,6 +144,20 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   REQUIRE direct execution + log read + summary in one tool call,
   not delegate to Monitor and exit early.
 
+- `tag: kaggle-p100-torch-sm60-incompat` — RealMLP kernel v1 failed
+  in 39s on Kaggle P100 with `torch.AcceleratorError: CUDA error: no
+  kernel image is available for execution on the device`. Cause:
+  P100 is sm_60 (CUDA capability 6.0); current PyPI torch (pulled
+  in via `pip install pytabkit`) supports only sm_70+. Existing
+  `cb-slow-wide-gpu` kernel uses CatBoost's own GPU runtime (not
+  torch) so P100 worked there — the gotcha is *torch-on-P100
+  specifically*. Fix: set `"machine_shape": "GpuT4x2"` in
+  kernel-metadata.json for any torch-based kernel. T4 is sm_75 and
+  supported by current torch. Add to do-and-dont.md kernel-template:
+  "any torch / pytabkit / pytorch-lightning kernel: use T4x2, not
+  the default P100. P100 is fine for CatBoost-GPU and LGBM-GPU which
+  ship their own CUDA kernels."
+
 - `tag: rule-R1-miss-groupkf-day3` — Day-3 mid-session, ran GroupKF
   anchor on d3a, d3b, M5i, M5j, M5k despite Rule R1 ("GroupKF dropped
   Day-3+ — U3 confirmed i.i.d. test, Strat is LB proxy, gap +3.8bp").

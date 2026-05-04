@@ -13,5 +13,5 @@
   "kernel_sources": [],
   "competition_sources": ["playground-series-s6e5"],
   "model_sources": [],
-  "machine_shape": "Gpu"
+  "machine_shape": "GpuT4x2"
 }
