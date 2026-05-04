@@ -12,7 +12,7 @@ url: https://www.kaggle.com/competitions/playground-series-s6e5
 title: Predicting F1 Pit Stops
 task: binary
 metric: roc_auc                 # to confirm — scores ~0.95 consistent with AUC
-train_rows: TBD                 # filled after batch-C download
+train_rows: 439140
 test_rows: 188165
 deadline: 2026-05-31 23:59:00 UTC
 team_size_limit: TBD            # confirm from comp rules
@@ -28,11 +28,11 @@ external_data_allowed: yes      # Playground default — confirm
 target_col: PitNextLap
 id_col: id
 feature_count:
-  numeric: TBD                  # filled after batch-C EDA
-  categorical: TBD
-class_priors: TBD               # filled after batch-C EDA
-missingness_train: TBD
-missingness_test: TBD
+  numeric: 11
+  categorical: 3
+class_priors: "pos=0.199, neg=0.801"
+missingness_train: 0.0
+missingness_test: TBD           # run after test EDA if needed
 ```
 
 ## LB context (auto-filled from leaderboard download)
