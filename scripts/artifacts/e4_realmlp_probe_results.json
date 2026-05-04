@@ -1,0 +1,9 @@
+{
+  "fold": 0,
+  "fold_auc": 0.9472167021859421,
+  "delta_vs_baseline_bp": 64.66702185942141,
+  "fit_secs": 2369.180424928665,
+  "total_secs": 2371.2077860832214,
+  "cap_hit": false,
+  "decision": "continue"
+}
