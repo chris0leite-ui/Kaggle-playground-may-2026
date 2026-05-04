@@ -71,7 +71,7 @@ submissions_used_total: 0
 saturation_count: 0
 mechanism_families_explored: []
 plateau_days: 0
-gate_status: pending_pi_signoff   # pre-baseline gate; see audit/2026-05-04-pre-baseline-gate.md
+gate_status: cleared              # pre-baseline gate cleared 2026-05-04; see audit/2026-05-04-pre-baseline-gate.md
 ```
 
 ## Calibration ladder

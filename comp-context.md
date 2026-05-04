@@ -84,7 +84,7 @@ gate_artifacts:
   prior_art: audit/2026-05-04-pre-baseline-gate.md   # appended block
   domain_notes: audit/2026-05-04-pre-baseline-gate.md
   metric_notes: audit/2026-05-04-pre-baseline-gate.md
-gate_status: pending_pi_signoff                      # → "cleared" after Q5b
+gate_status: cleared                                 # PI signed off 2026-05-04
 group_key_for_R1_anchor_b: Race                      # 26 levels; 5-fold ≈ 5 races/fold
 forbidden_columns:
   - Normalized_TyreLife    # host-removed from original; do NOT reintroduce
