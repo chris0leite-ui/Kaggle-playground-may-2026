@@ -50,10 +50,13 @@ def main():
     train = pd.read_csv("data/train.csv")
     test = pd.read_csv("data/test.csv")
 
-    # 50% stratified subsample
+    # 50% stratified subsample (pandas 2.2+ groupby.apply drops the
+    # grouping column by default — index-collect avoids that footgun).
     if task == "classification":
-        sub = (train.groupby(target_col, group_keys=False)
-                    .apply(lambda g: g.sample(frac=0.5, random_state=42)))
+        idx = []
+        for _, g in train.groupby(target_col):
+            idx.extend(g.sample(frac=0.5, random_state=42).index)
+        sub = train.loc[idx]
     else:
         sub = train.sample(frac=0.5, random_state=42)
 

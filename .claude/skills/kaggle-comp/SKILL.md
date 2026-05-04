@@ -38,9 +38,11 @@ turns. Never invoke `kaggle competitions submit` without the
 explicit Q6 ask-PI gate.
 
 The kickoff scaffolds a fresh comp repo, fills `comp-context.md`
-from the Kaggle API, runs EDA + a baseline LGBM, asks PI before the
-first LB submit, and writes a Day-1 audit. End-of-Day-1 hands off
-to the day-loop in [loops.md](loops.md).
+from the Kaggle API, runs EDA, **clears a pre-baseline understanding
+gate (parallel research agents + local schema audit) with PI
+sign-off**, runs a baseline LGBM, asks PI before the first LB
+submit, and writes a Day-1 audit. End-of-Day-1 hands off to the
+day-loop in [loops.md](loops.md).
 
 ## What to load (in order)
 
@@ -94,6 +96,7 @@ If CLAUDE.md is > 50k tokens, archive it before doing anything else.
 |---|---|
 | [kickoff-runbook.md](kickoff-runbook.md) | Agent step-by-step kickoff (load on kickoff trigger) |
 | [kickoff-bash.md](kickoff-bash.md) | Bash batches the runbook references |
+| [pre-baseline-gate.md](pre-baseline-gate.md) | The 7-item understanding gate before any baseline; spawn 3 research agents in parallel |
 | [kickoff.md](kickoff.md) | Day-1 human-facing checklist (background reading) |
 | [templates/](templates/) | Files copied into the new comp repo by the runbook |
 | [guardrails.md](guardrails.md) | The 11 invariants |

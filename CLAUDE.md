@@ -64,13 +64,14 @@ They override the kickoff-time defaults.
 
 ```yaml
 day: 1
-lb_best_today: {{LB_BEST}}        # leader's score on public LB today
+lb_best_today: 0.95435            # leader at kickoff (2026-05-04)
 our_lb_best: null                 # update after first submit
 submissions_used_today: 0
 submissions_used_total: 0
 saturation_count: 0
 mechanism_families_explored: []
 plateau_days: 0
+gate_status: pending_pi_signoff   # pre-baseline gate; see audit/2026-05-04-pre-baseline-gate.md
 ```
 
 ## Calibration ladder

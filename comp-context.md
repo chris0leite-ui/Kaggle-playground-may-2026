@@ -25,14 +25,19 @@ external_data_allowed: yes      # Playground default — confirm
 ## Schema (auto-filled by kickoff EDA)
 
 ```yaml
-target_col: PitNextLap
+target_col: PitNextLap                  # float64 {0.0, 1.0}
 id_col: id
 feature_count:
   numeric: 11
   categorical: 3
+categorical_cols: [Driver, Compound, Race]
+categorical_levels:
+  Driver: 887   # 801 also in test (full overlap)
+  Compound: 5   # MEDIUM HARD SOFT INTERMEDIATE WET
+  Race: 26      # 26 grand prix names; ALL overlap train↔test
 class_priors: "pos=0.199, neg=0.801"
 missingness_train: 0.0
-missingness_test: TBD           # run after test EDA if needed
+missingness_test: 0.0
 ```
 
 ## LB context (auto-filled from leaderboard download)
@@ -68,6 +73,24 @@ current-state, NOT here.
 # - our_lb_best
 # - submissions_used_today
 # - saturation_count
+```
+
+## Pre-baseline gate (2026-05-04)
+
+```yaml
+gate_artifacts:
+  brief: brief.md                                    # 149 lines, host verbatim
+  schema_target_groups: audit/2026-05-04-pre-baseline-gate.md
+  prior_art: audit/2026-05-04-pre-baseline-gate.md   # appended block
+  domain_notes: audit/2026-05-04-pre-baseline-gate.md
+  metric_notes: audit/2026-05-04-pre-baseline-gate.md
+gate_status: pending_pi_signoff                      # → "cleared" after Q5b
+group_key_for_R1_anchor_b: Race                      # 26 levels; 5-fold ≈ 5 races/fold
+forbidden_columns:
+  - Normalized_TyreLife    # host-removed from original; do NOT reintroduce
+structural_findings:
+  pitstop_pitnextlap_match_rate: 0.724    # NOT a deterministic 1-step lag
+  test_lead_pitstop_recoverable: 0.927    # 174,514 / 188,165 test rows have next-lap row in test
 ```
 
 ## Anti-patterns

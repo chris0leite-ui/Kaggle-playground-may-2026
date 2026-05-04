@@ -75,6 +75,26 @@ non-id column.
 
 Capture any FE notes in `audit/<date>-day-1-kickoff.md`.
 
+### Pre-baseline understanding gate (mandatory)
+
+Full spec: [pre-baseline-gate.md](pre-baseline-gate.md). Seven items;
+PI signs off before Bash batch D runs.
+
+**Use dedicated research agents in parallel** — single message,
+foreground, three `general-purpose` subagents (web-research,
+domain-research, metric-research). Local Bash for the schema items.
+Doing this in the main thread bloats context and is the documented
+failure mode (kickoff-#2 friction, 2026-05-04).
+
+### Q5b — chat (gate sign-off)
+
+> "Pre-baseline gate done: brief / prior_art / domain_notes /
+> metric_notes / schema / per-feature target-rate / group-keys.
+> Posting agent summaries. Cleared? [yes / fix what / show me X]"
+
+Wait for explicit "cleared". Friction-log thin agent output
+(`audit/friction.md`, `tag: research-thin`).
+
 ### Bash batch D — baseline LGBM
 
 Run `batch-D-baseline` from kickoff-bash.md. Reads OOF + fold-std
