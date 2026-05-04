@@ -1,0 +1,177 @@
+{
+  "v0_full13": {
+    "K": 13,
+    "strat": 0.9504333605395556,
+    "delta_m5h_bp": 0.03360539555630204,
+    "pool": [
+      "baseline",
+      "d2a_te",
+      "m2_xgb",
+      "e1_cb_sub",
+      "e3_hgbc",
+      "e5_optuna_lgbm",
+      "a_horizon",
+      "b_lapsuntilpit",
+      "f1_hgbc_deep",
+      "f2_hgbc_shallow",
+      "cb_year-cat",
+      "cb_lossguide",
+      "cb_slow-wide-bag"
+    ],
+    "dropped": [],
+    "l1": {
+      "baseline": 0.3727579488211089,
+      "d2a_te": 0.21963507450606715,
+      "m2_xgb": 0.20034152230749308,
+      "e1_cb_sub": 0.30105283868526556,
+      "e3_hgbc": 0.32274486188929763,
+      "e5_optuna_lgbm": 0.6702743810038309,
+      "a_horizon": 0.15387581177421597,
+      "b_lapsuntilpit": 0.7176398496377178,
+      "f1_hgbc_deep": 0.34098837864186166,
+      "f2_hgbc_shallow": 0.23721755914146017,
+      "cb_year-cat": 0.3745923017159005,
+      "cb_lossguide": 0.28320065371561365,
+      "cb_slow-wide-bag": 0.2818723372787384
+    }
+  },
+  "v1_drop_a": {
+    "K": 12,
+    "strat": 0.9504353340859344,
+    "delta_m5h_bp": 0.05334085934394217,
+    "pool": [
+      "baseline",
+      "d2a_te",
+      "m2_xgb",
+      "e1_cb_sub",
+      "e3_hgbc",
+      "e5_optuna_lgbm",
+      "b_lapsuntilpit",
+      "f1_hgbc_deep",
+      "f2_hgbc_shallow",
+      "cb_year-cat",
+      "cb_lossguide",
+      "cb_slow-wide-bag"
+    ],
+    "dropped": [
+      "a_horizon"
+    ],
+    "l1": {
+      "baseline": 0.38145633569032855,
+      "d2a_te": 0.22139133524797022,
+      "m2_xgb": 0.2056903106525195,
+      "e1_cb_sub": 0.3304856501978509,
+      "e3_hgbc": 0.3239343811205201,
+      "e5_optuna_lgbm": 0.6540061447076951,
+      "b_lapsuntilpit": 0.7171265568267641,
+      "f1_hgbc_deep": 0.35051608343070384,
+      "f2_hgbc_shallow": 0.2502022197061801,
+      "cb_year-cat": 0.37899775553106657,
+      "cb_lossguide": 0.2830618921502931,
+      "cb_slow-wide-bag": 0.24970206094972577
+    }
+  },
+  "v2_drop_a_m2": {
+    "K": 11,
+    "strat": 0.9504206400943741,
+    "delta_m5h_bp": -0.09359905625894172,
+    "pool": [
+      "baseline",
+      "d2a_te",
+      "e1_cb_sub",
+      "e3_hgbc",
+      "e5_optuna_lgbm",
+      "b_lapsuntilpit",
+      "f1_hgbc_deep",
+      "f2_hgbc_shallow",
+      "cb_year-cat",
+      "cb_lossguide",
+      "cb_slow-wide-bag"
+    ],
+    "dropped": [
+      "a_horizon",
+      "m2_xgb"
+    ],
+    "l1": {
+      "baseline": 0.41332297582614824,
+      "d2a_te": 0.24447369253076365,
+      "e1_cb_sub": 0.34091408113928057,
+      "e3_hgbc": 0.3377144046269034,
+      "e5_optuna_lgbm": 0.6615038318171818,
+      "b_lapsuntilpit": 0.7159277665256453,
+      "f1_hgbc_deep": 0.36378384351228665,
+      "f2_hgbc_shallow": 0.2608426644137776,
+      "cb_year-cat": 0.3831603813232365,
+      "cb_lossguide": 0.29430171528338256,
+      "cb_slow-wide-bag": 0.26093145861382083
+    }
+  },
+  "v3_drop_a_m2_d2a": {
+    "K": 10,
+    "strat": 0.9503639782214921,
+    "delta_m5h_bp": -0.6602177850789648,
+    "pool": [
+      "baseline",
+      "e1_cb_sub",
+      "e3_hgbc",
+      "e5_optuna_lgbm",
+      "b_lapsuntilpit",
+      "f1_hgbc_deep",
+      "f2_hgbc_shallow",
+      "cb_year-cat",
+      "cb_lossguide",
+      "cb_slow-wide-bag"
+    ],
+    "dropped": [
+      "a_horizon",
+      "m2_xgb",
+      "d2a_te"
+    ],
+    "l1": {
+      "baseline": 0.5176501525536694,
+      "e1_cb_sub": 0.4287417929316778,
+      "e3_hgbc": 0.345592457631165,
+      "e5_optuna_lgbm": 0.674628207737521,
+      "b_lapsuntilpit": 0.6054255092299431,
+      "f1_hgbc_deep": 0.36345854732708394,
+      "f2_hgbc_shallow": 0.2800861973753428,
+      "cb_year-cat": 0.3952689485132549,
+      "cb_lossguide": 0.320617842012057,
+      "cb_slow-wide-bag": 0.2851827396354472
+    }
+  },
+  "v4_drop_a_m2_d2a_f2": {
+    "K": 9,
+    "strat": 0.950335434854147,
+    "delta_m5h_bp": -0.9456514585304276,
+    "pool": [
+      "baseline",
+      "e1_cb_sub",
+      "e3_hgbc",
+      "e5_optuna_lgbm",
+      "b_lapsuntilpit",
+      "f1_hgbc_deep",
+      "cb_year-cat",
+      "cb_lossguide",
+      "cb_slow-wide-bag"
+    ],
+    "dropped": [
+      "a_horizon",
+      "m2_xgb",
+      "d2a_te",
+      "f2_hgbc_shallow"
+    ],
+    "l1": {
+      "baseline": 0.5370903109756422,
+      "e1_cb_sub": 0.41997016076937876,
+      "e3_hgbc": 0.45336407266244266,
+      "e5_optuna_lgbm": 0.7130713536245447,
+      "b_lapsuntilpit": 0.6257818291559503,
+      "f1_hgbc_deep": 0.42775064847384214,
+      "cb_year-cat": 0.4016527964619011,
+      "cb_lossguide": 0.34653019512221056,
+      "cb_slow-wide-bag": 0.31787505148693074
+    }
+  },
+  "winner": "v1_drop_a"
+}
