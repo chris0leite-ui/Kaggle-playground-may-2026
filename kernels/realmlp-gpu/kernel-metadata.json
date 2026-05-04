@@ -1,6 +1,6 @@
 {
-  "id": "chrisleitescha/realmlp-gpu-strat-5fold",
-  "title": "realmlp-gpu-strat-5fold",
+  "id": "chrisleitescha/realmlp-t4-gpu-strat",
+  "title": "realmlp-t4-gpu-strat",
   "code_file": "realmlp_gpu.py",
   "language": "python",
   "kernel_type": "script",

@@ -52,9 +52,9 @@ def gpu_boot():
 def install_pytabkit():
     """Install pytabkit (RealMLP) into the kernel runtime.
 
-    Kaggle's GPU base image does not include pytabkit. Internet is enabled
-    in kernel-metadata.json. Pin a recent stable version; pytabkit ships
-    RealMLP_TD as published by Holzmüller et al. (2024).
+    Kaggle's GPU base image does not include pytabkit. Internet enabled.
+    Requires T4 GPU (sm_75) — pre-installed and pulled torch only support
+    sm_70+, so machine_shape="GpuT4x2" must take effect (P100 = sm_60).
     """
     print("[setup] installing pytabkit ...")
     subprocess.check_call([
