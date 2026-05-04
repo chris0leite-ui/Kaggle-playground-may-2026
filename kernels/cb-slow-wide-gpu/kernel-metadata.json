@@ -1,5 +1,5 @@
 {
-  "id": "chrisLeiteScha/cb-slow-wide-gpu",
+  "id": "chrisleitescha/cb-slow-wide-gpu-multi-seed-bag",
   "title": "CB slow-wide GPU multi-seed bag",
   "code_file": "cb_slow_wide_gpu.py",
   "language": "python",
@@ -7,7 +7,7 @@
   "is_private": "true",
   "enable_gpu": "true",
   "enable_tpu": "false",
-  "enable_internet": "false",
+  "enable_internet": "true",
   "dataset_sources": [],
   "competition_sources": ["playground-series-s6e5"],
   "kernel_sources": [],

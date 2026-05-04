@@ -63,10 +63,27 @@ def run_anchor(seed, anchor_name, splits, X, y, X_test):
     return oof, test_p, auc, scores, biters, walls
 
 
+def find_data_dir():
+    import os
+    base = Path("/kaggle/input")
+    if not base.exists():
+        raise RuntimeError(f"/kaggle/input does not exist; ls /kaggle: {os.listdir('/kaggle')}")
+    print(f"DEBUG /kaggle/input = {os.listdir(base)}")
+    for sub in base.iterdir():
+        if sub.is_dir():
+            files = list(sub.glob("*.csv"))
+            print(f"DEBUG {sub} contains {[f.name for f in files]}")
+            if any(f.name == "train.csv" for f in files):
+                return sub
+    raise RuntimeError("could not locate train.csv under /kaggle/input")
+
+
 def main():
     t0 = time.time()
-    train = pd.read_csv("/kaggle/input/playground-series-s6e5/train.csv")
-    test = pd.read_csv("/kaggle/input/playground-series-s6e5/test.csv")
+    data_dir = find_data_dir()
+    print(f"Using data_dir={data_dir}")
+    train = pd.read_csv(data_dir / "train.csv")
+    test = pd.read_csv(data_dir / "test.csv")
     y = train[TARGET].astype(int).values
     X = train.drop(columns=[TARGET, ID_COL], errors="ignore")
     X_test = test.drop(columns=[ID_COL], errors="ignore")
