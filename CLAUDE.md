@@ -84,9 +84,14 @@ Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 ## Hypothesis board
 
 ```
-- (queued for next session)
-- (queued for next session)
-- (queued for next session)
+- [BLOCKER] Write brief.md: fetch competition data description + data
+  dictionary (column definitions in F1 domain context) before any model runs.
+- [BLOCKER] Research step: survey 2-3 top public notebooks, record AUC
+  benchmarks and key FE moves in LEARNINGS.md.
+- [NEXT] Extended EDA: per-feature distributions split by TyreLife bins,
+  Stint, and compound — the generic 7-line EDA is insufficient.
+- [NEXT] Informed baseline params: after domain + research notes exist,
+  revisit LightGBM params (grouping structure, leaf count for 440k rows).
 ```
 
 ## Friction log pointer
