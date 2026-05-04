@@ -44,14 +44,16 @@ def main():
     print("=== RealMLP-TD CPU fit (fold 0, full data) ===")
     t1 = time.time()
     # Use defaults; CPU only; reduce verbosity
+    import os
+    n_threads = max(1, os.cpu_count() or 1)
     model = RealMLP_TD_Classifier(
         device="cpu",
         random_state=SEED,
         n_cv=1,                     # single train/val split (we'll provide the split)
         val_metric_name="cross_entropy",
         use_ls=False,               # for AUC
-        verbosity=0,
-        n_threads=-1,
+        verbosity=1,                # so we see epoch progress in the log
+        n_threads=n_threads,
     )
     # RealMLP wants an explicit val split via val_idxs
     val_idxs = va.tolist() if hasattr(va, 'tolist') else list(va)
