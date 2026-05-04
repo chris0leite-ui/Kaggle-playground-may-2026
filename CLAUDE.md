@@ -68,9 +68,9 @@ ff-merge before reading state below.
 day: 3                            # 2026-05-04 / Day-2 5/10 used; Day-3 fresh
 lb_best_today: 0.95435            # leader (still); not refreshed
 our_lb_best: 0.94991              # M5h L1coef-pruned 13-base stack, +28bp vs M5d
-submissions_used_today: 6         # Day-2 5/10 + M5h Day-3-prep = 6/10
-submissions_used_total: 6
-saturation_count: 1
+submissions_used_today: 7         # Day-2 5/10 + M5h Day-3-prep + M5h2 = 7/10
+submissions_used_total: 7
+saturation_count: 2               # M5h (0.94991) and M5h2 (0.94991) tied LB
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -93,6 +93,7 @@ mechanism_families_explored:
   - l1coef_pool_prune               # M5h -- only prune that preserves OOF
   - unified_te_2way_keys            # d3a -- +2.2bp Strat std-alone, +0.1bp stacked (null)
   - sequence_fe_race_driver         # d3b -- +18bp Strat std-alone, +0.2bp stacked (null)
+  - tier_break_l1_prune             # M5h2 v1 -- drop a_horizon, K=12, LB 0.94991 (tied; gap unchanged)
 plateau_days: 0
 gate_status: cleared
 headroom_to_top5pct: 0.00354      # 0.95345 − 0.94991 = 35.4bp
@@ -122,6 +123,7 @@ headroom_to_top5pct: 0.00354      # 0.95345 − 0.94991 = 35.4bp
 | m5j (d3a swaps d2a, 13) | 0.95044 | 0.93092 | n/a | d3a L1=1.065 (3rd); +0.1bp Strat tie |
 | d3b_seqfe | 0.94254 | 0.92136 | n/a | +18bp Strat over baseline; FAIL gate by 35bp |
 | m5k (M5h+d3a+d3b, 15) | 0.95045 | 0.93102 | n/a | d3b L1=0.316 (mid-tier); +0.2bp Strat tie |
+| m5h2_v1 (drop a_horizon, 12) | 0.95044 | n/a | **0.94991** | **TIED M5h LB**; gap-vs-pool-size hypothesis falsified for 13→12 |
 
 ## Hypothesis board (Day 3)
 
