@@ -19,8 +19,8 @@ BASE_S, BASE_G = 0.94075, 0.92059
 def make_xgb():
     return xgb.XGBClassifier(
         objective="binary:logistic", eval_metric="auc", tree_method="hist",
-        learning_rate=0.05, max_depth=8, subsample=0.9, colsample_bytree=0.9,
-        min_child_weight=20, n_estimators=2000, early_stopping_rounds=100,
+        learning_rate=0.08, max_depth=6, subsample=0.9, colsample_bytree=0.9,
+        min_child_weight=20, n_estimators=1000, early_stopping_rounds=80,
         enable_categorical=True, random_state=42, n_jobs=-1, verbosity=0,
     )
 

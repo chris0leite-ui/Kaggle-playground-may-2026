@@ -69,11 +69,14 @@ def add_relstate_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str], li
     else:
         skipped.append("Cumulative_Degradation")
 
-    # Recent_Degradation: rolling mean window=3 of LapTime_Delta within (Race, Driver, Stint)
-    df["Recent_Degradation"] = (
-        df.groupby(["Race", "Driver", "Stint"])["LapTime_Delta"]
-          .transform(lambda s: s.rolling(window=3, min_periods=1).mean())
-    ).fillna(0)
+    # Recent_Degradation: rolling mean window=3 of LapTime_Delta within (Race, Driver, Stint).
+    # NOTE: groupby.transform(lambda s: s.rolling(...)) is O(n_groups * group_op) and HANGS on
+    # ~14k groups; use groupby.rolling directly which is vectorised. Index of rolling result is
+    # a MultiIndex (Race, Driver, Stint, original_index); drop the first 3 levels to align back.
+    rd = (df.groupby(["Race", "Driver", "Stint"], sort=False)["LapTime_Delta"]
+            .rolling(window=3, min_periods=1).mean()
+            .reset_index(level=[0, 1, 2], drop=True))
+    df["Recent_Degradation"] = rd.reindex(df.index).fillna(0).values
     added.append("Recent_Degradation")
 
     # Traffic_Pressure_Proxy: Position - min(Position) per (Race, LapNumber)
