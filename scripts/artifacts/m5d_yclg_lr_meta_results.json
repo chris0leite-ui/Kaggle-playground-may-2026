@@ -1,0 +1,68 @@
+{
+  "strat": {
+    "oof": 0.9502443638596798,
+    "delta_base_bp": 94.94363859679834,
+    "delta_m5c_bp": 2.4436385967985252,
+    "coefs": {
+      "raw_baseline": -0.05392989889797032,
+      "raw_d2a_te": 0.12700920849013353,
+      "raw_m2_xgb": -0.18352934043637875,
+      "raw_m3_catboost": -0.10120521940938047,
+      "raw_m4_relstate": -0.12869192158842052,
+      "raw_e1_cb_sub": -0.03258852974577482,
+      "raw_e3_hgbc": -0.20385340237072222,
+      "raw_e5_optuna_lgbm": -0.2778422438942524,
+      "raw_a_horizon": -0.3590074049350588,
+      "raw_b_lapsuntilpit": 0.49138142342099156,
+      "raw_cb_year-cat": -0.07098646216828348,
+      "raw_cb_lossguide": -0.1307902816151027,
+      "rank_baseline": -0.02281214292297116,
+      "rank_d2a_te": -0.0699866279644752,
+      "rank_m2_xgb": 0.06564130142051897,
+      "rank_m3_catboost": 0.04289172888025688,
+      "rank_m4_relstate": 0.017456589976650744,
+      "rank_e1_cb_sub": 0.017139736425924142,
+      "rank_e3_hgbc": 0.0990790078672552,
+      "rank_e5_optuna_lgbm": 0.127341655396763,
+      "rank_a_horizon": -0.08441909631121292,
+      "rank_b_lapsuntilpit": 0.2727046744757226,
+      "rank_cb_year-cat": 0.11820019643843307,
+      "rank_cb_lossguide": 0.112371711980708,
+      "logit_baseline": -0.21314795207665135,
+      "logit_d2a_te": -0.15449474179781825,
+      "logit_m2_xgb": -0.027954668152809652,
+      "logit_m3_catboost": -0.01016234165635793,
+      "logit_m4_relstate": -0.0018358637791601,
+      "logit_e1_cb_sub": -0.14403282621081262,
+      "logit_e3_hgbc": 0.4780583369120813,
+      "logit_e5_optuna_lgbm": 0.5892830238883336,
+      "logit_a_horizon": 0.07456823679445433,
+      "logit_b_lapsuntilpit": -0.00811181334429393,
+      "logit_cb_year-cat": 0.3286083475963966,
+      "logit_cb_lossguide": 0.19441587776351166
+    }
+  },
+  "groupkf": {
+    "oof": 0.9307498250855663,
+    "delta_base_bp": 101.59825085566231,
+    "delta_m5c_bp": 11.19825085566295
+  },
+  "pool": [
+    "baseline",
+    "d2a_te",
+    "m2_xgb",
+    "m3_catboost",
+    "m4_relstate",
+    "e1_cb_sub",
+    "e3_hgbc",
+    "e5_optuna_lgbm",
+    "a_horizon",
+    "b_lapsuntilpit",
+    "cb_year-cat",
+    "cb_lossguide"
+  ],
+  "variants": [
+    "year-cat",
+    "lossguide"
+  ]
+}
