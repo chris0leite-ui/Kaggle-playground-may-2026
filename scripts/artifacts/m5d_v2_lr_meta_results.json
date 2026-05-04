@@ -1,0 +1,73 @@
+{
+  "strat": {
+    "oof": 0.9502728172379168,
+    "delta_base_bp": 95.22817237916814,
+    "delta_m5c_bp": 2.7281723791683365,
+    "coefs": {
+      "raw_baseline": 0.1403363761661648,
+      "raw_d2a_te": 0.4434673462289058,
+      "raw_m2_xgb": -0.23638740451424836,
+      "raw_m3_catboost": -0.0931223535217863,
+      "raw_m4_relstate": -0.18336975817290818,
+      "raw_e1_cb_sub": 0.3274473733659317,
+      "raw_e3_hgbc": -0.35179939944574684,
+      "raw_e5_optuna_lgbm": -0.9153633823670632,
+      "raw_a_horizon": -0.5285850210452276,
+      "raw_b_lapsuntilpit": 0.40106427780792364,
+      "raw_cb_year-cat": -0.0310921990579982,
+      "raw_cb_lossguide": -0.056841621339086025,
+      "raw_cb_slow-wide-bag": 1.5991703436573448,
+      "rank_baseline": -0.40154706204948276,
+      "rank_d2a_te": -0.6978778324685454,
+      "rank_m2_xgb": -0.06316658155921381,
+      "rank_m3_catboost": -0.253242908431213,
+      "rank_m4_relstate": -0.2756118243577987,
+      "rank_e1_cb_sub": -0.35031170463911443,
+      "rank_e3_hgbc": -0.10510782816040337,
+      "rank_e5_optuna_lgbm": 0.0270971972235946,
+      "rank_a_horizon": 0.35572425851610917,
+      "rank_b_lapsuntilpit": 0.3860814477621775,
+      "rank_cb_year-cat": -0.027330212037645487,
+      "rank_cb_lossguide": -0.0059718883678705785,
+      "rank_cb_slow-wide-bag": 1.6024984120093526,
+      "logit_baseline": -0.19955858562195092,
+      "logit_d2a_te": -0.1504742853636187,
+      "logit_m2_xgb": -0.005060929319505745,
+      "logit_m3_catboost": 0.034265739752347306,
+      "logit_m4_relstate": 0.036324210514613646,
+      "logit_e1_cb_sub": -0.23352705059461024,
+      "logit_e3_hgbc": 0.4953743202847623,
+      "logit_e5_optuna_lgbm": 0.6730542747292907,
+      "logit_a_horizon": 0.04105457793749022,
+      "logit_b_lapsuntilpit": -0.006114589957361526,
+      "logit_cb_year-cat": 0.155348449703927,
+      "logit_cb_lossguide": 0.17889892482627914,
+      "logit_cb_slow-wide-bag": -0.011070854880136302
+    }
+  },
+  "groupkf": {
+    "oof": 0.9308377074529575,
+    "delta_base_bp": 102.47707452957444,
+    "delta_m5c_bp": 12.077074529575071
+  },
+  "pool": [
+    "baseline",
+    "d2a_te",
+    "m2_xgb",
+    "m3_catboost",
+    "m4_relstate",
+    "e1_cb_sub",
+    "e3_hgbc",
+    "e5_optuna_lgbm",
+    "a_horizon",
+    "b_lapsuntilpit",
+    "cb_year-cat",
+    "cb_lossguide",
+    "cb_slow-wide-bag"
+  ],
+  "variants": [
+    "year-cat",
+    "lossguide",
+    "slow-wide-bag"
+  ]
+}
