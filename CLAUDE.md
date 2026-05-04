@@ -34,7 +34,7 @@ ff-merge before reading state below.
     pull, 1-2 sentences with the latest fact.
 11. **Model routing.** Haiku read-only; Sonnet default; Opus hard.
     10/day budget.
-12. **Spend the full 5/day submission budget.** Submissions are
+12. **Spend the full 10/day submission budget.** Submissions are
     calibration probes — measured OOF→LB gap per mechanism family is
     load-bearing data. Each submit single-shot + PI-approved (Rule 1).
 13. **Kaggle GPU is part of compute budget.** Local CPU-only; Kaggle

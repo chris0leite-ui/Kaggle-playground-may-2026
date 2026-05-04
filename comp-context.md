@@ -16,7 +16,7 @@ train_rows: 439140
 test_rows: 188165
 deadline: 2026-05-31 23:59:00 UTC
 team_size_limit: TBD            # confirm from comp rules
-submission_budget: 5/day
+submission_budget: 10/day
 final_submissions: 2            # Playground default — confirm
 data_license: CC BY 4.0         # Playground default — confirm
 external_data_allowed: yes      # Playground default — confirm

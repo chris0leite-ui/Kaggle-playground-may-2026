@@ -102,7 +102,10 @@ If CLAUDE.md is > 50k tokens, archive it before doing anything else.
 | [templates/](templates/) | Files copied into the new comp repo by the runbook |
 | [guardrails.md](guardrails.md) | The 11 invariants |
 | [personas.md](personas.md) | Persona rotation prompts |
-| [loops.md](loops.md) | The 5 loops (day / experiment / calibration / research / weekly) |
+| [loops.md](loops.md) | Router — 6 loops (day / experiment / calibration / strategy-critic / research / weekly) |
+| [day-loop.md](day-loop.md) | Full Day-loop spec (boundary, EOD auto-trigger, 7 steps) |
+| [experiment-loop.md](experiment-loop.md) | Full Experiment-loop spec (8 steps + failure modes) |
+| [strategy-critic.md](strategy-critic.md) | Strategy-critic-loop (Rule 14) — 5-question template |
 | [self-improvement.md](self-improvement.md) | Friction tracking + skill-evolution workflow |
 | [do-and-dont.md](do-and-dont.md) | One-page concise checklist |
 | [examples/](examples/) | Walked examples from the reference comp |
