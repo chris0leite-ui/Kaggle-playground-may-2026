@@ -1,0 +1,73 @@
+{
+  "strat": {
+    "oof": 0.9504333605395556,
+    "delta_base_bp": 96.83360539555652,
+    "delta_m5f_bp": 0.13360539555584694,
+    "delta_m5d_bp": 2.0336053955560818,
+    "coefs": {
+      "raw_baseline": -0.13816222922880228,
+      "raw_d2a_te": -0.05318035289777105,
+      "raw_m2_xgb": -0.14843023096119523,
+      "raw_e1_cb_sub": -0.11884957284915557,
+      "raw_e3_hgbc": -0.12082432290044658,
+      "raw_e5_optuna_lgbm": -0.12250085776337308,
+      "raw_a_horizon": -0.10900874978220809,
+      "raw_b_lapsuntilpit": 0.35513978802821017,
+      "raw_f1_hgbc_deep": -0.0814638252262807,
+      "raw_f2_hgbc_shallow": -0.07079979260288927,
+      "raw_cb_year-cat": -0.08340536153687417,
+      "raw_cb_lossguide": -0.10320718684838422,
+      "raw_cb_slow-wide-bag": 0.11508142442268077,
+      "rank_baseline": -0.03902652199618117,
+      "rank_d2a_te": -0.05165406544292058,
+      "rank_m2_xgb": -0.0066549673751268345,
+      "rank_e1_cb_sub": -0.02773891051914257,
+      "rank_e3_hgbc": 0.005394540231751327,
+      "rank_e5_optuna_lgbm": 0.03922111818472506,
+      "rank_a_horizon": -0.026084122510812276,
+      "rank_b_lapsuntilpit": 0.35493307686720726,
+      "rank_f1_hgbc_deep": 0.003856500435866894,
+      "rank_f2_hgbc_shallow": 0.0018359256470039627,
+      "rank_cb_year-cat": 0.024947814852581157,
+      "rank_cb_lossguide": 0.019255634120964482,
+      "rank_cb_slow-wide-bag": 0.11536433071569992,
+      "logit_baseline": -0.19556919759612543,
+      "logit_d2a_te": -0.11480065616537552,
+      "logit_m2_xgb": -0.045256323971171034,
+      "logit_e1_cb_sub": -0.1544643553169674,
+      "logit_e3_hgbc": 0.19652599875709972,
+      "logit_e5_optuna_lgbm": 0.5085524050557327,
+      "logit_a_horizon": 0.018782939481195606,
+      "logit_b_lapsuntilpit": -0.007566984742300296,
+      "logit_f1_hgbc_deep": 0.25566805297971407,
+      "logit_f2_hgbc_shallow": 0.16458184089156694,
+      "logit_cb_year-cat": 0.26623912532644517,
+      "logit_cb_lossguide": 0.16073783274626494,
+      "logit_cb_slow-wide-bag": 0.051426582140357724
+    }
+  },
+  "groupkf": {
+    "oof": 0.9308734841096721,
+    "delta_base_bp": 102.83484109672058,
+    "delta_m5f_bp": -1.7651589032796622
+  },
+  "pool": [
+    "baseline",
+    "d2a_te",
+    "m2_xgb",
+    "e1_cb_sub",
+    "e3_hgbc",
+    "e5_optuna_lgbm",
+    "a_horizon",
+    "b_lapsuntilpit",
+    "f1_hgbc_deep",
+    "f2_hgbc_shallow",
+    "cb_year-cat",
+    "cb_lossguide",
+    "cb_slow-wide-bag"
+  ],
+  "dropped_from_m5f": [
+    "m3_catboost",
+    "m4_relstate"
+  ]
+}
