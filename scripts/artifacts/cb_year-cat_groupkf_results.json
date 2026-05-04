@@ -1,0 +1,47 @@
+{
+  "oof_score": 0.9199188638817952,
+  "fold_std": 0.015632610157932086,
+  "fold_scores": [
+    0.911444369490627,
+    0.9004414096337432,
+    0.9093454029554611,
+    0.9396704505848578,
+    0.9363469337842251
+  ],
+  "cv": "groupkf",
+  "metric": "roc_auc",
+  "delta_vs_baseline_bp": -6.711361182047959,
+  "params_used": {
+    "iterations": 800,
+    "learning_rate": 0.08,
+    "depth": 6,
+    "l2_leaf_reg": 3.0,
+    "random_seed": 42,
+    "eval_metric": "AUC",
+    "od_type": "Iter",
+    "od_wait": 50,
+    "verbose": 0,
+    "thread_count": -1,
+    "allow_writing_files": false
+  },
+  "cat_cols": [
+    "Driver",
+    "Race",
+    "Compound",
+    "Year"
+  ],
+  "best_iters": [
+    171,
+    100,
+    229,
+    489,
+    387
+  ],
+  "fold_walls": [
+    32.737520933151245,
+    22.65764331817627,
+    41.26385974884033,
+    77.92885756492615,
+    64.1765546798706
+  ]
+}
