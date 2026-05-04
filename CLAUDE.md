@@ -87,11 +87,11 @@ They override the kickoff-time defaults.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 2
+day: 2                            # CLOSED 2026-05-04 (5/5 used)
 lb_best_today: 0.95435            # leader (still); not refreshed since kickoff
-our_lb_best: 0.94891              # M5b expanded stack, Day-2 (+78bp over Day-1)
-submissions_used_today: 3         # baseline (D1) + M5 + M5b
-submissions_used_total: 3
+our_lb_best: 0.94963              # M5d 12-base stack, Day-2 (+85.0bp over Day-1)
+submissions_used_today: 5         # baseline + M5 + M5b + E3 + M5d
+submissions_used_total: 5
 saturation_count: 1               # D2-A null both anchors
 mechanism_families_explored:
   - baseline_lgbm_raw_features
@@ -108,7 +108,7 @@ mechanism_families_explored:
   - lr_meta_stacker_expanded        # M5b -- new PRIMARY, LB 0.94891
 plateau_days: 0
 gate_status: cleared
-headroom_to_top5pct: 0.00454      # 0.95345 − 0.94891 = 45.4bp (was 65bp)
+headroom_to_top5pct: 0.00382      # 0.95345 − 0.94963 = 38.2bp (was 45.4bp)
 ```
 
 ## Calibration ladder
@@ -129,20 +129,29 @@ Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 | e2_l1_meta | 0.94738 | 0.92489 | n/a | null on "L1 fixes gap" |
 | e3_hgbc | 0.94876 | 0.92785 | n/a | BEST single, both anchors lift |
 | e4_realmlp_cpu_f0 | 0.94722 (f0) | n/a | n/a | not pursued (3.3h proj for 5-fold) |
-| **m5b_lr_meta_expanded** | **0.94926** | **0.92871** | **0.94891** | **D2 PRIMARY; gap −3.5bp** |
+| m5b_lr_meta_expanded | 0.94926 | 0.92871 | 0.94891 | gap −3.5bp |
+| e3_hgbc_standalone | 0.94876 | 0.92785 | 0.94870 | gap −0.6bp (single-model gap≈0) |
+| f1_hgbc_deep | 0.94870 | 0.92739 | n/a | β: ~E3 clone |
+| f2_hgbc_shallow | 0.94861 | 0.92711 | n/a | β: ~E3 clone |
+| e5_optuna_lgbm | 0.94736 | 0.92585 | n/a | tuned hp via Optuna |
+| a_horizon_shift | 0.90640 | 0.87474 | n/a | reformulation; stack diversifier |
+| b_lapsuntilpit | 0.89840 | 0.86948 | n/a | reformulation; stack diversifier |
+| zeta_catboost_deep_f0 | 0.94992 (f0) | n/a | n/a | best single fold; 5-fold not pursued |
+| **m5d_lr_meta_expanded** | **0.95023** | **0.92994** | **0.94963** | **D2 PRIMARY; gap −6.0bp (widened)** |
 
-## Hypothesis board
+## Hypothesis board (Day 3)
 
 ```
-- pending: 4 LB submits today (slots 2-5): M5 / M6 / M3 / M4-hedge
-- D3 next: deepen the meta-stacker -- add CatBoost-shrunk-deeper variant
-           (depth=8 if probe fits in budget) for diversity
-- D3 next: LGBM Optuna sweep (30 trials, 1h cap) -- now justified post-blend
-- D3 next: row-subsample CatBoost (80%) to bound Race-overfit; probe lift
-- D3+ : RealMLP/PyTabKit if GPU becomes available (BLOCKED on CPU)
-- D3+ : Day-3 blend re-optimisation after LB calibration data lands
-- queued: TE-only-replace-raw, TE-Driver-Race-only (D2-A postmortem closure)
-- queued: D2-C concat external (aadigupta1601, low priority since join missed)
+- H1: pseudo-labeling on M5d high-conf test rows (~2h, +10-30bp est)
+- H2: more reformulations (stint-stratified, residual-from-baseline,
+      driver-recent-pit-history) (~3h, +10-25bp est)
+- H3: pairwise correlation gate on pool (drop ρ ≥ 0.97) → M5e refit
+      (~10min, +2-8bp est, addresses gap-widening from M5d)
+- H4: HGBC multi-seed bagging (proper variance reduction, not β
+      architectural variants) (~1h, +3-8bp est)
+- H5: hill-climb / Ridge meta drop-in (~30min, +0-5bp est, low EV)
+- D3+: GPU-only (RealMLP/PyTabKit) — blocked on hardware
+- See audit/2026-05-04-day-2-wrap.md for ranked plan + sequence.
 ```
 
 ## Friction log pointer
