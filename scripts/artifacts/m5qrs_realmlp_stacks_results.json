@@ -1,0 +1,102 @@
+{
+  "M5q": {
+    "K": 14,
+    "strat": 0.9505682484214828,
+    "delta_m5h_bp": 1.3824842148280059,
+    "spearman_vs_m5h": 0.9986456121602661,
+    "realmlp_l1": 0.5734578254600042,
+    "gate": "PASS",
+    "l1": {
+      "baseline": 0.4001501790764407,
+      "d2a_te": 0.7621547340008202,
+      "m2_xgb": 0.18645874208293878,
+      "e1_cb_sub": 0.28909682644969303,
+      "e3_hgbc": 0.39472379410136127,
+      "e5_optuna_lgbm": 0.9658462497218219,
+      "a_horizon": 0.6224662727876364,
+      "b_lapsuntilpit": 0.6678292073978863,
+      "f1_hgbc_deep": 0.2664895742011375,
+      "f2_hgbc_shallow": 0.3676869126935325,
+      "cb_year-cat": 0.2676766599771408,
+      "cb_lossguide": 0.2801358439018916,
+      "cb_slow-wide-bag": 1.12463412694638,
+      "realmlp": 0.5734578254600042
+    },
+    "pool": [
+      "baseline",
+      "d2a_te",
+      "m2_xgb",
+      "e1_cb_sub",
+      "e3_hgbc",
+      "e5_optuna_lgbm",
+      "a_horizon",
+      "b_lapsuntilpit",
+      "f1_hgbc_deep",
+      "f2_hgbc_shallow",
+      "cb_year-cat",
+      "cb_lossguide",
+      "cb_slow-wide-bag",
+      "realmlp"
+    ]
+  },
+  "M5r": {
+    "K": 13,
+    "strat": 0.9505638960523984,
+    "delta_m5h_bp": 1.3389605239844116,
+    "spearman_vs_m5h": 0.9990121523210863,
+    "realmlp_l1": 0.3263310294848369,
+    "gate": "TIE_EXPECTED",
+    "l1": {
+      "baseline": 0.3521720695130318,
+      "d2a_te": 0.20351710091405414,
+      "m2_xgb": 0.17021658267406056,
+      "e1_cb_sub": 0.32167264571106313,
+      "e3_hgbc": 0.2728001672938315,
+      "e5_optuna_lgbm": 0.5417604051416243,
+      "b_lapsuntilpit": 0.676495207936391,
+      "f1_hgbc_deep": 0.2938459002828762,
+      "f2_hgbc_shallow": 0.21115967981722278,
+      "cb_year-cat": 0.2750833628857705,
+      "cb_lossguide": 0.24153973634503645,
+      "cb_slow-wide-bag": 0.1635017868868028,
+      "realmlp": 0.3263310294848369
+    },
+    "pool": [
+      "baseline",
+      "d2a_te",
+      "m2_xgb",
+      "e1_cb_sub",
+      "e3_hgbc",
+      "e5_optuna_lgbm",
+      "b_lapsuntilpit",
+      "f1_hgbc_deep",
+      "f2_hgbc_shallow",
+      "cb_year-cat",
+      "cb_lossguide",
+      "cb_slow-wide-bag",
+      "realmlp"
+    ]
+  },
+  "M5s": {
+    "K": 5,
+    "strat": 0.9485436773398764,
+    "delta_m5h_bp": -18.863226601235628,
+    "spearman_vs_m5h": 0.9874033773766154,
+    "realmlp_l1": 2.3989307968799127,
+    "gate": "PASS",
+    "l1": {
+      "a_horizon": 0.21640771429294853,
+      "b_lapsuntilpit": 0.7751215898577893,
+      "cb_slow-wide-bag": 7.061453609846479,
+      "baseline": 2.8858216334405085,
+      "realmlp": 2.3989307968799127
+    },
+    "pool": [
+      "a_horizon",
+      "b_lapsuntilpit",
+      "cb_slow-wide-bag",
+      "baseline",
+      "realmlp"
+    ]
+  }
+}

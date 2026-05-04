@@ -7,128 +7,151 @@
 
 ---
 
-## Today's session — Day 3 mid-session (2026-05-04 ~17:50 UTC)
+## Today's session — Day 3 endgame (2026-05-04 ~23:00 UTC)
 
 **Read order on session start** (skip the default; this file is the
 synthesis):
 
-1. `CLAUDE.md` — state block + Rules 1-15 (especially R1, R12, R13, R14)
-2. `comp-context.md` — settled-once facts (compute, schema, GPU workflow)
-3. `audit/2026-05-04-strategy-critique.md` — what we still DON'T know
-4. `audit/2026-05-04-m5h-l1coef-prune.md` — **validated meta-level lever**
+1. `CLAUDE.md` — state block + Rules 1-15 (especially R1, R12, R14)
+2. `audit/2026-05-04-day3-endgame.md` — full Day-3 retrospective + Day-4 plan
+3. `audit/friction.md` — load-bearing failure modes
+4. `scripts/pre_submit_diff.py` — MANDATORY before every submit
 
 Open with a 3-bullet read-back of state + the first mechanism to run.
 
 ## Where we are
 
-- **Day 3 in progress**, **6/10 submissions used today, 4 remaining**.
-- **`our_lb_best = 0.94991`** (M5h L1coef-pruned 13-base stack, gap −5.2bp).
-  Headroom to top-5% (0.95345): **35.4bp**.
-- **Single-model ceiling ~0.94876 OOF** (E3 HGBC); pure-stack ceiling on
-  current pool is now demonstrably **bounded by orthogonality, not
-  pool size or meta-tuning**: M5h has 13 bases (more than M5d's 12) but
-  tighter gap because L1-prune dropped two bases with near-zero meta
-  weight (m3_catboost, m4_relstate).
+- **Day 3 done. 10/10 used today. LB best = 0.94991** (M5h, also
+  matched by M5h2 and M5j — all tied at quantization limit).
+- **Day-4 starts at 00:00 UTC** (~60 min from this writing).
+- **All Day-3-evening orthogonal-pool experiments REGRESSED on LB**:
+  M5p −237bp, M5n_3b −291bp. Minimal-basis hypothesis FALSIFIED.
+  GBDT consensus IS load-bearing for OOF→LB transfer.
 
-## What today landed
+## What completed overnight
 
-- **CatBoost variants explored on a dedicated branch** (Stage A research
-  + 7 1-fold probes + 3 anchor runs):
-  - **lossguide** (`grow_policy=Lossguide`, depth=8, Year∈CAT_COLS):
-    Strat 0.94697 / GroupKF **0.92377** — first CB to clear G1 GroupKF.
-  - **slow-wide-bag** (3-seed GPU bag, lr=0.03, iter=4000, l2=8):
-    Strat **0.94790** / GroupKF 0.92322 — best CB on Strat.
-  - **year-cat** (Year added to CAT_COLS, M3 params): Strat 0.94679 /
-    GroupKF 0.91992. Year-as-numeric was driving M3's overfit.
-- **Kaggle GPU pipeline working** (after fixing 2 root causes):
-  - `kaggle kernels init` template emits string-quoted booleans which
-    Kaggle silently treats as `false`. Always edit to bare `true`/`false`.
-  - Comp data path varies; use `Path('/kaggle/input').rglob('train.csv')`
-    rather than hardcoding `/kaggle/input/<slug>/`.
-  - Working reference: `kernels/cb-slow-wide-gpu/`. Pull a known-working
-    prior kernel (`kaggle kernels pull <user>/<slug> -m`) for any new GPU
-    work.
-- **L1-coef prune validated as a meta-level lever**:
-  - M5b (7 bases) gap −3.5bp; M5d (12) gap −6.0bp; **M5h (13, L1-pruned)
-    gap −5.2bp**. Drops m3_catboost + m4_relstate (lowest L1 sum across
-    raw/rank/logit channels). Reuse on every future stack.
-- **OOF→LB transfer is sharply diminishing**: M5b 92% transfer
-  → M5d 74% → **M5h 24%**. Each additional 20bp of OOF gives <5bp LB.
-  Implication: more bases of the same flavor pay less and less.
+| Base | Strat OOF | ρ vs M5h | Notes |
+|---|---:|---:|---|
+| RealMLP-TD (Kaggle T4) | 0.94582 | 0.972 | Strong, low diversity |
+| H1 (pseudo-label LGBM) | 0.94265 | 0.965 | +19bp baseline; modest |
+| EBM (interpret-core) | 0.93361 | 0.931 | Diverse but weak |
+| LR with FE | 0.89684 | 0.869 | Most-diverse but very weak |
 
-## PI direction for remaining slots / Day-4
+## Pre-built Day-4 slot-1 candidate: M5q
 
-> *"We need to add more models or features with orthogonal signal
-> before we dig deeper into ensemble specifics."*
+`submissions/submission_m5q_realmlp.csv` is **READY**.
 
-The L1-prune is the last meta-level squeeze that still works. Further
-ensemble tuning (Ridge meta, hill-climb, more pool members of the same
-GBDT flavor) is **lower EV than adding genuinely orthogonal signal**.
+  M5q = M5h pool + RealMLP (K=14)
+  Strat OOF: 0.95057 (+1.4bp vs M5h)
+  ρ vs M5h test: 0.99865 (PASS pre-submit-diff gate, just barely)
+  RealMLP L1 in meta: 0.573 (6th-highest of 14 — meaningful weight)
 
-## Day-3 sequence — orthogonal-signal first (DO IN ORDER)
+Expected LB: 0.94991 ± 2bp. ρ borderline → 50/50 tie vs lift.
 
-**Step 1 — 2-way TE base** (~30-60 min CPU). Day-1 missed lever flagged
-by the strategy critique and analyticaobscura Source 1 #2:
+**Submit M5q as Day-4 slot 1** assuming no overnight changes by PI.
 
-- Driver×Race / Driver×Compound / Race×Lap-bin with α=80 smoothing,
-  inner 5-fold per outer fold (no leakage). Single-base probe first;
-  if standalone ≥0.946 OOF, add to M5h pool → M5i refit. Apply L1-prune
-  before any LB submit (drop bases below median L1 sum). **Submit slot 7.**
+## Day-4 priority sequence
 
-**Step 2 — Sequence-FE base** (~30 min CPU). 97.4% of test has
-same-(Race, Driver) within-test continuation — this structure is
-unexploited:
+### Slot 1 (immediate): M5q
+Submit pre-built `submission_m5q_realmlp.csv`. Pre-submit-diff vs M5h
+already done (ρ=0.99865 → PASS). Expected LB 0.94991 ± 2bp.
 
-- `laps_since_last_pitstop`, `cumulative_pitstops_this_race`,
-  `rolling_target_rate(window=5)` over (Race, Driver) groups.
-- Single-LGBM probe on baseline + these 3 features. If OOF ≥0.945 → add
-  as M5j base. **Submit slot 8.**
+### Slot 2: depends on M5q LB outcome
+- If M5q LB > 0.94991 → build **M5q + H1 + EBM** (K=16). All
+  strong-orthogonal bases on M5h. New build: ~5 min LR-meta refit.
+- If M5q LB = 0.94991 (tie) → ρ-gate is too weak; need harder
+  rank-shifts. Try **M5h + RealMLP_logit_only** (drop the rank/raw
+  channels, force RealMLP to express only via probability scale)
+  to amplify its rank influence. Or move to slot 3.
+- If M5q LB < 0.94991 → very surprising; pivot to slot 3.
 
-**Step 3 — RealMLP on Kaggle GPU** (~2-3h roundtrip including push).
-yekenot's 56-vote public notebook for *this exact comp* uses RealMLP;
-truly orthogonal mechanism family (NN vs GBDTs):
+### Slot 3: HGBC multi-seed bag
+E3, f1, f2 are single-seed. Bag 3 seeds (seeds 42/123/456 like
+cb_slow-wide-bag did successfully). New pool member. ~30 min CPU.
+Could give +1-3bp via variance reduction.
 
-- Use `kernels/cb-slow-wide-gpu/` as the metadata template (booleans
-  fixed, rglob in place).
-- E4 was killed at fold-0 local CPU only (3.3h projection); GPU should
-  fit comfortably under 1h.
-- Single-model probe → add to stack as M5k base. **Submit slot 9.**
+### Slot 4: Pseudo-label H1 RUN-2 with RealMLP-anchored agreement
+H1 today used 13-GBDT pool agreement. Re-run with M5q's K=14 pool
+(includes RealMLP). May produce different pseudo-labels. ~30 min CPU.
 
-**Step 4 — HOLD** slot 10 for whichever of the above gave the best
-calibration data, or for an R2-hedge candidate.
+### Slot 5: Sequence-aware base (LSTM with Driver embedding)
+**1-fold smoke probe FIRST** (per Rule 2 — applying tonight's lesson).
+Then full 5-fold on Kaggle GPU. ~3-4h roundtrip.
+Driver embedding (887 → 16d) + LapNumber + per-lap features over
+(Race, Driver) sequence.
 
-## Lower priority (only if Step 1-3 underdeliver)
+### Slot 6+: Stint-2-targeted FE base (NH9)
+Pool is uniformly wrong on Stint 2. New features:
+  - lap_since_last_pit × tyre_compound interaction
+  - relative_pace = (LapTime − race_min) / race_std
+  - within-Stint-2 conditional TE
+Train ONE LGBM with these + raw features. New pool member.
 
-- HGBC multi-seed bag (H4) — *variance* reduction; pool variance is
-  not the binding issue (we have 99% correlation between HGBC variants).
-- Ridge / hill-climb meta drop-in (H5) — meta-level lever, but
-  L1-prune already squeezed most of what's available.
-- M5f raw vs M5h calibration probe — informative but not LB-improving.
-- M5e CB-only probe — same.
+### Slots 7-10: hedge / R5 final-window probes
+Conservative submissions:
+  - Best Strat OOF that regressed ≤30bp on public LB (R5 mandate)
+  - PRIMARY = best public LB; HEDGE = best-OOF-that-regressed
+  - Final-window lock at Day-30.
 
-## Anti-patterns (validated)
+## Critical operating rules (FRESHLY VIOLATED Day-3 — read these)
 
-- **Don't expand pool with correlated bases** — M5d→M5f gap-widening
-  pattern. L1-prune is the patch; orthogonal-signal-add is the cure.
-- **Don't pseudo-label from the over-fit stacker** — use multi-base
-  agreement guard (skill rule).
-- **Don't burn slots on calibration probes when LB calibration is
-  already established** — Day-3 has 4 slots; spend on net-new lift,
-  not A/B confirmation of known mechanisms.
-- **Don't trust `kaggle kernels init` output blindly** — fix the
-  string-bool defaults before pushing.
+1. **Pre-submit-diff before EVERY submit.** Run
+   `python3 scripts/pre_submit_diff.py <candidate.csv>`. If ρ > 0.999,
+   abort. Saved would-be-tied submissions on Day-3 retrospectively.
 
-## Workflow rules in force
+2. **1-fold smoke before any GPU 5-fold.** RealMLP took 175 min on
+   Kaggle T4. We didn't smoke first; could have been killed early
+   if it was 5h. Always 1-fold first, project, then full.
 
-- **R1** Submissions are single-shot + PI-approved.
-- **R12** Spend the full 10/day budget — calibration data is
-  load-bearing.
-- **R13** Kaggle GPU IS available — port any 5-fold > 1h local-CPU.
-- **R14** Strategy-critic-loop fires automatically before adding a
-  new mechanism family. Steps 1-3 above each trigger it.
+3. **Strat-only Day-3+** (Rule R1). GroupKF was DROPPED. Wasted 50%
+   of compute on multiple Day-3 scripts running both anchors.
 
-## Open questions for PI
+4. **In-pool tweaks of GBDT-heavy LR meta tie at LB 0.94991** within
+   Kaggle's 5-decimal quantization. Don't burn slots on rho > 0.999
+   variants.
 
-- 2-way TE smoothing α=80 OK, or sweep α?
-- RealMLP architecture: copy yekenot's exact config or smaller?
-- After steps 1-3 land, do we revisit Ridge meta / hill-climb (Day-4)?
+## Falsified hypotheses (DON'T retry)
+
+- Smaller pool → tighter LB gap (M5h2 v1, K=12 → tied)
+- TE-key swap → LB delta (M5j d3a/d2a swap → tied)
+- Calibration (per-Race/Year isotonic) → LB lift (overfit, inner-CV negative)
+- Stint-2 specialist → in-segment lift (specialist −124bp on its segment)
+- Hill-climb / LGBM-meta / L1-LR → beats LR meta (all within fold-noise)
+- **Minimal-orthogonal-basis → break LB tie** (M5p −237bp, M5n_3b −291bp)
+- 2-way TE (Driver×Compound, Race×LapBin, K=7) → orthogonal lift (+0.1bp)
+- Sequence-FE (cum_pits, laps_since_last_pit, rolling-TE) → stack lift (+0.2bp)
+
+## Open hypotheses for Day-4+
+
+- **NH8**: RealMLP brings general LB lift, not Stint-2 fix
+- **NH9**: Stint-2 needs feature engineering, not a new model family
+- **NH10**: Distillation — train a small model to mimic M5h
+- **NH11**: M5h_oof_probability as a feature (recursive base)
+- **NH12**: Per-(Year, Stint) mini-models (segment ensemble)
+- **NH13**: Logit-only stacker variant on M5h pool
+
+## Calibration ladder (today's additions)
+
+| Mechanism | Strat OOF | LB | Notes |
+|---|---:|---:|---|
+| **m5h** | 0.95043 | **0.94991** | **CURRENT PRIMARY** |
+| m5h2 (drop a_horizon, K=12) | 0.95044 | 0.94991 | tied |
+| m5j (d3a swaps d2a, K=13) | 0.95044 | 0.94991 | tied |
+| **m5p** (orth K=6) | 0.94839 | **0.94754** | **−237bp** REGRESSED |
+| **m5n_3b** (min-orth K=4) | 0.94808 | **0.94700** | **−291bp** REGRESSED |
+| RealMLP (standalone) | 0.94582 | n/a | strong; held |
+| H1 pseudo-LGBM (standalone) | 0.94265 | n/a | held |
+| EBM (standalone) | 0.93361 | n/a | held |
+| LR-FE (standalone) | 0.89684 | n/a | held |
+| **m5q** (M5h + RealMLP, K=14) | **0.95057** | n/a | **DAY-4 SLOT 1 CANDIDATE** |
+| m5r (M5h2 + RealMLP, K=13) | 0.95056 | n/a | held; ρ=0.999 → tie expected |
+| m5s (M5n_3b + RealMLP, K=5) | 0.94854 | n/a | held; minimal-basis is falsified |
+
+## Pointers
+
+- `audit/2026-05-04-day3-endgame.md` — Day-3 retrospective + Day-4 plan
+- `audit/2026-05-04-day3-learnings.md` — pool weaknesses + new hypotheses
+- `audit/2026-05-04-d3-pool-disagreement.md` — diversity diagnostic
+- `audit/2026-05-04-d3-per-segment-analysis.md` — Stint-2 blind spot
+- `audit/friction.md` — operating-rule failure modes (READ BEFORE NEW PROBE)
+- `scripts/pre_submit_diff.py` — MANDATORY pre-submit gate

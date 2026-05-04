@@ -28,5 +28,15 @@
     "rho_m5h_test": 0.8691632612838358,
     "diff_hi_disagreement": 0.23902875738618642,
     "diff_stint2": 0.15395018952684095
+  },
+  {
+    "name": "realmlp",
+    "label": "RealMLP-TD (Kaggle GPU)",
+    "oof": 0.9458222745589113,
+    "delta_m5h_bp": -46.077254410886724,
+    "rho_consensus": 0.9734610520137162,
+    "rho_m5h_test": 0.9719246728683075,
+    "diff_hi_disagreement": 0.024147650003084883,
+    "diff_stint2": 0.036834975650791274
   }
 ]
