@@ -43,13 +43,18 @@ ff-merge before reading state below.
     are calibration probes — measured OOF→LB gap per mechanism family
     is the load-bearing data, not just rank. Do NOT intentionally
     underspend. Each submit still single-shot + PI-approved (Rule 1).
-13. **Kaggle GPU is part of the compute budget.** The local sandbox is
-    CPU-only; the Kaggle notebook runtime (P100 or T4×2) is the GPU
-    path. Before declaring a mechanism "not cost-justified" on local
-    CPU, port it to a Kaggle notebook. Mandatory for: any NN
-    (RealMLP / PyTabKit / TabNet / similar), deep CatBoost (depth ≥ 8)
-    5-fold, and any 5-fold whose local-CPU projection > 1h. See
-    `comp-context.md` → `gpu_workflow` for the artifact-roundtrip path.
+13. **Kaggle GPU is part of the compute budget.** Local sandbox is
+    CPU-only; Kaggle notebooks (P100 / T4×2) are the GPU path. Port
+    NN / deep-CatBoost-depth≥8 5-fold / any 5-fold > 1h-CPU projection
+    to Kaggle before declaring "not cost-justified". See
+    `comp-context.md` → `gpu_workflow`.
+14. **Strategy-critic-loop fires automatically.** At end-of-day audit,
+    on OOF→LB gap drift ≥2bp on consecutive submits, before adding a
+    new mechanism family, at 50% comp checkpoint, or at any plateau
+    (before Research-loop). Output: `audit/YYYY-MM-DD-strategy-critique.md`
+    covering per-segment OOFs, calibration, disagreement localization,
+    unexploited structural-finding scout, headroom math vs realistic
+    H-list lift. Spec: `.claude/skills/kaggle-comp/strategy-critic.md`.
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
@@ -107,15 +112,10 @@ Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 | Mechanism | Strat OOF | GroupKF OOF | LB | Notes |
 |---|---:|---:|---:|---|
 | baseline_two_anchor | 0.94075 | 0.92059 | 0.94113 | LB-proxy ✓ gap +3.8bp |
-| d2a_te | 0.93670 | 0.91628 | n/a | NULL G1; +2-4bp in M1 blend |
-| m1_blend (50/50 base+te) | 0.94097 | 0.92098 | n/a | best-w 80/20 |
 | m2_xgb | 0.94507 | 0.91084 | n/a | Race-overfit |
 | m3_catboost | 0.94612 | 0.91645 | n/a | best single before E3; Race-overfit |
 | m4_relstate | 0.94244 | 0.92195 | n/a | only B1 lifting both anchors |
 | m5_lr_meta | 0.94737 | 0.92483 | 0.94693 | gap −4.4bp |
-| m6_dirichlet | 0.94696 | 0.92459 | n/a | held |
-| e1_cb_subsample | 0.94596 | 0.91638 | n/a | dominated by M3 |
-| e2_l1_meta | 0.94738 | 0.92489 | n/a | null on "L1 fixes gap" |
 | e3_hgbc | 0.94876 | 0.92785 | n/a | BEST single, both anchors lift |
 | e4_realmlp_cpu_f0 | 0.94722 (f0) | n/a | n/a | not pursued (3.3h proj for 5-fold) |
 | m5b_lr_meta_expanded | 0.94926 | 0.92871 | 0.94891 | gap −3.5bp |
