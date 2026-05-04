@@ -50,12 +50,12 @@ probe_resolution_floor: 0.00005 # 80/20 split × N_TEST (re-derive if Featured)
 ## Strategic decisions (PI-answered, batched Q4 in kickoff)
 
 ```yaml
-lb_stability: {{STABILITY}}               # stable | per-row-seeded | unknown
-external_data_strategy: {{EXT_STRATEGY}}  # use | skip | depends_on_rules
-time_budget_per_day_h: {{TIME_DAY}}
-time_budget_total_days: {{TIME_TOTAL}}
-compute_budget: {{COMPUTE}}               # cpu_only | gpu_kaggle | gpu_local
-model_preferences: {{MODELS}}             # e.g. "trees first, NN if obvious"
+lb_stability: stable
+external_data_strategy: use               # https://www.kaggle.com/datasets/aadigupta1601/f1-strategy-dataset-pit-stop-prediction/data
+time_budget_per_day_h: TBD               # awaiting PI answer
+time_budget_total_days: 27               # 2026-05-04 → 2026-05-31
+compute_budget: cpu_and_gpu_kaggle
+model_preferences: trees first, GPU if NN shows clear edge
 ```
 
 ## Daily-updated facts
