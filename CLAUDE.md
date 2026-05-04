@@ -48,6 +48,10 @@ These eleven invariants are LOAD-BEARING. Do not skip.
     PI pull, 1-2 sentences with the latest fact.
 11. **Model routing.** Haiku for routine read-only checks; Sonnet
     default; Opus for hard reasoning. Use the daily 10/day budget.
+12. **Spend the full 5/day submission budget every day.** Submissions
+    are calibration probes — measured OOF→LB gap per mechanism family
+    is the load-bearing data, not just rank. Do NOT intentionally
+    underspend. Each submit still single-shot + PI-approved (Rule 1).
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
