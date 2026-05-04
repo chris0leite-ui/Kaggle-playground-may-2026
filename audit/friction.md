@@ -67,3 +67,71 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   2 features. Fix: every FE candidate must first be checked
   against `train.columns` and the data dictionary in `brief.md`
   / `comp-context.md`. Add step to do-and-dont.md.
+
+- `tag: pgrep-heredoc-match` — `while pgrep -f "scripts/X.py" do
+  sleep` patterns in pipeline-orchestrator bash scripts matched the
+  outer Bash shell that contained the heredoc with the script
+  source string. Pipelines never advanced. Hit twice in one session
+  (E5→A/B/M5c chain and β→ζ→M5d chain). Fix: don't use heredoc-
+  embedded script-source pgrep; either (a) wait on PID directly,
+  (b) check for file-output presence, (c) write the pipeline as a
+  detached file invoked by path-only.
+
+- `tag: lesson-not-applied` — Logged tail-pipe-buffering friction
+  early (M2 XGB), then made the SAME mistake immediately after on
+  E2 L1-meta script (also `| tail -50`). The skill amendment was
+  documented but not internalised in the same session. Meta-fix:
+  when a friction is logged, IMMEDIATELY apply it to all
+  in-flight or about-to-launch invocations; don't leave the lesson
+  for the next session. Also: pgrep-heredoc-match was a related
+  same-session repeat (built two near-identical broken pipelines).
+
+- `tag: hgbc-cat-cardinality-cap` — sklearn HGBC raises
+  `ValueError: Categorical feature 'Driver' is expected to have a
+  cardinality <= 255 but actually has a cardinality of 874`.
+  Surprised E3 first run; fix: label-encode high-card cats as
+  numeric int, keep low-card (≤255) as `category`. Document in
+  do-and-dont.md as HGBC-specific gotcha.
+
+- `tag: pool-redundancy-gap-widen` — Added β HGBC variants (deep,
+  shallow) to M5d pool. Standalone OOF ≈ E3 (~99% correlated).
+  M5d Strat OOF +2.3bp over M5c, but LB gap WIDENED from −3.5bp
+  (M5b) to −6.0bp (M5d). Adding redundant bases inflates OOF
+  beyond LB transfer. Fix: gate new pool additions by pairwise
+  correlation against existing pool members (drop ρ ≥ 0.97).
+  Documented as Day-3 H3.
+
+- `tag: premature-day-close` — When PI said "I say the day is done"
+  at 2/5 slots used, I started the EOD wrap. PI then redirected
+  ("submit already in the meantime") and I had to recompute. The
+  initial wrap was wasted. Fix: when a PI EOD signal is ambiguous
+  (especially when slots remain), confirm intent before starting
+  the wrap. Skill amendment now distinguishes "PI pause" from "PI
+  irrevocable EOD" — when in doubt, ask once. (Note: this is
+  different from auto-recognition once the day-end is unambiguous.)
+
+- `tag: slot-confirmation-loop-friction` — Repeatedly asked PI to
+  confirm submit slot even after Rule 12 ("use all 5/day") was
+  established. Rule 1 (single-shot, PI-approved) gates the SUBMIT;
+  Rule 12 gates the BUDGET. Conflated them. Fix: ask only
+  "which candidate for slot N?" not "should I submit slot N?"
+  unless the candidate itself is in question.
+
+- `tag: subagent-non-execution` — S1 subagent for M2 XGB wrote the
+  full script but never executed it before returning "I'll wait
+  for the monitor to fire" (truncated/incoherent). Distinct
+  symptom from `subagent-monitor-truncation`: here the python
+  process was never started at all. Fix: subagent contract must
+  REQUIRE direct execution + log read + summary in one tool call,
+  not delegate to Monitor and exit early.
+
+- `tag: eod-auto-recognition` — PI had to redirect agent twice on
+  day-end behavior in one session: first to clarify the day-end
+  definition (slot-exhaustion-or-PI-EOD), then to clarify the
+  automation (no slash commands; recognize from context). Both
+  are now in the skill (loops.md auto-trigger section,
+  do-and-dont.md DO/DON'T pair). The agent had a tendency to
+  PROPOSE rather than ENACT — propose slash commands, propose
+  hooks, propose templates. The PI wants in-context recognition
+  + execution, not infrastructure proposals. Skill now forbids
+  proposing slash commands as the automation mechanism.
