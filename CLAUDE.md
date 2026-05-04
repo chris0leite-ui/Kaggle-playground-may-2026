@@ -65,11 +65,11 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 3                            # 2026-05-05 budget opens at UTC 00:00
+day: 3                            # 2026-05-04 / Day-2 5/10 used; Day-3 fresh
 lb_best_today: 0.95435            # leader (still); not refreshed
-our_lb_best: 0.94963              # M5d 12-base stack, Day-2
-submissions_used_today: 0         # Day-2 closed 5/5; Day-3 fresh
-submissions_used_total: 5
+our_lb_best: 0.94991              # M5h L1coef-pruned 13-base stack, +28bp vs M5d
+submissions_used_today: 6         # Day-2 5/10 + M5h Day-3-prep = 6/10
+submissions_used_total: 6
 saturation_count: 1
 mechanism_families_explored:
   - baseline_lgbm_raw_features
@@ -93,7 +93,7 @@ mechanism_families_explored:
   - l1coef_pool_prune               # M5h -- only prune that preserves OOF
 plateau_days: 0
 gate_status: cleared
-headroom_to_top5pct: 0.00382      # 0.95345 − 0.94963 = 38.2bp
+headroom_to_top5pct: 0.00354      # 0.95345 − 0.94991 = 35.4bp
 ```
 
 ## Calibration ladder
@@ -114,7 +114,7 @@ headroom_to_top5pct: 0.00382      # 0.95345 − 0.94963 = 38.2bp
 | m5e (CB-only 13-base) | 0.95027 | 0.93084 | n/a | held; M5c + 3 CB winners |
 | **m5f (combined 15-base)** | **0.95042** | **0.93105** | n/a | held; M5d + M5e new bases |
 | m5g (corr ρ≥0.97 prune) | 0.94961 | 0.92915 | n/a | TOO aggressive; 5/15 surv |
-| **m5h (L1coef top-13)** | **0.95043** | **0.93087** | n/a | held; drop m3+m4 dead weight |
+| **m5h (L1coef top-13)** | **0.95043** | **0.93087** | **0.94991** | **NEW PRIMARY**; gap −5.2bp; drop m3+m4 dead weight |
 
 ## Hypothesis board (Day 3)
 
