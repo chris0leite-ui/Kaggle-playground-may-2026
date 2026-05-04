@@ -96,12 +96,7 @@ def main():
     def add_te_for_split(tr_idx, va_idx, X_train_full, X_test_full):
         """Compute TE features per split. Returns augmented frames."""
         Xtr = X_train_full.copy()
-        Xva = X_train_full.iloc[va_idx].copy()
         Xte_aug = X_test_full.copy()
-        # Per outer fold:
-        # - outer-train (tr_idx) computes inner-OOF TE on itself
-        # - outer-val (va_idx) gets TE from full outer-train
-        # - test gets TE from full outer-train
         for k in all_te_keys:
             full_train_key = train[k].values
             inner_oof = oof_te_train(y[tr_idx], full_train_key[tr_idx],
@@ -110,11 +105,10 @@ def main():
                                 full_train_key[va_idx], ALPHA)
             te_test = smoothed_te(y[tr_idx], full_train_key[tr_idx],
                                   test[k].values, ALPHA)
-            Xtr.loc[Xtr.index[tr_idx], f"te_{k}"] = inner_oof
-            # outer-val: assign TE_va to those indices
-            Xtr.loc[Xtr.index[va_idx], f"te_{k}"] = te_va
-            # test: per-fold TE; we'll average across outer folds at the end
-            # We store on Xte_aug as a fold-specific column we'll average later
+            te_col = np.zeros(len(Xtr), dtype=np.float64)
+            te_col[tr_idx] = inner_oof
+            te_col[va_idx] = te_va
+            Xtr[f"te_{k}"] = te_col
             Xte_aug[f"te_{k}"] = te_test
         return Xtr, Xte_aug
 

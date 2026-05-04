@@ -81,8 +81,8 @@ lb_best_today: 0.95435            # leader at kickoff (2026-05-04)
 our_lb_best: 0.94113              # baseline_two_anchor (StratKFold), Day-1
 submissions_used_today: 1
 submissions_used_total: 1
-saturation_count: 0
-mechanism_families_explored: [baseline_lgbm_raw_features]
+saturation_count: 1               # D2-A null both anchors (2026-05-04)
+mechanism_families_explored: [baseline_lgbm_raw_features, oof_target_encoding]
 plateau_days: 0
 gate_status: cleared              # pre-baseline gate cleared 2026-05-04; see audit/2026-05-04-pre-baseline-gate.md
 headroom_to_top5pct: 0.01232      # 0.95345 − 0.94113 = 123bp
@@ -96,16 +96,22 @@ Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 |---|---:|---:|---:|---|
 | baseline_two_anchor (StratKFold) | 0.94075 | 0.94113 | +3.8bp | calibration ✓ ; anchor A confirmed right proxy |
 | baseline_two_anchor (GroupKFold Race) | 0.92059 | n/a | n/a | race-robustness; not LB proxy |
+| d2a_te (StratKFold) | 0.93670 | n/a | n/a | NULL G1; −40.5bp; not submitted |
+| d2a_te (GroupKFold Race) | 0.91628 | n/a | n/a | NULL G1; −43.1bp; not submitted |
 
 ## Hypothesis board
 
 ```
-- Day-2 (a): external-data join (aadigupta1601, minus Normalized_TyreLife)
-             expected lift +10-30bp; cheap
-- Day-2 (b): FE — interactions (TyreLife×Compound, LapNumber×RaceProgress,
-             Compound×Stint) + target encoding for Driver, Race×Compound
-             expected lift +30-60bp; needs OOF discipline (proper inner CV)
-- Day-3+ : top-notebook replication (RealMLP/PyTabKit; Driver-FE ladder)
+- next: blend-G2 — 0.5·baseline + 0.5·d2a_te on existing OOF .npy
+        FREE; tests cause #3 of d2a null (TE may only help in stack)
+- next: TE-only-replace-raw — drop raw Driver/Race when adding TE
+        cheap edit; tests cause #1 of d2a null
+- next: TE on (Driver, Race) only (drop Compound + interactions)
+        cheap; tests cause #2 of d2a null (high-card noise)
+- D2-C (queued): concat external (aadigupta1601) rows; lower priority
+                  since probe 1 join missed
+- D3+ : RealMLP/PyTabKit (Source 1 #1: standalone ~0.946 on this DGP)
+- D3+ : LGBM hyperparam sweep (Optuna, 30 trials) — only after research
 ```
 
 ## Friction log pointer
