@@ -97,6 +97,7 @@ If CLAUDE.md is > 50k tokens, archive it before doing anything else.
 | [kickoff-runbook.md](kickoff-runbook.md) | Agent step-by-step kickoff (load on kickoff trigger) |
 | [kickoff-bash.md](kickoff-bash.md) | Bash batches the runbook references |
 | [pre-baseline-gate.md](pre-baseline-gate.md) | The 7-item understanding gate before any baseline; spawn 3 research agents in parallel |
+| [problem-solving.md](problem-solving.md) | 7-step framework (Conn & McLean 2018) + Q3.5 worksheet |
 | [kickoff.md](kickoff.md) | Day-1 human-facing checklist (background reading) |
 | [templates/](templates/) | Files copied into the new comp repo by the runbook |
 | [guardrails.md](guardrails.md) | The 11 invariants |
@@ -105,6 +106,14 @@ If CLAUDE.md is > 50k tokens, archive it before doing anything else.
 | [self-improvement.md](self-improvement.md) | Friction tracking + skill-evolution workflow |
 | [do-and-dont.md](do-and-dont.md) | One-page concise checklist |
 | [examples/](examples/) | Walked examples from the reference comp |
+
+## Problem-solving framework
+
+The kaggle-comp loops are organised around the 7-step framework
+in [problem-solving.md](problem-solving.md) (Conn & McLean 2018):
+Define → Disaggregate → Prioritise → Workplan → Analyse →
+Synthesise → Communicate. Re-enter step 1 at every plateau —
+not step 5.
 
 ## Reference competition
 
