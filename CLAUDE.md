@@ -68,9 +68,10 @@ ff-merge before reading state below.
 day: 3                            # 2026-05-04 / Day-2 5/10 used; Day-3 fresh
 lb_best_today: 0.95435            # leader (still); not refreshed
 our_lb_best: 0.94991              # M5h L1coef-pruned 13-base stack, +28bp vs M5d
-submissions_used_today: 8         # + M5j swap = 8/10
-submissions_used_total: 8
-saturation_count: 3               # M5h, M5h2, M5j all tied LB 0.94991 (quantization-limit)
+submissions_used_today: 10        # + M5p (slot 9) + M5n_3b (slot 10) = 10/10
+submissions_used_total: 10
+saturation_count: 4               # M5h/M5h2/M5j tied LB 0.94991; M5p/M5n_3b regressed -237/-291bp
+                                  # Minimal-basis hypothesis FALSIFIED — 10 GBDT clones earn slot
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -125,6 +126,8 @@ headroom_to_top5pct: 0.00354      # 0.95345 − 0.94991 = 35.4bp
 | m5k (M5h+d3a+d3b, 15) | 0.95045 | 0.93102 | n/a | d3b L1=0.316 (mid-tier); +0.2bp Strat tie |
 | m5h2_v1 (drop a_horizon, 12) | 0.95044 | n/a | **0.94991** | **TIED M5h LB**; gap-vs-pool-size hypothesis falsified for 13→12 |
 | m5j (d3a swaps d2a, 13) | 0.95044 | n/a | **0.94991** | **TIED M5h LB**; TE-key swap is LB-neutral (quantization-limit) |
+| m5p (minimal+LR-FE+EBM, 6) | 0.94839 | n/a | **0.94754** | -237bp; orthogonal-mech thesis FAILED |
+| m5n_3b (minimal-basis, 4) | 0.94808 | n/a | **0.94700** | -291bp; minimal-basis thesis FAILED — clones earn slot |
 
 ## Hypothesis board (Day 3)
 
