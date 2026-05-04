@@ -80,7 +80,8 @@ Updated by the Calibration-loop. Format: mechanism / OOF / LB / gap.
 
 | Mechanism | OOF | LB | Gap | Notes |
 |---|---:|---:|---:|---|
-| (baseline_lgbm, after Day-1 first submit) | | | | |
+| baseline_two_anchor (StratKFold) | 0.94075 | TBD | TBD | i.i.d. anchor; matches test (U3) |
+| baseline_two_anchor (GroupKFold Race) | 0.92059 | n/a | n/a | race-robustness; not LB proxy |
 
 ## Hypothesis board
 
