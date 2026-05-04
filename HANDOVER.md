@@ -3,104 +3,132 @@
 > Next-session prompt for playground-series-s6e5. PI says **"handover"**
 > → agent reads this file and proceeds per its instructions. PI says
 > **"prepare handover"** → agent rewrites this file with the next
-> session's brief. Day-loop step 7 also auto-refreshes it at EOD.
+> session's brief.
 
 ---
 
-## Today's session — Day 3 (2026-05-05+)
+## Today's session — Day 3 mid-session (2026-05-04 ~17:50 UTC)
 
 **Read order on session start** (skip the default; this file is the
 synthesis):
 
 1. `CLAUDE.md` — state block + Rules 1-15 (especially R1, R12, R13, R14)
-2. `comp-context.md` — settled-once facts (compute, schema, structural
-   findings, GPU workflow)
-3. `audit/2026-05-04-day-2-wrap.md` — Day-2 close + ranked H-list
-4. `audit/2026-05-04-strategy-critique.md` — what we DON'T know yet
+2. `comp-context.md` — settled-once facts (compute, schema, GPU workflow)
+3. `audit/2026-05-04-strategy-critique.md` — what we still DON'T know
+4. `audit/2026-05-04-m5h-l1coef-prune.md` — **validated meta-level lever**
 
-After reading, open with a 3-bullet read-back of state + the first
-diagnostic you'll run. Don't start running until PI confirms.
+Open with a 3-bullet read-back of state + the first mechanism to run.
 
 ## Where we are
 
-- **Day 2 closed**, 5/5 submissions used. `our_lb_best = 0.94963`
-  (M5d 12-base LR-meta stack). Headroom to top-5% (0.95345): 38.2bp.
-- **Single-model gap is ~0bp** (E3 HGBC standalone OOF 0.94876, LB
-  0.94870). **Stack gap widens with redundancy:** M5 −4.4 → M5b −3.5
-  → M5d −6.0bp. The LR meta over-weights correlated bases.
-- **Strategy critique (2026-05-04) flagged five gaps:** no per-segment
-  failure map, no calibration check, no model-disagreement
-  localization, no sequence-FE scout, optimistic headroom math.
+- **Day 3 in progress**, **6/10 submissions used today, 4 remaining**.
+- **`our_lb_best = 0.94991`** (M5h L1coef-pruned 13-base stack, gap −5.2bp).
+  Headroom to top-5% (0.95345): **35.4bp**.
+- **Single-model ceiling ~0.94876 OOF** (E3 HGBC); pure-stack ceiling on
+  current pool is now demonstrably **bounded by orthogonality, not
+  pool size or meta-tuning**: M5h has 13 bases (more than M5d's 12) but
+  tighter gap because L1-prune dropped two bases with near-zero meta
+  weight (m3_catboost, m4_relstate).
 
-## Day-3 sequence (DO IN ORDER)
+## What today landed
 
-**Step 0 — four diagnostics (~30 min total)** before any H-list work.
-These re-rank H1-H5 and give H1 its missing safety guard:
+- **CatBoost variants explored on a dedicated branch** (Stage A research
+  + 7 1-fold probes + 3 anchor runs):
+  - **lossguide** (`grow_policy=Lossguide`, depth=8, Year∈CAT_COLS):
+    Strat 0.94697 / GroupKF **0.92377** — first CB to clear G1 GroupKF.
+  - **slow-wide-bag** (3-seed GPU bag, lr=0.03, iter=4000, l2=8):
+    Strat **0.94790** / GroupKF 0.92322 — best CB on Strat.
+  - **year-cat** (Year added to CAT_COLS, M3 params): Strat 0.94679 /
+    GroupKF 0.91992. Year-as-numeric was driving M3's overfit.
+- **Kaggle GPU pipeline working** (after fixing 2 root causes):
+  - `kaggle kernels init` template emits string-quoted booleans which
+    Kaggle silently treats as `false`. Always edit to bare `true`/`false`.
+  - Comp data path varies; use `Path('/kaggle/input').rglob('train.csv')`
+    rather than hardcoding `/kaggle/input/<slug>/`.
+  - Working reference: `kernels/cb-slow-wide-gpu/`. Pull a known-working
+    prior kernel (`kaggle kernels pull <user>/<slug> -m`) for any new GPU
+    work.
+- **L1-coef prune validated as a meta-level lever**:
+  - M5b (7 bases) gap −3.5bp; M5d (12) gap −6.0bp; **M5h (13, L1-pruned)
+    gap −5.2bp**. Drops m3_catboost + m4_relstate (lowest L1 sum across
+    raw/rank/logit channels). Reuse on every future stack.
+- **OOF→LB transfer is sharply diminishing**: M5b 92% transfer
+  → M5d 74% → **M5h 24%**. Each additional 20bp of OOF gives <5bp LB.
+  Implication: more bases of the same flavor pay less and less.
 
-1. Per-Race OOF AUC table on M5d (5 min) → which 3 races drag the mean?
-2. Reliability diagram on M5d OOF (5 min) → if miscalibrated, H1 uses
-   isotonic-calibrated probs, not raw.
-3. Multi-base agreement matrix across all 12 bases (10 min) → 2-tail
-   subset (count ∈ {0,1,2} ∪ {10,11,12}) is the safe pseudo-label pool.
-4. Sequence-FE scout (10 min): single-LGBM probe on baseline +
-   `laps_since_last_pitstop`, `cumulative_pitstops_this_race`,
-   `rolling_target_rate(window=5)` over (Race, Driver) groups. If
-   Strat-OOF lifts ≥5bp, add to EXPLORE queue at high priority.
+## PI direction for remaining slots / Day-4
 
-Output → `audit/2026-05-05-d3-diagnostics.md`.
+> *"We need to add more models or features with orthogonal signal
+> before we dig deeper into ensemble specifics."*
 
-**Step 1+ — H-list, re-ranked by diagnostic findings:**
+The L1-prune is the last meta-level squeeze that still works. Further
+ensemble tuning (Ridge meta, hill-climb, more pool members of the same
+GBDT flavor) is **lower EV than adding genuinely orthogonal signal**.
 
-- **H3** (~10 min) pairwise-correlation gate ρ≥0.97 → refit M5e on
-  diversity-pruned pool. **Submit slot 1 — D3 PRIMARY.**
-- **H1** (~2h) pseudo-labeling — but use the multi-base agreement
-  guard from diagnostic #3, NOT raw M5d confidence. Add a regression
-  test: does pseudo-labeling LIFT or REGRESS the *single-base* OOF?
-  **Submit slot 2.**
-- **2-way TE** (~1h) Driver×Race / Driver×Compound / Race×Lap-bin
-  with α=80, inner 5-fold per outer fold. This is the missed Day-1
-  research-loop lever (analyticaobscura Source 1 #2). **Submit slot 3.**
-- **Kaggle GPU port — RealMLP / EmbMLP** (~2-3h, first GPU
-  experiment). Per Rule 13. yekenot's 56-vote public notebook for
-  *this exact comp* uses RealMLP. Document the
-  notebook-roundtrip pipeline on first use. **Submit slot 4.**
-- **R2 hedge** (~30 min) best OOF that regressed ≤30bp on LB.
-  **Submit slot 5.**
+## Day-3 sequence — orthogonal-signal first (DO IN ORDER)
 
-Backlog if any of the above null:
-- H4 HGBC multi-seed bagging (proper variance reduction)
-- H5 hill-climb / Ridge meta drop-in
-- H2 reformulations: stint-stratified, residual-from-baseline,
-  driver-recent-pit-history
+**Step 1 — 2-way TE base** (~30-60 min CPU). Day-1 missed lever flagged
+by the strategy critique and analyticaobscura Source 1 #2:
 
-## Workflow rules in force (recap)
+- Driver×Race / Driver×Compound / Race×Lap-bin with α=80 smoothing,
+  inner 5-fold per outer fold (no leakage). Single-base probe first;
+  if standalone ≥0.946 OOF, add to M5h pool → M5i refit. Apply L1-prune
+  before any LB submit (drop bases below median L1 sum). **Submit slot 7.**
 
-- **R1** Submissions are single-shot + PI-approved. Never loop.
-- **R12** Spend the full 5/5 daily budget. Calibration probes are
-  load-bearing data, not just rank.
-- **R13** Kaggle GPU IS available — port heavy NN / deep CatBoost
-  5-fold / any 5-fold > 1h local-CPU projection to Kaggle.
-- **R14** Strategy-critic-loop fires automatically at EOD, on gap
-  drift ≥2bp on consecutive submits, before adding a new mechanism
-  family, mid-comp, or at plateau (before Research-loop).
+**Step 2 — Sequence-FE base** (~30 min CPU). 97.4% of test has
+same-(Race, Driver) within-test continuation — this structure is
+unexploited:
 
-## Anti-patterns (from Day-2 process errors)
+- `laps_since_last_pitstop`, `cumulative_pitstops_this_race`,
+  `rolling_target_rate(window=5)` over (Race, Driver) groups.
+- Single-LGBM probe on baseline + these 3 features. If OOF ≥0.945 → add
+  as M5j base. **Submit slot 8.**
 
-- **Don't expand a stack pool when OOF→LB gap is widening.** That's
-  the meta over-fitting OOF noise. Prune (H3) or swap meta (Ridge /
-  hill-climb) instead. Use the diagnostic #3 agreement matrix to
-  identify which bases to drop.
-- **Don't pseudo-label from the over-fit stacker.** Use multi-base
-  agreement, not single-stacker confidence.
-- **Don't declare a mechanism "not cost-justified" on local CPU
-  alone.** Re-evaluate on Kaggle GPU per R13 first (RealMLP 5-fold
-  and ζ deep CatBoost 5-fold both deserve a re-run).
+**Step 3 — RealMLP on Kaggle GPU** (~2-3h roundtrip including push).
+yekenot's 56-vote public notebook for *this exact comp* uses RealMLP;
+truly orthogonal mechanism family (NN vs GBDTs):
 
-## Open questions for PI before submitting
+- Use `kernels/cb-slow-wide-gpu/` as the metadata template (booleans
+  fixed, rglob in place).
+- E4 was killed at fold-0 local CPU only (3.3h projection); GPU should
+  fit comfortably under 1h.
+- Single-model probe → add to stack as M5k base. **Submit slot 9.**
 
-- Slot 1 (M5e pruned) is high-confidence; OK to push without further
-  PI gating beyond R1 single-shot?
-- Pseudo-label aggressiveness — what's the test fraction we're
-  comfortable using? Default plan: agreement-guarded ~10-15% of test.
-- Kaggle GPU notebook scheduling: PI to confirm Kaggle account /
-  notebook ownership for the first artifact-roundtrip run.
+**Step 4 — HOLD** slot 10 for whichever of the above gave the best
+calibration data, or for an R2-hedge candidate.
+
+## Lower priority (only if Step 1-3 underdeliver)
+
+- HGBC multi-seed bag (H4) — *variance* reduction; pool variance is
+  not the binding issue (we have 99% correlation between HGBC variants).
+- Ridge / hill-climb meta drop-in (H5) — meta-level lever, but
+  L1-prune already squeezed most of what's available.
+- M5f raw vs M5h calibration probe — informative but not LB-improving.
+- M5e CB-only probe — same.
+
+## Anti-patterns (validated)
+
+- **Don't expand pool with correlated bases** — M5d→M5f gap-widening
+  pattern. L1-prune is the patch; orthogonal-signal-add is the cure.
+- **Don't pseudo-label from the over-fit stacker** — use multi-base
+  agreement guard (skill rule).
+- **Don't burn slots on calibration probes when LB calibration is
+  already established** — Day-3 has 4 slots; spend on net-new lift,
+  not A/B confirmation of known mechanisms.
+- **Don't trust `kaggle kernels init` output blindly** — fix the
+  string-bool defaults before pushing.
+
+## Workflow rules in force
+
+- **R1** Submissions are single-shot + PI-approved.
+- **R12** Spend the full 10/day budget — calibration data is
+  load-bearing.
+- **R13** Kaggle GPU IS available — port any 5-fold > 1h local-CPU.
+- **R14** Strategy-critic-loop fires automatically before adding a
+  new mechanism family. Steps 1-3 above each trigger it.
+
+## Open questions for PI
+
+- 2-way TE smoothing α=80 OK, or sweep α?
+- RealMLP architecture: copy yekenot's exact config or smaller?
+- After steps 1-3 land, do we revisit Ridge meta / hill-climb (Day-4)?
