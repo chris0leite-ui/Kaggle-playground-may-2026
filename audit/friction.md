@@ -2,6 +2,39 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-12
+
+- `tag: multi-agent-handover-collision` — Day-12 session on
+  `claude/nn-design-options-NjDZ0` ran in parallel with
+  `claude/math-heuristics-ml-62fpM`. While I worked on TabM v3 +
+  strategy critique + HANDOVER updates, the parallel agent landed
+  d9c → d9d → d9e → d9f → d9g → d9h on origin/main (≈ one
+  falsification or PASS per ~30 min). **My HANDOVER updates were
+  stale before every push.** Rewrote HANDOVER.md 5+ times in one
+  session; 4 merge conflicts on HANDOVER.md, all manually resolved.
+  Conflict surface: HANDOVER.md and CLAUDE.md (state block); audit
+  + script files do NOT conflict because of unique
+  `<day>-<probe-letter>-*.md` naming. Cost: ~45 min repeated
+  HANDOVER rewrites + 5 force-rebuilds + push-rejected loops.
+  Three coordination options, by infrastructure cost:
+  (a) **HANDOVER ownership / scribe-of-the-day** — PI designates
+      ONE agent per session as HANDOVER scribe; other agents commit
+      audits/scripts only and let the scribe consolidate at EOD,
+      not mid-flight. Lowest cost; relies on social contract.
+  (b) **Append-only log** — HANDOVER becomes a chronological feed
+      where each agent appends `## Day-N PM <agent> — <summary>`
+      sections; daily scribe pass folds them into the structured
+      "## Day-N+1 morning" brief. No conflicts on disjoint append
+      sections; needs scribe role anyway.
+  (c) **Lock file** — `touch HANDOVER.lock` before edit; agents
+      poll. Higher infra cost; race conditions on the lock itself.
+  Recommendation for the remaining 15 days: (a) — PI designates
+  scribe per session; non-scribe agents commit audits + scripts
+  but skip HANDOVER edits. End-of-day reconciliation is one merge
+  per agent, not five. Friction file itself is 358 lines (over 150
+  cap from CLAUDE.md Rule 9) — separate issue; needs weekly
+  distillation per the skill.
+
 ## 2026-05-08
 
 - `tag: menu-overcrediting-redundant-mechanism` — Strategic-menu
