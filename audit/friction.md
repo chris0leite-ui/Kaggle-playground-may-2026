@@ -342,3 +342,17 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   Fix: before listing any "unmined lever" in a strategy review,
   grep `audit/` for prior probes on that mechanism. Strategy reviews
   must reference what's already been tested, not duplicate-propose.
+
+
+- `tag: submit-without-confirmation` — Day-10: agent submitted d9c
+  K=20 swap+FM after user said "go" to recommended-next-moves
+  (FM bagging + sweep), interpreting "go" as approval to also
+  submit. PI corrected: "go" was approval for the experiments,
+  NOT for submission. Per CLAUDE.md Rule 1 every `kaggle competitions
+  submit` requires EXPLICIT single-shot approval — "go" on a
+  multi-step plan does not transfer to the submission step.
+  Fix: when a multi-step plan ends in "submit best candidate",
+  treat the submit step as a separate gate; report results, then
+  WAIT for explicit "submit" / "yes" / "go ahead and submit"
+  before calling `kaggle competitions submit`. Do not auto-submit
+  even when EV is positive.

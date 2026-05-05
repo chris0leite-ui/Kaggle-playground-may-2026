@@ -1,0 +1,89 @@
+{
+  "results": {
+    "v0_k4": {
+      "std_oof": 0.9192638904566344,
+      "rho_vs_primary": 0.8906843773883136,
+      "min_meta_oof": 0.9506952459894429,
+      "delta_primary_bp": -0.04754010557106447,
+      "min_meta_pass": false
+    },
+    "v1_k8_baseline": {
+      "std_oof": 0.9206924181767216,
+      "rho_vs_primary": 0.893841864225871,
+      "min_meta_oof": 0.9506938775758949,
+      "delta_primary_bp": -0.06122424105137192,
+      "min_meta_pass": false
+    },
+    "v2_k16": {
+      "std_oof": 0.919288036297671,
+      "rho_vs_primary": 0.8912506125321512,
+      "min_meta_oof": 0.9506933868001555,
+      "delta_primary_bp": -0.06613199844518469,
+      "min_meta_pass": false
+    },
+    "v3_k8_wd1e5": {
+      "std_oof": 0.9206926593839693,
+      "rho_vs_primary": 0.8938405773553014,
+      "min_meta_oof": 0.9506938777060311,
+      "delta_primary_bp": -0.061222939689020706,
+      "min_meta_pass": false
+    },
+    "v4_k8_ep10": {
+      "std_oof": 0.9206618651990327,
+      "rho_vs_primary": 0.8914147437728858,
+      "min_meta_oof": 0.9506937273988442,
+      "delta_primary_bp": -0.06272601155821178,
+      "min_meta_pass": false
+    },
+    "bag3_seeds": {
+      "std_oof": 0.9225279458270609,
+      "rho_vs_primary": 0.8950748111513701,
+      "min_meta_oof": 0.9506931454627718,
+      "delta_primary_bp": -0.06854537228151436,
+      "min_meta_pass": false
+    },
+    "stack_v0_k4": {
+      "K": 20,
+      "strat_oof": 0.9507084782273427,
+      "delta_primary_bp": 0.08478227342734179,
+      "rho_vs_primary": 0.9999385860867458
+    },
+    "stack_v1_k8_baseline": {
+      "K": 20,
+      "strat_oof": 0.9507028167542344,
+      "delta_primary_bp": 0.02816754234413743,
+      "rho_vs_primary": 1.0
+    },
+    "stack_v2_k16": {
+      "K": 20,
+      "strat_oof": 0.950682641202714,
+      "delta_primary_bp": -0.17358797286037841,
+      "rho_vs_primary": 0.999952945106666
+    },
+    "stack_v3_k8_wd1e5": {
+      "K": 20,
+      "strat_oof": 0.9506903899611463,
+      "delta_primary_bp": -0.09610038853691272,
+      "rho_vs_primary": 0.9999760397584213
+    },
+    "stack_v4_k8_ep10": {
+      "K": 20,
+      "strat_oof": 0.9506920384275657,
+      "delta_primary_bp": -0.07961572434322939,
+      "rho_vs_primary": 0.9999597359071513
+    },
+    "stack_bag3_seeds": {
+      "K": 20,
+      "strat_oof": 0.9506872483131996,
+      "delta_primary_bp": -0.12751686800371864,
+      "rho_vs_primary": 0.9998822002614701
+    }
+  },
+  "best_single": "v3_k8_wd1e5",
+  "best_stack": "stack_v0_k4",
+  "primary": {
+    "strat_oof": 0.9507,
+    "lb": 0.95029
+  },
+  "total_wall_s": 748.7272019386292
+}

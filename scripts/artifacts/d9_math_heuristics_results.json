@@ -1,0 +1,107 @@
+{
+  "approaches": {
+    "R5_weibull_compound": {
+      "standalone_oof": 0.945995808923736,
+      "rho_vs_m5q_test": 0.9352109013004536,
+      "rho_vs_primary_test": 0.9427682212415314,
+      "minimal_meta_oof": 0.9506407148022717,
+      "minimal_meta_delta_primary_bp": -0.09285197728248207,
+      "minimal_meta_pass": false,
+      "has_residual": true
+    },
+    "R6_next_compound": {
+      "standalone_oof": 0.9444314151700481,
+      "rho_vs_m5q_test": 0.9008615437292691,
+      "rho_vs_primary_test": 0.907776517845003,
+      "minimal_meta_oof": 0.9506379875401783,
+      "minimal_meta_delta_primary_bp": -0.12012459821741928,
+      "minimal_meta_pass": false,
+      "has_residual": true
+    },
+    "R7_prev_compound": {
+      "standalone_oof": 0.9448062694683085,
+      "rho_vs_m5q_test": 0.9058753865239214,
+      "rho_vs_primary_test": 0.9139744296667812,
+      "minimal_meta_oof": 0.9506398710323812,
+      "minimal_meta_delta_primary_bp": -0.10128967618761031,
+      "minimal_meta_pass": false,
+      "has_residual": true
+    },
+    "R8_position_progress": {
+      "standalone_oof": 0.9455389778827696,
+      "rho_vs_m5q_test": 0.9229187340988906,
+      "rho_vs_primary_test": 0.9305964836983489,
+      "minimal_meta_oof": 0.9506391907459568,
+      "minimal_meta_delta_primary_bp": -0.10809254043175898,
+      "minimal_meta_pass": false,
+      "has_residual": true
+    },
+    "R9_laptime_delta_z": {
+      "standalone_oof": 0.9455832537927625,
+      "rho_vs_m5q_test": 0.9342452004250572,
+      "rho_vs_primary_test": 0.94174299246391,
+      "minimal_meta_oof": 0.9506406154758991,
+      "minimal_meta_delta_primary_bp": -0.09384524100930491,
+      "minimal_meta_pass": false,
+      "has_residual": true
+    },
+    "R10_driver_eb": {
+      "standalone_oof": 0.9446271096780732,
+      "rho_vs_m5q_test": 0.903533407763656,
+      "rho_vs_primary_test": 0.9119953171542328,
+      "minimal_meta_oof": 0.9506395484250076,
+      "minimal_meta_delta_primary_bp": -0.1045157499235394,
+      "minimal_meta_pass": false,
+      "has_residual": true
+    },
+    "R11_stint_overdue": {
+      "standalone_oof": 0.9455713590285552,
+      "rho_vs_m5q_test": 0.9174386876873953,
+      "rho_vs_primary_test": 0.9248641924090623,
+      "minimal_meta_oof": 0.9506407853685681,
+      "minimal_meta_delta_primary_bp": -0.09214631431886389,
+      "minimal_meta_pass": false,
+      "has_residual": true
+    },
+    "R12_cumdeg_knee": {
+      "standalone_oof": 0.9453524968474337,
+      "rho_vs_m5q_test": 0.9270494068658357,
+      "rho_vs_primary_test": 0.9344698039923988,
+      "minimal_meta_oof": 0.9506408144214507,
+      "minimal_meta_delta_primary_bp": -0.0918557854934221,
+      "minimal_meta_pass": false,
+      "has_residual": true
+    },
+    "R13_race_lapbin": {
+      "standalone_oof": 0.9453890443652928,
+      "rho_vs_m5q_test": 0.9179005590128798,
+      "rho_vs_primary_test": 0.9254131278075304,
+      "minimal_meta_oof": 0.9506380558290929,
+      "minimal_meta_delta_primary_bp": -0.11944170907107754,
+      "minimal_meta_pass": false,
+      "has_residual": true
+    },
+    "R14_hash_lr_3way": {
+      "standalone_oof": 0.7937651358090849,
+      "rho_vs_m5q_test": 0.4383762161571079,
+      "rho_vs_primary_test": 0.44357689834457703,
+      "minimal_meta_oof": 0.9506479124994196,
+      "minimal_meta_delta_primary_bp": -0.02087500580394419,
+      "minimal_meta_pass": false,
+      "has_residual": false
+    }
+  },
+  "coverages": {
+    "next_compound": 0.9326601652804719,
+    "prev_compound": 0.9322509499641273
+  },
+  "primary": {
+    "strat_oof": 0.95065,
+    "lb": 0.95026
+  },
+  "m5q": {
+    "strat_oof": 0.95057,
+    "lb": 0.95005
+  },
+  "total_wall_s": 942.5818560123444
+}
