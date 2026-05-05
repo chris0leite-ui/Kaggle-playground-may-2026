@@ -131,17 +131,13 @@ partly caused by the pred_lb extrapolation being 20× too small at
 
 ## 7. Honest realistic finish
 
-- **Median outcome**: 0.95080–0.95100 LB, top-15% to top-25%.
-- **P75 outcome**: 0.95130, top-12%.
-- **Tail-case (C2 + G4 both hit upper-tail)**: 0.95200, top-8%.
-- **Top-5% (0.95345)**: requires C2 +8bp **and** G4 +6bp **and** a
-  Bayesian-stack +3bp **and** leader pack stagnation. P ≈ 5%.
+Median 0.95080–0.95100 (top-15–25%); P75 0.95130 (top-12%); tail-case
+C2+G4 upper-tail 0.95200 (top-8%); top-5% (0.95345) requires C2 +8bp
+**and** G4 +6bp **and** Bayesian +3bp **and** leader stagnation, P≈5%.
 
-This is not catastrophic. PRIMARY at LB 0.95026 is already a strong
-finish given the rank-lock. The right play for the remaining 16
-days is to **pursue C2 hard, run G4 in background, and accept
-top-15% as the modal outcome** rather than spend more compute on
-in-class NN/GBDT variants.
+PRIMARY at 0.95026 is already a strong finish given the rank-lock.
+Right play: **pursue C2 hard, run G4 background, accept top-15% modal**
+rather than burn compute on in-class NN/GBDT variants.
 
 ## 8. Falsifications added to dead-list
 
