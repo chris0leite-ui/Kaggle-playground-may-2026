@@ -87,6 +87,43 @@ Layered candidates all expected to tie. Need a NEW BASE to make slot
 ### Slot 3+
 Depends on slot-2 outcome and which new base lands first.
 
+## Untried CatBoost levers (research note + YetiRank)
+
+Stage-A research note `audit/2026-05-04-catboost-research.md` lives on
+the catboost branch (`origin/claude/explore-catboost-options-jWhDD`).
+Mechanisms 1, 5, 7 became `cb_year-cat`, `cb_slow-wide-bag`,
+`cb_lossguide` (all in M5h). **Mechanisms 3, 4, 6, 8 were probed at
+fold-0 only and never 5-folded or stack-incorporated.**
+
+Probe results (all hit the 799-iter cap → 0.947-0.948 are FLOORS):
+
+| Variant (CatBoost branch) | Fold-0 AUC | Promising? |
+|---|---:|---|
+| **MVS bootstrap** (mech #6) | **0.94792** | YES — equals cb_slow-wide-bag floor |
+| One-hot (max_size=10) (mech #2 follow-up) | 0.94749 | maybe |
+| Counter-only CTR (mech #4) | 0.94741 | diversity — no target in CTR |
+| CTR-complex (max_ctr=6, mech #3) | 0.94731 | maybe |
+| Ordered (mech #8, smoke) | 0.93908 | abandoned — slow |
+
+**Plus the new untried recent-CatBoost feature**:
+
+- **`loss_function='YetiRank'`** (or `YetiRankPairwise`) — pairwise
+  ranking objective, structurally aligned with AUC. All current
+  CatBoost bases use `Logloss` → adding a YetiRank base introduces
+  a different loss surface, likely orthogonal predictions. Build:
+  `scripts/d4_cb_yetirank.py` (TBD). ~30-60 min CPU; faster on GPU.
+
+**Recommended ordering for Day-4 slot 2**:
+1. **MVS 5-fold + slow+wide hyperparams** (`bootstrap_type=MVS,
+   subsample=0.7, mvs_reg=0.1, lr=0.03, iter=4000`). Echoes the
+   slow-wide-bag pattern that worked. ~30 min CPU.
+2. **YetiRank** with same slow+wide config. ~30-60 min CPU.
+3. **Counter-only CTR** as a diversifier (no target in CTR =
+   different signal source).
+
+These give us 3 new CatBoost bases of distinct character. Add to
+M5q pool individually and check L1 contribution + ρ vs M5q.
+
 ### Final-window plan
 - M5q stays as PRIMARY unless dethroned.
 - HEDGE candidate per R2 (best-OOF that regressed ≤30bp on public).
@@ -152,9 +189,25 @@ Depends on slot-2 outcome and which new base lands first.
 - **NH11**: M5q_oof_probability as a feature (recursive base).
 - **NH12**: Per-(Year, Stint) mini-models (segment ensemble).
 - **NH13**: Logit-only stacker variant on M5q pool.
+- **NH14**: CatBoost YetiRank — pairwise ranking objective directly
+  optimizes the AUC-equivalent metric. All 3 existing CB bases use
+  Logloss; YetiRank introduces a different loss surface and likely
+  orthogonal predictions. Build alongside MVS slow+wide.
+- **NH15**: CatBoost MVS slow+wide — fold-0 probe (0.94792) on the
+  catboost branch was never extended to 5-fold or stacked. With
+  slow+wide hyperparams (lr=0.03, iter=4000, l2=8) following the
+  cb_slow-wide-bag recipe, expect 0.948+ Strat OOF.
+- **NH16**: CatBoost Counter-only CTR — pure frequency encoding,
+  no target dependency in the CTR layer. Different signal source
+  from existing CB bases (which all use default target-based CTRs).
+  Fold-0 probe was 0.94741.
 
 ## Pointers
 
+- `audit/2026-05-04-catboost-research.md` (on catboost branch
+  `origin/claude/explore-catboost-options-jWhDD`) — Stage-A research
+  note: 10 untried CatBoost mechanisms with citations. Mechanisms
+  3/4/6/8 were probed-only and never 5-folded.
 - `audit/2026-05-04-day3-endgame.md` — Day-3 retrospective + Day-4 plan
 - `audit/2026-05-04-day3-learnings.md` — pool weaknesses + new hypotheses
 - `audit/2026-05-04-d3-pool-disagreement.md` — diversity diagnostic
