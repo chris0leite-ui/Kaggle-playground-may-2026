@@ -77,11 +77,11 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 10                           # 2026-05-11 / Day-10: d9f K=21 swap+multi-FM LB 0.95031 (+2bp LIFT, NEW PRIMARY)
+day: 10                           # 2026-05-11 / Day-10: d9h+d9i BOTH LB 0.95034 (+3bp NEW PRIMARY); FM-class OOF→LB miscalibrated
 lb_best_today: 0.95435            # leader; not refreshed
-our_lb_best: 0.95031              # d9f_K21_swap_partA_partB NEW PRIMARY; gap -2.4bp (NARROWED from -2.6)
-submissions_used_today: 3         # d9b_k20_swap_l4 TIE; d9c K20+FM +3bp; d9f K21+multi-FM +2bp
-submissions_used_total: 17
+our_lb_best: 0.95034              # d9h_K22_add_aug12 / d9i_S1_K21_swap_aug2way (TIED); gap -1.7bp NARROWED from -2.4
+submissions_used_today: 5         # d9b TIE; d9c +3; d9f +2; d9h +3 (300× OOF upside); d9i +3 (OOF predicted -0.19, actual +3)
+submissions_used_total: 19
 saturation_count: 0               # FM model class transferred LB; Day-10 BREAKTHROUGH; Sd pred +0.53 actual +3.0
 mechanism_families_explored:
   - baseline_lgbm_raw_features
@@ -126,7 +126,7 @@ mechanism_families_explored:
   - hash_lr_3way_strength_ladder    # d9b R14 L0-L5 -- L2/L3/L4 PASS; K=20 swap+L4 LB 0.95025 TIE
   - factorization_machine_partition # d9f FM_A driver-dynamics + FM_B race-context -- K=21 swap LB 0.95031 (+2bp NEW PRIMARY)
 plateau_days: 0
-gate_status: cleared              # d9f K=21 swap+multi-FM LB 0.95031 (+2bp), NEW PRIMARY; gap -2.4bp NARROWED from -2.6
+gate_status: cleared              # d9h K=22 add + d9i S1 K=21 swap aug 2-way BOTH LB 0.95034 (+3bp each); gap -1.7bp NARROWED from -2.4
 headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 ```
 
@@ -191,7 +191,12 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 | d9c_Sd_K20_swap_FM | 0.95070 | n/a | 0.95029 | hedge; +3bp LB (5.7× upside on +0.53bp pred); demoted by d9f |
 | d9f_FM_A_driver_dynamics | 0.82505 | n/a | n/a | d9f -- D/C/S/T_q5; ρ vs PRIMARY 0.487 (most-diverse since R14) |
 | d9f_FM_B_race_context | 0.88438 | n/a | n/a | d9f -- R/Y/Rp_q5/P_q5; ρ 0.861; min-meta +0.04bp PASS |
-| **d9f_K21_swap_partA_partB** | **0.95073** | n/a | **0.95031** | **NEW PRIMARY**; +2bp LB (6.25× upside on +0.32bp pred); gap -2.4bp NARROWED from -2.6 |
+| d9f_K21_swap_partA_partB | 0.95073 | n/a | 0.95031 | demoted by d9h/d9i; was PRIMARY |
+| d9h_FM_aug12 (12-field unified) | 0.92540 | n/a | n/a | strongest single FM ever (+4.7bp std OOF over d9c FM); ρ=0.917 vs d9f |
+| **d9h_K22_add_aug12** | **0.95073** | n/a | **0.95034** | **NEW PRIMARY (TIED)**; +3bp LB (300× upside on +0.01bp pred) |
+| d9i_FM_A_aug (D/C/S/T/Cd/Ld) | 0.88123 | n/a | n/a | aug FM_A; ρ vs d9f PRIMARY 0.720 |
+| d9i_FM_B_aug (R/Y/Rp/P/Nx/Pv) | 0.88561 | n/a | n/a | aug FM_B; ρ 0.863 |
+| **d9i_S1_K21_swap_aug2way** | **0.95071** | n/a | **0.95034** | **NEW PRIMARY (TIED)**; +3bp LB; OOF predicted -0.19bp (regression!), actual +3bp lift; OOF direction-flipped |
 
 ## Hypothesis board (Day 9 evening)
 
@@ -233,10 +238,29 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
         NEW PRIMARY.** 6.25× upside on +0.32bp prediction (mirrors
         d9c's 5.7× pattern — FM-class LB amplification is real).
         Gap narrowed -2.6 → -2.4bp.
-- NEXT: 3-way feature partition (e.g., {D,C,S}, {R,Y}, {T_q,Rp_q,P_q})
-        — extends d9f's diversity-from-partition principle. Cheap.
-        Or DeepFM-lite (FM + MLP head) — adds non-linearity over the
-        FM embedding space.
+- DONE: d9g 3-way multi-FM (3+2+3 partition) — REGRESSED at all 3
+        stack configs (-0.46bp K=22 swap; -0.09bp K=24 add). Per-FM
+        too weak; LR meta demotes them. d9f 2-way is partition
+        sweet-spot.
+- DONE: d9h FM_aug12 unified 12-feat — std OOF 0.92540 (strongest
+        single FM ever, +4.7bp over d9c). K=22 add OOF +0.01bp (TIE
+        expected). **SUBMITTED 21:19 UTC: LB 0.95034, +3bp lift,
+        NEW PRIMARY (300× upside on OOF prediction).** Calibration
+        win — challenged "OOF tie → LB tie" assumption.
+- DONE: d9i augmented 2-way (D/C/S/T/Cd/Ld + R/Y/Rp/P/Nx/Pv) — std
+        FM_A_aug 0.881 (+5.6bp), FM_B_aug 0.886. K=21 swap predicted
+        OOF -0.19bp REGRESSION. **SUBMITTED 21:20 UTC: LB 0.95034,
+        +3bp lift (TIED with d9h)**. OOF *predicted regression* but
+        LB *amplified positive* — 16× direction-flip plus magnitude.
+- INSIGHT: FM-class OOF on Strat-fold underestimates LB lift due to
+        StratifiedKFold's 80% within-group leakage (P6) inflating
+        GBDT-pool OOF. Three consecutive FM-class submits (d9c +3bp,
+        d9f +2bp, d9h +3bp, d9i +3bp) confirm. **OOF Δ is a LOWER
+        BOUND on LB Δ for FM-class candidates at ρ ≈ 0.9997.**
+- NEXT: Spend remaining 5/10 today on more FM-class probes since
+        the OOF→LB amplification is much stronger than the prior
+        believed. Candidates: d9g S3 K=25 (all FMs), d9h K=20 swap
+        (FM_aug12 replaces d9f), d9i S2 K=23 (aug 2-way + d9f).
 - LATER: External-data Pirelli pit-window scrape (Tier-2 highest
         absolute EV), EmbMLP CPU (different model class), hazard NN
         (GPU; d9 hazard_nn_stack regressed 315bp — implementation
@@ -266,5 +290,8 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 - `audit/2026-05-09-d9c-fm.md` — d9c FM passes min-meta +0.18bp; Sd K=20 swap+FM LB 0.95029 (+3bp).
 - `audit/2026-05-10-d9d-fm-sweep-bag.md` — FM hparam sweep + bag NULL; bag HURTS stack.
 - `audit/2026-05-10-d9e-ffm.md` — FFM strictly worse than FM (overfit + redundant).
-- `audit/2026-05-10-d9f-multi-fm.md` — multi-FM partition K=21 swap LB 0.95031 (+2bp NEW PRIMARY).
+- `audit/2026-05-10-d9f-multi-fm.md` — multi-FM partition K=21 swap LB 0.95031 (+2bp prior PRIMARY).
+- `audit/2026-05-10-d9g-3way-multi-fm.md` — 3-way partition REGRESSED.
+- `audit/2026-05-10-d9h-fm-augmented.md` — FM_aug12 standalone strongest; K=22 add LB 0.95034 (+3bp NEW PRIMARY tied).
+- `audit/2026-05-10-d9i-augmented-2way.md` — aug 2-way K=21 swap LB 0.95034 (+3bp NEW PRIMARY tied; OOF was -0.19bp regression).
 - `audit/friction.md` — friction one-liners.
