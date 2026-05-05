@@ -46,27 +46,22 @@ diversity (FFM, multi-FM partitions) AND new info (C2 Pirelli).**
 
 ## Day-12 first-action plan
 
-### Path A — FFM (field-aware FM) — highest-EV FM follow-up
+### Path A — C2 Pirelli pit-windows (highest absolute EV; promoted Day-11)
 
-Per d9c "what next" §4 + d9d HOLD finding. Plain-FM embedding table
-shared across all features; FFM gives each field its own embedding
-*per other field*. Typically +0.5–1bp std OOF over FM at ~3-5× train
-cost. Cheap CPU (~5 min); leak-free (same target). EV +0.5–2bp K=20
-swap. **Build first; gate via pre-submit-diff at ρ < 0.999 vs PRIMARY.**
-
-### Path B — Multi-FM diversity (different feature partitions)
-
-Train 2 FMs with disjoint field subsets (e.g. FM_categorical-only +
-FM_numerical-quintiles-only) and stack both. Tests whether FM
-model-class diversity bonus extends to multiple FM bases at K=21.
-Cheap CPU (~10 min). Predicted +0.2–1bp.
-
-### Path C — C2 Pirelli pit-windows (highest absolute EV)
-
-Per critique §5. **Do NOT defer past Day-13.** 6-8h scrape
-(F1.com strategy guides + Pirelli press kits, 26 races × 4 years)
-+ 2h CPU build of 4-6 rule_residual bases following F1.2 template.
+FFM falsified Day-10 (`audit/2026-05-10-d9e-ffm.md`); FM hparam
+neighborhood flat (`d9d`); FM bagging stacks worse (d9d). With all
+in-class FM follow-ups dead, **C2 is the clear top-priority CPU
+move.** **Do NOT defer past Day-13.** 6-8h scrape (F1.com strategy
+guides + Pirelli press kits, 26 races × 4 years) + 2h CPU build of
+4-6 rule_residual bases following F1.2 template + Q6 filter.
 EV +3-8bp median. Only un-explored move bringing genuinely new info.
+
+### Path B — Multi-FM partition diversity (Tier-2; FFM-falsified setting)
+
+Train 2 FMs with disjoint field subsets (FM_cat-only + FM_num-quintile-
+only) and stack both at K=21. Cheap CPU (~10 min). Predicted +0.2–1bp.
+Demoted to Tier-2 after FFM showed the FM model class saturates the
+interaction surface — partition variants likely hit same redundancy.
 
 ### Path D — F2 multi-rule rebuild w/ Q6 (cheap falsification)
 
@@ -105,6 +100,7 @@ at sub-0.99 ρ where current uncertainty is ~30bp. Single-shot per R1.
 - d9 10 math heuristic rule_residuals — Day-9 (cohort)
 - d9b R14 hash-LR ladder K=20 swap+L4 — Day-9 (LB 0.95025 TIE)
 - d9d FM hparam sweep + 3-seed bag — Day-10 (flat hparam neighborhood)
+- d9e FFM (field-aware FM, 6ep + 2ep) — Day-10 (overfit; std OOF below FM)
 - **In-pool hypothesis-class NN variants (whole class)** — 4× confirmed
 - **Single-rule rule_residuals on raw features (whole class)** — 5× confirmed
 
