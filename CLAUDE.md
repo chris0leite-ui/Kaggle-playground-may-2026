@@ -68,9 +68,9 @@ ff-merge before reading state below.
 day: 5                            # 2026-05-06 / Day-5 morning; Path B Phase 1+2 PASS, slot-1 candidate held
 lb_best_today: 0.95435            # leader; not refreshed
 our_lb_best: 0.95005              # M5q (M5h + RealMLP-TD, K=14) — PRIMARY pending Path B slot
-submissions_used_today: 0         # 0/10 today; Path B partial-pseudo K=14 candidate ready
-submissions_used_total: 12
-saturation_count: 0               # Path B Phase 2 broke the meta-add ceiling; +2.54bp OOF on partial-pseudo K=14
+submissions_used_today: 1         # 1/10 today; partial-pseudo K=14 burned at LB 0.94963 (-4.2bp)
+submissions_used_total: 13
+saturation_count: 1               # partial-pseudo OOF +2.54bp INVERTED to LB -4.2bp; pseudo over-amp falsified
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -147,7 +147,7 @@ headroom_to_top5pct: 0.00340      # 0.95345 − 0.95005 = 34.0bp
 | d5_recursive_m5q (HGBC + M5q feat) | 0.94994 | n/a | n/a | std-alone +92bp baseline; ρ=0.99159 vs M5q |
 | d5_M5_K15a (M5q + recursive, LR) | 0.95056 | n/a | n/a | NULL (-0.06bp); rec L1=0.84 but ρ=0.99991 TIE_EXPECTED |
 | d5_meta_k15_lgbm_shallow (GBDT meta) | 0.95038 | n/a | n/a | NULL (-1.0bp vs d4 K=14); GBDT-meta ceiling fixed |
-| **d5_partial_pseudo_m5q (K=14)** | **0.95082** | n/a | n/a | **slot-1 candidate**; +2.54bp OOF; ρ=0.99836 REAL_DELTA |
+| **d5_partial_pseudo_m5q (K=14)** | **0.95082** | n/a | **0.94963** | **slot-1 −4.2bp LB**; gap WIDENED −5.2→−12bp; pseudo over-amp falsified |
 
 ## Hypothesis board (Day 5 morning)
 
