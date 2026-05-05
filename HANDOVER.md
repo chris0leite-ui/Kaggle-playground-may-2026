@@ -110,13 +110,9 @@ TabM closure.
 
 ## Held submissions (do NOT submit)
 
-- Day-9: `submission_d9_k19_hazard_nn_stack.csv` (BURNED at LB 0.94711),
-  `submission_d9_hazard_nn.csv`, `submission_d9_k20_neighbor.csv`,
-  `submission_d9_k19_sc_prob.csv`
-- Day-7: `d7_realmlp_bag_partB.csv`, `d7_realmlp_bag_partC.csv`
-- Day-8: `d8_l3_blend.csv`, `d8_k19_q12.csv`, `d8_k19_poisson.csv`
-- Day-5: `d5_partial_pseudo_m5q.csv` (BURNED at LB 0.94963)
-- Day-10: `submission_d10_hazard_nn_leakfree.csv`
+- BURNED: `d5_partial_pseudo_m5q.csv` (LB 0.94963), `d9_k19_hazard_nn_stack.csv` (LB 0.94711)
+- Day-7-10 TIE/DEAD: `d7_realmlp_bag_part[BC].csv`, `d8_{l3_blend,k19_q12,k19_poisson}.csv`,
+  `d9_{hazard_nn,k20_neighbor,k19_sc_prob}.csv`, `d10_hazard_nn_leakfree.csv`
 
 ## Calibration ladder snapshot (Day 12 morning)
 
@@ -152,8 +148,5 @@ TabM closure.
 - `audit/2026-05-11-d11-strategy-critique.md` — load-bearing pivot
 - `audit/2026-05-11-d11-tabm-v3-extended-training-dead.md` — TabM close
 - `audit/2026-05-10-d10-hazard-nn-leakfree-confirmed-dead.md` — leak diag
-- `audit/2026-05-08-data-probe-results.md` — P1-P10 priors
-- `audit/2026-05-08-strategic-menu-wider-steps.md` — full menu (with
-  Day-9/10/11 falsifications overlaid via dead-list above)
-- `scripts/d6_multi_rule.py` — F1.2 builder, F2 template
-- `scripts/pre_submit_diff.py` — MANDATORY (ρ < 0.999)
+- `audit/2026-05-08-{data-probe-results,strategic-menu-wider-steps}.md`
+- `scripts/{d6_multi_rule,pre_submit_diff}.py` — F2 template + MANDATORY gate
