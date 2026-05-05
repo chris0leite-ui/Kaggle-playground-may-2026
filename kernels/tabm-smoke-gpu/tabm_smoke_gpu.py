@@ -130,6 +130,28 @@ def find_data_dir():
     return train_path.parent
 
 
+def safe_kwargs(cls, **proposed):
+    """Filter kwargs to only those the class' __init__ accepts.
+
+    pytabkit classes do NOT share a constructor signature: TabM_D_Classifier
+    rejects RealMLP-specific args like `use_ls`. Use signature introspection
+    so we don't crash on benign tuning hints. Falls back to **kwargs accept
+    when signature is variadic.
+    """
+    import inspect
+    sig = inspect.signature(cls.__init__)
+    has_var_kw = any(p.kind == inspect.Parameter.VAR_KEYWORD
+                     for p in sig.parameters.values())
+    if has_var_kw:
+        return proposed
+    allowed = set(sig.parameters.keys())
+    keep = {k: v for k, v in proposed.items() if k in allowed}
+    dropped = sorted(set(proposed) - set(keep))
+    if dropped:
+        print(f"[setup] dropped unsupported kwargs for {cls.__name__}: {dropped}")
+    return keep
+
+
 def main():
     t0 = time.time()
     gpu_boot()
@@ -155,17 +177,18 @@ def main():
     print(f"=== SMOKE fold {SMOKE_FOLD} (train={len(tr)} val={len(va)}) ===")
 
     t_fold = time.time()
-    # TabM_D_* matches RealMLP_TD's "tuned defaults" idiom in pytabkit:
-    # n_cv=1 for a single internal split (we already do outer 5-fold),
-    # AUC-friendly settings (no label smoothing).
-    model = TabMCls(
+    # TabM_D_* uses tuned defaults from Gomes/Gorishniy 2024 (k=32 internal
+    # heads, BatchEnsemble). Constructor args differ from RealMLP_TD; use
+    # signature filtering to avoid TypeError on RealMLP-only kwargs.
+    proposed = dict(
         device="cuda",
         random_state=SEED,
-        n_cv=1,
+        n_cv=1,                         # outer 5-fold already gives val
         val_metric_name="cross_entropy",
-        use_ls=False,
+        use_ls=False,                   # AUC-friendly (RealMLP-only; filtered)
         verbosity=1,
     )
+    model = TabMCls(**safe_kwargs(TabMCls, **proposed))
     model.fit(X.iloc[tr], y[tr])
     p_va = model.predict_proba(X.iloc[va])[:, 1]
     fold_auc = float(roc_auc_score(y[va], p_va))
