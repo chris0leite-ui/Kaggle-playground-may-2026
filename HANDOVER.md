@@ -54,32 +54,29 @@ robust to synth artifacts. Skip new external info.**
 
 ## Day-12 first-action plan (synth-robust only; external info DEPRECATED)
 
-### Path A — 3-way multi-FM partition (cheap; extends d9f +2bp win)
-Disjoint 3-way split {D,C,S} + {R,Y} + {T_q5,Rp_q5,P_q5}; 3× FM k=8
-6-ep, K=N stack as add or swap. ~10 min CPU. Pred +0.2-1bp.
-Template: `scripts/d9f_multi_fm.py`.
-
-### Path B — G4 SCARF on aadigupta1601 (overnight T4)
+### Path A — G4 SCARF on aadigupta1601 (overnight T4)
+**Promoted Day-12 PM** after d9g 3-way multi-FM REGRESSED (-0.46bp K=22
+swap; per-FM interaction surface over-fragments at 2-3 features each).
 Contrastive pretraining on aadigupta's 101k unlabeled rows (NOT in
 comp train) → fine-tune on labeled comp. Different inductive bias;
-synth-robust (depends on aadigupta joint structure, not real-world).
-6-10h T4. EV +1-4bp. Sole un-falsified GPU post-TabM closure.
+synth-robust. 6-10h T4. EV +1-4bp. Sole un-falsified GPU candidate.
 
-### Path C — Bayesian hierarchical stacking (Yao 2021)
+### Path B — Bayesian hierarchical stacking (Yao 2021)
 2-3h CPU PyMC+JAX. Per-segment (Compound, Stint, Year×Compound)
 weights under Gaussian partial-pooling. Different META structure;
 uses only existing pool OOFs. EV +1-3bp.
 
-### Path D — Adversarial validation instance weights (HIGH FLOOR)
+### Path C — Adversarial validation instance weights (HIGH FLOOR)
 30 min CPU. p(test|x) density ratio as instance weight on K=N stack
 rebuild. EV 0-2bp, no harm. Year=2023 mixture rescue.
 
-### DEPRECATED Day-12 — C2 Pirelli + F2 Q6 rebuild
-C2: synth-DGP incompatible (`audit/2026-05-12-d12-c2-pirelli-prep.md`
-deprecation header). F2: 6× P10 confirmation (d9 10-cohort + d9b
-ladder + C5 + C1) = dead-list category, not a probe.
+### DEPRECATED Day-12 — C2 Pirelli, F2 Q6 rebuild, 3-way multi-FM
+C2: synth-DGP incompatible (`audit/2026-05-12-d12-c2-pirelli-prep.md`).
+F2: 6× P10 confirmation = dead-list category. **3-way multi-FM
+REGRESSED Day-10** (`audit/2026-05-10-d9g-3way-multi-fm.md`); 2-way
+d9f is the partition sweet-spot.
 
-### Path E — Calibration submits on held TIEs (1-2 day overlap)
+### Path D — Calibration submits on held TIEs (1-2 day overlap)
 3-4 of 253 unused submits on held candidates (m5x, m5z, d6_k15,
 d8_k19_q12, d9_k19_sc_prob, d9_k20_neighbor, d9d_*) to recal
 `pred_lb` at sub-0.99 ρ where uncertainty is ~30bp. Single-shot R1.
@@ -94,7 +91,7 @@ d8_k19_q12, d9_k19_sc_prob, d9_k20_neighbor, d9d_*) to recal
 - C5 prev/next compound multi-rule (Day-9 K=20 TIE); C1 SC-prob lookup (Day-9 K=19 TIE)
 - T1.4 Hazard NN — Day-9/10 (230bp leak)
 - d9 10 math heuristic rule_residuals (cohort); d9b R14 hash-LR K=20 swap+L4 (TIE)
-- d9d FM hparam sweep + 3-seed bag (flat); d9e FFM (overfit)
+- d9d FM hparam sweep + 3-seed bag (flat); d9e FFM (overfit); **d9g 3-way multi-FM (REGRESSION −0.46bp)**
 - **In-pool NN variants (whole class) 4×**; **single-rule rule_res on raw features 5×**
 - **External real-world priors on synth** — C1 TIE + **C2 Pirelli pre-flight DEPRECATED Day-12**
 
