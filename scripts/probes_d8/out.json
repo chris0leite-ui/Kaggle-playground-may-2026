@@ -1,0 +1,1036 @@
+{
+  "P1": {
+    "train_groups": {
+      "name": "train",
+      "n_groups": 113567,
+      "n_rows": 439140,
+      "mean_group_len": 3.8667922900138243,
+      "median_group_len": 3.0,
+      "max_group_len": 35,
+      "p95_group_len": 11.0,
+      "frac_contiguous_groups": 0.2942668204672132,
+      "frac_groups_ge5": 0.31198323456637933,
+      "frac_groups_ge10": 0.07081282414785986
+    },
+    "test_groups": {
+      "name": "test",
+      "n_groups": 83812,
+      "n_rows": 188165,
+      "mean_group_len": 2.2450842361475685,
+      "median_group_len": 2.0,
+      "max_group_len": 15,
+      "p95_group_len": 6.0,
+      "frac_contiguous_groups": 0.4628931417935379,
+      "frac_groups_ge5": 0.09653748866510763,
+      "frac_groups_ge10": 0.0030425237436166657
+    },
+    "test_group_count": 83812,
+    "test_groups_overlap_train": 72859,
+    "test_groups_unique_to_test": 10953
+  },
+  "P2": {
+    "n_train_sample": 40000,
+    "n_test_sample": 20000,
+    "n_features": 14,
+    "mean_nn_dist": 0.7288366139778978,
+    "p5": 0.2044659108259538,
+    "p25": 0.448114049285764,
+    "p50": 0.6751702218591356,
+    "p75": 0.9513934538643398,
+    "p95": 1.4300591733562942,
+    "max": 3.8853730016882033,
+    "frac_dist_lt_0p1": 0.016,
+    "frac_dist_lt_0p5": 0.3049,
+    "frac_dist_lt_1p0": 0.7813
+  },
+  "P3": {
+    "per_year": [
+      {
+        "Year": 2022,
+        "mean": 0.266505199484269,
+        "count": 82989
+      },
+      {
+        "Year": 2023,
+        "mean": 0.00960726273806988,
+        "count": 136147
+      },
+      {
+        "Year": 2024,
+        "mean": 0.2953190150263551,
+        "count": 127110
+      },
+      {
+        "Year": 2025,
+        "mean": 0.2843886580403471,
+        "count": 92894
+      }
+    ],
+    "year_share_compare": [
+      {
+        "year": 2022,
+        "train_n": 82989,
+        "test_n": 35348,
+        "train_share": 0.18898073507309743,
+        "test_share": 0.1878564026253554
+      },
+      {
+        "year": 2023,
+        "train_n": 136147,
+        "test_n": 58160,
+        "train_share": 0.31003096962244386,
+        "test_share": 0.30909042595594294
+      },
+      {
+        "year": 2024,
+        "train_n": 127110,
+        "test_n": 54532,
+        "train_share": 0.28945211094411805,
+        "test_share": 0.28980947572609145
+      },
+      {
+        "year": 2025,
+        "train_n": 92894,
+        "test_n": 40125,
+        "train_share": 0.21153618436034066,
+        "test_share": 0.2132436956926102
+      }
+    ],
+    "n_anomalous_low_yr_race": 24,
+    "anomalous_low_examples": [
+      {
+        "Year": 2023,
+        "Race": "Abu Dhabi Grand Prix",
+        "mean": 0.009506680369989723,
+        "count": 7784
+      },
+      {
+        "Year": 2023,
+        "Race": "Australian Grand Prix",
+        "mean": 0.006968641114982578,
+        "count": 4879
+      },
+      {
+        "Year": 2023,
+        "Race": "Austrian Grand Prix",
+        "mean": 0.009130816505706761,
+        "count": 5695
+      },
+      {
+        "Year": 2023,
+        "Race": "Azerbaijan Grand Prix",
+        "mean": 0.008040792312218083,
+        "count": 5099
+      },
+      {
+        "Year": 2023,
+        "Race": "Bahrain Grand Prix",
+        "mean": 0.01373134328358209,
+        "count": 6700
+      },
+      {
+        "Year": 2023,
+        "Race": "Belgian Grand Prix",
+        "mean": 0.016084873374401096,
+        "count": 2922
+      },
+      {
+        "Year": 2023,
+        "Race": "British Grand Prix",
+        "mean": 0.004585353072186558,
+        "count": 7633
+      },
+      {
+        "Year": 2023,
+        "Race": "Canadian Grand Prix",
+        "mean": 0.0070921985815602835,
+        "count": 6063
+      },
+      {
+        "Year": 2023,
+        "Race": "Dutch Grand Prix",
+        "mean": 0.0187170988496783,
+        "count": 5129
+      },
+      {
+        "Year": 2023,
+        "Race": "Hungarian Grand Prix",
+        "mean": 0.009622113365990203,
+        "count": 5716
+      },
+      {
+        "Year": 2023,
+        "Race": "Italian Grand Prix",
+        "mean": 0.0075110456553755525,
+        "count": 6790
+      },
+      {
+        "Year": 2023,
+        "Race": "Japanese Grand Prix",
+        "mean": 0.01355206847360913,
+        "count": 4206
+      },
+      {
+        "Year": 2023,
+        "Race": "Las Vegas Grand Prix",
+        "mean": 0.011621261192608116,
+        "count": 5249
+      },
+      {
+        "Year": 2023,
+        "Race": "Mexico City Grand Prix",
+        "mean": 0.005943348507840162,
+        "count": 7908
+      },
+      {
+        "Year": 2023,
+        "Race": "Miami Grand Prix",
+        "mean": 0.005860491709548313,
+        "count": 6996
+      }
+    ],
+    "y2023_min10": [
+      {
+        "Year": 2023,
+        "Race": "Emilia Romagna Grand Prix",
+        "mean": 0.0,
+        "count": 29
+      },
+      {
+        "Year": 2023,
+        "Race": "Chinese Grand Prix",
+        "mean": 0.0,
+        "count": 17
+      },
+      {
+        "Year": 2023,
+        "Race": "British Grand Prix",
+        "mean": 0.004585353072186558,
+        "count": 7633
+      },
+      {
+        "Year": 2023,
+        "Race": "Singapore Grand Prix",
+        "mean": 0.004678362573099415,
+        "count": 5985
+      },
+      {
+        "Year": 2023,
+        "Race": "Pre-Season Testing",
+        "mean": 0.005092297899427116,
+        "count": 7855
+      },
+      {
+        "Year": 2023,
+        "Race": "Miami Grand Prix",
+        "mean": 0.005860491709548313,
+        "count": 6996
+      },
+      {
+        "Year": 2023,
+        "Race": "Mexico City Grand Prix",
+        "mean": 0.005943348507840162,
+        "count": 7908
+      },
+      {
+        "Year": 2023,
+        "Race": "Monaco Grand Prix",
+        "mean": 0.006548175865294668,
+        "count": 7483
+      },
+      {
+        "Year": 2023,
+        "Race": "Australian Grand Prix",
+        "mean": 0.006968641114982578,
+        "count": 4879
+      },
+      {
+        "Year": 2023,
+        "Race": "Canadian Grand Prix",
+        "mean": 0.0070921985815602835,
+        "count": 6063
+      }
+    ],
+    "y2023_max10": [
+      {
+        "Year": 2023,
+        "Race": "Las Vegas Grand Prix",
+        "mean": 0.011621261192608116,
+        "count": 5249
+      },
+      {
+        "Year": 2023,
+        "Race": "United States Grand Prix",
+        "mean": 0.012177763719753282,
+        "count": 6323
+      },
+      {
+        "Year": 2023,
+        "Race": "Japanese Grand Prix",
+        "mean": 0.01355206847360913,
+        "count": 4206
+      },
+      {
+        "Year": 2023,
+        "Race": "Bahrain Grand Prix",
+        "mean": 0.01373134328358209,
+        "count": 6700
+      },
+      {
+        "Year": 2023,
+        "Race": "Spanish Grand Prix",
+        "mean": 0.0143181421337524,
+        "count": 5727
+      },
+      {
+        "Year": 2023,
+        "Race": "S\u00e3o Paulo Grand Prix",
+        "mean": 0.014382845188284518,
+        "count": 3824
+      },
+      {
+        "Year": 2023,
+        "Race": "Belgian Grand Prix",
+        "mean": 0.016084873374401096,
+        "count": 2922
+      },
+      {
+        "Year": 2023,
+        "Race": "Dutch Grand Prix",
+        "mean": 0.0187170988496783,
+        "count": 5129
+      },
+      {
+        "Year": 2023,
+        "Race": "Qatar Grand Prix",
+        "mean": 0.023110700254217704,
+        "count": 4327
+      },
+      {
+        "Year": 2023,
+        "Race": "French Grand Prix",
+        "mean": 0.25,
+        "count": 4
+      }
+    ]
+  },
+  "P4": {
+    "n_stint2_rows": 129536,
+    "stint2_share": 0.29497654506535503,
+    "stint2_pit_rate_overall": 0.3911036314229249,
+    "rc_top_pit": [
+      {
+        "Race": "Monaco Grand Prix",
+        "Compound": "MEDIUM",
+        "mean": 0.7650513950073421,
+        "count": 681
+      },
+      {
+        "Race": "Chinese Grand Prix",
+        "Compound": "HARD",
+        "mean": 0.6981132075471698,
+        "count": 2491
+      },
+      {
+        "Race": "Belgian Grand Prix",
+        "Compound": "HARD",
+        "mean": 0.6638830897703549,
+        "count": 958
+      },
+      {
+        "Race": "Monaco Grand Prix",
+        "Compound": "HARD",
+        "mean": 0.6541992053705987,
+        "count": 7299
+      },
+      {
+        "Race": "British Grand Prix",
+        "Compound": "MEDIUM",
+        "mean": 0.6492103075644223,
+        "count": 1203
+      },
+      {
+        "Race": "Bahrain Grand Prix",
+        "Compound": "MEDIUM",
+        "mean": 0.5746980292434838,
+        "count": 1573
+      },
+      {
+        "Race": "Pre-Season Testing",
+        "Compound": "MEDIUM",
+        "mean": 0.5506607929515418,
+        "count": 1589
+      },
+      {
+        "Race": "Austrian Grand Prix",
+        "Compound": "HARD",
+        "mean": 0.5353299017313992,
+        "count": 4274
+      },
+      {
+        "Race": "Hungarian Grand Prix",
+        "Compound": "MEDIUM",
+        "mean": 0.5337883959044368,
+        "count": 1465
+      },
+      {
+        "Race": "Emilia Romagna Grand Prix",
+        "Compound": "MEDIUM",
+        "mean": 0.5293080652269723,
+        "count": 2269
+      }
+    ],
+    "rc_bot_pit": [
+      {
+        "Race": "Pre-Season Testing",
+        "Compound": "SOFT",
+        "mean": 0.008522727272727272,
+        "count": 704
+      },
+      {
+        "Race": "British Grand Prix",
+        "Compound": "HARD",
+        "mean": 0.015296367112810707,
+        "count": 523
+      },
+      {
+        "Race": "Spanish Grand Prix",
+        "Compound": "HARD",
+        "mean": 0.024174053182917002,
+        "count": 1241
+      },
+      {
+        "Race": "Dutch Grand Prix",
+        "Compound": "SOFT",
+        "mean": 0.031088082901554404,
+        "count": 193
+      },
+      {
+        "Race": "British Grand Prix",
+        "Compound": "SOFT",
+        "mean": 0.044715447154471545,
+        "count": 738
+      },
+      {
+        "Race": "Austrian Grand Prix",
+        "Compound": "MEDIUM",
+        "mean": 0.06039915966386555,
+        "count": 1904
+      },
+      {
+        "Race": "Dutch Grand Prix",
+        "Compound": "INTERMEDIATE",
+        "mean": 0.0625,
+        "count": 224
+      },
+      {
+        "Race": "Miami Grand Prix",
+        "Compound": "MEDIUM",
+        "mean": 0.09119496855345911,
+        "count": 318
+      },
+      {
+        "Race": "Miami Grand Prix",
+        "Compound": "HARD",
+        "mean": 0.18038585209003216,
+        "count": 6220
+      },
+      {
+        "Race": "Bahrain Grand Prix",
+        "Compound": "HARD",
+        "mean": 0.1849387972325705,
+        "count": 3758
+      }
+    ],
+    "lis_pit": [
+      {
+        "lis_bucket": "0",
+        "mean": 0.22365282368156345,
+        "count": 34795
+      },
+      {
+        "lis_bucket": "1-2",
+        "mean": 0.3224043715846995,
+        "count": 6222
+      },
+      {
+        "lis_bucket": "3-5",
+        "mean": 0.3562617604014217,
+        "count": 9566
+      },
+      {
+        "lis_bucket": "6-10",
+        "mean": 0.4114917915774447,
+        "count": 16812
+      },
+      {
+        "lis_bucket": "11-15",
+        "mean": 0.4440971543921339,
+        "count": 15357
+      },
+      {
+        "lis_bucket": "16-20",
+        "mean": 0.4931486446231755,
+        "count": 13428
+      },
+      {
+        "lis_bucket": "21-30",
+        "mean": 0.5109303771239121,
+        "count": 19304
+      },
+      {
+        "lis_bucket": "30+",
+        "mean": 0.5154426416168517,
+        "count": 14052
+      }
+    ],
+    "prev_compound_x_compound_pit": [
+      {
+        "prev_compound": "WET",
+        "Compound": "HARD",
+        "mean": 0.7542372881355932,
+        "count": 236
+      },
+      {
+        "prev_compound": "INTERMEDIATE",
+        "Compound": "MEDIUM",
+        "mean": 0.5681063122923588,
+        "count": 2709
+      },
+      {
+        "prev_compound": "SOFT",
+        "Compound": "MEDIUM",
+        "mean": 0.4715271202488841,
+        "count": 7393
+      },
+      {
+        "prev_compound": "HARD",
+        "Compound": "HARD",
+        "mean": 0.4163475944731147,
+        "count": 12014
+      },
+      {
+        "prev_compound": "MEDIUM",
+        "Compound": "MEDIUM",
+        "mean": 0.41422629657923776,
+        "count": 11781
+      },
+      {
+        "prev_compound": "HARD",
+        "Compound": "MEDIUM",
+        "mean": 0.41369047619047616,
+        "count": 1008
+      },
+      {
+        "prev_compound": "MEDIUM",
+        "Compound": "HARD",
+        "mean": 0.39189966782622343,
+        "count": 76466
+      },
+      {
+        "prev_compound": "INTERMEDIATE",
+        "Compound": "INTERMEDIATE",
+        "mean": 0.3477124183006536,
+        "count": 1530
+      },
+      {
+        "prev_compound": "MEDIUM",
+        "Compound": "INTERMEDIATE",
+        "mean": 0.3341121495327103,
+        "count": 428
+      },
+      {
+        "prev_compound": "SOFT",
+        "Compound": "SOFT",
+        "mean": 0.22340425531914893,
+        "count": 564
+      },
+      {
+        "prev_compound": "MEDIUM",
+        "Compound": "SOFT",
+        "mean": 0.18952618453865336,
+        "count": 2406
+      },
+      {
+        "prev_compound": "SOFT",
+        "Compound": "HARD",
+        "mean": 0.1891999205876514,
+        "count": 5037
+      }
+    ]
+  },
+  "P5": {
+    "n_test": 188165,
+    "frac_with_next_lap": 0.1237796614673292,
+    "frac_with_next_next_lap": 0.019440384768687057,
+    "frac_with_lead_pitstop_observable": 0.1237796614673292,
+    "frac_with_next_compound_observable": 0.6815082507373847,
+    "frac_laps_until_eos_known_pos": 0.4659102383546356,
+    "median_laps_until_eos_when_known": 2.0,
+    "frac_next_compound_same": 0.21620386363032446
+  },
+  "P6": {
+    "n_unique_race_driver": 14942,
+    "groupkfold5_fold_sizes": [
+      87828,
+      87828,
+      87828,
+      87828,
+      87828
+    ],
+    "groupkfold5_fold_size_min": 87828,
+    "groupkfold5_fold_size_max": 87828,
+    "n_consecutive_lap_pairs": 91087,
+    "n_consec_diff_fold": 72948,
+    "frac_consec_lap_pairs_diff_fold_strat5": 0.8008607155796107
+  },
+  "P7": {
+    "len_distribution": {
+      "3": 16710,
+      "4": 7502,
+      "2": 8605,
+      "1": 6094,
+      "5": 1685,
+      "6": 224,
+      "8": 13,
+      "7": 36
+    },
+    "top_sequences_overall": [
+      {
+        "sequence": "MEDIUM->HARD->HARD",
+        "count": 7631
+      },
+      {
+        "sequence": "MEDIUM->HARD",
+        "count": 4829
+      },
+      {
+        "sequence": "MEDIUM",
+        "count": 3052
+      },
+      {
+        "sequence": "HARD",
+        "count": 2298
+      },
+      {
+        "sequence": "MEDIUM->HARD->MEDIUM",
+        "count": 2285
+      },
+      {
+        "sequence": "HARD->HARD",
+        "count": 1789
+      },
+      {
+        "sequence": "HARD->HARD->HARD",
+        "count": 1188
+      },
+      {
+        "sequence": "MEDIUM->HARD->HARD->HARD",
+        "count": 1095
+      },
+      {
+        "sequence": "MEDIUM->HARD->SOFT",
+        "count": 1003
+      },
+      {
+        "sequence": "MEDIUM->HARD->HARD->MEDIUM",
+        "count": 669
+      },
+      {
+        "sequence": "MEDIUM->MEDIUM->HARD",
+        "count": 580
+      },
+      {
+        "sequence": "MEDIUM->MEDIUM",
+        "count": 565
+      },
+      {
+        "sequence": "SOFT->HARD->HARD->SOFT",
+        "count": 510
+      },
+      {
+        "sequence": "SOFT",
+        "count": 502
+      },
+      {
+        "sequence": "SOFT->HARD->HARD",
+        "count": 453
+      }
+    ],
+    "stint2_pit_given_s1_s2_cmp": [
+      {
+        "s1_cmp": "WET",
+        "s2_cmp": "HARD",
+        "mean": 0.7542372881355932,
+        "count": 236
+      },
+      {
+        "s1_cmp": "WET",
+        "s2_cmp": "INTERMEDIATE",
+        "mean": 0.6218487394957983,
+        "count": 119
+      },
+      {
+        "s1_cmp": "INTERMEDIATE",
+        "s2_cmp": "MEDIUM",
+        "mean": 0.5681063122923588,
+        "count": 2709
+      },
+      {
+        "s1_cmp": "SOFT",
+        "s2_cmp": "MEDIUM",
+        "mean": 0.4715271202488841,
+        "count": 7393
+      },
+      {
+        "s1_cmp": "HARD",
+        "s2_cmp": "HARD",
+        "mean": 0.4163475944731147,
+        "count": 12014
+      },
+      {
+        "s1_cmp": "MEDIUM",
+        "s2_cmp": "MEDIUM",
+        "mean": 0.41422629657923776,
+        "count": 11781
+      },
+      {
+        "s1_cmp": "HARD",
+        "s2_cmp": "MEDIUM",
+        "mean": 0.41369047619047616,
+        "count": 1008
+      },
+      {
+        "s1_cmp": "INTERMEDIATE",
+        "s2_cmp": "HARD",
+        "mean": 0.3942857142857143,
+        "count": 175
+      },
+      {
+        "s1_cmp": "MEDIUM",
+        "s2_cmp": "HARD",
+        "mean": 0.39189966782622343,
+        "count": 76466
+      },
+      {
+        "s1_cmp": "INTERMEDIATE",
+        "s2_cmp": "INTERMEDIATE",
+        "mean": 0.3477124183006536,
+        "count": 1530
+      },
+      {
+        "s1_cmp": "MEDIUM",
+        "s2_cmp": "INTERMEDIATE",
+        "mean": 0.3341121495327103,
+        "count": 428
+      },
+      {
+        "s1_cmp": "SOFT",
+        "s2_cmp": "SOFT",
+        "mean": 0.22340425531914893,
+        "count": 564
+      },
+      {
+        "s1_cmp": "MEDIUM",
+        "s2_cmp": "SOFT",
+        "mean": 0.18952618453865336,
+        "count": 2406
+      },
+      {
+        "s1_cmp": "SOFT",
+        "s2_cmp": "HARD",
+        "mean": 0.1891999205876514,
+        "count": 5037
+      },
+      {
+        "s1_cmp": "SOFT",
+        "s2_cmp": "INTERMEDIATE",
+        "mean": 0.06,
+        "count": 200
+      }
+    ]
+  },
+  "P8": {
+    "race_typical_length": [
+      {
+        "Race": "Monaco Grand Prix",
+        "min": 70,
+        "max": 78,
+        "median": 77.0,
+        "mean": 75.5,
+        "std": 3.7859388972001833,
+        "count": 4
+      },
+      {
+        "Race": "Dutch Grand Prix",
+        "min": 72,
+        "max": 77,
+        "median": 75.0,
+        "mean": 74.75,
+        "std": 2.217355782608345,
+        "count": 4
+      },
+      {
+        "Race": "Mexico City Grand Prix",
+        "min": 71,
+        "max": 76,
+        "median": 72.5,
+        "mean": 73.0,
+        "std": 2.449489742783176,
+        "count": 4
+      },
+      {
+        "Race": "S\u00e3o Paulo Grand Prix",
+        "min": 70,
+        "max": 76,
+        "median": 71.5,
+        "mean": 72.25,
+        "std": 2.629955639676584,
+        "count": 4
+      },
+      {
+        "Race": "Canadian Grand Prix",
+        "min": 70,
+        "max": 75,
+        "median": 71.0,
+        "mean": 71.75,
+        "std": 2.217355782608344,
+        "count": 4
+      },
+      {
+        "Race": "Austrian Grand Prix",
+        "min": 70,
+        "max": 76,
+        "median": 71.0,
+        "mean": 72.0,
+        "std": 2.7080128015453213,
+        "count": 4
+      },
+      {
+        "Race": "Hungarian Grand Prix",
+        "min": 70,
+        "max": 76,
+        "median": 70.5,
+        "mean": 71.75,
+        "std": 2.872281323269016,
+        "count": 4
+      },
+      {
+        "Race": "Australian Grand Prix",
+        "min": 69,
+        "max": 73,
+        "median": 69.5,
+        "mean": 70.25,
+        "std": 1.892969448600092,
+        "count": 4
+      },
+      {
+        "Race": "Spanish Grand Prix",
+        "min": 68,
+        "max": 76,
+        "median": 69.5,
+        "mean": 70.75,
+        "std": 3.593976442141304,
+        "count": 4
+      },
+      {
+        "Race": "Pre-Season Testing",
+        "min": 66,
+        "max": 69,
+        "median": 69.0,
+        "mean": 68.25,
+        "std": 1.5,
+        "count": 4
+      },
+      {
+        "Race": "Bahrain Grand Prix",
+        "min": 67,
+        "max": 71,
+        "median": 68.5,
+        "mean": 68.75,
+        "std": 1.7078251276599314,
+        "count": 4
+      },
+      {
+        "Race": "Miami Grand Prix",
+        "min": 63,
+        "max": 72,
+        "median": 67.5,
+        "mean": 67.5,
+        "std": 3.872983346207417,
+        "count": 4
+      },
+      {
+        "Race": "Emilia Romagna Grand Prix",
+        "min": 59,
+        "max": 76,
+        "median": 67.5,
+        "mean": 67.5,
+        "std": 7.047458170621991,
+        "count": 4
+      },
+      {
+        "Race": "Singapore Grand Prix",
+        "min": 64,
+        "max": 69,
+        "median": 66.5,
+        "mean": 66.5,
+        "std": 2.3804761428476167,
+        "count": 4
+      },
+      {
+        "Race": "Abu Dhabi Grand Prix",
+        "min": 61,
+        "max": 72,
+        "median": 65.5,
+        "mean": 66.0,
+        "std": 5.354126134736337,
+        "count": 4
+      },
+      {
+        "Race": "Italian Grand Prix",
+        "min": 59,
+        "max": 71,
+        "median": 64.5,
+        "mean": 64.75,
+        "std": 5.315072906367326,
+        "count": 4
+      },
+      {
+        "Race": "British Grand Prix",
+        "min": 56,
+        "max": 73,
+        "median": 64.5,
+        "mean": 64.5,
+        "std": 7.8528126595931615,
+        "count": 4
+      },
+      {
+        "Race": "Saudi Arabian Grand Prix",
+        "min": 53,
+        "max": 69,
+        "median": 64.0,
+        "mean": 62.5,
+        "std": 7.187952884282608,
+        "count": 4
+      },
+      {
+        "Race": "United States Grand Prix",
+        "min": 60,
+        "max": 71,
+        "median": 63.0,
+        "mean": 64.25,
+        "std": 5.315072906367326,
+        "count": 4
+      },
+      {
+        "Race": "Japanese Grand Prix",
+        "min": 52,
+        "max": 67,
+        "median": 62.5,
+        "mean": 61.0,
+        "std": 6.976149845485449,
+        "count": 4
+      },
+      {
+        "Race": "Qatar Grand Prix",
+        "min": 55,
+        "max": 71,
+        "median": 62.5,
+        "mean": 62.75,
+        "std": 7.135591542869215,
+        "count": 4
+      },
+      {
+        "Race": "Azerbaijan Grand Prix",
+        "min": 55,
+        "max": 66,
+        "median": 59.0,
+        "mean": 59.75,
+        "std": 4.645786621588786,
+        "count": 4
+      },
+      {
+        "Race": "Chinese Grand Prix",
+        "min": 54,
+        "max": 66,
+        "median": 56.5,
+        "mean": 58.25,
+        "std": 5.678908345800274,
+        "count": 4
+      },
+      {
+        "Race": "Belgian Grand Prix",
+        "min": 51,
+        "max": 60,
+        "median": 56.5,
+        "mean": 56.0,
+        "std": 3.741657386773941,
+        "count": 4
+      },
+      {
+        "Race": "Las Vegas Grand Prix",
+        "min": 50,
+        "max": 58,
+        "median": 56.0,
+        "mean": 55.0,
+        "std": 3.8297084310253524,
+        "count": 4
+      },
+      {
+        "Race": "French Grand Prix",
+        "min": 45,
+        "max": 68,
+        "median": 55.0,
+        "mean": 55.75,
+        "std": 9.464847243000456,
+        "count": 4
+      }
+    ]
+  },
+  "P9": {
+    "n_drivers_train": 887,
+    "n_drivers_test": 801,
+    "n_drivers_test_only": 0,
+    "n_drivers_lt10": 221,
+    "n_drivers_lt100": 402,
+    "n_drivers_lt1000": 655,
+    "top50_share_of_rows": 0.17272396046818783,
+    "low_count_pit_mean": 0.002641482847555786,
+    "low_count_pit_std": 0.016122640459490432,
+    "high_count_pit_mean": 0.21356338121725454,
+    "high_count_pit_std": 0.0397482137116615
+  },
+  "P10": {
+    "global_residual_mean": -5.678438537870534e-05,
+    "global_residual_std": 0.26358041167259216,
+    "n_race_stint_cohorts_with_bias_ge_002": 3,
+    "race_stint_top": [
+      {
+        "Race": "Abu Dhabi Grand Prix",
+        "Stint": 4,
+        "mean": -0.02941286936402321,
+        "std": 0.2835376560688019,
+        "count": 213
+      },
+      {
+        "Race": "Emilia Romagna Grand Prix",
+        "Stint": 4,
+        "mean": -0.024071691557765007,
+        "std": 0.3784157335758209,
+        "count": 265
+      },
+      {
+        "Race": "Qatar Grand Prix",
+        "Stint": 5,
+        "mean": -0.020690884441137314,
+        "std": 0.1977439671754837,
+        "count": 231
+      }
+    ],
+    "n_cmp_tl_cohorts_with_bias_ge_002": 0,
+    "cmp_tl_top": [],
+    "n_year_pos_cohorts_with_bias_ge_002": 0,
+    "year_pos_top": []
+  }
+}
