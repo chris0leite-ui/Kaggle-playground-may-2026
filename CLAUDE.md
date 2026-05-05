@@ -77,12 +77,12 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 10                           # 2026-05-11 / Day-10: d9h+d9i BOTH LB 0.95034 (+3bp NEW PRIMARY); FM-class OOF→LB miscalibrated
+day: 12                           # 2026-05-12 / Day-12: 6-option overnight; 5/6 falsified, Option 1 STRUCTURAL FINDING (rank-lock dissolves under GroupKF)
 lb_best_today: 0.95435            # leader; not refreshed
-our_lb_best: 0.95034              # d9h_K22_add_aug12 / d9i_S1_K21_swap_aug2way (TIED); gap -1.7bp NARROWED from -2.4
-submissions_used_today: 5         # d9b TIE; d9c +3; d9f +2; d9h +3 (300× OOF upside); d9i +3 (OOF predicted -0.19, actual +3)
+our_lb_best: 0.95034              # d9h_K22_add_aug12 / d9i_S1_K21_swap_aug2way (TIED Day-10); gap -1.7bp; no submits Day-11/12
+submissions_used_today: 0         # 0/9 Day-12 (subagent night, no submits per Rule 1)
 submissions_used_total: 19
-saturation_count: 0               # FM model class transferred LB; Day-10 BREAKTHROUGH; Sd pred +0.53 actual +3.0
+saturation_count: 0               # Day-12 not a saturation; structural pivot to FM/rule-class diversification thesis
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -125,9 +125,20 @@ mechanism_families_explored:
   - factorization_machine_cpu       # d9c FM -- std 0.921, ρ=0.899, min-meta +0.18bp PASS; K=20 swap LB 0.95029 (+3bp)
   - hash_lr_3way_strength_ladder    # d9b R14 L0-L5 -- L2/L3/L4 PASS; K=20 swap+L4 LB 0.95025 TIE
   - factorization_machine_partition # d9f FM_A driver-dynamics + FM_B race-context -- K=21 swap LB 0.95031 (+2bp NEW PRIMARY)
-plateau_days: 0
-gate_status: cleared              # d9h K=22 add + d9i S1 K=21 swap aug 2-way BOTH LB 0.95034 (+3bp each); gap -1.7bp NARROWED from -2.4
-headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
+  - factorization_machine_aug12     # d9h unified 12-field FM + K=22 add LB 0.95034 (+3bp tied PRIMARY, 300× upside)
+  - factorization_machine_aug2way   # d9i FM_A_aug + FM_B_aug 2-way partition K=21 swap LB 0.95034 (+3bp tied)
+  - t12_censored_regression         # d12 -- LGBM weighted-regression on log(laps_until_pit); std 0.544, FAIL min-meta
+  - t12_ratio_target                # d12 -- LGBM regression on pits/stints + heuristic; std 0.674, FAIL min-meta
+  - t12_stintlevel_survival         # d12 -- stint-level LGBM duration → row hazard; std 0.601, FAIL min-meta
+  - year_segmented_specialist       # d12 -- M_active/M_2023 split FALSIFIED; AV-AUC 0.502 (no shift); 2023 is EASIEST segment
+  - adversarial_validation_reweight # d12 -- e3+adv-weight FALSIFIED -4.92bp min-meta; train/test i.i.d.
+  - lambdarank_race_meta            # d12 -- LambdaMART Race-grouped REGRESSED -86bp; LR-meta-stays-best
+  - aucpairwise_xgb_base            # d12 -- XGB rank:pairwise smoke -451bp fold-0; FAIL gate
+  - single_bag_e3_5seed             # d12 -- standalone bag -19bp OOF; K=21 complexity JUSTIFIED (not OOF-noise)
+  - groupkf_full_pool_meta          # d12 -- KEY FINDING: rank-lock partial dissolves; ρ(Strat-vs-GKF meta)=0.9914
+plateau_days: 1                   # Day-11 (TabM-D dead) + Day-12 (5/6 falsified); but Option 1 is structural advance, not plateau
+gate_status: cleared              # d9h/d9i Day-10 LB 0.95034 (+3bp tied PRIMARY); d12 no submits
+headroom_to_top5pct: 0.00311      # 0.95345 − 0.95034 = 31.1bp
 ```
 
 ## Calibration ladder
@@ -197,8 +208,11 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 | d9i_FM_A_aug (D/C/S/T/Cd/Ld) | 0.88123 | n/a | n/a | aug FM_A; ρ vs d9f PRIMARY 0.720 |
 | d9i_FM_B_aug (R/Y/Rp/P/Nx/Pv) | 0.88561 | n/a | n/a | aug FM_B; ρ 0.863 |
 | **d9i_S1_K21_swap_aug2way** | **0.95071** | n/a | **0.95034** | **NEW PRIMARY (TIED)**; +3bp LB; OOF predicted -0.19bp (regression!), actual +3bp lift; OOF direction-flipped |
+| d12_groupkf_meta (K=21 GKF) | 0.95069 / **GKF 0.94776** | n/a | n/a | **Day-12 STRUCTURAL FINDING**: ρ(Strat-vs-GKF meta-test)=0.9914 — rank-lock partial dissolves; FM ΔAUC −9bp vs GBDT −200 to −343bp |
+| d12_groupkf_meta_no_realmlp K=20 | 0.95056 / **GKF 0.94577** | n/a | n/a | clean K=20 (no realmlp Strat anchor); ρ vs Strat-meta 0.9856; GroupKF-meta candidate HEDGE for R5 |
+| d12 single bags (e3 5seed / cb 3seed) | 0.94876 / 0.94790 | n/a | n/a | calibration probe -- regress -19/-28bp every segment vs PRIMARY; K=21 complexity JUSTIFIED, NOT OOF-noise overfit |
 
-## Hypothesis board (Day 9 evening)
+## Hypothesis board (Day 12 evening)
 
 ```
 - DONE: d9 simple-math rule_residual cohort — 9 of 10 FALSIFIED at
@@ -266,6 +280,57 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
         (GPU; d9 hazard_nn_stack regressed 315bp — implementation
         matters; main-branch agent's leakfree hazard NN at OOF 0.92013
         confirmed DEAD).
+- DONE Day-12: 6 wider-step options run as parallel subagents
+        overnight. 5 FALSIFIED. **Option 1 produced load-bearing
+        finding.**
+- DONE: Option 1 GroupKF full rebuild — K=21 LR-meta on GroupKFold
+        OOFs produces test predictions with ρ=0.9914 vs Strat-meta
+        (K=20 clean: 0.9856). **Rank-lock partially dissolves under
+        leakage-blocked OOF.** Per-base ΔAUC: GBDT bases drop −200 to
+        −343bp under GKF; FM/rule/sparse-LR drop −9 to −43bp. **FM is
+        23–37× more leakage-robust than every GBDT.** L1 ranking
+        shifts: cb_slow-wide-bag −17 ranks, e5_optuna_lgbm −13; FM
+        +15 (#20→#5). The Strat-OOF "all-bases-tie" is GBDTs eating
+        shared fold-mate signal; FM/rules generalize.
+- DONE: Option 9 single-bag probe — falsifies "OOF-noise overfit"
+        thesis. Single 5-seed/3-seed bags regress -19 to -28bp every
+        Year/Stint/Compound segment vs PRIMARY. K=21 stack complexity
+        is JUSTIFIED — it routes between leakage-eaters and
+        leakage-robust bases.
+- DONE: Option 3 T1.2 multi-formulation 3-of-3 (censored / ratio /
+        survival LGBMs) — ALL FAIL min-meta. Standalone OOF 0.54-0.67
+        confirms time-to-event LGBMs are GBDT-class (leakage-eaters
+        category). 4-of-4 T1.2 cohort dead-listed.
+- DONE: Option 4 Year-specialist + AV-reweight — BOTH FAIL min-meta
+        -4.5 to -5.0bp. Two crisp findings: (a) AV-classifier AUC =
+        0.502 (train/test i.i.d.; no shift to exploit, refutes
+        external-info-as-lever thesis), (b) Year=2023 is the EASIEST
+        segment for the pool (AUC 0.94602, highest of any Year);
+        cohort splitting strips cross-Year regularization (specialist
+        2023-AUC -105bp). P3's "-45bp 2023 lift" interpretation
+        INVERTED.
+- DONE: Option 5 LambdaRank meta — REGRESSES -86bp under Race
+        grouping; AUC-pairwise XGB base smoke -451bp fold-0. LR-meta
+        on [raw, rank, logit] is metric-aligned for global AUC when
+        bases are well-calibrated; pairwise-rank objectives offer no
+        lift here. Dead-list.
+- DONE: Option 2 TabPFN-2.5 fine-tuned — Kaggle GPU kernel ready at
+        `kernels/d12-tabpfn-finetune-gpu/`. CPU smoke blocked on
+        license. T4×2 wall 5-7h. EV +5-15bp std-alone, +1-3bp stack
+        median, tail +3-9bp. **Only live "10bp shot" remaining.**
+- INSIGHT (Day-12 unifying frame): K=21 stack works because LR-meta
+        routes between two base populations — leakage-eating GBDTs
+        (high Strat AUC, real LB AUC much lower) and leakage-robust
+        FM/rules (Strat AUC ≈ GroupKF AUC). Public LB is row-iid (U3)
+        so PRIMARY survives, but the diversification we need is
+        WITHIN the leakage-robust population. **Pivot:** more FM-class
+        bases (5/3 multi-FM, 4/4 multi-FM, DeepFM-lite, regularised
+        FFM re-attempt). Replace 3 most-leakage-eating GBDTs.
+- NEXT (Day-13+): (a) push TabPFN kernel to Kaggle (PI-approved);
+        (b) build 5/3 + 4/4 multi-FM partitions (cheap CPU); (c)
+        DeepFM-lite (FM + 2-layer MLP head); (d) GroupKF-meta as R5
+        final-3-day HEDGE candidate (don't submit as PRIMARY — public
+        is row-iid).
 ```
 
 ## Pointers
@@ -292,6 +357,13 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 - `audit/2026-05-10-d9e-ffm.md` — FFM strictly worse than FM (overfit + redundant).
 - `audit/2026-05-10-d9f-multi-fm.md` — multi-FM partition K=21 swap LB 0.95031 (+2bp prior PRIMARY).
 - `audit/2026-05-10-d9g-3way-multi-fm.md` — 3-way partition REGRESSED.
+- `audit/2026-05-12-d12-master-synthesis.md` — Day-12 6-option overnight synthesis.
+- `audit/2026-05-12-d12-groupkf-rebuild.md` — Option 1 STRUCTURAL FINDING.
+- `audit/2026-05-12-d12-tabpfn-finetune-prep.md` — Option 2 Kaggle GPU kernel ready.
+- `audit/2026-05-12-d12-t12-multi-formulation.md` — Option 3 T1.2 3-of-3 falsified.
+- `audit/2026-05-12-d12-year-specialist-advweight.md` — Option 4 falsified; AV-AUC 0.502.
+- `audit/2026-05-12-d12-lambdarank-meta.md` — Option 5 -86bp regression.
+- `audit/2026-05-12-d12-monolithic-bag-probe.md` — Option 9 K=21 complexity justified.
 - `audit/2026-05-10-d9h-fm-augmented.md` — FM_aug12 standalone strongest; K=22 add LB 0.95034 (+3bp NEW PRIMARY tied).
 - `audit/2026-05-10-d9i-augmented-2way.md` — aug 2-way K=21 swap LB 0.95034 (+3bp NEW PRIMARY tied; OOF was -0.19bp regression).
 - `audit/friction.md` — friction one-liners.
