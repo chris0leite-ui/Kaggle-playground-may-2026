@@ -1,0 +1,43 @@
+{
+  "oof_score": 0.879844938583011,
+  "fold_std": 0.0011433596127409444,
+  "fold_scores": [
+    0.8822034594681541,
+    0.8788283053335747,
+    0.8807754012188809,
+    0.881081218786915,
+    0.881605034892259
+  ],
+  "cv": "strat",
+  "metric": "roc_auc",
+  "delta_vs_baseline_bp": -609.0506141698893,
+  "delta_vs_m5q_bp": -707.2506141698898,
+  "num_cols": [
+    "LapNumber",
+    "TyreLife",
+    "Position",
+    "LapTime (s)",
+    "LapTime_Delta",
+    "Cumulative_Degradation",
+    "RaceProgress",
+    "Position_Change",
+    "PitStop"
+  ],
+  "low_card_cat": [
+    "Year",
+    "Compound",
+    "Stint"
+  ],
+  "high_card_cat": [
+    "Driver",
+    "Race"
+  ],
+  "te_alpha": 20.0,
+  "fold_walls": [
+    3.4294164180755615,
+    2.391062021255493,
+    2.026615858078003,
+    1.9332451820373535,
+    1.9304025173187256
+  ]
+}

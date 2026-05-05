@@ -1,0 +1,55 @@
+{
+  "oof_score": 0.905076198049675,
+  "fold_std": 0.002410590017062491,
+  "fold_scores": [
+    0.9054785497157106,
+    0.9051552662521467,
+    0.9092979729229229,
+    0.9026852936894957,
+    0.9027638884319626
+  ],
+  "cv": "strat",
+  "metric": "roc_auc",
+  "delta_vs_baseline_bp": -356.7380195032499,
+  "delta_vs_m5h_bp": -453.5380195032501,
+  "params_used": {
+    "loss_function": "YetiRank",
+    "iterations": 4000,
+    "learning_rate": 0.03,
+    "depth": 6,
+    "l2_leaf_reg": 8.0,
+    "random_seed": 42,
+    "eval_metric": "AUC",
+    "od_type": "Iter",
+    "od_wait": 100,
+    "verbose": 0,
+    "thread_count": -1,
+    "allow_writing_files": false
+  },
+  "cat_cols": [
+    "Driver",
+    "Race",
+    "Compound",
+    "Year"
+  ],
+  "group_cols": [
+    "Year",
+    "Race",
+    "Driver"
+  ],
+  "best_iters": [
+    506,
+    509,
+    440,
+    371,
+    322
+  ],
+  "fold_walls": [
+    171.53655433654785,
+    171.18606877326965,
+    154.00466585159302,
+    140.35482621192932,
+    167.62610912322998
+  ],
+  "output": "rank-normalized within fold/test"
+}
