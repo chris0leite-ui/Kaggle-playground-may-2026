@@ -1,0 +1,7 @@
+{
+  "mode": "probe",
+  "auc_fold0": 0.9054785497157106,
+  "best_iter_fold0": 506,
+  "wall_fold0": 167.4793906211853,
+  "strat_5fold_proj_s": 837.3969531059265
+}
