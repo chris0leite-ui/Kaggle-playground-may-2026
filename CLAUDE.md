@@ -65,13 +65,12 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 3                            # 2026-05-04 / Day-2 5/10 used; Day-3 fresh
-lb_best_today: 0.95435            # leader (still); not refreshed
-our_lb_best: 0.94991              # M5h L1coef-pruned 13-base stack, +28bp vs M5d
-submissions_used_today: 10        # + M5p (slot 9) + M5n_3b (slot 10) = 10/10
-submissions_used_total: 10
-saturation_count: 4               # M5h/M5h2/M5j tied LB 0.94991; M5p/M5n_3b regressed -237/-291bp
-                                  # Minimal-basis hypothesis FALSIFIED — 10 GBDT clones earn slot
+day: 4                            # 2026-05-05 / Day-4 fresh; M5q broke the LB tie
+lb_best_today: 0.95435            # leader; not refreshed
+our_lb_best: 0.95005              # M5q (M5h + RealMLP-TD, K=14) — +14bp LB over M5h's 0.94991
+submissions_used_today: 1         # M5q slot 1 = 1/10 today
+submissions_used_total: 11
+saturation_count: 0               # broken on Day-4! +14bp LB lift
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -97,7 +96,7 @@ mechanism_families_explored:
   - tier_break_l1_prune             # M5h2 v1 -- drop a_horizon, K=12, LB 0.94991 (tied; gap unchanged)
 plateau_days: 0
 gate_status: cleared
-headroom_to_top5pct: 0.00354      # 0.95345 − 0.94991 = 35.4bp
+headroom_to_top5pct: 0.00340      # 0.95345 − 0.95005 = 34.0bp
 ```
 
 ## Calibration ladder
@@ -128,6 +127,7 @@ headroom_to_top5pct: 0.00354      # 0.95345 − 0.94991 = 35.4bp
 | m5j (d3a swaps d2a, 13) | 0.95044 | n/a | **0.94991** | **TIED M5h LB**; TE-key swap is LB-neutral (quantization-limit) |
 | m5p (minimal+LR-FE+EBM, 6) | 0.94839 | n/a | **0.94754** | -237bp; orthogonal-mech thesis FAILED |
 | m5n_3b (minimal-basis, 4) | 0.94808 | n/a | **0.94700** | -291bp; minimal-basis thesis FAILED — clones earn slot |
+| **m5q (M5h + RealMLP, 14)** | **0.95057** | n/a | **0.95005** | **NEW PRIMARY**; +14bp LB; +1.4bp OOF → 10× LB amplification |
 
 ## Hypothesis board (Day 3)
 
