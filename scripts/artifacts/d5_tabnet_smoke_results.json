@@ -1,0 +1,24 @@
+{
+  "smoke_fold": 0,
+  "fold_auc": 0.9353230503162666,
+  "fold_wall_s": 711.2804751396179,
+  "delta_vs_baseline_bp": -54.26949683733362,
+  "delta_vs_realmlp_e4_fold0_bp": -118.96949683733338,
+  "five_fold_projection_min": 59.27337292830149,
+  "cv": "StratifiedKFold(5)",
+  "metric": "roc_auc",
+  "seed": 42,
+  "n_folds": 5,
+  "total_wall_s": 781.4067363739014,
+  "notes": "TabNet 1-fold smoke. Compare fold-0 AUC vs RealMLP E4 (0.94722). Decision rule: if AUC < 0.945 OR 5-fold proj >=60min, shrink before promoting to 5-fold.",
+  "cat_idxs": [
+    11,
+    12,
+    13
+  ],
+  "cat_dims": [
+    887,
+    5,
+    26
+  ]
+}
