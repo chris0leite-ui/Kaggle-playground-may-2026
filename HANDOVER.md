@@ -33,79 +33,97 @@ Open with a 3-bullet read-back of state + first action.
   another branch. This branch's continuation is the RealMLP-bag
   thread; coordinate at merge points.
 
-## ⚠️ ACTIVE THREAD: RealMLP bag (primary continuation)
+## RealMLP bag thread — CLOSED, NULL salvage
 
-`kernels/realmlp-bag-gpu/` was pushed to Kaggle on Day-6 (v1).
-RealMLP-TD seeds 123 + 456 in 5-fold Strat with the SAME split
-seed (42) as the seed-42 run, so OOF/test arrays are directly
-rank-averageable. Per-fold checkpointing.
+`kernels/realmlp-bag-gpu/` was cancelled mid-fold-3 of seed 123
+after parallel-branch probes (P10 in
+`audit/2026-05-08-data-probe-results.md`) downgraded bag EV to
+Tier-3. Salvage in `scripts/d7_realmlp_partial_bag.py` tested two
+paths:
 
-**ETA**: ~6h after Day-6 evening start; should be COMPLETE by
-Day-7 morning.
+| Path | K=18 OOF | Δ d6_k18 | ρ vs d6_k18 |
+|---|---:|---:|---:|
+| B (bagged TEST + seed-42 OOF) | 0.95065 | −0.02bp | 0.99955 |
+| C (hybrid OOF + bagged TEST) | 0.95066 | +0.08bp | 0.99964 |
 
-```bash
-kaggle kernels status chrisleitescha/realmlp-bag-gpu
-kaggle kernels output chrisleitescha/realmlp-bag-gpu -p scripts/artifacts/
-```
+Both above the 0.9995 tightened tie threshold. **Confirmed Tier-3
+classification**: variance-reduction on 1 of 18 bases caps stack
+lift at ≤0.1bp. Both submissions HELD — see
+`audit/2026-05-08-d7-realmlp-partial-bag-null.md`. **Do not retry
+RealMLP bagging.**
 
-Expected files:
-- `oof_realmlp_seed{123,456}_strat.npy`
-- `test_realmlp_seed{123,456}_strat.npy`
-- `realmlp_bag_results.json`
+## Updated priors from parallel branch (read first)
 
-### Day-7 first action — RealMLP bag → K=18 rebuild
+`origin/claude/read-handover-850hm` published 10 data probes +
+strategic menu Day-8. Material updates to our priors:
 
-1. **Pull artifacts** (above).
-2. **Rank-average seeds {42, 123, 456}** for OOF and test:
-   ```python
-   from scipy.stats import rankdata
-   oof_bag = sum(rankdata(o) for o in [oof42, oof123, oof456]) / (3 * N)
-   ```
-   Save as `oof_realmlp_bag_strat.npy`, `test_realmlp_bag_strat.npy`.
-3. **Rebuild K=18 stack**: M5q pool with `realmlp_bag` swapped for
-   `realmlp` + 4 rule-residuals. Reuse `scripts/d6_multi_rule.py`
-   (just change the realmlp pool entry).
-4. **Pre-submit-diff vs `submission_d6_k18_multi_rule.csv`** (NEW
-   PRIMARY ref, not M5q). **Threshold ρ < 0.9995** for slot-worthy
-   (NOT 0.999 — see friction below).
-5. **If OOF > 0.95065 AND ρ < 0.9995 → slot Day-7 slot-1.** HANDOVER
-   A.1 prior: expected +1–3bp on top of +2.1bp baseline.
+- **P1 falsifies sequence models.** Test groups average 2.25 laps;
+  only 9.7% have ≥5 consecutive laps. Big LSTM/Transformer is
+  bounded. **Drop F4 from the menu.** What survives: 1-step lookup
+  features (next_compound, prev_compound, laps_into_stint).
+- **P2 falsifies retrieval.** kNN distances too large → TabR /
+  Hopular / TabPFN-context bounded.
+- **P5**: 68% of test rows have computable `next_compound` —
+  large unused signal.
+- **P10**: pool extracts what's extractable from the 14 raw
+  features. **No residual cohort with |bias|≥2pp.** Lift requires
+  NEW signals, not better extraction.
+- **P6**: StratifiedKFold has 80% within-group leakage. OOF is
+  optimistic by ~5bp (matches our gap). Use Strat as LB proxy
+  per R1 but add GroupKFold(Race, Driver, Year, Stint) as
+  diagnostic.
+- **C6**: compute is NOT the binding constraint.
 
-## Re-rankable next moves (post-RealMLP-bag)
+## Day-7 first action — T1.3 Q12 forced-pit rule_residual
+
+Per parallel-branch strategic menu T1.3 (highest EV/hour). F1
+regulation requires ≥2 distinct dry compounds per driver per race.
+
+1. **Verify (Driver, Race, Year)-group atomicity** — check
+   `train.groupby(['Driver','Race','Year'])['Compound'].nunique()`
+   distribution. If groups are atomic in the synth (≥1 distinct
+   compound per group consistently), proceed.
+2. **Build rule_proba via lookup**:
+   - `compounds_used_so_far[Driver, Race, Year]` (within-group
+     cumulative distinct count up to lap k).
+   - `must_change_compound = (n_distinct == 1) AND
+     (LapNumber > race_total_laps × 0.6)`.
+   - `forced_pit_pressure = must_change_compound × Stint`.
+3. **Train HGBC residual GBDT** on raw features predicting
+   `(target − rule_proba)`, à la `scripts/d6_rule_residual.py`.
+4. **Pool-add to K=18 → K=19** stack. Reuse
+   `scripts/d6_multi_rule.py` (add the new rule_residual to the
+   `RULES` list; change file paths).
+5. **Pre-submit-diff vs `submission_d6_k18_multi_rule.csv`**
+   (NEW PRIMARY ref). Threshold **ρ < 0.9995** (NOT 0.999).
+6. **If OOF > 0.95068 AND ρ < 0.9995 → slot Day-7 slot-1.**
+
+EV prior: +5-10bp standalone, +1.5-3bp K=19 stacked. Cost 3-5h CPU.
+
+## Re-rankable next moves (post-T1.3)
 
 | # | Move | Cost | EV (bp) | Notes |
 |---|---|---|---:|---|
-| A | RealMLP bag K=18 rebuild | 30min CPU | 1–3 | top priority Day-7 slot-1 |
-| B | F1.3 classifier-residual (sample_weight) | 2h CPU | 1–2 | inverse rule_proba weighting |
-| C | F1.4 rule_proba as meta-feature | 30s CPU | 0–1 | append to LR-meta input |
-| D | TabM smoke (Kaggle GPU, 1-fold first) | 6h GPU | 2–6 | Rule 2 |
-| E | Sequence-FE LGBM probe | 2h CPU | 1–4 | unmined since Day-2 |
-| F | More rules: Compound × Position-bin | 30min CPU | 0–1 | diminishing returns |
+| A | T1.3 Q12 forced-pit rule | 3-5h CPU | +1.5-3 stack | TOP — Day-7 slot-1 |
+| B | T1.1 TabM 1-fold smoke | 1h GPU | gate | Rule 2; only proceed to 5-fold if smoke OK |
+| C | T1.1 TabM 5-fold | 6-10h GPU | +2-8 | new NN family |
+| D | T1.2 Multi-formulation L1 | 6-10h CPU | +2-10 | Deotte April-2025 winner pattern |
+| E | T1.4 Hazard-rate reformulation | 3-4h | +1-7 | attacks Stint-2 −341bp blind spot |
+| F | T1.5 Deotte L2 std/mean meta | 30min CPU | +0.5-3 | distinct from F5 (L3 weighted avg) |
+| G | T2.1 next_compound feature | 1-2h CPU | +1-4 | 68% test computable per P5 |
+| H | T2.2 prev_compound × laps_into_stint rule | 1-2h CPU | +1-3 | targeted Stint-2 attack |
 
-## Strategic notes for parallel branch
+## Falsified / dead — do NOT retry
 
-The PI is working a different angle on another branch. Likely
-candidates given Day-6 falsifications:
-
-- **Pseudo-label retry** (Tschalzev 2023 regularized): Day-5 broad
-  gate falsified; tighter gate / sample-weighted addresses
-  over-amp. Audit §3 side-quest.
-- **Sequence model** (Bi-LSTM on Race × Driver): strategy critique
-  flagged Day-2 as the largest unmined class; Frontiers AI 2025
-  documents 0.988 ROC-AUC. F4 in the audit.
-- **TabPFN-v2 / TabICL-v2**: foundation-model inductive bias.
-
-If parallel-branch work lands lift, merge via the meta layer:
-stack new bases onto the K=18 pool. Pre-submit-diff on every
-combination.
-
-## Falsified Day-6 (do not retry without new evidence)
-
-- **F5 aux-feature GBDT-meta** — +0.12bp over no-aux LGBM, OOF
-  −0.78bp vs M5q. 3rd rank-lock confirmation.
-- **Move B 2-base [M5q, recursive]** — V1 ρ=0.99996 tie-lock;
-  V2-V4 OOF regression. Recursive trained on `m5q_oof_proba` →
-  structurally redundant with M5q.
+- **Big sequence models** — P1 (parallel branch).
+- **kNN / retrieval / TabR / Hopular** — P2.
+- **TabPFN-2.5 ICL ensemble** — same regime issue as P2.
+- **RealMLP bagging** — Day-7 partial-bag null (this audit).
+- **Broad pseudo-labeling** — Day-5 partial-pseudo K=14.
+- **F5 aux-feature GBDT-meta** — Day-6.
+- **Move B 2-base [M5q, recursive]** — Day-6.
+- **Per-Race / per-Stint isotonic** — Day-3 in-CV regress.
+- **Reintroduce `Normalized_TyreLife`** — host-removed.
 
 ## Critical operating rules (freshly used Day-6)
 
@@ -132,21 +150,21 @@ combination.
 
 ## Held submissions (do not blindly submit)
 
-- (carry-forward) `m5x_yetirank.csv`, `m5z_yetirank_nb.csv` — TIE
-- `m5_meta_lgbm_medium.csv`, `m5_meta_hgbc.csv` — meta variants
-- `d5_meta_k15_*.csv`, `m5_k15a/b/c.csv` — K=15 NULLs
-- `d5_partial_pseudo_m5q.csv` — burned LB 0.94963
-- `d6_aux_meta_with_aux.csv` — F5 falsified
-- `d6_2base_v[1-4]_*.csv` — Move B falsified
-- `d6_k15_rule_residual.csv`, `d6_k16_two_diverse.csv` — superseded
+Carry-forward TIE/NULL: `m5x_yetirank`, `m5z_yetirank_nb`,
+`m5_meta_lgbm_*`, `m5_meta_hgbc`, `d5_meta_k15_*`, `m5_k15a/b/c`.
+Burned: `d5_partial_pseudo_m5q` (−4.2bp).
+Day-6 falsified: `d6_aux_meta_with_aux`, `d6_2base_v[1-4]_*`,
+superseded `d6_k15_rule_residual`/`d6_k16_two_diverse`.
+Day-7 NULL salvage: `d7_realmlp_bag_part{B,C}.csv`.
 
 ## Pointers
 
 - `audit/2026-05-07-d6-f1-2-LB-result.md` — Day-6 LB win
 - `audit/2026-05-07-d6-f1-2-multi-rule.md` — K=18 build
-- `audit/2026-05-07-d6-critic-loop.md` — Rule 14 audit + 5 untried
-- `audit/2026-05-07-d6-move-c-rule-residual.md` — F1.1 single rule
-- `scripts/d6_multi_rule.py` — F1.2 builder (reuse for K=18 rebuild)
+- `audit/2026-05-08-d7-realmlp-partial-bag-null.md` — bag null
+- `audit/2026-05-08-strategic-menu-wider-steps.md` (parallel branch) — Tier-1/2/3 EV
+- `audit/2026-05-08-data-probe-results.md` (parallel branch) — P1-P10 priors
+- `scripts/d6_multi_rule.py` — F1.2 builder (reuse for T1.3 K=19)
 - `scripts/d6_rule_residual.py` — F1.1 builder
-- `scripts/pre_submit_diff.py` — MANDATORY (tighten ρ to 0.9995)
-- `kernels/realmlp-bag-gpu/` — Move F kernel (running)
+- `scripts/d7_realmlp_partial_bag.py` — bag salvage (closed)
+- `scripts/pre_submit_diff.py` — MANDATORY (use ρ < 0.9995)
