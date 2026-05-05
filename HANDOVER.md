@@ -6,201 +6,174 @@
 
 ---
 
-## Today's session — Day 8 (2026-05-08)
+## Today's session — Day 10 (2026-05-11)
 
 **Read order on session start** (skip the default; this is the synthesis):
 
-1. `CLAUDE.md` — state block + Rules 1-16 (Rule 16 NEW Day-8: 5-question pre-flight)
-2. `audit/2026-05-08-d8-cpu-probes-falsified.md` — Day-8 T1.5/T1.3/T1.2 falsifications
-3. `audit/2026-05-08-d7-realmlp-partial-bag-null.md` — Day-7 RealMLP-bag NULL salvage
-4. `audit/2026-05-08-strategic-menu-wider-steps.md` — full ranked menu (read with falsification overlay below)
-5. `audit/2026-05-08-data-probe-results.md` — load-bearing probes (P1 falsifies sequence; P10 confirms tight calibration)
-6. `audit/2026-05-07-d6-f1-2-LB-result.md` — F1.2 PRIMARY landed +2.1bp
-7. `scripts/pre_submit_diff.py` — MANDATORY before submit. ρ threshold 0.9995.
+1. `CLAUDE.md` — state block + Rules 1-16 (Rule 16 Q7 PROPOSED below; needs PI go to land in CLAUDE.md)
+2. `audit/2026-05-09-d9-hazard-nn-LB-postmortem.md` — load-bearing failure mode discovery
+3. `audit/2026-05-10-d10-hazard-nn-leakfree-confirmed-dead.md` — diagnostic close-out
+4. `audit/2026-05-09-d9-three-nulls-tabm-c5-c1.md` — Day-9 CPU/GPU sweep
+5. `audit/2026-05-08-data-probe-results.md` — load-bearing P1-P10 (P6 explains the leak mechanism)
+6. `scripts/pre_submit_diff.py` — MANDATORY before submit (ρ < 0.999)
 
 Open with a 3-bullet read-back of state + first action.
 
-## Where we are (Day 9 morning)
+## Where we are (Day 10 morning)
 
-- **Day 9, 0/10 used today.** Day-7 used 0/10 (bag salvage NULL, no submit). Day-8 used 0/10 (CPU falsifications, no submit).
-- **PRIMARY** = `d6_k18_multi_rule` LB **0.95026** (M5q + 4 rule_residuals). Strat OOF 0.95065. Gap −3.9bp.
-- **Headroom to top-5%** (0.95345): **31.9bp**.
-- **Headroom to leader** (0.95435): 41bp.
-- **22 days remaining** (deadline 2026-05-31). 9 slots/day.
+- **PRIMARY UNCHANGED** = `d6_k18_multi_rule` LB **0.95026** (M5q + 4 rule_residuals).
+- **Headroom to top-5%** (0.95345): **31.9bp**. To leader (0.95435): 41bp.
+- **20 days remaining** (deadline 2026-05-31). 9 slots/day after submit reset.
+- **Submits used today**: 0/10. **Total comp: 15.**
 
-## Day-7 RealMLP bag thread — CLOSED, NULL salvage
+## Day-9 result — load-bearing failure mode discovery
 
-`kernels/realmlp-bag-gpu/` was cancelled mid-fold-3 of seed 123 after
-parallel-branch probes (P10 in `audit/2026-05-08-data-probe-results.md`)
-downgraded bag EV to Tier-3. Salvage in `scripts/d7_realmlp_partial_bag.py`
-tested two paths:
+Submitted `submission_d9_k19_hazard_nn_stack.csv` (M5q + 4 d6 rules +
+hazard_nn_bag, K=19). Strat OOF 0.95446 (+38.1bp vs K=18). Predicted LB
+0.95367. **Actual LB 0.94711. Gap −73.5bp** (vs calibrated −5bp).
 
-| Path | K=18 OOF | Δ d6_k18 | ρ vs d6_k18 |
-|---|---:|---:|---:|
-| B (bagged TEST + seed-42 OOF) | 0.95065 | −0.02bp | 0.99955 |
-| C (hybrid OOF + bagged TEST) | 0.95066 | +0.08bp | 0.99964 |
+**Root cause**: hazard target's `bfill` propagates val-row PitNextLap
+backward through every earlier row in the same stint group. Per P6,
+80% of consecutive-lap pairs cross fold boundaries → 80% of tr rows'
+hazard buckets directly encode val labels. Hazard NN's K=20 buckets
+per row carry 20× the per-row leak signal vs scalar reformulations.
 
-Both above the 0.9995 tightened tie threshold. **Confirmed Tier-3
-classification**: variance-reduction on 1 of 18 bases caps stack lift
-at ≤0.1bp. Both submissions HELD — see
-`audit/2026-05-08-d7-realmlp-partial-bag-null.md`. **Do not retry RealMLP
-bagging.**
+**Day-10 leak-free re-run** (stint-drop within Strat fold): leak-free
+seed-42 OOF **0.92013** vs leaky 0.94319. **Leak magnitude: 230bp.**
+Hazard NN architecture itself adds **zero usable signal** beyond
+the binary pool. **Hazard NN is DEAD; do not retry.**
 
-## Day-8 CPU probes — three falsifications (load-bearing)
+## Pool audit finding
 
-| Probe | Std OOF | ρ vs PRIMARY | min-meta Δ | K=N stack | Verdict |
-|---|---:|---:|---:|---|---|
-| T1.5 Deotte L2 (LGBM-aug) | 0.95057 | 0.99517 | n/a | OOF -0.76bp | FAIL |
-| T1.5 Deotte L3 blend | 0.95065 | 0.98535 | n/a | OOF +0.02bp ρ=0.985 | TIE_EXPECTED |
-| T1.3 Q12 forced-pit (V_B) | 0.94518 | 0.92570 | -0.06bp | K=19 ρ=0.99994 | FAIL |
-| T1.2 Poisson laps-until-pit | 0.56951 | 0.36998 | -0.08bp | K=19 ρ=0.99982 | FAIL (redundant) |
+`b_lapsuntilpit` (in K=18) and `a_horizon` (in K=18) use the SAME
+bfill mechanism. b_lapsuntilpit groups by `(Race, Driver)` — broader
+than hazard's `(Race, Driver, Year, Stint)`. Both carry within-group
+label leakage but at much smaller magnitude (their L1 weights 0.57 /
+0.67 in the K=18 LR-meta — diluted by 14 leak-free binary
+classifiers). Hazard NN entered K=19 with **L1=9.52**, dominating the
+meta and exposing its 230bp leak.
 
-Three failure modes:
-- **T1.5 meta-only**: 18-base pool at info ceiling regardless of meta family. d3-endgame already said this.
-- **T1.3 single-rule rule_residual**: low coverage (4.26%) + GBDT-class residual on raw features → LR meta routes around.
-- **T1.2 reformulation**: redundant — `a_horizon` + `b_lapsuntilpit` are ALREADY in M5q pool from Day-2.
+K=18's calibrated −3.9bp gap is robust because all bases share
+similar leak signatures and L1 weights are anchored by the binary
+classifiers. **Don't disturb the K=18 pool composition** unless we
+have a clean replacement.
 
-Friction codified: `tag: menu-overcrediting-redundant-mechanism` →
-**CLAUDE.md Rule 16**: 5-question pre-flight check before committing
-compute on any new candidate.
+## Proposed Rule 16 Q7 (needs PI go for CLAUDE.md)
 
-## Updated priors (from data probes P1-P10)
+> **Q7 — Target-construction leak test.** If a candidate base's
+> target/feature construction depends on FUTURE same-group labels
+> (e.g., `bfill`, `next_pit_lap`, horizon-shifted target with group
+> propagation), apply ×0.1 EV downgrade UNLESS its OOF was computed
+> under GroupKFold by the relevant group. Apply PRE-FLIGHT, not
+> post-submit. Catches the failure mode that pre_submit_diff,
+> min-meta, and Q6 all missed (all are sensitive to predictions, not
+> targets).
 
-- **P1 falsifies sequence models.** Test groups average 2.25 laps;
-  only 9.7% have ≥5 consecutive laps. Big LSTM/Transformer bounded.
-  What survives: 1-step lookup features (next_compound, prev_compound,
-  laps_into_stint).
-- **P2 falsifies retrieval.** kNN distances too large → TabR /
-  Hopular / TabPFN-context bounded.
-- **P5**: 68% of test rows have computable `next_compound` — large
-  unused signal.
-- **P10**: pool extracts what's extractable from the 14 raw features.
-  No residual cohort with |bias|≥2pp. **Lift requires NEW SIGNALS or
-  NEW MODEL CLASS, not better extraction.**
-- **P6**: StratifiedKFold has 80% within-group leakage. OOF is
-  optimistic by ~5bp (matches our gap). Use Strat as LB proxy per R1
-  but add GroupKFold(Race, Driver, Year, Stint) as diagnostic.
-- **C6**: compute is NOT the binding constraint.
+## Day-10 first-action plan
 
-## Updated CPU queue (post-Day-8 falsifications)
+### Path A — TabM v3 with extended training (top-priority)
 
-| # | Move | Cost | EV (bp) | Notes |
-|---|---|---|---:|---|
-| C1 | **External-data Q3 (SC probability per track)** | 2-3h CPU + 1h scrape | 2-5 | new info NOT in pool; race-marginal preserved under CTGAN |
-| C2 | **External-data Q1 (Pirelli pit-windows)** | 6-8h scrape + 2h CPU | 3-12 | as 4-6 rule_residual bases (F1.2 pattern); highest absolute EV |
-| C3 | **EmbMLP on CPU** (PyTorch nn.Embedding for Driver) | 4-6h CPU (8-core) | 1-3 | distinct from RealMLP-TD cat handling |
-| C4 | **Hierarchical Bayesian stacking (Yao 2021)** | 2-3h CPU (PyMC+JAX) | 1-6 | different META STRUCTURE (not just family) |
-| C5 | T2.1+T2.2 multi-rule extension (next_compound + prev_compound × laps_into_stint, F1.2-style) | 30 min CPU | 0-3 | AT RISK of Q12-mode failure but cheap |
-| C6 | RaceLength + Year=2023 mask audit | <1h | 0-2 | small but free |
-| C7 | Adversarial-validation instance weights | 30 min | 0-2 | small but free |
+Day-9 TabM smoke v2 stopped at val cross-entropy −0.4248 at epoch 5,
+then 20 epochs of oscillation. Possibly converged to a local basin;
+possibly under-trained at the margin.
 
-## GPU queue (when GPU returns)
+**Build**: copy `kernels/tabm-smoke-gpu/` → `kernels/tabm-smoke-v3-gpu/`
+with explicit longer training:
+- introspect `pytabkit.TabM_D_Classifier.__init__` for `n_epochs` /
+  `patience` / `lr` knobs; pass max-epochs ≥200, patience ≥50
+- if pytabkit doesn't expose those, fall back to standalone `tabm`
+  package (simpler API)
+- ~10 min on T4
 
-| # | Move | Cost | EV (bp) | Notes |
-|---|---|---|---:|---|
-| G1 | **T1.1 TabM 1-fold smoke** (Rule 2!) | 1-2h T4 | gate test | NOT YET FALSIFIED; sole unbroken Tier-1 |
-| G2 | **T1.1 TabM 5-fold + bag (3 seeds)** | 6-10h T4×2 | 2-8 | proceed only if smoke gate passes |
-| G3 | **T1.4 Hazard-rate NN** (K=20 hazard buckets, nnet-survival loss) | 4-6h T4 | 1-7 | structurally different problem |
-| G4 | **T2.6 SCARF pretrain on aadigupta1601 unlabeled** | 6-10h T4 | 1-6 | different unlabeled corpus avoids d5 amp |
-| G5 | TabPFN-v2 / TabICL-v2 ICL ensemble | 6-12h T4 | 1-5 | regime mismatch; held |
+Same gates as smoke v2: fold-0 AUC ≥ 0.945 PROMOTE; else HOLD.
 
-## Day-9 first-action plan
+**No leak risk** (binary PitNextLap target). If it clears the gate,
+this is the cleanest next-base candidate. EV +1-7bp at K=19.
 
-### If GPU is available:
+### Path B — G4 SCARF/VIME pretrain on aadigupta1601 (heavy)
 
-1. **Push TabM 1-fold smoke kernel** to Kaggle T4. Use `pip install tabm`;
-   build with the same Strat fold-0 split as M5q (`SEED=42, N_FOLDS=5,
-   fold 0`). Target wall <1.5h.
-2. **Smoke gate**: fold-0 val AUC ≥ 0.945 (RealMLP fold-0 was 0.947).
-   - PASS: schedule 5-fold + 3-seed bag overnight; expect Day-10 stack.
-   - FAIL: don't proceed to 5-fold; document and try T1.4 hazard-NN.
-3. **In parallel on CPU**: C5 multi-rule extension (cheap 30 min) +
-   C1 SC-probability scrape.
+6-10h T4. Different unlabeled corpus avoids d5 partial-pseudo amp.
+Different inductive bias (contrastive pretraining). No leak risk.
 
-### If GPU is NOT available:
+Defer until Path A resolves.
 
-1. **C1 external-data Q3 SC probability** (highest CPU EV; non-redundant
-   signal). Build SC-probability lookup from public F1 stats
-   (axiorablogs.com, Williams Racing posts, oddschecker — sources cited
-   in F1-domain audit). Implement as rule_residual base: lookup
-   `(Race, sc_prob_decile, Stint, lap_quintile) → pit_rate`; HGBC residual.
-2. **C2 external-data Q1 pit-windows** (highest absolute EV but highest
-   eng cost). Scrape Pirelli pit-window predictions from F1.com strategy-
-   guide articles for 26 races × 4 years. Build 4-6 rule_residual bases
-   (in_window, dist_to_window_center, etc.) following F1.2 multi-rule
-   template.
-3. **C5 T2.1+T2.2 multi-rule extension** in parallel — cheap probe.
-4. **C4 Bayesian hierarchical stacking** — different meta STRUCTURE.
+### Path C — F2 multi-rule rebuild with Q6 enforcement (cheap CPU)
 
-## Critical operating rules (reaffirmed Day-8)
-
-1. **Pre-submit-diff before EVERY submit**, ρ < 0.9995.
-2. **Mechanism-class-only**: today confirmed Nth time. Pool tweaks AND
-   meta-only changes AND single-rule residuals on raw features AND
-   duplicate reformulations AND single-base bag rebuilds are all dead.
-3. **Predicted-gap gate**: pred-gap <−7bp needs PI sign-off.
-4. **Minimal-input-meta sanity check**: today's Q12 confirms this gate
-   is sharp — Q12 failed by 0.06bp at 2-comp meta and the K=19 stack
-   collapse confirmed the gate was right.
-5. **Strat-only Day-3+** (R1; U3 confirmed i.i.d.).
-6. **Track gap direction** — Day-7 K=18 narrowed gap −5.2 →−3.9bp.
-   Real positive transfer.
-7. **NEW** (Day-8) **Rule 16 pre-flight (5 questions)**. Apply BEFORE
-   committing compute: ladder cross-check + mechanism-vulnerability
-   classification + predicted standalone OOF + predicted ρ vs PRIMARY
-   + closest gate-PASS/FAIL precedent. EV midpoint × 0.3 if rank-lock-
-   vulnerable.
+After today's confirmation that K=18 pool is at the LR-meta info
+ceiling (8 nulls), the only way to add a base via rule_residual is
+to find a rule whose ρ-orthogonality is preserved AGAINST EVERY
+existing pool member, not just M5q. Cheap experiment but predicted
+NULL by analogy with C5/C1.
 
 ## Falsified / dead — do NOT retry
 
-- **Big sequence models** — P1.
-- **kNN / retrieval / TabR / Hopular** — P2.
-- **TabPFN-2.5 ICL ensemble** — same regime issue as P2; held.
-- **RealMLP bagging** — Day-7 partial-bag NULL salvage.
-- **Broad pseudo-labeling** — Day-5 partial-pseudo K=14.
-- **F5 aux-feature GBDT-meta** — Day-6.
-- **Move B 2-base [M5q, recursive]** — Day-6.
-- **Per-Race / per-Stint isotonic** — Day-3 in-CV regress.
-- **Reintroduce `Normalized_TyreLife`** — host-removed.
-- **T1.5 Deotte L2 stacking** — Day-8 (meta-only changes 0bp).
-- **T1.3 Q12 single-rule rule_residual** — Day-8 (low-coverage rule_residual collapses).
-- **T1.2 Poisson laps-until-next-pit** — Day-8 (redundant with `a_horizon`/`b_lapsuntilpit`).
+(keep this list growing)
+- **Big sequence models** — P1
+- **kNN / retrieval / TabR / Hopular** — P2
+- **TabPFN-2.5 ICL ensemble** — P2 regime issue
+- **RealMLP bagging** — Day-7
+- **Broad pseudo-labeling** — Day-5
+- **F5 aux-feature GBDT-meta** — Day-6
+- **Move B 2-base [M5q, recursive]** — Day-6
+- **Per-Race / per-Stint isotonic** — Day-3
+- **Reintroduce `Normalized_TyreLife`** — host-removed
+- **T1.5 Deotte L2 stacking** — Day-8
+- **T1.3 Q12 single-rule rule_residual** — Day-8
+- **T1.2 Poisson laps-until-pit** — Day-8
+- **TabM-D smoke (default config)** — Day-9
+- **C5 prev/next compound multi-rule** — Day-9 (K=20 TIE)
+- **C1 SC-prob curated lookup** — Day-9 (K=19 TIE)
+- **NEW: T1.4 Hazard-rate NN** — Day-9 LB −31.5bp / Day-10 leak-free OOF 0.92013
 
-## Calibration ladder snapshot (Day 9 morning)
+## Held submissions (do NOT submit)
 
-| Mechanism | Strat OOF | LB | Notes |
-|---|---:|---:|---|
-| m5q (M5h + RealMLP, K=14) | 0.95057 | 0.95005 | gap −5.2bp |
-| **d6_k18_multi_rule (PRIMARY)** | **0.95065** | **0.95026** | **gap −3.9bp** |
-| d7_realmlp_bag_partB | 0.95065 | n/a | TIE ρ=0.99955 (held) |
-| d7_realmlp_bag_partC | 0.95066 | n/a | TIE ρ=0.99964 (held) |
-| d8_l2_l3_blend | 0.95065 | n/a | TIE ρ=0.985 (held) |
-| d8_q12_v_b standalone | 0.94518 | n/a | min-meta FAIL by 0.06bp |
-| d8_k19_q12 | 0.95065 | n/a | TIE ρ=0.99994 (rank-lock) |
-| d8_poisson_lapsuntil | 0.56951 | n/a | redundant; std AUC ~random |
-| d8_k19_poisson | 0.95064 | n/a | TIE ρ=0.99982 |
+- `submission_d9_k19_hazard_nn_stack.csv` — burned at LB 0.94711
+- `submission_d9_hazard_nn.csv` (single-base hazard) — predict LB ~0.926
+- `submission_d10_hazard_nn_leakfree.csv` — predicted LB ~0.916
+- Day-9 `submission_d9_k20_neighbor.csv`, `submission_d9_k19_sc_prob.csv` — TIE-locked
+- Day-7 `d7_realmlp_bag_partB.csv`, `d7_realmlp_bag_partC.csv` — TIE-locked
+- Day-8 `d8_l3_blend.csv`, `d8_k19_q12.csv`, `d8_k19_poisson.csv`
+- Day-5 `d5_partial_pseudo_m5q.csv` — burned at LB 0.94963
 
-## Held submissions (do NOT blindly submit)
+## Calibration ladder snapshot (Day 10 morning)
 
-- **Day-7 NULL salvage**: `d7_realmlp_bag_partB.csv`, `d7_realmlp_bag_partC.csv`
-- **Day-8 new holds**: `d8_l3_blend.csv`, `d8_k19_q12.csv`, `d8_k19_poisson.csv`
-- **Carry-forward TIE/NULL**: `m5x_yetirank`, `m5z_yetirank_nb`,
-  `m5_meta_lgbm_*`, `m5_meta_hgbc`, `d5_meta_k15_*`, `m5_k15a/b/c`
-- **Burned**: `d5_partial_pseudo_m5q` (−4.2bp)
-- **Day-6 falsified**: `d6_aux_meta_with_aux`, `d6_2base_v[1-4]_*`,
-  superseded `d6_k15_rule_residual` / `d6_k16_two_diverse`
+| Mechanism | Strat OOF | LB | Gap | Notes |
+|---|---:|---:|---:|---|
+| **d6_k18_multi_rule (PRIMARY)** | **0.95065** | **0.95026** | **−3.9bp** | UNCHANGED |
+| m5q (M5h + RealMLP, K=14) | 0.95057 | 0.95005 | −5.2bp | parent |
+| d9_k19_hazard_nn (LEAKY) | 0.95446 | **0.94711** | **−73.5bp** | burned |
+| d9_k19_sc_prob | 0.95065 | n/a | n/a | TIE held |
+| d9_k20_neighbor | 0.95065 | n/a | n/a | TIE held |
+| Day-10 hazard leak-free | 0.92013 | n/a | n/a | DEAD |
+
+## Critical operating rules (re-emphasised)
+
+1. **Pre-submit-diff before EVERY submit**, ρ < 0.999.
+2. **Predicted-LB calibration is fragile in low-ρ regime.** The
+   `pred_lb` function's offset table was calibrated on ρ ≥ 0.99
+   submits; at ρ ≈ 0.96 the offset extrapolation was 20× too small.
+   **At ρ < 0.99, downgrade pred-LB by an additional 30bp** until we
+   have more sub-0.99 submits to recalibrate.
+3. **Rule 16 Q7 (PROPOSED): target-construction leak test.** Apply
+   ×0.1 EV downgrade pre-flight unless GroupKF OOF available.
+4. **Strat-only Day-3+** (R1) BUT: GroupKFold is now load-bearing
+   for any base whose target depends on within-group future labels.
+5. **Mechanism-class-only**: confirmed Nth time. Pool tweaks AND
+   meta-only changes AND single-rule residuals on raw features AND
+   duplicate reformulations AND single-base bag rebuilds AND
+   leak-saturated NN bases are ALL dead.
+6. **NEVER-GIVE-UP / saturation-is-bounded**. Today's failure is a
+   data point about WHICH new bases work, not that no new bases
+   work. TabM (binary target) is unfalsified.
 
 ## Pointers
 
-- `audit/2026-05-08-d8-cpu-probes-falsified.md` — today's CPU audit
-- `audit/2026-05-08-d7-realmlp-partial-bag-null.md` — Day-7 bag NULL
-- `audit/2026-05-08-strategic-menu-wider-steps.md` — full menu (refer with falsification overlay)
-- `audit/2026-05-08-data-probe-results.md` — P1-P10 probes (load-bearing for sequence, kNN, calibration)
-- `audit/2026-05-07-d6-f1-2-LB-result.md` — F1.2 K=18 LB win
-- `audit/2026-05-07-d6-f1-2-multi-rule.md` — K=18 build template
-- `scripts/d6_multi_rule.py` — F1.2 builder (template for C1, C2, C5 extensions)
-- `scripts/d6_rule_residual.py` — F1.1 builder
-- `scripts/d7_realmlp_partial_bag.py` — bag salvage (closed)
-- `scripts/d8_l2_stacking.py`, `scripts/d8_q12_forced_pit.py`, `scripts/d8_poisson_lapsuntil.py` — falsified probes
-- `scripts/probes_d8/run_probes.py` — P1-P10 probe code
-- `scripts/pre_submit_diff.py` — MANDATORY (ρ < 0.9995)
+- `audit/2026-05-09-d9-hazard-nn-LB-postmortem.md`
+- `audit/2026-05-10-d10-hazard-nn-leakfree-confirmed-dead.md`
+- `audit/2026-05-09-d9-three-nulls-tabm-c5-c1.md`
+- `audit/2026-05-09-d9-c5-neighbor-rules-marginal.md`
+- `audit/2026-05-08-data-probe-results.md` (P6 = leak mechanism)
+- `audit/2026-05-08-strategic-menu-wider-steps.md` (apply Q7 overlay)
+- `kernels/hazard-nn-leakfree-gpu/hazard_nn_leakfree.py` (stint-drop pattern)
+- `kernels/tabm-smoke-gpu/tabm_smoke_gpu.py` (Day-9 v2; copy for Path A)
+- `scripts/pre_submit_diff.py` (MANDATORY)
