@@ -1,0 +1,73 @@
+{
+  "seed": 42,
+  "leakfree_oof_auc": 0.9201280600744995,
+  "leaky_bag_oof_ref": 0.94319,
+  "leak_magnitude_bp": 230.6193992550043,
+  "delta_vs_baseline_bp": -206.21939925500433,
+  "fold_aucs": [
+    0.922354804098577,
+    0.918834231798476,
+    0.9200095497614247,
+    0.9202999582702015,
+    0.9203611935219467
+  ],
+  "fold_walls": [
+    11.323782444000244,
+    5.395979404449463,
+    5.089725017547607,
+    5.224144220352173,
+    5.2115607261657715
+  ],
+  "drop_stats": [
+    {
+      "fold": 0,
+      "tr_orig": 351312,
+      "tr_clean": 141223,
+      "tr_dropped": 210089,
+      "drop_pct": 59.80125927950084,
+      "n_val_stints": 55714,
+      "n_val_rows": 87828
+    },
+    {
+      "fold": 1,
+      "tr_orig": 351312,
+      "tr_clean": 141202,
+      "tr_dropped": 210110,
+      "drop_pct": 59.80723687206814,
+      "n_val_stints": 55731,
+      "n_val_rows": 87828
+    },
+    {
+      "fold": 2,
+      "tr_orig": 351312,
+      "tr_clean": 140805,
+      "tr_dropped": 210507,
+      "drop_pct": 59.920241836316436,
+      "n_val_stints": 55835,
+      "n_val_rows": 87828
+    },
+    {
+      "fold": 3,
+      "tr_orig": 351312,
+      "tr_clean": 140563,
+      "tr_dropped": 210749,
+      "drop_pct": 59.98912647447283,
+      "n_val_stints": 55969,
+      "n_val_rows": 87828
+    },
+    {
+      "fold": 4,
+      "tr_orig": 351312,
+      "tr_clean": 141756,
+      "tr_dropped": 209556,
+      "drop_pct": 59.64954228719771,
+      "n_val_stints": 55768,
+      "n_val_rows": 87828
+    }
+  ],
+  "cv": "StratifiedKFold(5)+stint_drop",
+  "metric": "roc_auc",
+  "n_buckets": 20,
+  "total_wall_s": 120.1837432384491,
+  "notes": "Leak-free hazard NN diagnostic: stint-drop within-fold, outer split unchanged at random_state=42. OOF aligned with M5q pool for downstream K=N+1 stacking."
+}
