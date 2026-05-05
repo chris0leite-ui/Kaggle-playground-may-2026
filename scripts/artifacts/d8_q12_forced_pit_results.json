@@ -1,0 +1,46 @@
+{
+  "primary_oof": 0.9506475901523181,
+  "primary_lb": 0.95026,
+  "variant_a": {
+    "std_oof": 0.9443893222767423,
+    "rho_vs_primary": 0.9096646404776223
+  },
+  "variant_b": {
+    "std_oof": 0.9451835484459796,
+    "rho_vs_primary": 0.9257026645180072
+  },
+  "chosen": "q12_v_b",
+  "k19_stack": {
+    "K": 19,
+    "strat_oof": 0.9506475902173861,
+    "delta_primary_bp": 6.506795102723117e-07,
+    "rho_vs_primary": 0.9999406052700782,
+    "pred_lb": 0.9502575902173861,
+    "l1_ranking": {
+      "baseline": 0.43970924082928087,
+      "d2a_te": 0.5893814554939854,
+      "m2_xgb": 0.2966334454324203,
+      "e1_cb_sub": 0.43633507938809446,
+      "e3_hgbc": 0.5778637924171898,
+      "e5_optuna_lgbm": 0.8151507228623633,
+      "a_horizon": 0.6558285459652843,
+      "b_lapsuntilpit": 0.5686081870658309,
+      "f1_hgbc_deep": 0.47062661752946156,
+      "f2_hgbc_shallow": 0.2757673504642955,
+      "cb_year-cat": 0.3868583288571525,
+      "cb_lossguide": 0.3965305446895237,
+      "cb_slow-wide-bag": 0.4637589600179787,
+      "realmlp": 0.6900866238973041,
+      "rule_compound_tyre": 0.5006455919569357,
+      "rule_compound_stint": 0.3177504024882803,
+      "rule_driver_compound": 0.9839950803952129,
+      "rule_year_race": 0.5780485128525865,
+      "q12_b": 0.27816042461669077
+    },
+    "stack_pass": false,
+    "rho_pass": false,
+    "pred_lb_pass": false,
+    "sub_status": "skip"
+  },
+  "wall_total_s": 272.64318466186523
+}

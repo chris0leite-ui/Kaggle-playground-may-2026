@@ -1,0 +1,65 @@
+{
+  "lr_baseline": {
+    "oof": 0.9506475901523181,
+    "rho_vs_primary": 1.0
+  },
+  "lgbm_l2": {
+    "oof": 0.9505716457543172,
+    "delta_primary_bp": -0.7594439800095998,
+    "rho_vs_primary": 0.9951681326658706,
+    "rho_vs_lr_base": 0.9951681326658706
+  },
+  "ridge_l2": {
+    "oof": 0.9501527373793011,
+    "delta_primary_bp": -4.948527730170849,
+    "rho_vs_primary": 0.9364799879460278,
+    "rho_vs_lr_base": 0.9364799879460278
+  },
+  "l3_blend": {
+    "oof": 0.9506491572186115,
+    "delta_primary_bp": 0.01567066293395314,
+    "rho_vs_primary": 0.9853541891450476,
+    "weights": {
+      "lr": 0.46005527207381114,
+      "lgbm": 0.2879661515540231,
+      "ridge": 0.25248772540832354
+    }
+  },
+  "gates": {
+    "L2a-LR": {
+      "label": "L2a-LR",
+      "oof_pass": false,
+      "rho_pass": false,
+      "slot_worthy": false,
+      "margin_oof_bp": 0.0,
+      "rho_vs_primary": 1.0
+    },
+    "L2b-LGBM": {
+      "label": "L2b-LGBM",
+      "oof_pass": false,
+      "rho_pass": true,
+      "slot_worthy": false,
+      "margin_oof_bp": -0.7594439800095998,
+      "rho_vs_primary": 0.9951681326658706
+    },
+    "L2c-Ridge": {
+      "label": "L2c-Ridge",
+      "oof_pass": false,
+      "rho_pass": true,
+      "slot_worthy": false,
+      "margin_oof_bp": -4.948527730170849,
+      "rho_vs_primary": 0.9364799879460278
+    },
+    "L3-blend": {
+      "label": "L3-blend",
+      "oof_pass": false,
+      "rho_pass": true,
+      "slot_worthy": false,
+      "margin_oof_bp": 0.01567066293395314,
+      "rho_vs_primary": 0.9853541891450476
+    }
+  },
+  "primary_oof": 0.9506475901523181,
+  "primary_lb": 0.95026,
+  "wall_total_s": 199.07229828834534
+}

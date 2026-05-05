@@ -2,6 +2,27 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-08
+
+- `tag: menu-overcrediting-redundant-mechanism` — Strategic-menu
+  research synthesis (`audit/2026-05-08-strategic-menu-wider-steps.md`)
+  recommended T1.5 (Deotte L2 stacking) and T1.2 (multi-formulation
+  L1) as Tier-1 candidates. Both were predictably redundant: T1.5 is
+  a meta-only change (Day-3 endgame says "LR with [raw,rank,logit]
+  is genuinely the right stacker"), and T1.2 IS already in the pool
+  via `a_horizon` (horizon-shift) + `b_lapsuntilpit` (laps-until-pit).
+  T1.3 (Q12 single-rule rule_residual) was rank-lock-vulnerable per
+  the 4× prior confirmation pattern. Cause: research agents proposed
+  candidates from general SOTA / Deotte writeups without cross-
+  checking against `mechanism_families_explored` ledger or load-
+  bearing day-N-endgame audits. Fix: pre-flight 5-question check
+  (see CLAUDE.md Rule 16) — match against the ladder, classify
+  mechanism vulnerability, predict standalone OOF + ρ vs PRIMARY,
+  cite the closest gate-PASS/FAIL precedent. Apply 0.3× EV
+  downgrade for {meta-only, rule_residual-on-raw, formulation-
+  already-in-pool}. Total cost of today's friction: ~14 min CPU
+  + 3 menu items demoted.
+
 ## 2026-05-04
 
 - `tag: stats-error` — Pre-baseline gate audit reported "PitStop ↔

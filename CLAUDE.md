@@ -48,6 +48,18 @@ ff-merge before reading state below.
     and proceed per its instructions (skip the usual read-order;
     HANDOVER.md is the latest synthesis). PI says **"prepare handover"**
     → update `HANDOVER.md` with the next-session brief.
+16. **New-candidate pre-flight (5-question check).** Before committing
+    CPU/GPU compute on any new base or meta variant, answer:
+    (1) Is the underlying mechanism in `mechanism_families_explored`?
+    (2) Does the candidate fall in {meta-only, rule_residual-on-raw,
+    GBDT-on-binary-target, formulation-already-in-pool}? If yes,
+    rank-lock-vulnerable. (3) Predict standalone OOF (cite precedent).
+    (4) Predict ρ vs PRIMARY (cite closest base). (5) At that ρ,
+    cite the closest gate-PASS/FAIL precedent. If 1–5 don't return
+    a coherent answer, downgrade EV midpoint by 0.3× before ranking.
+    Origin: `tag: menu-overcrediting-redundant-mechanism` (Day-8
+    falsified T1.5/T1.3/T1.2 all of which passed research-agent EV
+    ranking but failed the 5-question check retroactively).
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
