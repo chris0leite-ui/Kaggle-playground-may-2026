@@ -1,0 +1,165 @@
+{
+  "diversities": {
+    "R14_hash_lr_3way": 0.44357689834457703,
+    "R6_next_compound": 0.907776517845003,
+    "R10_driver_eb": 0.9119953171542328,
+    "R7_prev_compound": 0.9139744296667812,
+    "R11_stint_overdue": 0.9248641924090623,
+    "R13_race_lapbin": 0.9254131278075304,
+    "R8_position_progress": 0.9305964836983489,
+    "R12_cumdeg_knee": 0.9344698039923988,
+    "R9_laptime_delta_z": 0.94174299246391,
+    "R5_weibull_compound": 0.9427682212415314
+  },
+  "existing_rule_rhos": [
+    [
+      "rule_compound_tyre",
+      0.9382273034849329
+    ],
+    [
+      "rule_compound_stint",
+      0.9367179365650217
+    ],
+    [
+      "rule_year_race",
+      0.9333481490525937
+    ],
+    [
+      "rule_driver_compound",
+      0.9023168235879468
+    ]
+  ],
+  "stacks": {
+    "S1_K20_top2_diverse": {
+      "K": 20,
+      "strat_oof": 0.9506594545622822,
+      "delta_primary_bp": 0.09454562282185108,
+      "rho_vs_primary_test": 0.9999142244372603,
+      "pred_lb": 0.9502694545622822,
+      "delta_lb_bp": 0.09454562282185108,
+      "l1_ranking": {
+        "baseline": 0.3975800629829116,
+        "d2a_te": 0.5427838381041087,
+        "m2_xgb": 0.25839613681202955,
+        "e1_cb_sub": 0.40791521298522565,
+        "e3_hgbc": 0.5258811049088309,
+        "e5_optuna_lgbm": 0.7593376721345237,
+        "a_horizon": 0.6383097448216031,
+        "b_lapsuntilpit": 0.5402360283720483,
+        "f1_hgbc_deep": 0.4209227867429468,
+        "f2_hgbc_shallow": 0.261074673468527,
+        "cb_year-cat": 0.34999167589233965,
+        "cb_lossguide": 0.3404475133592355,
+        "cb_slow-wide-bag": 0.46839473351451777,
+        "realmlp": 0.6556495656414262,
+        "rule_compound_tyre": 0.4339388771067485,
+        "rule_compound_stint": 0.35993328085608384,
+        "rule_driver_compound": 1.0799442664482415,
+        "rule_year_race": 0.49531736801229653,
+        "R14_hash_lr_3way": 0.6201887500995724,
+        "R6_next_compound": 0.31850975468502446
+      }
+    },
+    "S2_K28_all": {
+      "K": 28,
+      "strat_oof": 0.9506566921309096,
+      "delta_primary_bp": 0.0669213090964682,
+      "rho_vs_primary_test": 0.9997328249253478,
+      "pred_lb": 0.9502666921309096,
+      "delta_lb_bp": 0.0669213090964682,
+      "l1_ranking": {
+        "baseline": 0.4230538263864635,
+        "d2a_te": 0.4091861654166786,
+        "m2_xgb": 0.2817615686253649,
+        "e1_cb_sub": 0.4382658193110174,
+        "e3_hgbc": 0.47915699432708403,
+        "e5_optuna_lgbm": 0.7174416415168146,
+        "a_horizon": 0.610508669007412,
+        "b_lapsuntilpit": 0.5317302933812803,
+        "f1_hgbc_deep": 0.4245521533140737,
+        "f2_hgbc_shallow": 0.24780746191702208,
+        "cb_year-cat": 0.38151476852085076,
+        "cb_lossguide": 0.36664226401933453,
+        "cb_slow-wide-bag": 0.28826422515864575,
+        "realmlp": 0.6303482053658692,
+        "rule_compound_tyre": 0.3487942708134983,
+        "rule_compound_stint": 0.19439612269259565,
+        "rule_driver_compound": 0.9356861630089562,
+        "rule_year_race": 0.42723494608415924,
+        "R5_weibull_compound": 0.29477277309987765,
+        "R6_next_compound": 0.36059256125477146,
+        "R7_prev_compound": 0.4199132579925298,
+        "R8_position_progress": 0.2700256857688772,
+        "R9_laptime_delta_z": 0.2556817679258055,
+        "R10_driver_eb": 0.17964237509494488,
+        "R11_stint_overdue": 0.32732510457350866,
+        "R12_cumdeg_knee": 0.368669365447674,
+        "R13_race_lapbin": 0.09286177652547276,
+        "R14_hash_lr_3way": 0.5780351384443683
+      }
+    },
+    "S3_K18_swap_2rules": {
+      "K": 18,
+      "strat_oof": 0.9506520965700022,
+      "delta_primary_bp": 0.02096570002163567,
+      "rho_vs_primary_test": 0.9998086689821268,
+      "pred_lb": 0.9502620965700022,
+      "delta_lb_bp": 0.02096570002163567,
+      "l1_ranking": {
+        "baseline": 0.41903739141549556,
+        "d2a_te": 0.5780889535255836,
+        "m2_xgb": 0.2331934380033807,
+        "e1_cb_sub": 0.3810383393026119,
+        "e3_hgbc": 0.5220580213599626,
+        "e5_optuna_lgbm": 0.7500090640023922,
+        "a_horizon": 0.5970313658894895,
+        "b_lapsuntilpit": 0.5352815055816968,
+        "f1_hgbc_deep": 0.40395016624530977,
+        "f2_hgbc_shallow": 0.2506585292369557,
+        "cb_year-cat": 0.31764434405963926,
+        "cb_lossguide": 0.31325452833159995,
+        "cb_slow-wide-bag": 0.5486252390925479,
+        "realmlp": 0.6330384959205226,
+        "rule_driver_compound": 1.1580590980576733,
+        "rule_year_race": 0.5758598357258131,
+        "R14_hash_lr_3way": 0.6034856041608859,
+        "R6_next_compound": 0.40094552659478716
+      }
+    },
+    "S4_K20_swap_2rules_add4": {
+      "K": 20,
+      "strat_oof": 0.9506629346291374,
+      "delta_primary_bp": 0.1293462913742882,
+      "rho_vs_primary_test": 0.9997107157967211,
+      "pred_lb": 0.9502729346291374,
+      "delta_lb_bp": 0.1293462913742882,
+      "l1_ranking": {
+        "baseline": 0.41499823597298285,
+        "d2a_te": 0.35005228047312636,
+        "m2_xgb": 0.26041933598580347,
+        "e1_cb_sub": 0.40939977590408305,
+        "e3_hgbc": 0.4573375571213093,
+        "e5_optuna_lgbm": 0.6952004985497038,
+        "a_horizon": 0.5487452893315274,
+        "b_lapsuntilpit": 0.4270937054993706,
+        "f1_hgbc_deep": 0.4158983314023103,
+        "f2_hgbc_shallow": 0.22009959851316613,
+        "cb_year-cat": 0.36007265260897003,
+        "cb_lossguide": 0.34469541685046734,
+        "cb_slow-wide-bag": 0.31198144153944535,
+        "realmlp": 0.5983773467912441,
+        "rule_driver_compound": 0.967353481898218,
+        "rule_year_race": 0.5712009349890869,
+        "R14_hash_lr_3way": 0.5411024766563272,
+        "R6_next_compound": 0.49526399083417644,
+        "R10_driver_eb": 0.24798789817212533,
+        "R7_prev_compound": 0.45650866799831896
+      }
+    }
+  },
+  "primary": {
+    "strat_oof": 0.95065,
+    "lb": 0.95026
+  },
+  "total_wall_s": 213.38264894485474
+}
