@@ -1,0 +1,42 @@
+{
+  "rebuilt_oof": 0.9491686019020372,
+  "delta_vs_anchor_bp": 4.086019020371756,
+  "rho_vs_orig_test": 0.9959294536664979,
+  "gate_oof_pass": true,
+  "gate_rho_pass": true,
+  "proceed": true,
+  "fold_aucs": [
+    0.9503671422381591,
+    0.9481080229988113,
+    0.9494040806403302,
+    0.948389441872991,
+    0.949575743009953
+  ],
+  "fold_walls_s": [
+    27.20385766029358,
+    20.197737216949463,
+    23.04097557067871,
+    23.084526777267456,
+    21.92074179649353
+  ],
+  "anchor_e3_oof": 0.94876,
+  "pseudo_stats": {
+    "n_test": 188165,
+    "n_pseudo": 180278,
+    "n_pos": 33314,
+    "n_neg": 146964,
+    "pos_rate": 0.18479237621895073,
+    "track_a_pos": 2294,
+    "track_a_neg": 111721,
+    "track_b_pos": 33314,
+    "track_b_neg": 146964,
+    "track_a_only": 0,
+    "track_b_only": 66263,
+    "intersection": 114015,
+    "conflicts": 0
+  },
+  "cv": "StratifiedKFold(5, shuffle=True, random_state=42)",
+  "metric": "roc_auc",
+  "total_wall_s": 125.19162464141846,
+  "notes": "Path B Phase 1 MVP. Pseudo-label channel validation on e3_hgbc only. Both gates must hold for full 14-base rebuild."
+}

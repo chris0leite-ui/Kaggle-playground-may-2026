@@ -1,0 +1,38 @@
+{
+  "lgbm_shallow": {
+    "strat_oof": 0.9503795626692662,
+    "delta_m5q_bp": -1.9043733073387248,
+    "rho_vs_m5q_test": 0.9952100455604552,
+    "gate": "REAL_DELTA",
+    "wall": 27.078793048858643,
+    "best_iters": [
+      424,
+      190,
+      314,
+      256,
+      458
+    ]
+  },
+  "lgbm_medium": {
+    "strat_oof": 0.9503700589280228,
+    "delta_m5q_bp": -1.9994107197718325,
+    "rho_vs_m5q_test": 0.9942216041623367,
+    "gate": "REAL_DELTA",
+    "wall": 36.79532313346863,
+    "best_iters": [
+      461,
+      235,
+      217,
+      291,
+      402
+    ]
+  },
+  "hgbc": {
+    "strat_oof": 0.9503211169070931,
+    "delta_m5q_bp": -2.4888309290693744,
+    "rho_vs_m5q_test": 0.9944936374803334,
+    "gate": "REAL_DELTA",
+    "wall": 32.51058864593506,
+    "best_iters": null
+  }
+}

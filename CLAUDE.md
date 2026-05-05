@@ -65,12 +65,12 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 4                            # 2026-05-05 / Day-4 evening; slot 2 burned, M5q stays PRIMARY
+day: 5                            # 2026-05-06 / Day-5 morning; Path B Phase 1+2 PASS, slot-1 candidate held
 lb_best_today: 0.95435            # leader; not refreshed
-our_lb_best: 0.95005              # M5q (M5h + RealMLP-TD, K=14) — PRIMARY since slot 1
-submissions_used_today: 2         # M5q + m5_meta_lgbm_shallow = 2/10 today
+our_lb_best: 0.95005              # M5q (M5h + RealMLP-TD, K=14) — PRIMARY pending Path B slot
+submissions_used_today: 0         # 0/10 today; Path B partial-pseudo K=14 candidate ready
 submissions_used_total: 12
-saturation_count: 0               # M5q +14bp slot 1 broke saturation; slot 2 confirmed base-pool ceiling
+saturation_count: 0               # Path B Phase 2 broke the meta-add ceiling; +2.54bp OOF on partial-pseudo K=14
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -97,8 +97,14 @@ mechanism_families_explored:
   - catboost_yetirank_pairwise      # d4 -- 0.90508 std, ρ=0.666 vs M5q (most diverse), TIE_EXPECTED
   - gaussian_naive_bayes_mixed      # d4 -- 0.87984 std, ρ=0.853 vs M5q, TIE_EXPECTED stack
   - gbdt_meta_lr_alternative        # d4 slot 2 -- LGBM/HGBC meta over M5q pool; LB 0.95001 (-4bp)
+  - recursive_gbdt_m5q_feature      # d5 path-c -- 0.94994 std (+92bp); K=15 stacks NULL (3rd rank-lock)
+  - gbdt_meta_k15_recursive         # d5 -- LGBM/HGBC meta over K=15 NULL (-1bp vs d4 K=14)
+  - tabnet_smoke_default_config     # d5 -- 0.93532 fold0, FAIL gate; under-trained, parked
+  - pseudo_label_e3_mvp             # d5 path-b phase1 -- +4.1bp e3, ρ=0.996 PASS both gates
+  - pseudo_label_5_base_phase2      # d5 path-b phase2 -- 5 fast bases all lift +2-19bp
+  - partial_pseudo_m5q_k14          # d5 -- 6 pseudo + 8 orig; OOF 0.95082 (+2.54bp); ρ=0.99836 REAL_DELTA
 plateau_days: 0
-gate_status: cleared
+gate_status: cleared              # Path B both gates PASS (e3 +4.1bp/ρ0.996; partial-pseudo +2.5bp/ρ0.998)
 headroom_to_top5pct: 0.00340      # 0.95345 − 0.95005 = 34.0bp
 ```
 
@@ -138,29 +144,32 @@ headroom_to_top5pct: 0.00340      # 0.95345 − 0.95005 = 34.0bp
 | m5_meta_lgbm_shallow (LGBM d=3) | 0.95048 | n/a | **0.95001** | **slot 2**; -4bp LB; meta-switch bounded; ρ=0.995→4bp |
 | m5_meta_lgbm_medium (LGBM d=5) | 0.95047 | n/a | n/a | held; ρ=0.99436 vs M5q; OOF -1bp |
 | m5_meta_hgbc | 0.95042 | n/a | n/a | held; ρ=0.99490 vs M5q; OOF -1.5bp |
+| d5_recursive_m5q (HGBC + M5q feat) | 0.94994 | n/a | n/a | std-alone +92bp baseline; ρ=0.99159 vs M5q |
+| d5_M5_K15a (M5q + recursive, LR) | 0.95056 | n/a | n/a | NULL (-0.06bp); rec L1=0.84 but ρ=0.99991 TIE_EXPECTED |
+| d5_meta_k15_lgbm_shallow (GBDT meta) | 0.95038 | n/a | n/a | NULL (-1.0bp vs d4 K=14); GBDT-meta ceiling fixed |
+| **d5_partial_pseudo_m5q (K=14)** | **0.95082** | n/a | n/a | **slot-1 candidate**; +2.54bp OOF; ρ=0.99836 REAL_DELTA |
 
-## Hypothesis board (Day 4 evening)
+## Hypothesis board (Day 5 morning)
 
 ```
-- DONE: GBDT-meta (LGBM d=3) over M5q pool — slot 2 LB 0.95001
-        (-4bp). ρ=0.995 vs M5q produced REAL movement, NOT tie:
-        validates the 0.999 threshold. But meta-switch is bounded;
-        BASE-POOL signal ceiling is the binding constraint, not meta.
-- DONE: YetiRank (ρ=0.666 vs M5q) + NB (ρ=0.853) — both PASS
-        diversity at base level but TIE_EXPECTED at LR-meta-stack
-        level. LR-meta-rank-lock 3× confirmed; orthogonal-base-add
-        cannot break it on its own.
-- ACTIVE: H1 pseudo-labeling at scale -- use M5q high-confidence
-        + multi-base agreement on 188k test rows; rebuild bases on
-        train + pseudo-test; restack. Different POOL, not different
-        meta. ~30bp-class move in prior comps.
-- ACTIVE: NN-family multiplication -- multi-seed RealMLP bag,
-        TabNet, FT-Transformer. RealMLP gave 10× OOF→LB amp; second
-        NN family is highest-EV unmined lever (see
-        audit/2026-05-05-nn-stack-priorities.md).
-- LATER: Recursive base (NH11) -- GBDT trained with M5q_oof_proba
-        as a feature, then re-stacked. Cross-row interactions bases
-        never saw before.
+- DONE: Path B Phase 1+2 cleared both gates. e3_hgbc rebuilt on
+        train+pseudo gives +4.1bp OOF, ρ=0.996 vs orig. K=14 partial-
+        pseudo M5q (6 pseudo + 8 orig): Strat 0.95082 (+2.54bp);
+        ρ=0.99836 vs M5q REAL_DELTA. FIRST non-null Day-5 meta-level
+        result. L1 reshuffles away from cb_slow-wide-bag/a_horizon.
+- DONE: Recursive GBDT (M5q_oof_proba as feature) — std-alone +92bp
+        baseline (best single GBDT to date, 0.94994), but K=15 LR
+        stack and K=15 GBDT-meta both NULL (-0.06bp / -1.0bp). 3rd
+        confirmation lr-meta-rank-lock-strong-anchor.
+- DONE: TabNet smoke at default config (n_d=32, cat_emb_dim=4)
+        FAIL gate: fold-0 0.93532, model under-trained at 120 epochs.
+        Park; tuned retry only after Path B succeeds or fails.
+- ACTIVE: Path B Phase 3 — CatBoost CPU rebuilds (4 bases, ~1-2h),
+        d2a_te TE-aware rebuild (~10min), RealMLP Kaggle GPU
+        rebuild (~6h overnight). Decision rule cleared: partial-
+        pseudo OOF > M5q+1bp → expand. Compounding lift expected.
+- LATER: NN-family multiplication (RealMLP seed bag, FT-Transformer)
+        only after Path B's full ceiling is measured.
 ```
 
 ## Pointers

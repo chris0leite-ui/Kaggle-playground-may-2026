@@ -1,0 +1,15 @@
+{
+  "n_test": 188165,
+  "n_pseudo": 180278,
+  "n_pos": 33314,
+  "n_neg": 146964,
+  "pos_rate": 0.18479237621895073,
+  "track_a_pos": 2294,
+  "track_a_neg": 111721,
+  "track_b_pos": 33314,
+  "track_b_neg": 146964,
+  "track_a_only": 0,
+  "track_b_only": 66263,
+  "intersection": 114015,
+  "conflicts": 0
+}
