@@ -1,0 +1,69 @@
+{
+  "levels": {
+    "L0": {
+      "level": 0,
+      "std_oof": 0.7936797677686056,
+      "fold_mean_auc": 0.7937069002086791,
+      "rho_vs_primary_test": 0.4436402571648257,
+      "min_meta_oof": 0.9506477589062962,
+      "delta_primary_bp": -0.022410937038364054,
+      "min_meta_pass": false,
+      "wall_s": 74.95207786560059
+    },
+    "L1": {
+      "level": 1,
+      "std_oof": 0.8920034499023503,
+      "fold_mean_auc": 0.8920108710401484,
+      "rho_vs_primary_test": 0.8446705337764767,
+      "min_meta_oof": 0.9506441781141053,
+      "delta_primary_bp": -0.0582188589470789,
+      "min_meta_pass": false,
+      "wall_s": 176.43719816207886
+    },
+    "L2": {
+      "level": 2,
+      "std_oof": 0.9144865956507573,
+      "fold_mean_auc": 0.9144921114871719,
+      "rho_vs_primary_test": 0.8735225701334672,
+      "min_meta_oof": 0.95065070313779,
+      "delta_primary_bp": 0.0070313778999242516,
+      "min_meta_pass": true,
+      "wall_s": 235.38609886169434
+    },
+    "L3": {
+      "level": 3,
+      "std_oof": 0.9162619063053675,
+      "fold_mean_auc": 0.916265282655576,
+      "rho_vs_primary_test": 0.874866050833124,
+      "min_meta_oof": 0.9506508009350638,
+      "delta_primary_bp": 0.008009350638271684,
+      "min_meta_pass": true,
+      "wall_s": 282.5516393184662
+    },
+    "L4": {
+      "level": 4,
+      "std_oof": 0.9136856563461132,
+      "fold_mean_auc": 0.9136895799019777,
+      "rho_vs_primary_test": 0.8693793867938514,
+      "min_meta_oof": 0.950650548308374,
+      "delta_primary_bp": 0.0054830837403763155,
+      "min_meta_pass": true,
+      "wall_s": 335.00139808654785
+    },
+    "L5": {
+      "level": 5,
+      "std_oof": 0.9085189040854085,
+      "fold_mean_auc": 0.9085226295256443,
+      "rho_vs_primary_test": 0.8538727166968846,
+      "min_meta_oof": 0.9506397380007604,
+      "delta_primary_bp": -0.10261999239591368,
+      "min_meta_pass": false,
+      "wall_s": 457.73389196395874
+    }
+  },
+  "primary": {
+    "strat_oof": 0.95065,
+    "lb": 0.95026
+  },
+  "total_wall_s": 1586.2564451694489
+}
