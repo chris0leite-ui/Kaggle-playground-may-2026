@@ -77,12 +77,12 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 10                           # 2026-05-11 / Day-10: hazard-NN DEAD (main); d9c FM SUBMITTED 18:56 UTC (parallel branch)
+day: 10                           # 2026-05-11 / Day-10: d9c FM K=20 swap LB 0.95029 (+3bp LIFT, NEW PRIMARY)
 lb_best_today: 0.95435            # leader; not refreshed
-our_lb_best: 0.95026              # d6_k18_multi_rule still PRIMARY; d9c K=20 swap+FM submitted, LB pending
-submissions_used_today: 2         # d9b_k20_swap_l4 (TIE −0.01bp); d9c K=20 swap+FM (pending)
+our_lb_best: 0.95029              # d9c_K20_swap_FM NEW PRIMARY; gap -2.6bp (NARROWED from -3.9)
+submissions_used_today: 2         # d9b_k20_swap_l4 TIE; d9c K=20 swap+FM +3bp (5.7x upside on +0.53 pred)
 submissions_used_total: 16
-saturation_count: 0               # FM passes min-meta +0.18bp (first new mech-class since RealMLP); Sd pred LB +0.53bp
+saturation_count: 0               # FM model class transferred LB; Day-10 BREAKTHROUGH; Sd pred +0.53 actual +3.0
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -124,7 +124,7 @@ mechanism_families_explored:
   - hash_lr_strength_ladder         # d9b R14 L0-L5 -- L2/L3/L4 PASS at +0.01bp; L4 K=20 swap LB 0.95025 TIE
   - factorization_machine_cpu       # d9c FM -- std 0.921, ρ=0.899, min-meta +0.18bp PASS; K=20 swap pred +0.53bp HELD
 plateau_days: 0
-gate_status: candidate-pending    # d9c K=20 swap+FM pred +0.53bp (above slot threshold); awaits PI sign-off
+gate_status: cleared              # d9c K=20 swap+FM LB 0.95029 (+3bp), NEW PRIMARY; gap -2.6bp NARROWED from -3.9
 headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 ```
 
@@ -186,7 +186,7 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 | d9b_R14_L4 (+ Driver × num) | 0.91369 | n/a | n/a | d9b -- ρ 0.869; min-meta +0.01bp PASS; K=20 swap chosen |
 | d9b_k20_swap_l4 | 0.95067 | n/a | **0.95025** | d9b SUBMITTED -- pred +0.19bp, actual −0.01bp TIE (LB quantization) |
 | **d9c_FM (Factorization Machine)** | **0.92069** | n/a | n/a | **d9c -- ρ 0.899, min-meta +0.18bp PASS, 18× R14 lift; new model class** |
-| **d9c_Sd_K20_swap_FM** | **0.95070** | n/a | n/a | **CANDIDATE** -- swap drop 2 redundant rules + R6/R10/R7 + FM; pred LB +0.53bp; HELD |
+| **d9c_Sd_K20_swap_FM** | **0.95070** | n/a | **0.95029** | **NEW PRIMARY**; +3bp LB (5.7× upside on +0.53bp pred); gap -2.6bp NARROWED from -3.9 |
 
 ## Hypothesis board (Day 9 evening)
 
@@ -208,9 +208,10 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
         cross-feature interactions in low-rank space; replaces R14
         ladder entirely. Sd K=20 swap with FM (no R14): pred LB
         +0.53bp, ρ=0.99973. ABOVE +0.5bp slot threshold.
-- HELD: d9c Sd K=20 swap + FM — submission_d9c_K20_swap_FM.csv
-        ready, pre-submit-diff 0.99973 < 0.9995 PASS. Awaits PI
-        single-shot approval.
+- DONE: d9c Sd K=20 swap + FM SUBMITTED at 18:56 UTC. **LB 0.95029,
+        +3bp lift, NEW PRIMARY.** 5.7× upside on +0.53bp prediction.
+        Gap narrowed -3.9 → -2.6bp. FM is the first genuinely new
+        model class to land LB lift since RealMLP joined M5q (Day-3).
 - NEXT: FM hyperparameter sweep (k ∈ {4,8,16}, weight decay,
         bagged across 3 seeds). 5-10 min CPU each; could push Sd
         from +0.53bp to +0.7-1.0bp before submit.

@@ -24,10 +24,12 @@ Open with a 3-bullet read-back of state + first action.
 
 ## Where we are (Day 10 morning)
 
-- **PRIMARY UNCHANGED** = `d6_k18_multi_rule` LB **0.95026** (M5q + 4 rule_residuals).
-- **Headroom to top-5%** (0.95345): **31.9bp**. To leader (0.95435): 41bp.
+- **NEW PRIMARY** = `d9c_K20_swap_FM` LB **0.95029** (+3bp from prior PRIMARY).
+- **Prior PRIMARY** = `d6_k18_multi_rule` LB 0.95026 (held as hedge).
+- **Gap NARROWED**: −3.9bp → **−2.6bp**.
+- **Headroom to top-5%** (0.95345): **31.6bp**. To leader (0.95435): 40.6bp.
 - **20 days remaining** (deadline 2026-05-31). 9 slots/day after submit reset.
-- **Submits used today**: **2/10** (d9b L4 burned + d9c FM swap submitted at 18:56 UTC, LB pending).
+- **Submits used today**: **2/10** (d9b L4 TIE + d9c FM swap +3bp LIFT).
 - **Total comp: 16.**
 
 ## Day-9 main-branch — load-bearing hazard-NN failure mode discovery
@@ -107,7 +109,9 @@ Sa < Sd: FM and R14_L4 occupy the same model-class slot. FM
 dominates; including R14 is double-counting.
 
 **Sd SUBMITTED at 18:56 UTC** as `submission_d9c_K20_swap_FM.csv`.
-Predicted +0.53bp (above +0.5bp slot threshold). LB result pending.
+Predicted +0.53bp; **actual LB 0.95029 (+3.0bp), 5.7× upside.** NEW
+PRIMARY. Gap narrowed −3.9 → −2.6bp. FM is the first genuinely new
+model class to land LB lift since RealMLP joined M5q in Day-3.
 
 ## Pool audit finding (from main hazard-NN postmortem, still valid)
 
@@ -138,17 +142,19 @@ have a clean replacement. FM in d9c is **leak-free** (binary target,
 
 ## Day-10 / Day-11 first-action plan
 
-### Path A0 — read d9c K=20 swap+FM LB result (immediate)
+### Path A0 — d9c K=20 swap+FM LANDED at LB 0.95029 (+3bp)
 
-Submission landed at 18:56 UTC; result expected within 30s of submit.
-Update calibration ladder + decide:
-- **LB +0.5bp or more**: Sd becomes new PRIMARY. Rebuild K=N around
-  it; pool composition is FM-augmented + 2 dropped rules.
-- **LB +0.0–0.4bp (TIE-band)**: calibration probe; FM model class
-  works in stack but lift bounded by quantization. Consider
-  FM-bagged + FM-FFM as next-step refinements.
-- **LB <0**: structural counter to FM hypothesis; investigate
-  test-set distribution shift in the 8 main-effect features.
+Sd is **NEW PRIMARY**. 5.7× upside on +0.53bp prediction. Confirms FM
+model class transfers to LB. Next:
+
+1. **FM bagging** — 3 seeds rank-averaged; predicted +0.1–0.5bp.
+2. **FM hyperparameter sweep** — embed_dim k ∈ {4, 8, 16}, weight
+   decay ∈ {0, 1e-6, 1e-5}, epoch ∈ {4, 6, 10}. Find best single FM.
+3. **Field-aware FM (FFM)** — different field-pair embedding tables;
+   typically +0.5–1bp std OOF over plain FM.
+4. **Multi-FM diversity** — train 2 FMs with different feature
+   partitions or different k; stack both. Tests whether the FM
+   model-class diversity bonus extends with more FM bases.
 
 ### Path A — TabM v3 with extended training (top-priority main-branch)
 
@@ -243,7 +249,7 @@ but predicted NULL by analogy with C5/C1.
 | Day-10 hazard leak-free | 0.92013 | n/a | n/a | DEAD (main) |
 | d9b_k20_swap_l4 | 0.95067 | 0.95025 | TIE | burned -0.01bp; pred +0.19bp |
 | d9c_FM (Factorization Machine) | 0.92069 | n/a | n/a | most-diverse since RealMLP; passes min-meta +0.18bp |
-| **d9c_Sd_K20_swap_FM** | **0.95070** | **PENDING** | n/a | **submitted 18:56 UTC; pred +0.53bp** |
+| **d9c_Sd_K20_swap_FM (NEW PRIMARY)** | **0.95070** | **0.95029** | **−2.6bp** | **+3bp LB lift; 5.7× upside on +0.53bp pred** |
 
 ## Critical operating rules (re-emphasised)
 
