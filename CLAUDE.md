@@ -125,6 +125,7 @@ mechanism_families_explored:
   - factorization_machine_cpu       # d9c FM -- std 0.921, ρ=0.899, min-meta +0.18bp PASS; K=20 swap LB 0.95029 (+3bp)
   - hash_lr_3way_strength_ladder    # d9b R14 L0-L5 -- L2/L3/L4 PASS; K=20 swap+L4 LB 0.95025 TIE
   - factorization_machine_partition # d9f FM_A driver-dynamics + FM_B race-context -- K=21 swap LB 0.95031 (+2bp NEW PRIMARY)
+  - groupkf_stack_rebuild_audit     # d10b/c -- FM-class lift +2.01bp under Race-only GKF vs +0.87bp Strat (2.3× AMPLIFIED); FM_B is #1 L1 component under GKF; PRIMARY private-LB robust
 plateau_days: 0
 gate_status: cleared              # d9h K=22 add + d9i S1 K=21 swap aug 2-way BOTH LB 0.95034 (+3bp each); gap -1.7bp NARROWED from -2.4
 headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
@@ -197,6 +198,8 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 | d9i_FM_A_aug (D/C/S/T/Cd/Ld) | 0.88123 | n/a | n/a | aug FM_A; ρ vs d9f PRIMARY 0.720 |
 | d9i_FM_B_aug (R/Y/Rp/P/Nx/Pv) | 0.88561 | n/a | n/a | aug FM_B; ρ 0.863 |
 | **d9i_S1_K21_swap_aug2way** | **0.95071** | n/a | **0.95034** | **NEW PRIMARY (TIED)**; +3bp LB; OOF predicted -0.19bp (regression!), actual +3bp lift; OOF direction-flipped |
+| d10b_K13_baseline (Strat / GKF-Race) | 0.95043 | 0.92744 | n/a | 13 GBDT/baseline; gap −229.92bp (leakage signature) |
+| d10b_K15_+FMA+FMB (Strat / GKF-Race) | 0.95052 | 0.92764 | n/a | FM-class lift +0.87bp Strat → **+2.01bp GKF (2.3× amplified)**; FM_B L1 #1 under GKF |
 
 ## Hypothesis board (Day 9 evening)
 
@@ -257,10 +260,18 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
         GBDT-pool OOF. Three consecutive FM-class submits (d9c +3bp,
         d9f +2bp, d9h +3bp, d9i +3bp) confirm. **OOF Δ is a LOWER
         BOUND on LB Δ for FM-class candidates at ρ ≈ 0.9997.**
-- NEXT: Spend remaining 5/10 today on more FM-class probes since
-        the OOF→LB amplification is much stronger than the prior
-        believed. Candidates: d9g S3 K=25 (all FMs), d9h K=20 swap
-        (FM_aug12 replaces d9f), d9i S2 K=23 (aug 2-way + d9f).
+- DONE: d10 GroupKF audit — under strict (Race,Driver,Year,Stint)
+        GKF, FM bases drop only 2.5–54bp vs GBDTs dropping 209–247bp
+        under Race-only GKF. FM bases are leakage-robust at the
+        standalone level.
+- DONE: d10b/c GroupKF stack rebuild — built K=13/K=15 stacks under
+        BOTH Strat and Race-only GKF (apples-to-apples). FM-class
+        lift: **+0.87bp Strat → +2.01bp GKF (2.3× AMPLIFIED)**.
+        L1 inversion: under Strat FMs are mid-pack (FM_B L1=0.138,
+        rank 13/15); under GKF FM_B is **#1 dominant** (L1=6.96,
+        2× the next base). When LR meta can't piggyback on within-
+        group leakage from GBDTs, it routes hard through FM. PRIMARY
+        d9f K=21 swap (LB 0.95031) is private-LB robust.
 - LATER: External-data Pirelli pit-window scrape (Tier-2 highest
         absolute EV), EmbMLP CPU (different model class), hazard NN
         (GPU; d9 hazard_nn_stack regressed 315bp — implementation
@@ -294,4 +305,6 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 - `audit/2026-05-10-d9g-3way-multi-fm.md` — 3-way partition REGRESSED.
 - `audit/2026-05-10-d9h-fm-augmented.md` — FM_aug12 standalone strongest; K=22 add LB 0.95034 (+3bp NEW PRIMARY tied).
 - `audit/2026-05-10-d9i-augmented-2way.md` — aug 2-way K=21 swap LB 0.95034 (+3bp NEW PRIMARY tied; OOF was -0.19bp regression).
+- `audit/2026-05-10-d10-groupkf-audit-fm-real.md` — strict GKF FM bases drop 2.5–54bp vs GBDTs −210bp.
+- `audit/2026-05-10-d10b-groupkf-stack-rebuild.md` — FM-class lift +2.01bp GKF vs +0.87bp Strat (2.3× AMPLIFIED); FM_B is #1 L1 under GKF.
 - `audit/friction.md` — friction one-liners.
