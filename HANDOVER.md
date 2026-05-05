@@ -92,6 +92,8 @@ d8_k19_q12, d9_k19_sc_prob, d9_k20_neighbor, d9d_*) to recal
 - T1.4 Hazard NN — Day-9/10 (230bp leak)
 - d9 10 math heuristic rule_residuals (cohort); d9b R14 hash-LR K=20 swap+L4 (TIE)
 - d9d FM hparam sweep + 3-seed bag (flat); d9e FFM (overfit); **d9g 3-way multi-FM (REGRESSION −0.46bp)**
+- **d9h FM_aug12 unified 12-feat (Day-10 evening): standalone +4.7bp, K=22 add stack +0.01bp ρ=0.99978 — strongest single FM ever but no stack lift**
+- **d9i augmented 2-way 6+6 partition (Day-10 evening): K=21 swap REGRESSION −0.19bp; ρ between FMs jumped 0.406 → 0.663. FM family CLOSED at single-feature-set level.**
 - **In-pool NN variants (whole class) 4×**; **single-rule rule_res on raw features 5×**
 - **External real-world priors on synth** — C1 TIE + **C2 Pirelli pre-flight DEPRECATED Day-12**
 
