@@ -1,0 +1,30 @@
+{
+  "alone_oof_score": 0.9499389945568599,
+  "stack_oof_score": 0.9505526657956138,
+  "delta_vs_baseline_bp": 91.88994556859953,
+  "delta_vs_m5q_bp": -0.1733420438621014,
+  "rho_vs_m5q_test": 0.9915871946529994,
+  "fold_aucs": [
+    0.9511873459509561,
+    0.949061379746345,
+    0.9499668675538415,
+    0.9494209655369075,
+    0.9502202239649705
+  ],
+  "fold_walls_s": [
+    3.7737715244293213,
+    3.506488084793091,
+    3.611520528793335,
+    3.6928935050964355,
+    3.6988296508789062
+  ],
+  "cv": "StratifiedKFold(5, shuffle=True, random_state=42)",
+  "metric": "roc_auc",
+  "n_folds": 5,
+  "seed": 42,
+  "features_added": [
+    "m5q_proba"
+  ],
+  "notes": "Recursive base: HGBC + raw features + M5q_oof_proba. Same fold split as M5q for leakage-clean OOF. Stack = LR-meta on expand([M5q, recursive]).",
+  "total_wall_s": 23.572196006774902
+}
