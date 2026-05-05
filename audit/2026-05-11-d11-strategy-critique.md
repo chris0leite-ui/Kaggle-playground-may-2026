@@ -55,15 +55,15 @@ Headroom to top-5% (0.95345): **31.6bp** (post-FM). 15 days left.
 
 | Move | Median EV | Class |
 |---|---:|---|
-| **FFM (field-aware FM)** | **+0.5–2bp** | extends FM model class |
-| **Multi-FM partition diversity** | +0.2–1bp | extends FM model class |
-| **C2 Pirelli pit-windows** | **+3–8bp** | NEW INFORMATION |
+| ~~FFM (field-aware FM)~~ | ~~+0.5–2bp~~ | **DEAD Day-10** (overfit; OOF below FM) |
+| Multi-FM partition diversity | +0.2–1bp | extends FM model class (FFM-falsified setting) |
+| **C2 Pirelli pit-windows** | **+3–8bp** | NEW INFORMATION (clear top priority) |
 | G4 SCARF/VIME on aadigupta | +1–4bp | different inductive bias |
 | Bayesian hierarchical stacking | +1–3bp | different META structure |
 | F2 multi-rule rebuild Q6 | 0–2bp | predicted NULL (P10 5×) |
 | Adversarial validation weights | 0–2bp | reweighting |
-| **Sum of medians** | **~13bp** | |
-| Realistic transfer (50%) | **~7-9bp** | |
+| **Sum of medians** | **~10bp** | (was 13bp before FFM died) |
+| Realistic transfer (50%) | **~5-7bp** | |
 
 **Expected ceiling at full execution: 0.95100–0.95120** (top-12% to
 top-18%). Top-5% still requires tail-case stacking (~5% probability).
@@ -89,12 +89,7 @@ slot; FFM extends it; SCARF/Bayesian add yet more orthogonal slots.
 
 ## 5. Recommended sequence (3-day window)
 
-### Day-12 (today): FFM + multi-FM diversity
-Build FFM (field-aware) following `scripts/d9c_fm.py` template;
-~5 min CPU. Build 2 partition-FMs with disjoint field subsets.
-Predicted +0.5–2bp K=N swap. **Highest-EV/$ move on the board.**
-
-### Day-12–13: C2 Pirelli pit-windows scrape + build
+### Day-12 (today): C2 Pirelli pit-windows scrape + build
 6-8h scrape + 2h CPU + K=N rebuild following F1.2 template + Q6
 filter. Highest-absolute-EV move; orthogonal to FM gains. Tail +8bp.
 
@@ -134,6 +129,7 @@ modal**, attack the tail-case with G4 + Bayesian.
 
 - **TabM-D extended training (200 epochs, lr 3e-4)** — Day-11.
 - **d9d FM hparam sweep + 3-seed bag** (in-class FM tuning) — Day-10.
+- **d9e FFM** (overfit; std OOF 0.91869 below FM's 0.92069) — Day-10.
 - All 4 null classes from §2 confirmed as dead-list categories.
 
 PRIMARY: `d9c_K20_swap_FM` LB **0.95029**, gap −2.6bp. 16/270 submits
