@@ -24,13 +24,13 @@ Open with a 3-bullet read-back of state + first action.
 
 ## Where we are (Day 10 morning)
 
-- **NEW PRIMARY** = `d9c_K20_swap_FM` LB **0.95029** (+3bp from prior PRIMARY).
-- **Prior PRIMARY** = `d6_k18_multi_rule` LB 0.95026 (held as hedge).
-- **Gap NARROWED**: −3.9bp → **−2.6bp**.
-- **Headroom to top-5%** (0.95345): **31.6bp**. To leader (0.95435): 40.6bp.
+- **NEW PRIMARY** = `d9f_K21_swap_partA_partB` LB **0.95031** (+2bp from d9c).
+- **Prior PRIMARY** = `d9c_K20_swap_FM` LB 0.95029 (held as hedge).
+- **Gap NARROWED**: −2.6bp → **−2.4bp**.
+- **Headroom to top-5%** (0.95345): **31.4bp**. To leader (0.95435): 40.4bp.
 - **20 days remaining** (deadline 2026-05-31). 9 slots/day after submit reset.
-- **Submits used today**: **2/10** (d9b L4 TIE + d9c FM swap +3bp LIFT).
-- **Total comp: 16.**
+- **Submits used today**: **3/10** (d9b L4 TIE + d9c FM +3bp + d9f multi-FM +2bp).
+- **Total comp: 17.**
 
 ## Day-9 main-branch — load-bearing hazard-NN failure mode discovery
 
@@ -249,7 +249,10 @@ but predicted NULL by analogy with C5/C1.
 | Day-10 hazard leak-free | 0.92013 | n/a | n/a | DEAD (main) |
 | d9b_k20_swap_l4 | 0.95067 | 0.95025 | TIE | burned -0.01bp; pred +0.19bp |
 | d9c_FM (Factorization Machine) | 0.92069 | n/a | n/a | most-diverse since RealMLP; passes min-meta +0.18bp |
-| **d9c_Sd_K20_swap_FM (NEW PRIMARY)** | **0.95070** | **0.95029** | **−2.6bp** | **+3bp LB lift; 5.7× upside on +0.53bp pred** |
+| d9c_Sd_K20_swap_FM (hedge) | 0.95070 | 0.95029 | −2.6bp | +3bp LB lift; 5.7× upside; demoted by d9f |
+| d9f_FM_A (D/C/S/T_q5) | 0.82505 | n/a | n/a | most-diverse single base since R14 (ρ=0.487 vs PRIMARY) |
+| d9f_FM_B (R/Y/Rp_q5/P_q5) | 0.88438 | n/a | n/a | min-meta +0.04bp PASS |
+| **d9f_K21_swap_partA_partB (NEW PRIMARY)** | **0.95073** | **0.95031** | **−2.4bp** | **+2bp LB lift; 6.25× upside on +0.32bp pred; multi-FM partition replaces unified FM** |
 
 ## Critical operating rules (re-emphasised)
 

@@ -77,11 +77,11 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 10                           # 2026-05-11 / Day-10: d9c FM K=20 swap LB 0.95029 (+3bp LIFT, NEW PRIMARY)
+day: 10                           # 2026-05-11 / Day-10: d9f K=21 swap+multi-FM LB 0.95031 (+2bp LIFT, NEW PRIMARY)
 lb_best_today: 0.95435            # leader; not refreshed
-our_lb_best: 0.95029              # d9c_K20_swap_FM NEW PRIMARY; gap -2.6bp (NARROWED from -3.9)
-submissions_used_today: 2         # d9b_k20_swap_l4 TIE; d9c K=20 swap+FM +3bp (5.7x upside on +0.53 pred)
-submissions_used_total: 16
+our_lb_best: 0.95031              # d9f_K21_swap_partA_partB NEW PRIMARY; gap -2.4bp (NARROWED from -2.6)
+submissions_used_today: 3         # d9b_k20_swap_l4 TIE; d9c K20+FM +3bp; d9f K21+multi-FM +2bp
+submissions_used_total: 17
 saturation_count: 0               # FM model class transferred LB; Day-10 BREAKTHROUGH; Sd pred +0.53 actual +3.0
 mechanism_families_explored:
   - baseline_lgbm_raw_features
@@ -122,9 +122,11 @@ mechanism_families_explored:
   - simple_math_rule_residual_pool  # d9 -- 9 closed-form / Bayesian rule_residuals; ALL FAIL min-meta vs PRIMARY
   - hash_lr_3way_baseline           # d9 R14 -- sparse-LR 3-way interactions; std 0.794, ρ=0.444 most-diverse
   - hash_lr_strength_ladder         # d9b R14 L0-L5 -- L2/L3/L4 PASS at +0.01bp; L4 K=20 swap LB 0.95025 TIE
-  - factorization_machine_cpu       # d9c FM -- std 0.921, ρ=0.899, min-meta +0.18bp PASS; K=20 swap pred +0.53bp HELD
+  - factorization_machine_cpu       # d9c FM -- std 0.921, ρ=0.899, min-meta +0.18bp PASS; K=20 swap LB 0.95029 (+3bp)
+  - hash_lr_3way_strength_ladder    # d9b R14 L0-L5 -- L2/L3/L4 PASS; K=20 swap+L4 LB 0.95025 TIE
+  - factorization_machine_partition # d9f FM_A driver-dynamics + FM_B race-context -- K=21 swap LB 0.95031 (+2bp NEW PRIMARY)
 plateau_days: 0
-gate_status: cleared              # d9c K=20 swap+FM LB 0.95029 (+3bp), NEW PRIMARY; gap -2.6bp NARROWED from -3.9
+gate_status: cleared              # d9f K=21 swap+multi-FM LB 0.95031 (+2bp), NEW PRIMARY; gap -2.4bp NARROWED from -2.6
 headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 ```
 
@@ -186,7 +188,10 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 | d9b_R14_L4 (+ Driver × num) | 0.91369 | n/a | n/a | d9b -- ρ 0.869; min-meta +0.01bp PASS; K=20 swap chosen |
 | d9b_k20_swap_l4 | 0.95067 | n/a | **0.95025** | d9b SUBMITTED -- pred +0.19bp, actual −0.01bp TIE (LB quantization) |
 | **d9c_FM (Factorization Machine)** | **0.92069** | n/a | n/a | **d9c -- ρ 0.899, min-meta +0.18bp PASS, 18× R14 lift; new model class** |
-| **d9c_Sd_K20_swap_FM** | **0.95070** | n/a | **0.95029** | **NEW PRIMARY**; +3bp LB (5.7× upside on +0.53bp pred); gap -2.6bp NARROWED from -3.9 |
+| d9c_Sd_K20_swap_FM | 0.95070 | n/a | 0.95029 | hedge; +3bp LB (5.7× upside on +0.53bp pred); demoted by d9f |
+| d9f_FM_A_driver_dynamics | 0.82505 | n/a | n/a | d9f -- D/C/S/T_q5; ρ vs PRIMARY 0.487 (most-diverse since R14) |
+| d9f_FM_B_race_context | 0.88438 | n/a | n/a | d9f -- R/Y/Rp_q5/P_q5; ρ 0.861; min-meta +0.04bp PASS |
+| **d9f_K21_swap_partA_partB** | **0.95073** | n/a | **0.95031** | **NEW PRIMARY**; +2bp LB (6.25× upside on +0.32bp pred); gap -2.4bp NARROWED from -2.6 |
 
 ## Hypothesis board (Day 9 evening)
 
@@ -212,13 +217,31 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
         +3bp lift, NEW PRIMARY.** 5.7× upside on +0.53bp prediction.
         Gap narrowed -3.9 → -2.6bp. FM is the first genuinely new
         model class to land LB lift since RealMLP joined M5q (Day-3).
-- NEXT: FM hyperparameter sweep (k ∈ {4,8,16}, weight decay,
-        bagged across 3 seeds). 5-10 min CPU each; could push Sd
-        from +0.53bp to +0.7-1.0bp before submit.
+- DONE: d9d FM hparam sweep + 3-seed bag — FLAT. k=8 is sweet spot;
+        bagging HURTS K=20 stack (smooths predictions toward shared
+        bias, removes routing diversity LR meta consumes).
+- DONE: d9e FFM (field-aware FM) — STRICTLY WORSE than FM. 4× more
+        params overfits 351k train rows; 8 fields too few for FFM's
+        per-field-pair specialization to add value.
+- DONE: d9f multi-FM with disjoint feature partitions —
+        FM_A driver-dynamics (D/C/S/T_q5) + FM_B race-context
+        (R/Y/Rp_q5/P_q5). ρ FM_A vs FM_B = 0.406 (≈ orthogonal).
+        K=21 swap (drop d9c FM, add FM_A + FM_B): OOF 0.95073
+        (+0.29bp), ρ=0.99965. d9c FM demoted out of L1 top-15 in
+        K=22 add — partition replaces unified FM cleanly.
+- DONE: d9f K=21 swap SUBMITTED at 20:25 UTC. **LB 0.95031, +2bp lift,
+        NEW PRIMARY.** 6.25× upside on +0.32bp prediction (mirrors
+        d9c's 5.7× pattern — FM-class LB amplification is real).
+        Gap narrowed -2.6 → -2.4bp.
+- NEXT: 3-way feature partition (e.g., {D,C,S}, {R,Y}, {T_q,Rp_q,P_q})
+        — extends d9f's diversity-from-partition principle. Cheap.
+        Or DeepFM-lite (FM + MLP head) — adds non-linearity over the
+        FM embedding space.
 - LATER: External-data Pirelli pit-window scrape (Tier-2 highest
         absolute EV), EmbMLP CPU (different model class), hazard NN
-        (GPU; note d9 hazard_nn_stack from another agent regressed
-        315bp — implementation matters).
+        (GPU; d9 hazard_nn_stack regressed 315bp — implementation
+        matters; main-branch agent's leakfree hazard NN at OOF 0.92013
+        confirmed DEAD).
 ```
 
 ## Pointers
@@ -240,5 +263,8 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 - `audit/2026-05-07-d6-f1-2-multi-rule.md` — F1.2 K=18 LB-landed +2.1bp.
 - `audit/2026-05-09-d9-math-heuristics.md` — d9 10-approach cohort, all min-meta FAIL vs PRIMARY.
 - `audit/2026-05-09-d9b-r14-ladder.md` — d9b R14 ladder L0-L5; K=20 swap+L4 SUBMITTED LB 0.95025 TIE.
-- `audit/2026-05-09-d9c-fm.md` — d9c FM passes min-meta +0.18bp; Sd K=20 swap+FM pred +0.53bp HELD.
+- `audit/2026-05-09-d9c-fm.md` — d9c FM passes min-meta +0.18bp; Sd K=20 swap+FM LB 0.95029 (+3bp).
+- `audit/2026-05-10-d9d-fm-sweep-bag.md` — FM hparam sweep + bag NULL; bag HURTS stack.
+- `audit/2026-05-10-d9e-ffm.md` — FFM strictly worse than FM (overfit + redundant).
+- `audit/2026-05-10-d9f-multi-fm.md` — multi-FM partition K=21 swap LB 0.95031 (+2bp NEW PRIMARY).
 - `audit/friction.md` — friction one-liners.
