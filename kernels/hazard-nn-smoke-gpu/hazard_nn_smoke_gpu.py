@@ -227,7 +227,7 @@ def prepare_features(train: pd.DataFrame, test: pd.DataFrame):
 
 
 def make_hazard_net(num_dim, cat_dims, emb_dims=None,
-                    hidden=(256, 128), dropout=0.2, n_buckets=N_BUCKETS):
+                    hidden=(384, 256, 128), dropout=0.15, n_buckets=N_BUCKETS):
     import torch
     import torch.nn as nn
     if emb_dims is None:
@@ -294,7 +294,12 @@ def main():
     n_params = sum(p.numel() for p in net.parameters())
     print(f"net params: {n_params:,}")
 
-    optimizer = torch.optim.Adam(net.parameters(), lr=1e-3, weight_decay=1e-5)
+    LR = 2e-3
+    EPOCHS = 250
+    PATIENCE = 25
+    optimizer = torch.optim.Adam(net.parameters(), lr=LR, weight_decay=1e-5)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer, T_max=EPOCHS, eta_min=1e-5)
 
     def to_tensor(idx):
         return (torch.from_numpy(X_num[idx]).to(device),
@@ -306,9 +311,7 @@ def main():
     Xn_tr, Xc_tr, eb_tr, cc_tr, y_tr = to_tensor(tr)
     Xn_va, Xc_va, eb_va, cc_va, y_va = to_tensor(va)
 
-    BATCH = 4096
-    EPOCHS = 30
-    PATIENCE = 5
+    BATCH = 8192  # T4 has plenty of memory for our small MLP
     best_val_auc = -np.inf
     best_state = None
     bad = 0
@@ -328,6 +331,7 @@ def main():
             optimizer.step()
             running += loss.item(); nb += 1
         train_nll = running / max(nb, 1)
+        scheduler.step()
 
         # --- val ---
         net.eval()
@@ -347,9 +351,12 @@ def main():
             val_auc = float(roc_auc_score(y[va], p_pit))
 
         improved = val_auc > best_val_auc + 1e-5
-        msg = (f"ep{ep:02d}: train_nll={train_nll:.4f}  val_nll={val_nll:.4f}  "
-               f"val_AUC={val_auc:.5f}  {'★' if improved else ''}")
-        print(msg)
+        cur_lr = optimizer.param_groups[0]["lr"]
+        msg = (f"ep{ep:03d}: lr={cur_lr:.1e}  train_nll={train_nll:.4f}  "
+               f"val_nll={val_nll:.4f}  val_AUC={val_auc:.5f}  "
+               f"{'★' if improved else ''}")
+        if ep % 5 == 0 or improved:
+            print(msg)
         if improved:
             best_val_auc = val_auc
             best_state = {k: v.detach().cpu().clone() for k, v in net.state_dict().items()}

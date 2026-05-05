@@ -1,0 +1,22 @@
+{
+  "smoke_fold": 0,
+  "n_buckets": 20,
+  "fold_auc": 0.9369489370868758,
+  "fold_wall_s": 10.23037338256836,
+  "delta_vs_baseline_bp": -38.01062913124209,
+  "delta_vs_realmlp_e4_fold0_bp": -102.71062913124184,
+  "five_fold_projection_min": 0.8525311152140299,
+  "smoke_gate_auc": 0.945,
+  "auc_gate": "FAIL",
+  "wall_gate": "PASS",
+  "overall": "HOLD",
+  "n_params": 100408,
+  "cv": "StratifiedKFold(5)",
+  "metric": "roc_auc",
+  "seed": 42,
+  "n_folds": 5,
+  "n_event": 144072,
+  "n_censored": 295068,
+  "total_wall_s": 76.6464626789093,
+  "notes": "Hazard-rate NN 1-fold smoke (T1.4). PROMOTE -> 5-fold + 3-seed bag; HOLD -> pivot to TabM-HPO or G4 SCARF."
+}
