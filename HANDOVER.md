@@ -7,141 +7,140 @@
 
 ---
 
-## Today's session — Day 4 early (2026-05-05 ~05:30 UTC)
+## Today's session — Day 5 (2026-05-06)
 
 **Read order on session start** (skip the default; this file is the
 synthesis):
 
 1. `CLAUDE.md` — state block + Rules 1-15 (especially R1, R12, R14)
-2. `audit/2026-05-04-day3-endgame.md` — Day-3 retrospective
-3. `audit/friction.md` — 25 logged failure modes; consult before
-   any new probe (especially the new R-tagged ones)
-4. `scripts/pre_submit_diff.py` — MANDATORY before every submit
+2. `audit/2026-05-05-d4-gbdt-meta-breakthrough.md` — slot-2 envelope
+3. `audit/2026-05-05-d4-yetirank-nb-results.md` — base-add probes
+4. `audit/2026-05-05-nn-stack-priorities.md` — bigger-move ordering
+5. `audit/friction.md` — 30 logged failure modes (4 new from Day-4 PM)
+6. `scripts/pre_submit_diff.py` — MANDATORY before every submit
 
 Open with a 3-bullet read-back of state + first action.
 
 ## Where we are
 
-- **Day 4, 1/10 used today.** New PRIMARY: **M5q LB 0.95005** —
-  +14bp over M5h's 0.94991. **First substantive lift in many days.**
+- **Day 5, 0/10 used today.** PRIMARY = **M5q LB 0.95005** (M5h +
+  RealMLP-TD, K=14, LR meta).
 - **Headroom to top-5%** (0.95345): **34.0bp**.
-- **Slot 2 pending PI direction.** All 4 stack candidates built
-  overnight (M5t, M5u, M5v, M5w) — all ρ ≥ 0.997 vs M5q →
-  TIE_EXPECTED. New base build needed to make slot 2 informative.
+- **22 days remaining** (deadline 2026-05-31). 8 slots/day available.
 
-## The big find: NN-family bases have disproportionate LB amplification
+## Day-4 outcomes (single-paragraph synthesis)
 
-M5q = M5h + RealMLP-TD (K=14). Strat OOF +1.4bp vs M5h. **LB +14bp.**
-**10× amplification of OOF→LB delta.** Possible explanations:
-1. GBDT OOFs are slightly optimistic on the test distribution; RealMLP
-   "honest-corrects" without showing up in OOF AUC.
-2. Test set has rows that benefit from smooth NN-style predictions
-   that GBDT-heavy pool was biased away from.
-3. Sample-size: 188k test rows allow rank corrections that don't
-   surface in OOF AUC (which is integrated over a different
-   distribution).
+Slot 1 = M5q at LB 0.95005 (+14bp over M5h; 10× OOF→LB amplification
+from RealMLP). Slot 2 = m5_meta_lgbm_shallow (LGBM d=3 meta over same
+K=14 base pool) at LB 0.95001 (-4bp; meta-switch costs). Probed two
+new structurally-different bases (YetiRank ρ=0.666, NB ρ=0.853) — both
+TIE_EXPECTED at LR-meta-stack level. Three independent confirmations
+this session of `lr-meta-rank-lock-strong-anchor`. **Strategic
+finding: base-pool signal ceiling is the binding constraint, not the
+meta-learner.** ρ=0.995→4bp empirically validates the 0.999 tie
+threshold.
 
-**Strategic implication**: NN-family bases provide LB EV that the
-OOF metric understates. Adding more NN-family bases (TabNet,
-sequence LSTM with embeddings, multi-seed RealMLP bag) is HIGH-EV
-even if their standalone OOF is weak.
+## Day-5 plan — bigger moves only (PI directive)
 
-## Day-3 falsified hypotheses (DO NOT retry)
+**Stop sub-1bp tuning.** With 34bp headroom and 22 days remaining,
+EV calculus = multi-bp moves only. Save seed-bagging / Optuna for
+the final 3-day R5 window.
+
+### Three high-EV candidate paths
+
+#### Path A: NN-family multiplication (PRIMARY recommendation)
+
+RealMLP gave 10× OOF→LB amplification adding ONE NN to a GBDT-heavy
+pool. Hypothesis: a SECOND NN family with different inductive bias
+compounds. Priority order from `audit/2026-05-05-nn-stack-priorities.md`:
+
+1. **Multi-seed RealMLP bag** (Kaggle GPU T4x2, ~6h overnight). Same
+   model, seeds 42 + 123 + 456, rank-bag the 3 OOF/test. Replaces
+   M5q's RealMLP base; rebuild stack. Expected +1-3bp on top of M5q.
+   *Note: this is the smallest of the three "bigger" moves; consider
+   only as a parallel-stream while a fresh family is in flight.*
+2. **TabNet on Kaggle T4x2** (~3h roundtrip; 1-fold SMOKE FIRST per
+   Rule 2 — Day-3 RealMLP burned 175min skipping smoke). Attention-
+   based feature selection. Distinct from RealMLP's MLP+embedding.
+3. **FT-Transformer / SAINT** (Kaggle T4x2). Transformer family for
+   tabular. Different inductive bias again.
+
+Each new NN base added to M5q pool with LR meta first; then with
+GBDT-meta when the pool composition changes (so a re-test of the
+GBDT meta becomes informative again).
+
+#### Path B: Pseudo-labeling at scale (HIGHEST CEILING)
+
+H1 from CLAUDE.md hypothesis board, NH11 from the prior HANDOVER.
+Use M5q's high-confidence predictions on the 188k test rows + multi-
+base agreement gates (≥10/13 of M5h bases agree on pos/neg call OR
+M5q proba in [0.95, 1.0] ∪ [0, 0.05]) to construct ~50-100k pseudo-
+labels. Rebuild ALL 14 bases on train + pseudo-test (each base needs
+its own re-OOF). Restack. **30bp-class move in prior comps when it
+lands**; null risk is real (can over-amplify systematic errors).
+
+Build artifact: `scripts/d5_pseudo_label_pool_rebuild.py`. ETA ~3-4h
+local CPU for the GBDT bases; RealMLP rebuild needs Kaggle GPU.
+
+Risks to gate against:
+- Per-row leakage: ensure pseudo-test rows go ONLY to the OOF folds
+  they wouldn't naturally appear in (i.e., add to all 5 train folds,
+  evaluate OOF only on real labels).
+- Overconfidence collapse: validate that test_rho_pseudo_vs_orig <
+  0.998 so we're not just re-ranking the same scores.
+- 4-gate leakage filter (G1-G4) before LB submit.
+
+#### Path C: Recursive base (NH11)
+
+Train a fresh GBDT base that includes `M5q_oof_proba` as a feature
+plus all original features. The GBDT learns ROW-LEVEL CORRECTIONS
+to M5q's predictions — cross-row interactions the original bases
+never saw. Then re-stack on M5q + recursive_gbdt + (any new bases).
+
+Build artifact: `scripts/d5_recursive_m5q_gbdt.py`. ETA ~30min CPU.
+Smaller move than B, faster to test. Expected +2-5bp on top of M5q
+if M5q leaves any row-level systematic error to correct.
+
+### Recommended sequencing
+
+1. **Day-5 morning**: launch Path C (recursive base, 30min CPU) AND
+   Path A.2 TabNet smoke kernel (1-fold) in parallel. Smallest
+   commitment, fastest data.
+2. **Day-5 afternoon**: launch Path B (pseudo-label rebuild) — heavy
+   compute, runs while we evaluate slots from morning.
+3. **Day-5 slots**: 1-2 single-shots only; preserve 6+ slots for the
+   pseudo-label restack candidate (highest variance, highest reward).
+
+### Slot 2 candidate ALREADY built (tie-margin material)
+
+`submission_m5_meta_lgbm_medium.csv` — most-divergent of the three
+GBDT-meta variants (ρ=0.99436 vs M5q vs lgbm_shallow's 0.99508).
+OOF -1bp; held. NOT a primary candidate, but if PI wants to extract
+more LB-point information from the meta-switch theory, this is the
+held option.
+
+## Falsified hypotheses (DO NOT retry)
+
+(carried forward from Day-3 + Day-4)
 
 - Smaller pool → tighter LB gap (M5h2 K=12 → tied)
 - TE-key swap → LB delta (M5j d3a/d2a swap → tied)
 - Per-group calibration (per-Race / per-Year isotonic) → LB lift
-  (in-sample +24.6bp, inner-CV −10.9bp; overfit)
-- Stint-2 specialist → in-segment lift (specialist −124bp on its
-  segment vs M5h)
-- Hill-climb / LGBM-meta / L1-LR → beats LR meta (within fold-noise)
-- **Minimal-orthogonal-basis → break LB tie** (M5p −237bp,
-  M5n_3b −291bp). The 10 GBDT clones earn their slot.
-- 2-way TE (Driver×Compound, Race×LapBin, K=7) → orthogonal lift
-  (+0.1bp stacked)
-- Sequence-FE (cum_pits, laps_since_last_pit, rolling-TE) → stack
-  lift (+0.2bp)
-- **Layered orthogonal bases on M5q anchor → break rank lock**
-  (M5t/M5u/M5v all ρ ≥ 0.9997 vs M5q)
-
-## Day-4 slot 2-10 plan (pending PI direction)
-
-### Slot 2: build new base FIRST, then submit
-
-Layered candidates all expected to tie. Need a NEW BASE to make slot
-2 informative. Options ranked:
-
-1. **HGBC multi-seed bag** (~30 min CPU). E3, f1, f2 are single-seed.
-   Bag 3 seeds (42/123/456) following cb_slow-wide-bag pattern.
-2. **Multi-seed RealMLP bag** (Kaggle GPU, ~6h overnight).
-   Re-run RealMLP with seeds 123 + 456. Rank-bag the 3 OOF/test.
-   Likely +1-3bp on top of M5q's +14bp lift.
-3. **TabNet on Kaggle GPU** (~3h roundtrip; 1-fold SMOKE FIRST per
-   Rule 2 lesson). Different NN family from RealMLP.
-4. **Stint-2-targeted FE base** (NH9, ~30 min CPU). Features GBDT
-   pool is missing on the shared blind spot:
-   - lap_since_last_pit × tyre_compound interaction
-   - relative_pace = (LapTime − race_min) / race_std
-   - within-Stint-2 conditional TE.
-
-### Slot 3+
-Depends on slot-2 outcome and which new base lands first.
-
-## Untried CatBoost levers (research note + YetiRank)
-
-Stage-A research note `audit/2026-05-04-catboost-research.md` lives on
-the catboost branch (`origin/claude/explore-catboost-options-jWhDD`).
-Mechanisms 1, 5, 7 became `cb_year-cat`, `cb_slow-wide-bag`,
-`cb_lossguide` (all in M5h). **Mechanisms 3, 4, 6, 8 were probed at
-fold-0 only and never 5-folded or stack-incorporated.**
-
-Probe results (all hit the 799-iter cap → 0.947-0.948 are FLOORS):
-
-| Variant (CatBoost branch) | Fold-0 AUC | Promising? |
-|---|---:|---|
-| **MVS bootstrap** (mech #6) | **0.94792** | YES — equals cb_slow-wide-bag floor |
-| One-hot (max_size=10) (mech #2 follow-up) | 0.94749 | maybe |
-| Counter-only CTR (mech #4) | 0.94741 | diversity — no target in CTR |
-| CTR-complex (max_ctr=6, mech #3) | 0.94731 | maybe |
-| Ordered (mech #8, smoke) | 0.93908 | abandoned — slow |
-
-**Plus the new untried recent-CatBoost feature**:
-
-- **`loss_function='YetiRank'`** (or `YetiRankPairwise`) — pairwise
-  ranking objective, structurally aligned with AUC. All current
-  CatBoost bases use `Logloss` → adding a YetiRank base introduces
-  a different loss surface, likely orthogonal predictions. Build:
-  `scripts/d4_cb_yetirank.py` (TBD). ~30-60 min CPU; faster on GPU.
-
-**Recommended ordering for Day-4 slot 2**:
-1. **MVS 5-fold + slow+wide hyperparams** (`bootstrap_type=MVS,
-   subsample=0.7, mvs_reg=0.1, lr=0.03, iter=4000`). Echoes the
-   slow-wide-bag pattern that worked. ~30 min CPU.
-2. **YetiRank** with same slow+wide config. ~30-60 min CPU.
-3. **Counter-only CTR** as a diversifier (no target in CTR =
-   different signal source).
-
-These give us 3 new CatBoost bases of distinct character. Add to
-M5q pool individually and check L1 contribution + ρ vs M5q.
-
-### Final-window plan
-- M5q stays as PRIMARY unless dethroned.
-- HEDGE candidate per R2 (best-OOF that regressed ≤30bp on public).
-- R5 final-window OOF probe.
-- Lock-in by Day-30.
-
-## Critical operating rules (FRESHLY VIOLATED Day-3 — read these)
-
-1. **Pre-submit-diff before EVERY submit.** Run
-   `python3 scripts/pre_submit_diff.py <candidate.csv>`. If ρ ≥ 0.999,
-   abort. ρ ≥ 0.9997 → guaranteed tie at LB 5-decimal precision.
-2. **1-fold smoke before any GPU 5-fold.** Codified after the
-   RealMLP 175-min run (Rule 2 violation logged).
-3. **Strat-only Day-3+** (Rule R1). No GroupKF in new scripts.
-4. **In-pool tweaks of GBDT-heavy LR meta tie at LB 0.95005** within
-   Kaggle's 5-decimal quantization. Pre-submit-diff prevents waste.
-5. **Don't drop bases purely on L1/diversity grounds.** Minimal-
-   basis falsified Day-3.
+- Stint-2 specialist → in-segment lift
+- Hill-climb / LGBM-base-meta / L1-LR → beats LR meta
+- Minimal-orthogonal-basis → break LB tie (M5p, M5n_3b regressed)
+- 2-way TE / Sequence-FE → stack lift
+- Layered orthogonal bases on M5q anchor → break rank lock
+  (M5t/M5u/M5v/M5x/M5z all ρ ≥ 0.9995 vs M5q)
+- **GBDT-meta over M5q pool → break LB ceiling** (Day-4 slot-2:
+  -4bp LB; meta-switch is bounded; base-pool ceiling is binding)
+- External F1 strategy dataset → recover features (Day-2 d2-probe1:
+  5.6% test match rate, host-shuffled)
+- Optuna sweep on RealMLP-TD as bigger move (lower EV per GPU-hour
+  than seed bagging; lower than fresh NN family)
+- Hand-crafted FE specifically for NN branch (RealMLP's internal
+  embeddings re-derive most hand-features; d3a/d3b were null at
+  stack level)
 
 ## Calibration ladder snapshot
 
@@ -152,70 +151,54 @@ M5q pool individually and check L1 contribution + ρ vs M5q.
 | m5b | 0.94926 | 0.94891 | gap −3.5bp (anchor) |
 | m5d | 0.95023 | 0.94963 | gap −6.0bp (widened) |
 | m5h | 0.95043 | 0.94991 | gap −5.2bp |
-| m5h2 (K=12) | 0.95044 | 0.94991 | tied |
-| m5j (swap) | 0.95044 | 0.94991 | tied |
-| m5p (orth K=6) | 0.94839 | **0.94754** | **−237bp** REGRESSED |
-| m5n_3b (min-orth K=4) | 0.94808 | **0.94700** | **−291bp** REGRESSED |
-| **m5q (M5h + RealMLP, K=14)** | **0.95057** | **0.95005** | **NEW PRIMARY**; +14bp; 10× LB amplification |
-| RealMLP standalone | 0.94582 | (held) | strong, low diversity |
+| m5p (orth K=6) | 0.94839 | 0.94754 | −237bp REGRESSED |
+| m5n_3b (min-orth K=4) | 0.94808 | 0.94700 | −291bp REGRESSED |
+| **m5q (M5h + RealMLP, K=14)** | **0.95057** | **0.95005** | **PRIMARY**; +14bp; 10× LB amplification |
+| m5_meta_lgbm_shallow | 0.95048 | 0.95001 | -4bp; meta-switch costs |
+| RealMLP standalone | 0.94582 | (held) | strong, single-seed |
 | H1 pseudo-LGBM | 0.94265 | (held) | +19bp baseline |
 | EBM | 0.93361 | (held) | weak alone, GA²M family |
 | LR-FE | 0.89684 | (held) | most-diverse, very weak alone |
-
-## New base candidates ready (artifacts in scripts/artifacts/)
-
-- `oof_realmlp_strat.npy` / `test_realmlp_strat.npy` — Day-4 anchor
-- `oof_d3e_ebm_strat.npy` / `test_d3e_ebm_strat.npy`
-- `oof_d3f_pseudo_lgbm_strat.npy` / `test_d3f_pseudo_lgbm_strat.npy`
-- `oof_d3g_lr_fe_strat.npy` / `test_d3g_lr_fe_strat.npy`
+| d4_cb_yetirank | 0.90508 | (held) | ρ=0.666 vs M5q (most diverse) |
+| d4_nb (mixed) | 0.87984 | (held) | ρ=0.853 vs M5q |
 
 ## Held submissions (built but not submitted)
 
-- `submission_m5t_layered.csv` — TIE_EXPECTED (K=15, +H1)
-- `submission_m5u_layered.csv` — TIE_EXPECTED (K=16, +H1+EBM)
-- `submission_m5v_lr_fe_layered.csv` — TIE_EXPECTED (K=15, +LR-FE)
+- `submission_m5x_yetirank.csv` — M5q + YetiRank, TIE_EXPECTED
+- `submission_m5z_yetirank_nb.csv` — M5q + YetiRank + NB, TIE_EXPECTED
+- `submission_m5_meta_lgbm_medium.csv` — meta-switch most-divergent
+- `submission_m5_meta_hgbc.csv` — meta-switch HGBC variant
+- `submission_m5t_layered.csv` / `m5u_layered.csv` / `m5v_lr_fe_layered.csv`
 - `submission_m5w_blend_50.csv` — PASS but lower OOF (risky)
-- `submission_realmlp_standalone.csv` — RealMLP single-base
-- `submission_d3e_ebm.csv` — EBM single-base
-- `submission_d3f_pseudo_lgbm.csv` — H1 single-base
-- `submission_d3g_lr_fe.csv` — LR-FE single-base
+- `submission_realmlp_standalone.csv` / `d3e_ebm.csv` / `d3f_pseudo_lgbm.csv`
+  / `d3g_lr_fe.csv` — single-base candidates
 
-## Open hypotheses (NH8-NH13)
+## Critical operating rules (FRESHLY VIOLATED Day-3/4 — read these)
 
-- **NH8**: RealMLP brings GENERAL LB lift, not Stint-2 fix
-  (|Δ|@Stint2 only 0.0368 — confirmed on M5q).
-- **NH9**: Stint-2 needs feature engineering, not new model family.
-- **NH10**: Distillation — train small model to mimic M5q.
-- **NH11**: M5q_oof_probability as a feature (recursive base).
-- **NH12**: Per-(Year, Stint) mini-models (segment ensemble).
-- **NH13**: Logit-only stacker variant on M5q pool.
-- **NH14**: CatBoost YetiRank — pairwise ranking objective directly
-  optimizes the AUC-equivalent metric. All 3 existing CB bases use
-  Logloss; YetiRank introduces a different loss surface and likely
-  orthogonal predictions. Build alongside MVS slow+wide.
-- **NH15**: CatBoost MVS slow+wide — fold-0 probe (0.94792) on the
-  catboost branch was never extended to 5-fold or stacked. With
-  slow+wide hyperparams (lr=0.03, iter=4000, l2=8) following the
-  cb_slow-wide-bag recipe, expect 0.948+ Strat OOF.
-- **NH16**: CatBoost Counter-only CTR — pure frequency encoding,
-  no target dependency in the CTR layer. Different signal source
-  from existing CB bases (which all use default target-based CTRs).
-  Fold-0 probe was 0.94741.
+1. **Pre-submit-diff before EVERY submit.** Run
+   `python3 scripts/pre_submit_diff.py <candidate.csv>`. ρ ≥ 0.999 → tie.
+   ρ in [0.994, 0.999] → real LB delta possible (Day-4 slot-2 calibration).
+2. **1-fold smoke before any GPU 5-fold.** Codified after the
+   RealMLP 175-min run (Rule 2 violation logged).
+3. **Strat-only Day-3+** (Rule R1). No GroupKF in new scripts.
+4. **Don't drop bases purely on L1/diversity grounds.** Minimal-
+   basis falsified Day-3.
+5. **Bigger-moves rule: weight candidates by EV_bp / day_invested.**
+   Sub-1bp tuning saved for final-window R5 probe (Day-4 friction).
+6. **Strategy review before propose: grep audit/ for prior probes on
+   the proposed mechanism.** External data already-tested-d2 friction.
 
 ## Pointers
 
-- `audit/2026-05-04-catboost-research.md` (on catboost branch
-  `origin/claude/explore-catboost-options-jWhDD`) — Stage-A research
-  note: 10 untried CatBoost mechanisms with citations. Mechanisms
-  3/4/6/8 were probed-only and never 5-folded.
-- `audit/2026-05-04-day3-endgame.md` — Day-3 retrospective + Day-4 plan
-- `audit/2026-05-04-day3-learnings.md` — pool weaknesses + new hypotheses
-- `audit/2026-05-04-d3-pool-disagreement.md` — diversity diagnostic
-- `audit/2026-05-04-d3-per-segment-analysis.md` — Stint-2 blind spot
-- `audit/friction.md` — 25 operating-rule failure modes
+- `audit/2026-05-05-d4-gbdt-meta-breakthrough.md` — slot-2 envelope
+- `audit/2026-05-05-d4-yetirank-nb-results.md` — base-add probes
+- `audit/2026-05-05-nn-stack-priorities.md` — bigger-move ordering
+- `audit/2026-05-04-day3-endgame.md` — Day-3 retrospective
+- `audit/2026-05-04-d2-probe1-external-join.md` — external join FAILED
+- `audit/2026-05-04-catboost-research.md` (catboost branch) — CB levers
+- `audit/friction.md` — 30 logged failure modes
 - `scripts/pre_submit_diff.py` — MANDATORY pre-submit gate
-- `scripts/diag_pool_disagreement.py` — base-diversity diagnostic
-- `scripts/diag_new_base_diversity.py` — new-base scorecard
+- `scripts/d4_cb_yetirank.py` — YetiRank base build
+- `scripts/d4_naive_bayes.py` — NB base build
+- `scripts/d4_gbdt_meta.py` — GBDT-meta sweep over M5q pool
 - `scripts/m5qrs_realmlp_stacks.py` — M5q/M5r/M5s builders
-- `scripts/m5tu_layered.py` — M5t/M5u builders
-- `scripts/m5vw_diversity_blends.py` — M5v/M5w builders

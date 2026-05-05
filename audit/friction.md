@@ -265,3 +265,59 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   hooks, propose templates. The PI wants in-context recognition
   + execution, not infrastructure proposals. Skill now forbids
   proposing slash commands as the automation mechanism.
+
+## 2026-05-05
+
+- `tag: layered-orthogonal-base-tie-3x-confirmed` — Day-4 slot-2
+  exploration added two structurally orthogonal bases on top of M5q:
+  CatBoost YetiRank (pairwise loss; ρ=0.666 vs M5q test — most diverse
+  base ever measured) and Gaussian-NB-mixed (ρ=0.853). Both are
+  fundamentally different model families from the GBDT/NN pool.
+  Stack-level ρ vs M5q was 0.99966 (yetirank) and 0.99981 (nb), both
+  TIE_EXPECTED. Combined M5z (yetirank + nb) ρ=0.99957, also TIE.
+  3rd independent confirmation of `lr-meta-rank-lock-strong-anchor`:
+  the LR meta with expand() produces near-identical TEST RANKINGS
+  regardless of what orthogonal base you stack onto a strong GBDT-heavy
+  anchor. Even ρ=0.666 underlying diversity gets washed out at the
+  meta level. Fix: do not burn slot adding orthogonal bases via LR
+  meta on top of M5q. Slot-add via LR meta is dead. Either change the
+  meta-learner OR the BASE pool itself.
+
+- `tag: rho-0.995-not-tie-meta-switch-bounded` — Day-4 slot-2 actual
+  submit was m5_meta_lgbm_shallow (LGBM d=3 over the same K=14 base
+  pool that M5q's LR meta uses). ρ vs M5q test = 0.99508 — well below
+  the 0.999 tie-threshold. Result: LB came in at 0.95001 (M5q LB
+  0.95005, Δ -4bp), NOT a tie. This validates the 0.999 threshold
+  empirically: ρ=0.995 produces ~4bp LB movement at this scale of
+  pool, ρ≥0.999 produces tie. OOF→LB transfer for meta-switch was
+  ~50% of the OOF regression (-0.92bp OOF → -0.4bp LB), in contrast
+  to RealMLP's 10× OOF→LB amplification on base-add. Strategic
+  takeaway: rank-lock is PARTIALLY a meta-learner artifact (different
+  meta DOES move LB) but the LR meta is close to optimal for this
+  pool — switching costs, doesn't lift. **Base-pool signal ceiling
+  is the binding constraint**, not meta-learner choice. Add to
+  do-and-dont.md: "If you're considering meta-learner alternatives,
+  test the THEORY first — the OOF tells you whether the ceiling is
+  the meta or the bases. If candidate meta OOF < anchor OOF, expect
+  LB to follow downward at ~50% transfer."
+
+- `tag: bigger-moves-overrride-seed-variance` — Day-4 evening, I
+  proposed multi-seed bagging as a slot-2 improvement; PI corrected
+  with "We have plenty of headroom. Don't think small (seed
+  variance) yet". Seed-bag is ~+1-3bp/base; with 34bp headroom and
+  23 days remaining, the EV calculus dictates multi-bp moves
+  (pseudo-labeling, NN-family multiplication, recursive bases) over
+  single-bp tuning. Fix: when proposing next-move ranking, weight
+  candidates by EV_bp / day_invested AND headroom_bp_to_target
+  before sequencing. Sub-1bp moves are saved for the final-window
+  R5 probe.
+
+- `tag: external-data-already-tested-d2` — Proposed external-data
+  integration as an unmined lever in a strategy review. PI corrected:
+  `audit/2026-05-04-d2-probe1-external-join.md` already shows the
+  external join (`aadigupta1601/f1-strategy-dataset-pit-stop-prediction`)
+  fails at 5.6% test match rate — host shuffled or synthesized rows
+  beyond the original. Plus `Normalized_TyreLife` is host-forbidden.
+  Fix: before listing any "unmined lever" in a strategy review,
+  grep `audit/` for prior probes on that mechanism. Strategy reviews
+  must reference what's already been tested, not duplicate-propose.
