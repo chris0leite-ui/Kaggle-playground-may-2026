@@ -77,12 +77,12 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 6                            # 2026-05-07 / Day-6: F1.2 multi-rule LANDED at LB 0.95026 (+2.1bp)
+day: 9                            # 2026-05-09 / Day-9: d9 cohort + d9b R14 ladder + d9c FM
 lb_best_today: 0.95435            # leader; not refreshed
-our_lb_best: 0.95026              # d6_k18_multi_rule (M5q + 4 rule-residual bases) — NEW PRIMARY
-submissions_used_today: 1         # 1/10 today; d6_k18_multi_rule cleared LB at 0.95026
-submissions_used_total: 14
-saturation_count: 0               # F1.2 multi-rule cleared the +0.5bp predicted, +2.1bp actual (+1.3bp upside)
+our_lb_best: 0.95026              # d6_k18_multi_rule still PRIMARY; d9b_k20_swap_l4 LB 0.95025 TIE
+submissions_used_today: 1         # d9b_k20_swap_l4 (TIE −0.01bp); d9c K=20 swap+FM HELD pending PI
+submissions_used_total: 15
+saturation_count: 0               # F1.2 multi-rule held; d9b L4 was a calibration probe, FM cohort lifts pred to +0.53bp
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -119,8 +119,12 @@ mechanism_families_explored:
   - 2base_recursive_blend           # d6 B -- 4 variants; tie or regress; FALSIFIED
   - rule_residual_l1_base           # d6 C/F1.1 -- residual GBDT on rule_proba; min-meta PASS
   - multi_rule_residual_k18         # d6 F1.2 -- 4 rules; LB 0.95026 (+2.1bp PRIMARY)
+  - simple_math_rule_residual_pool  # d9 -- 9 closed-form / Bayesian rule_residuals; ALL FAIL min-meta vs PRIMARY
+  - hash_lr_3way_baseline           # d9 R14 -- sparse-LR 3-way interactions; std 0.794, ρ=0.444 most-diverse
+  - hash_lr_strength_ladder         # d9b R14 L0-L5 -- L2/L3/L4 PASS at +0.01bp; L4 K=20 swap LB 0.95025 TIE
+  - factorization_machine_cpu       # d9c FM -- std 0.921, ρ=0.899, min-meta +0.18bp PASS; K=20 swap pred +0.53bp HELD
 plateau_days: 0
-gate_status: cleared              # F1.2 multi-rule LB +2.1bp; gap narrowed -5.2 -> -3.9bp
+gate_status: candidate-pending    # d9c K=20 swap+FM pred +0.53bp (above slot threshold); awaits PI sign-off
 headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 ```
 
@@ -171,33 +175,49 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 | d6_rule_compound_stint (std) | 0.94604 | n/a | n/a | F1.2 R2; min-meta +0.30bp PASS |
 | d6_rule_driver_compound (std) | 0.94457 | n/a | n/a | F1.2 R3; ρ=0.89144 (most diverse); min-meta +0.45bp PASS |
 | d6_rule_year_race (std) | 0.94586 | n/a | n/a | F1.2 R4; min-meta +0.37bp PASS |
-| **d6_k18_multi_rule** | **0.95065** | n/a | **0.95026** | **NEW PRIMARY**; +2.1bp LB; gap −3.9bp (NARROWED from −5.2); 1.3bp upside on +0.8bp prediction |
+| **d6_k18_multi_rule** | **0.95065** | n/a | **0.95026** | **PRIMARY**; +2.1bp LB; gap −3.9bp (NARROWED from −5.2); 1.3bp upside on +0.8bp prediction |
+| d9_R5_weibull_compound | 0.94600 | n/a | n/a | d9 -- ρ vs PRIMARY 0.943; min-meta -0.09bp FAIL |
+| d9_R6_next_compound | 0.94443 | n/a | n/a | d9 -- ρ 0.908 (P5 1-step lookup); min-meta -0.12bp FAIL |
+| d9_R7_prev_compound | 0.94481 | n/a | n/a | d9 -- ρ 0.914; min-meta -0.10bp FAIL |
+| d9_R10_driver_eb | 0.94463 | n/a | n/a | d9 -- ρ 0.912 Beta-Binom; min-meta -0.10bp FAIL |
+| d9_R14_hash_lr_3way (L0) | 0.79377 | n/a | n/a | d9 -- ρ=0.444 most diverse; min-meta -0.02bp FAIL by hair |
+| d9b_R14_L2 (binned numerics) | 0.91449 | n/a | n/a | d9b -- ρ 0.874; min-meta +0.01bp PASS; sweet spot |
+| d9b_R14_L3 (+ Compound × num) | 0.91626 | n/a | n/a | d9b -- ρ 0.875; min-meta +0.01bp PASS; best ladder rung |
+| d9b_R14_L4 (+ Driver × num) | 0.91369 | n/a | n/a | d9b -- ρ 0.869; min-meta +0.01bp PASS; K=20 swap chosen |
+| d9b_k20_swap_l4 | 0.95067 | n/a | **0.95025** | d9b SUBMITTED -- pred +0.19bp, actual −0.01bp TIE (LB quantization) |
+| **d9c_FM (Factorization Machine)** | **0.92069** | n/a | n/a | **d9c -- ρ 0.899, min-meta +0.18bp PASS, 18× R14 lift; new model class** |
+| **d9c_Sd_K20_swap_FM** | **0.95070** | n/a | n/a | **CANDIDATE** -- swap drop 2 redundant rules + R6/R10/R7 + FM; pred LB +0.53bp; HELD |
 
-## Hypothesis board (Day 6 evening)
+## Hypothesis board (Day 9 evening)
 
 ```
-- DONE: F5 aux-feature GBDT-meta — FALSIFIED (+0.12bp, OOF -0.78bp
-        vs M5q). Third rank-lock confirmation that base-pool signal
-        is the binding constraint, not meta expressiveness.
-- DONE: Move B 2-base [M5q, recursive] — FALSIFIED across 4 variants.
-        K=2 LR-expand tie-locks (ρ=0.99996); V2-V4 OOF regression.
-        Recursive structurally redundant with M5q (recursive trained
-        on m5q_oof_proba feature).
-- DONE: F1.1 rule_residual single base — REAL but quantum-bounded.
-        Std OOF 0.94593, ρ=0.93 vs M5q test, K=15 +0.51bp, minimal-
-        meta PASS. First non-tie minimal-meta lift in 5 days.
-- DONE: F1.2 multi-rule strengthening — LANDED at LB 0.95026
-        (+2.1bp PRIMARY). 4 rule_residual bases (Compound x TyreLife,
-        Compound x Stint, Driver x Compound, Year x Race) all pass
-        minimal-meta. K=18 LR-stack: OOF 0.95065 (+0.78bp), ρ=0.99902
-        (4x safety margin vs tie threshold). Gap narrowed -5.2→-3.9bp.
-- ACTIVE: Move F multi-seed RealMLP bag — kernel realmlp-bag-gpu v1
-        running on Kaggle T4 (seeds 123+456). ~6h ETA. Pull when
-        complete; rank-average with seed-42; rebuild K=19 stack
-        (M5q_bag + 4 rules). Predicted +1-3bp on top of K=18 anchor.
-- NEXT: F1.3 classifier-residual variant (sample_weight inverse to
-        rule confidence) + F1.4 rule_proba as meta-feature. Both
-        cheap CPU; build alongside RealMLP bag pull.
+- DONE: d9 simple-math rule_residual cohort — 9 of 10 FALSIFIED at
+        min-meta vs PRIMARY (-0.09 to -0.12bp band regardless of
+        lookup key / smoothing). 5th confirmation of P10: rule_residual
+        family is saturated within PRIMARY's 4-rule cohort.
+- DONE: d9 R14 hash_lr_3way — std 0.794 but ρ=0.444 (most-diverse
+        single base since RealMLP). Min-meta -0.02bp FAIL by a hair;
+        new model-class signal flagged.
+- DONE: d9b R14 strength ladder L0-L5 — L2/L3/L4 PASS at +0.01bp;
+        L1 (+Race/Year) and L5 (kitchen sink) FAIL. Sweet spot is
+        adding 5-quintile bins of TyreLife/RaceProgress/Position to
+        the LR. K=20 swap+L4 SUBMITTED at LB 0.95025 (TIE -0.01bp;
+        pred +0.19bp; quantization-bounded).
+- DONE: d9c Factorization Machine — std OOF 0.92069, ρ=0.899,
+        min-meta +0.18bp PASS (18× R14_L3's lift). FM auto-learns
+        cross-feature interactions in low-rank space; replaces R14
+        ladder entirely. Sd K=20 swap with FM (no R14): pred LB
+        +0.53bp, ρ=0.99973. ABOVE +0.5bp slot threshold.
+- HELD: d9c Sd K=20 swap + FM — submission_d9c_K20_swap_FM.csv
+        ready, pre-submit-diff 0.99973 < 0.9995 PASS. Awaits PI
+        single-shot approval.
+- NEXT: FM hyperparameter sweep (k ∈ {4,8,16}, weight decay,
+        bagged across 3 seeds). 5-10 min CPU each; could push Sd
+        from +0.53bp to +0.7-1.0bp before submit.
+- LATER: External-data Pirelli pit-window scrape (Tier-2 highest
+        absolute EV), EmbMLP CPU (different model class), hazard NN
+        (GPU; note d9 hazard_nn_stack from another agent regressed
+        315bp — implementation matters).
 ```
 
 ## Pointers
@@ -217,4 +237,7 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 - `audit/2026-05-07-d6-move-b-2base-recursive.md` — Move B falsified.
 - `audit/2026-05-07-d6-move-c-rule-residual.md` — F1.1 single rule.
 - `audit/2026-05-07-d6-f1-2-multi-rule.md` — F1.2 K=18 LB-landed +2.1bp.
+- `audit/2026-05-09-d9-math-heuristics.md` — d9 10-approach cohort, all min-meta FAIL vs PRIMARY.
+- `audit/2026-05-09-d9b-r14-ladder.md` — d9b R14 ladder L0-L5; K=20 swap+L4 SUBMITTED LB 0.95025 TIE.
+- `audit/2026-05-09-d9c-fm.md` — d9c FM passes min-meta +0.18bp; Sd K=20 swap+FM pred +0.53bp HELD.
 - `audit/friction.md` — friction one-liners.

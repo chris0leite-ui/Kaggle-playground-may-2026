@@ -1,0 +1,16 @@
+{
+  "std_oof": 0.9206924181767216,
+  "rho_vs_primary_test": 0.8985763417001311,
+  "min_meta_oof": 0.9506684553600616,
+  "delta_primary_bp": 0.18455360061619963,
+  "min_meta_pass": true,
+  "params": {
+    "embed_dim": 8,
+    "epochs": 6,
+    "batch": 8192,
+    "lr": 0.05,
+    "wd": 1e-06,
+    "n_hash_bits": 18
+  },
+  "total_wall_s": 56.277087926864624
+}
