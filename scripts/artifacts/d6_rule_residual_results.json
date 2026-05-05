@@ -1,0 +1,56 @@
+{
+  "standalone": {
+    "rule_only_oof": 0.7471,
+    "rule_only_std": 0.00198,
+    "rule_residual_oof": 0.94593,
+    "rule_residual_std": 0.00088,
+    "delta_e3_bp": -28.26,
+    "delta_m5q_bp": -46.36,
+    "fold_aucs_rule": [
+      0.74966,
+      0.74776,
+      0.74938,
+      0.74474,
+      0.74557
+    ],
+    "fold_aucs_full": [
+      0.94734,
+      0.94509,
+      0.94581,
+      0.94497,
+      0.94647
+    ],
+    "walls": [
+      23.0,
+      24.5,
+      24.3,
+      23.8,
+      23.0
+    ]
+  },
+  "rho_test_vs_m5q": 0.92887,
+  "k15_stack": {
+    "oof": 0.95062,
+    "delta_m5q_bp": 0.51,
+    "rho_vs_m5q_test": 0.99971,
+    "l1_ranking": {
+      "rule_residual": 1.485,
+      "e5_optuna_lgbm": 0.722,
+      "b_lapsuntilpit": 0.581,
+      "realmlp": 0.564,
+      "a_horizon": 0.494
+    },
+    "rule_residual_l1": 1.485
+  },
+  "minimal_meta": {
+    "oof": 0.95061,
+    "delta_m5q_bp": 0.38
+  },
+  "gate": {
+    "base_pass": false,
+    "stack_pass": false,
+    "rho_pass": false,
+    "minimal_pass": true,
+    "pred_lb": 0.9501
+  }
+}
