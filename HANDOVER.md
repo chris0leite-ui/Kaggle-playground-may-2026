@@ -22,10 +22,8 @@ Open with a 3-bullet read-back of state + first action.
 
 ## Where we are (Day 12 morning)
 
-- **PRIMARY UNCHANGED** = `d6_k18_multi_rule` LB **0.95026**.
-- **Headroom to top-5%** (0.95345): **31.9bp**. To leader: 41bp.
-- **15 days remaining** (deadline 2026-05-31). 9 slots/day after reset.
-- **Submits used Day-11**: 0/10. **Total comp: 14 / 270 budget.**
+- **PRIMARY** = `d6_k18_multi_rule` LB **0.95026** (unchanged); top-5% gap **31.9bp**.
+- **15 days remaining** (deadline 2026-05-31). Submits **14/270**, Day-11 0/10 used.
 - **Null streak**: 11 in 5 days since Day-6 K=18 landed.
 
 ## Day-11 close: TabM v3 dead + strategy pivot
@@ -82,8 +80,7 @@ off per submit.
 ### Background — G4 SCARF on aadigupta1601 (Day-13 overnight)
 
 Kick off when Path C returns. 6-10h T4. Different inductive bias
-(contrastive pretraining); only un-falsified GPU candidate post-
-TabM closure.
+(contrastive pretraining); only un-falsified GPU candidate.
 
 ## Falsified / dead — do NOT retry
 
