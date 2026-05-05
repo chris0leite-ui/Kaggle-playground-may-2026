@@ -56,12 +56,15 @@ guides + Pirelli press kits, 26 races × 4 years) + 2h CPU build of
 4-6 rule_residual bases following F1.2 template + Q6 filter.
 EV +3-8bp median. Only un-explored move bringing genuinely new info.
 
-### Path B — Multi-FM partition diversity (Tier-2; FFM-falsified setting)
+### Path B — Multi-FM partition diversity → STRONG CANDIDATE (d9f, EXECUTED Day-10)
 
-Train 2 FMs with disjoint field subsets (FM_cat-only + FM_num-quintile-
-only) and stack both at K=21. Cheap CPU (~10 min). Predicted +0.2–1bp.
-Demoted to Tier-2 after FFM showed the FM model class saturates the
-interaction surface — partition variants likely hit same redundancy.
+`audit/2026-05-10-d9f-multi-fm.md`. FM_A (driver-dynamics: D,C,S,T_q5)
++ FM_B (race-context: R,Y,Rp_q5,P_q5), each k=8 6-ep. ρ FM_A vs FM_B =
+**0.406** (~orthogonal). FM_A ρ vs PRIMARY = **0.487** (most-diverse
+single base since Day-9 R14). K=22 add: OOF **+0.30bp**, ρ=0.99968,
+pred-LB **+0.32bp**. **Awaiting PI sign-off for LB submit.** Apply
++30bp pred-LB downgrade per Rule 2 (sub-0.99 → 0.9997 ρ band still
+fragile).
 
 ### Path D — F2 multi-rule rebuild w/ Q6 (cheap falsification)
 
@@ -115,7 +118,8 @@ at sub-0.99 ρ where current uncertainty is ~30bp. Single-shot per R1.
 
 | Mechanism | Strat OOF | LB | Gap | Notes |
 |---|---:|---:|---:|---|
-| **d9c_K20_swap_FM (PRIMARY)** | **0.95070** | **0.95029** | **−2.6bp** | NEW PRIMARY |
+| d9f K=22 add (FM_A+FM_B) | 0.95073 | n/a | n/a | STRONG CANDIDATE pred +0.32bp |
+| **d9c_K20_swap_FM (PRIMARY)** | **0.95070** | **0.95029** | **−2.6bp** | current PRIMARY |
 | d6_k18_multi_rule (HEDGE) | 0.95065 | 0.95026 | −3.9bp | parent |
 | m5q (M5h + RealMLP, K=14) | 0.95057 | 0.95005 | −5.2bp | grandparent |
 | TabM v2 fold-0 | 0.94039 | n/a | n/a | gate FAIL |
