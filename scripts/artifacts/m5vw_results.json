@@ -1,0 +1,50 @@
+{
+  "M5v": {
+    "K": 15,
+    "strat": 0.9506115951923082,
+    "delta_m5q_bp": 0.41595192308174767,
+    "spearman_vs_m5q": 0.999776709954651,
+    "gate": "TIE_EXPECTED",
+    "l1": {
+      "baseline": 0.3203804413981426,
+      "d2a_te": 0.5688748695351801,
+      "m2_xgb": 0.21134253424356209,
+      "e1_cb_sub": 0.25083475991554005,
+      "e3_hgbc": 0.38695382355725727,
+      "e5_optuna_lgbm": 0.8201199995042099,
+      "a_horizon": 0.5803987710732925,
+      "b_lapsuntilpit": 0.753815533261408,
+      "f1_hgbc_deep": 0.26833206587521485,
+      "f2_hgbc_shallow": 0.25588427912269,
+      "cb_year-cat": 0.4306223938329729,
+      "cb_lossguide": 0.40897067343540183,
+      "cb_slow-wide-bag": 0.8389469209957156,
+      "realmlp": 0.5796398853494644,
+      "d3g_lr_fe": 0.6747190875891597
+    },
+    "pool": [
+      "baseline",
+      "d2a_te",
+      "m2_xgb",
+      "e1_cb_sub",
+      "e3_hgbc",
+      "e5_optuna_lgbm",
+      "a_horizon",
+      "b_lapsuntilpit",
+      "f1_hgbc_deep",
+      "f2_hgbc_shallow",
+      "cb_year-cat",
+      "cb_lossguide",
+      "cb_slow-wide-bag",
+      "realmlp",
+      "d3g_lr_fe"
+    ]
+  },
+  "M5w": {
+    "blend_weights": "0.5 M5q + 0.5 RealMLP_standalone",
+    "strat": 0.9494735148826479,
+    "delta_m5q_bp": -10.96485117352164,
+    "spearman_vs_m5q": 0.9949716227021511,
+    "gate": "PASS"
+  }
+}
