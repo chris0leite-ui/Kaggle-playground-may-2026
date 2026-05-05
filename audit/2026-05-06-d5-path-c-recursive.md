@@ -61,6 +61,60 @@ already saturated by linear means. Same gate test applies here.
 
 - `scripts/artifacts/oof_d5_recursive_m5q_strat.npy`
 - `scripts/artifacts/test_d5_recursive_m5q_strat.npy`
-- `scripts/artifacts/d5_recursive_m5q_results.json`
+- `scripts/artifacts/d5_recursive_m5q_strat_results.json`
 
-End — 50 lines.
+## K=15 result — recursive eaten by LR rank-lock (3rd confirmation)
+
+`scripts/d5_recursive_stack_k15.py` ran three pool-composition
+variants. All TIE-class at meta level:
+
+| variant | K | Strat OOF | Δ M5q bp | ρ M5q test | rec L1 | gate |
+|---|---:|---:|---:|---:|---:|---|
+| M5_K15a (M5q + rec) | 15 | 0.95056 | −0.06 | **0.99991** | **0.841** | TIE_EXPECTED |
+| M5_K15b (drop e3, +rec) | 14 | 0.95053 | −0.35 | 0.99971 | 0.256 | TIE_EXPECTED |
+| M5_K15c (drop f1+f2, +rec) | 13 | 0.95045 | −1.23 | 0.99922 | 0.345 | TIE_LIKELY |
+
+The striking fact: in M5_K15a the recursive is the **2nd-highest L1
+weight in the pool** (0.841, behind only `cb_slow-wide-bag` at 1.060,
+and 2× realmlp's 0.422). The LR meta clearly wants to use it. Yet
+the resulting test predictions are ρ=0.99991 vs M5q — Kaggle
+5-decimal quantization territory.
+
+**Mechanistic read.** Because the recursive base IS a transformation
+of (raw_features + M5q_consensus), an LR meta over the expanded
+pool can re-derive M5q's contribution through the recursive's
+noisier-but-richer path. Big L1 weight on a near-clone of the
+consensus equals the same rank ordering, by construction. LR cannot
+exploit the row-level corrections that the recursive's tree splits
+encode — those corrections require a non-linear meta to combine
+`recursive_proba` with `e3_hgbc_proba` × `cb_lossguide_rank` etc.
+
+**Third confirmation of `lr-meta-rank-lock-strong-anchor`.**
+Day-3 friction logged it. Day-4 yetirank (ρ=0.666 standalone /
+TIE_EXPECTED stacked) + nb (ρ=0.853 / TIE_EXPECTED stacked) gave
+two more confirmations. Today's recursive (ρ=0.99159 standalone /
+ρ=0.99991 stacked) is the third. The pattern is invariant to base
+diversity at any scale — orthogonal OR near-clone, the LR meta
+collapses to M5q's rank ordering.
+
+## Falsified
+
+- "K=15 LR re-stack with recursive added breaks M5q ceiling" → null
+- "Pool composition (drop e3 / drop f1+f2) un-locks the LR meta" → null
+
+## Live candidate from this build
+
+The recursive base remains a strong **pool member for a non-linear
+meta**. d4 GBDT-meta over K=14 was −4bp LB (ρ=0.995); GBDT-meta over
+K=15 with recursive may find the cross-base interactions LR cannot
+(`recursive` correlates highly with consensus but encodes different
+per-row residual structure that trees can split on).
+
+## Next move
+
+`scripts/d5_gbdt_meta_k15.py` — re-run the d4 GBDT-meta sweep
+(LightGBM depth=3/5, HGBC) over the K=15 pool. Decision rule: if
+OOF ≥ 0.95048 (matches d4 lgbm_shallow which gave −4bp LB) AND
+ρ < 0.999, candidate is real and we have a slot 2 LB probe.
+
+End — 95 lines.
