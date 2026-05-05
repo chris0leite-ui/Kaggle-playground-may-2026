@@ -287,16 +287,25 @@ def main():
     X_num, X_cat, X_num_t, X_cat_t, y, cat_dims = prepare_features(train, test)
     print(f"cat_dims={cat_dims}")
 
+    # CRITICAL: outer fold split is FIXED at random_state=42 (matches M5q
+    # pool's fold structure). Only the torch model seed varies per seed.
+    # If we let random_state=seed, each seed's val rows would intersect
+    # other seeds' train rows → bag OOF has in-sample contamination
+    # against M5q's fold partition, and any K=N+1 stack lift would be fake.
+    OUTER_SEED = 42
+    skf_fixed = StratifiedKFold(n_splits=N_FOLDS, shuffle=True,
+                                 random_state=OUTER_SEED)
+    splits_fixed = list(skf_fixed.split(np.zeros(len(y)), y))
+
     seed_oofs = []   # list of (n_train,) arrays per seed (probabilities)
     seed_tests = []  # list of (n_test,) arrays per seed
     seed_results = []
     for seed in SEEDS:
-        print(f"\n=== SEED {seed} (5-fold Strat) ===")
-        skf = StratifiedKFold(n_splits=N_FOLDS, shuffle=True, random_state=seed)
+        print(f"\n=== SEED {seed} (model-seed; outer fold split=SEED={OUTER_SEED}) ===")
         oof_seed = np.zeros(len(y), dtype=np.float64)
         test_seed = np.zeros(len(test), dtype=np.float64)
         fold_aucs = []
-        for k, (tr, va) in enumerate(skf.split(np.zeros(len(y)), y)):
+        for k, (tr, va) in enumerate(splits_fixed):
             t_fold = time.time()
             p_va, p_te, fauc = train_one_fold(
                 seed, X_num, X_cat, X_num_t, X_cat_t, y, eb_full, cc_full,
@@ -315,6 +324,12 @@ def main():
         seed_tests.append(test_seed)
         seed_results.append(dict(seed=seed, oof_auc=full_auc,
                                   fold_aucs=fold_aucs))
+        # Persist per-seed OOFs so we can stack them back independently
+        # if the bag turns out to be tie-locked.
+        np.save(WORK / f"oof_d9_hazard_nn_seed{seed}_strat.npy",
+                np.column_stack([1 - oof_seed, oof_seed]))
+        np.save(WORK / f"test_d9_hazard_nn_seed{seed}_strat.npy",
+                np.column_stack([1 - test_seed, test_seed]))
 
     # Rank-average across seeds (more robust than mean for AUC)
     n_train = len(y); n_test = len(test)

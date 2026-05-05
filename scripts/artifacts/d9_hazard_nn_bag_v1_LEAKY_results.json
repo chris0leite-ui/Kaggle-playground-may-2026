@@ -1,0 +1,50 @@
+{
+  "seeds": [
+    42,
+    123,
+    456
+  ],
+  "seed_results": [
+    {
+      "seed": 42,
+      "oof_auc": 0.9431923147013663,
+      "fold_aucs": [
+        0.9449128065188086,
+        0.9426592531683076,
+        0.9425827369611234,
+        0.9426996485722673,
+        0.9437475809119007
+      ]
+    },
+    {
+      "seed": 123,
+      "oof_auc": 0.9438438641808617,
+      "fold_aucs": [
+        0.9446138063591315,
+        0.9434828976831826,
+        0.94257518493604,
+        0.9438691315079732,
+        0.9451297324527278
+      ]
+    },
+    {
+      "seed": 456,
+      "oof_auc": 0.944351902180115,
+      "fold_aucs": [
+        0.9422147373083463,
+        0.9451223601796686,
+        0.9452418249202402,
+        0.9449734657219624,
+        0.9444232825974325
+      ]
+    }
+  ],
+  "bag_oof_auc": 0.9486314163135605,
+  "delta_vs_baseline_bp": 78.81416313560541,
+  "delta_vs_realmlp_e4_fold0_bp": 14.11416313560565,
+  "cv": "StratifiedKFold(5)",
+  "metric": "roc_auc",
+  "n_buckets": 20,
+  "total_wall_s": 410.084942817688,
+  "notes": "Hazard-NN 5-fold x 3-seed bag, rank-averaged. Save OOF/test and submission. K=19 stack vs K=18 PRIMARY (LB 0.95026) evaluated locally; submission HELD until \u03c1-vs-K=18 < 0.999 and stack OOF >= K=18 + 0.5bp."
+}
