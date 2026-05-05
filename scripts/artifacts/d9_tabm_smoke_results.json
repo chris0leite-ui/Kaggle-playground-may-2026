@@ -1,0 +1,18 @@
+{
+  "smoke_fold": 0,
+  "fold_auc": 0.9403904234104332,
+  "fold_wall_s": 325.25952887535095,
+  "delta_vs_baseline_bp": -3.5957658956675687,
+  "delta_vs_realmlp_e4_fold0_bp": -68.29576589566733,
+  "five_fold_projection_min": 27.10496073961258,
+  "smoke_gate_auc": 0.945,
+  "auc_gate": "FAIL",
+  "wall_gate": "PASS",
+  "overall": "HOLD",
+  "cv": "StratifiedKFold(5)",
+  "metric": "roc_auc",
+  "seed": 42,
+  "n_folds": 5,
+  "total_wall_s": 511.3729739189148,
+  "notes": "TabM 1-fold smoke. Sole unfalsified Tier-1 (HANDOVER Day-9). PROMOTE -> 5-fold + 3-seed bag; HOLD -> pivot to T1.4 hazard-NN."
+}
