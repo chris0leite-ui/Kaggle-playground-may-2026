@@ -1,0 +1,7 @@
+{
+  "frac_succ_anywhere": 0.41719235777110514,
+  "frac_succ_in_train": 0.2934126963037759,
+  "frac_succ_in_test": 0.1237796614673292,
+  "frac_succ_rdl_in_test": 0.34036085350623124,
+  "frac_pred_in_train": 0.2922594531395318
+}
