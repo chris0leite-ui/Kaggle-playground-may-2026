@@ -144,6 +144,45 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   REQUIRE direct execution + log read + summary in one tool call,
   not delegate to Monitor and exit early.
 
+- `tag: rule2-smoke-skip-realmlp-day3` — Day-3 launched RealMLP-TD
+  full 5-fold on Kaggle T4 without first running a 1-fold smoke
+  probe. Kernel ran 175 min total. Two prior versions failed in
+  ~40s on P100 sm_60 (different issue), but the full run had no
+  smoke gate behind it. Cost: 175 min Kaggle GPU quota; if the
+  full run had been 5h instead of 3h we'd have learned that only
+  after burning 5h. Fix: codify "1-fold smoke first, project to
+  5-fold, kill if projection ≥1h" — `--folds 1` flag in any new
+  GPU kernel. Add to do-and-dont.md GPU-workflow checklist.
+
+- `tag: minimal-orth-basis-falsified-day3` — Day-3 evening
+  hypothesis: "the 10 GBDT consensus clones in M5h are redundant
+  and removing them will tighten the OOF→LB gap." Tested via M5p
+  (K=6: 3 most-diverse + LR-FE + EBM + baseline) and M5n_3b (K=4:
+  most-diverse only). Both REGRESSED substantially: M5p −237bp LB,
+  M5n_3b −291bp LB. The OOF→LB gap WIDENED, not tightened (52bp →
+  85bp → 108bp). Lesson: even bases that look "redundant" by
+  Spearman correlation provide ensemble averaging that improves
+  generalization. The pool's LB rank IS the consensus; removing
+  clones exposes the rank to whichever model's idiosyncratic
+  errors dominate the smaller pool. Fix: do not drop bases purely
+  on diversity / L1 grounds. Pruning must be inner-CV-validated
+  (the L1-prune rule from M5h was diversity-conscious AND OOF-
+  preserving — that's the right shape).
+
+- `tag: lr-meta-rank-lock-strong-anchor` — Day-4 slot-2 exploration:
+  M5q (M5h + RealMLP, Strat 0.95057, LB 0.95005) is the new
+  PRIMARY. Tested 4 layered candidates on top: M5t (+H1),
+  M5u (+H1+EBM), M5v (+LR-FE), all ρ ≥ 0.9997 vs M5q → TIE_EXPECTED
+  on LB. Even LR-FE (most-diverse base from Day-3) got L1=0.675
+  in M5v but ρ=0.9998. The LR-meta-on-strong-anchor is rank-
+  saturated: adding orthogonal bases redistributes L1 weights
+  internally but the test ranking is locked. Strategic
+  implication: to break a strong-anchor stack's LB, change the
+  ANCHOR composition (replace bases, change mechanism family),
+  not stack on top. Add to do-and-dont.md: "When ρ between candidate
+  and anchor is ≥0.9997, slot is wasted as a calibration probe;
+  prefer ANCHOR-replacement variants (swap, not add)."
+
 - `tag: pre-submit-rank-diff-check` — Day-3 burned 3 slots (M5h, M5h2,
   M5j) all landing at LB 0.94991. Post-hoc diff of the submissions:
   predictions differ noticeably in ABSOLUTE values (M5h vs M5j: 44%
