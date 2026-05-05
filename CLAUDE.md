@@ -65,12 +65,12 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 5                            # 2026-05-06 / Day-5 morning; Path B Phase 1+2 PASS, slot-1 candidate held
+day: 6                            # 2026-05-07 / Day-6: F1.2 multi-rule LANDED at LB 0.95026 (+2.1bp)
 lb_best_today: 0.95435            # leader; not refreshed
-our_lb_best: 0.95005              # M5q (M5h + RealMLP-TD, K=14) — PRIMARY pending Path B slot
-submissions_used_today: 1         # 1/10 today; partial-pseudo K=14 burned at LB 0.94963 (-4.2bp)
-submissions_used_total: 13
-saturation_count: 1               # partial-pseudo OOF +2.54bp INVERTED to LB -4.2bp; pseudo over-amp falsified
+our_lb_best: 0.95026              # d6_k18_multi_rule (M5q + 4 rule-residual bases) — NEW PRIMARY
+submissions_used_today: 1         # 1/10 today; d6_k18_multi_rule cleared LB at 0.95026
+submissions_used_total: 14
+saturation_count: 0               # F1.2 multi-rule cleared the +0.5bp predicted, +2.1bp actual (+1.3bp upside)
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -103,9 +103,13 @@ mechanism_families_explored:
   - pseudo_label_e3_mvp             # d5 path-b phase1 -- +4.1bp e3, ρ=0.996 PASS both gates
   - pseudo_label_5_base_phase2      # d5 path-b phase2 -- 5 fast bases all lift +2-19bp
   - partial_pseudo_m5q_k14          # d5 -- 6 pseudo + 8 orig; OOF 0.95082 (+2.54bp); ρ=0.99836 REAL_DELTA
+  - aux_feature_gbdt_meta           # d6 F5 -- +0.12bp over no-aux LGBM; FALSIFIED
+  - 2base_recursive_blend           # d6 B -- 4 variants; tie or regress; FALSIFIED
+  - rule_residual_l1_base           # d6 C/F1.1 -- residual GBDT on rule_proba; min-meta PASS
+  - multi_rule_residual_k18         # d6 F1.2 -- 4 rules; LB 0.95026 (+2.1bp PRIMARY)
 plateau_days: 0
-gate_status: cleared              # Path B both gates PASS (e3 +4.1bp/ρ0.996; partial-pseudo +2.5bp/ρ0.998)
-headroom_to_top5pct: 0.00340      # 0.95345 − 0.95005 = 34.0bp
+gate_status: cleared              # F1.2 multi-rule LB +2.1bp; gap narrowed -5.2 -> -3.9bp
+headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 ```
 
 ## Calibration ladder
@@ -148,28 +152,40 @@ headroom_to_top5pct: 0.00340      # 0.95345 − 0.95005 = 34.0bp
 | d5_M5_K15a (M5q + recursive, LR) | 0.95056 | n/a | n/a | NULL (-0.06bp); rec L1=0.84 but ρ=0.99991 TIE_EXPECTED |
 | d5_meta_k15_lgbm_shallow (GBDT meta) | 0.95038 | n/a | n/a | NULL (-1.0bp vs d4 K=14); GBDT-meta ceiling fixed |
 | **d5_partial_pseudo_m5q (K=14)** | **0.95082** | n/a | **0.94963** | **slot-1 −4.2bp LB**; gap WIDENED −5.2→−12bp; pseudo over-amp falsified |
+| d6_aux_meta_with_aux | 0.95049 | n/a | n/a | F5 falsified; +0.12bp over no-aux; held |
+| d6_2base_v1_lr_expand | 0.95055 | n/a | n/a | Move B falsified; ρ=0.99996 (tie); held |
+| d6_rule_residual (standalone) | 0.94593 | n/a | n/a | Δe3 −28bp; ρ vs M5q test 0.92887 (most diverse since RealMLP) |
+| d6_k15_rule_residual | 0.95062 | n/a | n/a | held; +0.51bp; ρ=0.99971; superseded by K=18 |
+| d6_rule_compound_stint (std) | 0.94604 | n/a | n/a | F1.2 R2; min-meta +0.30bp PASS |
+| d6_rule_driver_compound (std) | 0.94457 | n/a | n/a | F1.2 R3; ρ=0.89144 (most diverse); min-meta +0.45bp PASS |
+| d6_rule_year_race (std) | 0.94586 | n/a | n/a | F1.2 R4; min-meta +0.37bp PASS |
+| **d6_k18_multi_rule** | **0.95065** | n/a | **0.95026** | **NEW PRIMARY**; +2.1bp LB; gap −3.9bp (NARROWED from −5.2); 1.3bp upside on +0.8bp prediction |
 
-## Hypothesis board (Day 5 morning)
+## Hypothesis board (Day 6 evening)
 
 ```
-- DONE: Path B Phase 1+2 cleared both gates. e3_hgbc rebuilt on
-        train+pseudo gives +4.1bp OOF, ρ=0.996 vs orig. K=14 partial-
-        pseudo M5q (6 pseudo + 8 orig): Strat 0.95082 (+2.54bp);
-        ρ=0.99836 vs M5q REAL_DELTA. FIRST non-null Day-5 meta-level
-        result. L1 reshuffles away from cb_slow-wide-bag/a_horizon.
-- DONE: Recursive GBDT (M5q_oof_proba as feature) — std-alone +92bp
-        baseline (best single GBDT to date, 0.94994), but K=15 LR
-        stack and K=15 GBDT-meta both NULL (-0.06bp / -1.0bp). 3rd
-        confirmation lr-meta-rank-lock-strong-anchor.
-- DONE: TabNet smoke at default config (n_d=32, cat_emb_dim=4)
-        FAIL gate: fold-0 0.93532, model under-trained at 120 epochs.
-        Park; tuned retry only after Path B succeeds or fails.
-- ACTIVE: Path B Phase 3 — CatBoost CPU rebuilds (4 bases, ~1-2h),
-        d2a_te TE-aware rebuild (~10min), RealMLP Kaggle GPU
-        rebuild (~6h overnight). Decision rule cleared: partial-
-        pseudo OOF > M5q+1bp → expand. Compounding lift expected.
-- LATER: NN-family multiplication (RealMLP seed bag, FT-Transformer)
-        only after Path B's full ceiling is measured.
+- DONE: F5 aux-feature GBDT-meta — FALSIFIED (+0.12bp, OOF -0.78bp
+        vs M5q). Third rank-lock confirmation that base-pool signal
+        is the binding constraint, not meta expressiveness.
+- DONE: Move B 2-base [M5q, recursive] — FALSIFIED across 4 variants.
+        K=2 LR-expand tie-locks (ρ=0.99996); V2-V4 OOF regression.
+        Recursive structurally redundant with M5q (recursive trained
+        on m5q_oof_proba feature).
+- DONE: F1.1 rule_residual single base — REAL but quantum-bounded.
+        Std OOF 0.94593, ρ=0.93 vs M5q test, K=15 +0.51bp, minimal-
+        meta PASS. First non-tie minimal-meta lift in 5 days.
+- DONE: F1.2 multi-rule strengthening — LANDED at LB 0.95026
+        (+2.1bp PRIMARY). 4 rule_residual bases (Compound x TyreLife,
+        Compound x Stint, Driver x Compound, Year x Race) all pass
+        minimal-meta. K=18 LR-stack: OOF 0.95065 (+0.78bp), ρ=0.99902
+        (4x safety margin vs tie threshold). Gap narrowed -5.2→-3.9bp.
+- ACTIVE: Move F multi-seed RealMLP bag — kernel realmlp-bag-gpu v1
+        running on Kaggle T4 (seeds 123+456). ~6h ETA. Pull when
+        complete; rank-average with seed-42; rebuild K=19 stack
+        (M5q_bag + 4 rules). Predicted +1-3bp on top of K=18 anchor.
+- NEXT: F1.3 classifier-residual variant (sample_weight inverse to
+        rule confidence) + F1.4 rule_proba as meta-feature. Both
+        cheap CPU; build alongside RealMLP bag pull.
 ```
 
 ## Pointers
@@ -184,4 +200,9 @@ headroom_to_top5pct: 0.00340      # 0.95345 − 0.95005 = 34.0bp
 - `audit/2026-05-05-d4-yetirank-nb-results.md` — Day-4 base-add probes.
 - `audit/2026-05-05-d4-gbdt-meta-breakthrough.md` — Day-4 slot-2 envelope.
 - `audit/2026-05-05-nn-stack-priorities.md` — bigger-move ordering.
+- `audit/2026-05-07-d6-critic-loop.md` — Rule 14 audit; 5 untried mechanisms.
+- `audit/2026-05-07-d6-f5-aux-meta-result.md` — F5 falsified.
+- `audit/2026-05-07-d6-move-b-2base-recursive.md` — Move B falsified.
+- `audit/2026-05-07-d6-move-c-rule-residual.md` — F1.1 single rule.
+- `audit/2026-05-07-d6-f1-2-multi-rule.md` — F1.2 K=18 LB-landed +2.1bp.
 - `audit/friction.md` — friction one-liners.
