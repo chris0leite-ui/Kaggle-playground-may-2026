@@ -1,4 +1,11 @@
-"""C2 — Build 6 Pirelli pit-window rule_residual bases (Day-12 prep).
+"""C2 — Build 6 Pirelli pit-window rule_residual bases [DEPRECATED 2026-05-12].
+
+DEPRECATED before execution alongside `d12_c2_pirelli_scrape.py`. See
+`audit/2026-05-12-d12-c2-pirelli-prep.md` for the synthetic-DGP-
+incompatibility rationale. Skeleton preserved for reference.
+
+Original docstring follows.
+---
 
 Consumes `data/external/pirelli_windows.csv` (built by
 `d12_c2_pirelli_scrape.py`) and produces 6 rule_residual L1 bases

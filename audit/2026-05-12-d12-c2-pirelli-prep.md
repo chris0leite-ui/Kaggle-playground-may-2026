@@ -1,4 +1,39 @@
-# Day-12 — C2 Pirelli pit-windows preparation
+# Day-12 — C2 Pirelli pit-windows preparation [DEPRECATED]
+
+> **DEPRECATED 2026-05-12** — synthetic-DGP incompatibility flagged
+> by PI before execution. Three concrete reasons C2 is bounded near
+> zero EV on this comp's data:
+>
+> 1. **Year=2023 mode-collapsed** in the CTGAN synth (24/26 races
+>    <5% pit rate vs ~28% real-world). Pirelli's real-world windows
+>    for 2023 races would predict normal pit-rates inside the window
+>    but the synth shows almost no pits there at all → ~31% of train
+>    rows yield flat global-mean fallback.
+> 2. **CTGAN broke 4+-way joints** (P10). A Pirelli window's signal
+>    lives in the 5-way (Race, Year, Compound, lap, what-actually-
+>    happened) co-occurrence — exactly the structure CTGAN doesn't
+>    preserve.
+> 3. **Pool already absorbs the synth's empirical analog** through
+>    `Compound × TyreLife` and `Race × Compound × Stint` rules.
+>    Real-world priors that go beyond the synth's own joint structure
+>    are noise.
+>
+> **Direct prior evidence**: C1 SC-prob (Day-9 K=19 TIE ρ=0.9999) is
+> the same failure mode. External real-world signal does not transfer
+> to synthetic data.
+>
+> **Falsified by Q5 of Rule 16 retroactively**: closest gate-PASS
+> precedent at predicted ρ ≈ 0.998-0.999 from external-data lookup is
+> C1, which TIE-locked. EV midpoint downgraded ×0.1.
+>
+> **Pivoted to**: 3-way multi-FM partition (cheap probe extending
+> d9f's 2-way win) + G4 SCARF on aadigupta1601 (different unlabeled
+> corpus → different inductive bias, robust to synth artifacts).
+>
+> Skeletons preserved for reference / repurposing if a future comp
+> uses real F1 telemetry. Below is the original (now-stale) plan.
+
+---
 
 > Top-priority CPU move per Day-11 strategy critique + Day-12 HANDOVER
 > Path A. Multi-FM partitions (d9c, d9f) added +5bp LB territory in

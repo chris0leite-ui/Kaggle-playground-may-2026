@@ -1,4 +1,16 @@
-"""C2 — Pirelli pit-window scrape (Day-12 prep, DO NOT EXECUTE without PI sign-off).
+"""C2 — Pirelli pit-window scrape [DEPRECATED 2026-05-12 — synthetic-DGP incompatibility].
+
+DEPRECATED before execution. See `audit/2026-05-12-d12-c2-pirelli-prep.md`
+for the deprecation rationale: Year=2023 is mode-collapsed in the CTGAN
+synth, the 5-way co-occurrence Pirelli windows depend on is exactly what
+CTGAN broke, and the pool already absorbs the synth's empirical analog
+via existing Compound × TyreLife / Race × Compound × Stint rules.
+
+Skeleton preserved for reference / repurposing if a future comp uses
+real F1 telemetry. DO NOT EXECUTE on the s6e5 synthetic data.
+
+Original docstring follows.
+---
 
 Scrapes F1.com pre-race strategy guides + Pirelli Motorsport press
 kits for pre-race pit-window predictions, building the lookup CSV
