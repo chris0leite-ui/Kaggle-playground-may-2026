@@ -44,7 +44,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 
 TARGET, ID_COL = "PitNextLap", "id"
-SEED, N_FOLDS = 42, 5
+SEED, N_FOLDS = 42, 1   # 1-fold time-probe; bump to 5 after wall confirmed <9h
 BASE_S = 0.94075          # baseline_two_anchor Strat OOF (LB-proxy anchor)
 REALMLP_E4 = 0.94722      # E4 fold-0 reference
 
