@@ -162,26 +162,39 @@ LR→hier-meta gap dominates +0.78 bp base-add gains.
   end on this comp because synth public-LB is row-iid and the GBDT
   pool already captures most of the DGP via TyreLife/RaceProgress.
 
-## Day-15 follow-ups (refreshed)
+## Multi-arch orig bag (2026-05-06 evening) — NULL
 
-The hier-meta(K=22) probe **rules out a single-LGBM orig_transfer as
-a structural advance** but **opens 3 cheap diversification paths**:
+Trained 3 additional orig-trained bases:
+  - `d15_orig_cb`     CatBoost  | held-out 0.99400 | synth 0.83722 | ρ vs PRIMARY 0.587
+  - `d15_orig_xgb`    XGBoost   | held-out 0.99372 | synth 0.86585 | ρ vs PRIMARY 0.639
+  - `d15_orig_lgbm_t` LGBM tuned| held-out 0.99725 | synth 0.85253 | ρ vs PRIMARY 0.568
 
-1. **Multi-arch orig_transfer bag** (~1h CPU). Train CatBoost +
-   XGBoost + Optuna-tuned LGBM on the original 99k rows; each predicts
-   on synth. Each base ≈ ρ=0.56 vs PRIMARY (orthogonal-class). Bag
-   them or add as 3 separate K=22/K=23/K=24 bases. EV: each
-   incremental orig-arch may add +0.5-1 bp OOF; bag may compound to
-   +2-3 bp at hier-meta.
-2. **Mixed-source LGBM** (~2-3h CPU): `concat(orig 99k + synth 439k)`
-   with sample-weights ∝ density-ratio (AV-classifier). Risk: AV-AUC
-   was 0.502 in d12, so density ratio likely uninformative; but the
-   orig rows act as ground-truth anchors which AV can't see.
-3. **Decoded-LapTime per-row leak**: 95% of synth `LapTime` values
-   exist in original. For each synth row, look up the original rows
-   with that exact LapTime, take median PitNextLap → leaked-posterior
-   feature. Add to a synth-trained LGBM. EV: small standalone (the
-   join is many-to-many) but might be the cleanest "data leak" feature.
+Inter-arch ρ (synth test):
+  transfer ↔ lgbm_t = 0.988 (REDUNDANT — dropped from probe pool)
+  cb ↔ xgb = 0.941 (most-diverse intra-orig pair)
+  all others ≈ 0.95
+
+Hier-meta(Compound × Stint, τ=20k) probe results:
+
+| Pool                     | OOF      | Δ vs K=21 | Δ vs K=22 | ρ vs PRIM | flips top-1%   |
+|--------------------------|---------:|----------:|----------:|----------:|----------------|
+| K=22 (transfer)          | 0.95094  | +1.13 bp  | —         | 0.99844   | 180 (R7 ≤200)  |
+| K=23 (transfer + cb)     | 0.95094  | +1.10 bp  | +0.005 bp | 0.99854   | 202            |
+| K=24 (transfer + cb + xgb)| 0.95097 | +1.43 bp  | +0.33 bp  | 0.99828   | 293 (over R7)  |
+
+**Verdict: NULL on multi-arch diversification.** The 4 orig-trained
+bases carry the same underlying DGP signal in slightly different
+forms; LR-meta absorbs the additional architectures with marginal
+gains (+0.005 bp / +0.33 bp). The single-arch LGBM (`d15_orig_transfer`)
+captures most of the available orig-side signal at lower cost.
+
+K=24 not submitted: (1) +0.326 bp OOF at ρ=0.998 predicts LB tie at
+best per `probe.py` band; (2) 293 flips > R7 200-cap requires explicit
+PI sign-off; net EV not worth the slot.
+
+Friction tag: `external-data-arch-bag-redundant-when-shared-training-data`.
+For future external-data work: vary either training-data subset OR
+target-engineering, not just architecture.
 
 ## Artifacts
 
