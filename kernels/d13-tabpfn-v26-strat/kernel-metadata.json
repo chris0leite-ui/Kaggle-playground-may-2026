@@ -1,0 +1,17 @@
+{
+  "id": "chrisleitescha/d13-tabpfn-v26-strat",
+  "title": "d13-tabpfn-v26-strat",
+  "code_file": "d13_tabpfn_v26.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "keywords": ["gpu"],
+  "dataset_sources": [],
+  "kernel_sources": [],
+  "competition_sources": ["playground-series-s6e5"],
+  "model_sources": [],
+  "machine_shape": "GpuT4x2"
+}
