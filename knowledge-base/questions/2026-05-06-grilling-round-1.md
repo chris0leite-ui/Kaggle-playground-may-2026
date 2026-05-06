@@ -81,8 +81,27 @@ So what transfers?
 data for the PI, or for the framework, or both — and what we should be
 explicitly logging for the cross-domain comparison.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** What transfers is **the research loop**,
+> not the models. Within Kaggle: regression ↔ classification ↔ time-series
+> require different model classes, but the loop (benchmark → understand
+> → frame → key components → hypotheses → experiments → evaluate → log)
+> is task-agnostic. The 7-step bulletproof process is the backbone.
+>
+> Beyond the loop, four further claims:
+> 1. **Documentation & context-handoff is the bottleneck**, not compute.
+>    Agents have narrow context per instance but you can run many; the
+>    bottleneck shifts to communication.
+> 2. **PI as focus-setter.** Unlimited agent capacity is useless without
+>    direction. PI's job: instructions/scaffolding so agents find right
+>    focus and don't burn a week on dead-end probes.
+> 3. **Incidental learning matters.** Don't only chase next-day LB —
+>    invest in foundation that pays off at *final* evaluation 3-4 weeks
+>    out.
+> 4. **Same principle transfers to day-job model building**: explore
+>    AND invest in foundation; keep improving.
+>
+> Synthesis: see [`thoughts/2026-05-06-transfer-answer.md`](../thoughts/2026-05-06-transfer-answer.md).
+> Follow-ups in [`grilling-round-2.md`](./2026-05-06-grilling-round-2.md).
 
 ---
 
