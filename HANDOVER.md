@@ -153,8 +153,6 @@ winner. **Pivoted to Move D + feature engineering instead.**
 
 - `audit/2026-05-12-d12-master-synthesis.md` — Day-12 unifying frame
 - `audit/2026-05-12-d12-groupkf-rebuild.md` — Option 1 detail
-- `audit/2026-05-12-d12-tabpfn-finetune-prep.md` — Move A specifics
-- `audit/2026-05-09-d9c-fm.md`, `audit/2026-05-10-d9f-multi-fm.md` — FM thread
-- `scripts/{d9c_fm.py, d9c_kn_stack.py, d9f_multi_fm.py}` — Move B templates
-- `kernels/d12-tabpfn-finetune-gpu/` — Move A kernel
-- `scripts/{d12_groupkf_meta.py, d6_multi_rule.py, pre_submit_diff.py}`
+- `audit/2026-05-13-d13-move-b-fm-variants.md` — Move B (V1 PASS_BOTH)
+- `audit/2026-05-12-d12-tabpfn-finetune-prep.md` — Move A kernel
+- `scripts/{d13_move_b_fm_variants.py, d12_groupkf_meta.py, pre_submit_diff.py}`
