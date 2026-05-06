@@ -130,6 +130,41 @@ The K=22 Path B fit + d15b_dae_only is the **structural-breakthrough candidate**
 2. **R5 candidates accumulating.** d15c (ExtraTrees), d15d (LGBM-on-KNN), d15c+d15d K=23 add are HEDGE-eligible if the final-3-day window arrives without further structural breakthrough.
 3. **HEDGE alt**: `d15b_path_b_K22_dae_only_tau100000` OOF 0.95089 (+0.563bp), ρ=0.99882 — a slightly lower-amp variant if the τ=20000 winner regresses on submit.
 
+## SUBMIT RESULT (2026-05-06 15:38)
+
+`d15b_path_b_K22_dae_only_tau20000` submitted single-shot with PI approval (Rule 1).
+**Public LB: 0.95059** (+1.0bp over d13e PRIMARY 0.95049). **NEW PRIMARY.**
+
+Gap to top-5% threshold (0.95345): 29.6 → **28.6bp**.
+
+### Realised vs predicted
+
+| Source | Predicted LB Δ | Realised |
+|---|---:|---:|
+| ρ-band baseline (probe.py) | +0.22bp | +1.0bp |
+| 6× Path B amp | +4.3bp | +1.0bp |
+| 8× Path B amp (d13e ratio) | +5.7bp | +1.0bp |
+| 11.6× Path B amp (d13 Stint ratio) | +8.3bp | +1.0bp |
+
+Realised amp ratio = **+1.0/+0.715 ≈ 1.4×**. Above ρ-band baseline (positive surprise); well below Path-B-amp central. New friction tag:
+
+`path-b-amp-only-fires-on-meta-arch-not-base-add` — Path B amplification (6.7-11.6× empirical) is conditional on lift coming from META-ARCHITECTURE REDESIGN (e.g. Compound × Stint segmentation in d13e, vs Stint alone in d13), NOT from K_pool → K_pool+1 base additions, even when the new base is genuinely orthogonal-class (ρ_test 0.9477 standalone). Base-additions get standard ρ-band treatment.
+
+### Cross-confirmation from parallel main-branch agent
+
+Today main-branch ran two related K=22 additions:
+- `d15 K=22 + orig_transfer` (no Path B): LB 0.95039 (−1bp regress at +0.778bp OOF, ρ 0.9953)
+- `d15 hier-meta(K=22) + orig_transfer τ=20k`: LB 0.95049 (TIE at +1.127bp OOF, ρ 0.99844)
+- **(this branch) `d15b K=22 hier-meta + DAE-only τ=20k`: LB 0.95059 (+1bp, +0.715bp OOF, ρ 0.99973)** ← strongest
+
+Same K=22-Path-B mechanism, three different new bases. DAE-class beats orig_transfer-class by +1bp. The pattern reinforces that the new-base axis is alive but Path-B-amp-bounded.
+
+### Take-away for Day-16 sequencing
+
+- **Base-add axis empirical**: +0-1bp LB lift per orthogonal new base on this K=21+hier-meta architecture, regardless of standalone diversity.
+- **Path-B-amp-eligible axis**: meta-arch redesign (non-Gaussian shrinkage, covariance-aware Σ stacker per Yao/Vehtari, alternative segmentation cross). These should be the Day-16 priority.
+- **R5 hedge ladder**: d15b (now PRIMARY), d13e (was PRIMARY, +0bp), d13 Stint (LB 0.95041, -8bp), C/D candidates (predicted -1.4bp without amp, untested).
+
 ## Hypothesis-board updates
 
 - **Saturation list grows.** Add to friction: `single-base-fe-additions-noise-wall` extended — even genuinely new-class candidates (ExtraTrees, KNN features) land in the ρ=0.996 noise-floor band when LR-meta routes them. The binding constraint for the K=21 pool's LR meta is *test-row prediction-rank space*, and orthogonal raw-prediction diversity (ρ=0.93 between d15c and d15d) gets compressed to ρ=0.996 vs PRIMARY through the meta.

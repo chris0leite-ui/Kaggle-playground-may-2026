@@ -26,11 +26,14 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
   (cap 150k rows); resume fold-0 probe. EV: +5–15bp std-alone,
   +1–3bp stack median, tail +3–9bp. Live "10bp shot" per Day-12
   master synthesis. `[owner: unclaimed | status: open]`
-- **1b.** EmbMLP CPU baseline. Embedding-MLP for the leakage-robust
-  population. Cheap, untried. Day-15 reframed: Jahrer-style swap-noise
-  DAE + LGBM-on-latent (Porto Seguro precedent) is the strict upgrade —
-  unsupervised, orthogonal to the supervised pool.
-  `[owner: read-handover-LgbQ4 | status: wip]`
+- **1b.** EmbMLP CPU baseline → reframed as Jahrer swap-noise DAE +
+  LGBM-on-latent. **DONE 2026-05-06**: GPU kernel d15b-dae-lgbm-gpu v2
+  ran on P100 (torch 2.4 sm_60 fix). std OOF 0.94007, ρ_test 0.9477
+  (most-diverse since FM_A_53), min-meta +0.793bp at ρ 0.99547.
+  K=22 Path B Compound×Stint τ=20000 OOF +0.715bp. **SUBMITTED LB
+  0.95059 (+1.0bp NEW PRIMARY).** Realised amp 1.4× (well below Path-B-amp
+  6-11.6× central) — new friction `path-b-amp-only-fires-on-meta-arch-not-base-add`.
+  `[owner: read-handover-LgbQ4 | status: done]`
 - **1c.** DeepFM-lite (FM + 2-layer MLP head). Extends d9c FM with
   non-linear interactions. Cheap CPU.
   `[owner: unclaimed | status: open]`
