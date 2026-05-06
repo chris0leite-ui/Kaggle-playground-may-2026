@@ -122,14 +122,33 @@ LR-meta), d12_lr_meta 4.69 (dominates).
    PitNextLap among original rows with this LapTime" become a leaked
    posterior.
 
-## Submit calculus (NOT submitted today)
+## Submit result (2026-05-06 13:03 UTC)
 
-OOF lift +0.778 bp at ρ=0.995 → predicted-LB-band per `probe.py`:
-[0, 0.5, 2.0] bp. With FM-class amplification pattern (5–15× for
-truly orthogonal new model class), bull case +3 to +10 bp LB. Per
-Rule 1, no submit without PI approval. Recommend: submit K=22 stack
-(K=21 + d15_orig_transfer) as the next probe — orig-transfer is the
-first new-model-class base since FM landed in d9c.
+Submitted `submission_d15_K22_add_orig_transfer.csv` (K=22 LR-meta =
+K=21 + d15_orig_transfer). Pre-submit ρ vs PRIMARY = 0.9953
+(structurally different).
+
+**LB 0.95039** vs PRIMARY 0.95049 — **regressed −10 bp**.
+
+Diagnosis: this submit holds the *base pool* mechanism (orig_transfer
+is genuinely orthogonal at ρ=0.565) but uses the *wrong meta
+architecture* (plain LR-meta). PRIMARY (0.95049) is hier-meta(K=21,
+Compound×Stint, τ=20k). LR-meta(K=22) ≈ 0.95039 ≤ LR-meta(K=21)
+baseline (≈ 0.95035, extrapolated from hier-meta uplift Δ +0.014 bp
+OOF → +14 bp LB). So the +0.778 bp OOF gain is consistent with
+landing ~0.95040 LB; the 10 bp gap to PRIMARY is the meta-architecture
+delta, not the base addition.
+
+**Mechanism is NOT yet falsified** — the orthogonal new-class signal
+should ride a hier-meta. The clean follow-up probe is **hier-meta on
+K=22** (PRIMARY architecture + d15_orig_transfer added to the pool).
+That isolates whether orig_transfer adds incremental LB on top of the
+PRIMARY. Tag: `meta-arch-required-for-orthogonal-base-eval`.
+
+Friction: pre-submit BOTE under-weighted the meta-arch axis. Rule-19
+BOTE for new-base candidates should specify which meta architecture
+will be used for evaluation; LR-meta vs hier-meta is a 14 bp delta
+on this comp and dominates +0.778 bp base-add lifts.
 
 ## Artifacts
 
