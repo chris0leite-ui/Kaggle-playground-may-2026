@@ -74,6 +74,29 @@ ff-merge before reading state below.
     status (`wip` → `done`/`null`/`parked`) at wrap-up. Re-decomposition
     of the tree fires on the same triggers as the strategy-critic-loop
     (plateau, saturation, kickoff, 50% checkpoint, "redecompose").
+19. **Experimentation harness (BOTE-first / gate-after).** Embed
+    BOTE in problem-solving. Workflow:
+    (a) Before any candidate ≥10 min CPU/GPU, run
+        `python scripts/probe.py bote NAME --family X --cost_min N`.
+        SKIP verdict → don't run; DEFER → only if cycles permit;
+        PURSUE → ok. Family priors are calibrated to empirical hit rate
+        (~17% for s6e5 base population; family-conditional adjustments
+        in `FAMILY_PRIORS` dict).
+    (b) After artifacts exist, run
+        `python scripts/probe.py gate NAME --oof PATH --test PATH`
+        for the uniform structured report (standalone OOF Δ, ρ vs
+        PRIMARY, predicted LB Δ, G3 flip ratio, verdict). DON'T write
+        bespoke gate logic per script.
+    (c) For K=21+N stack-add probes use
+        `python scripts/probe_min_meta.py --candidates ...`.
+    (d) Rule-out is a valid result. Cheap null findings get audit
+        notes too (`audit/YYYY-MM-DD-*.md`); don't only document wins.
+    (e) "Many small things" beats "one big bet": prefer 5×30-min
+        probes over 1×3-h NN unless EV/cost-min strongly favors the
+        big bet under the harness's BOTE.
+    PI corollary: the calendar/budget belongs to PI; agents do
+    not propose timelines or "today/tomorrow" framings — execute
+    until PI says stop.
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
