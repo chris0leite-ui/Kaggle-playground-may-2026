@@ -106,22 +106,15 @@ winner. **Pivoted to Move D + feature engineering instead.**
 - RealMLP bagging (Day-7); broad pseudo-labeling (Day-5)
 - TabM-D smoke + extended 200ep lr=3e-4 (Day-9/11)
 - T1.4 Hazard NN — Day-9/10 (230bp leak; leakfree zero signal)
-- d9 10 math heuristic rule_residuals; d9b R14 K=20 swap+L4 (TIE)
-- d9d FM hparam sweep + 3-seed bag; d9e FFM (overfit at default cap);
-  d9g 3-way multi-FM (REGRESSION −0.46bp); d9h K=22 add (TIE_EXPECTED
-  but LB +3bp from FM-class amplification)
-- **T1.2 multi-formulation 4-of-4** (Day-8 Poisson + Day-12
-  censored/ratio/survival)
-- **Year-segmented specialist** (cohort-split strips cross-Year reg.;
-  Year=2023 is EASIEST segment, P3 inverted)
-- **Adversarial validation reweighting** (AV-AUC=0.502; train/test
-  i.i.d.; no shift to exploit)
-- **LambdaRank meta** (-86bp); **AUC-pairwise XGB base** (-451bp
-  fold-0); LR-meta on [raw,rank,logit] retains seat
-- **Single-bag e3 5seed** (-19bp; K=21 complexity JUSTIFIED, not
-  OOF-noise overfit)
-- **External real-world priors on synth** — C1 TIE + C2 Pirelli
-  DEPRECATED Day-12
+- d9 10 math heuristic rule_residuals; d9b R14 K=20 swap+L4 TIE
+- d9d FM sweep + 3-seed bag; d9e FFM overfit; d9g 3-way multi-FM −0.46bp
+- **T1.2 multi-formulation 4-of-4** (Poisson Day-8 + censored/ratio/survival Day-12)
+- **Year-segmented specialist** (cohort-split strips reg.; Year=2023 is EASIEST, P3 inverted)
+- **Adversarial validation reweighting** (AV-AUC=0.502; train/test i.i.d.)
+- **LambdaRank meta** (-86bp); **AUC-pairwise XGB base** (-451bp fold-0)
+- **Single-bag e3 5seed** (-19bp; K=21 complexity JUSTIFIED)
+- **External real-world priors on synth** — C1 TIE + C2 Pirelli DEPRECATED
+- **Day-13 Move B V2/V3 K=22 add** Strat regress; held as GKF-only HEDGE only
 
 ## Held submissions (do NOT submit)
 
