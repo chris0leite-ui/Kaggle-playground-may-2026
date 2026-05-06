@@ -109,10 +109,15 @@ def install_tabpfn():
         sys.executable, "-m", "pip", "install", "--quiet",
         "--no-deps", "tabpfn==7.1.1",
     ])
-    # Install tabpfn's non-torch transitive deps
+    # Install tabpfn's non-torch transitive deps (torch excluded to hold pin)
     subprocess.check_call([
         sys.executable, "-m", "pip", "install", "--quiet",
-        "scikit-learn", "numpy", "pandas", "scipy",
+        "scikit-learn>=1.2.0", "numpy>=1.21.6", "pandas>=1.4.0",
+        "scipy>=1.11.1", "einops>=0.4.0", "huggingface-hub>=0.19.0",
+        "pydantic>=2.8.0", "pydantic-settings>=2.10.1",
+        "eval-type-backport>=0.2.2", "joblib>=1.2.0", "filelock>=3.11.0",
+        "typing_extensions>=4.12.0",
+        "tabpfn-common-utils[telemetry-interactive]>=0.2.13",
     ])
 
     import importlib
