@@ -53,7 +53,22 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
 
 - **3a.** Within-stint relative-progress as TARGET (not feature).
   d13 G1 was a feature-add NULL; reframe as target variable.
-  `[owner: unclaimed | status: open]`
+  `[owner: ml-handover-alignment-xvUN0 | status: done]`
+  Result: stint_progress LGBM (TyreLife/max-stint) std OOF 0.65,
+  ρ=0.252 (most-diverse single base ever), but K=21+1 alone NULL;
+  joint with inv_laps adds only +0.10 bp. Concept lives in pool
+  via inv_laps_until_pit.
+- **3b.** Single-task GBDT on transformed targets (NEW FINDING).
+  `[owner: ml-handover-alignment-xvUN0 | status: done]`
+  Result: **inv_laps_until_pit** LGBM regression on 1/(1+laps_until_pit);
+  K=21+1 alone +1.899 bp OOF, ρ=0.99392. Path B over K=22+inv_laps
+  Compound×Stint τ=20k OOF 0.95110 (+2.75 bp vs PRIMARY). LARGEST
+  OOF advance of session. HELD; submission decision pending.
+  Predicted LB band +1.25 to +32 bp depending on Path B amp factor.
+- **3c.** Other single-task target reformulations untested.
+  `[owner: unclaimed | status: open]` Untried framings:
+  pit_horizon_multiclass (4-class horizon bucket); reverse cumcount
+  of pits in race; stint_index_within_race.
 
 ## 4. External data
 
@@ -66,6 +81,14 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
 - **5a.** d13e Compound×Stint τ=20k vs τ=100k HEDGE. Flip ratio
   55/98 < 200; HEDGE-eligible per R7. Decide at start of final
   window.
+  `[owner: unclaimed | status: open]`
+- **5b.** path_b_K22_invlaps τ=20k as PRIMARY-replacement candidate.
+  OOF 0.95110, ρ=0.99753 vs PRIMARY, 53% rows differ >1e-3, flip
+  ratio 0.594. Submission held pending PI decision.
+  `[owner: unclaimed | status: open]`
+- **5c.** path_b_K22_invlaps τ=100k as HEDGE candidate (asymmetric
+  flips 45/189 echoes d13 Stint Path B which lifted +7 bp despite
+  G3 fail). Hold for final-window decision.
   `[owner: unclaimed | status: open]`
 
 ## 6. Pool composition surgery
@@ -108,6 +131,29 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
   rows. Friction tag `synthetic-dgp-conditionally-near-independent`.
   Joint-explains FM-aug12 saturation, Day-13/14 alt-axis 4-of-4 NULL,
   TabPFN 0.944 ceiling. See `audit/2026-05-06-d14-dgp-residuals.md`.
+- KD-distilled-LGBM-of-K=21-meta (2026-05-06: meta-derivative class;
+  +0.526 bp OOF predicted same LB-regress pattern; held).
+- NN-with-embedding-layers single-base (2026-05-06: ρ=0.918
+  most-diverse measured but K=21+1 -0.025 bp NULL; ρ alone
+  insufficient to clear meta-absorption ceiling).
+- Lap-mod / id-mod features in LGBM (2026-05-06: 566 bp marginal
+  span on LapNumber_mod_10 absorbed by existing GBDT interactions;
+  K=21+1 +0.002 bp NULL).
+- Confidence-extreme pseudo-cascade (2026-05-06: K=21+1 +0.019 bp NULL).
+- K=21 simple aggregators (mean/gmean/rank_mean/trimmed) (2026-05-06:
+  -19 to -32 bp standalone; LR meta with [raw,rank,logit] expand
+  is doing real work, simple aggregators ruled out).
+- α-calibrated τ-resweep on PRIMARY (2026-05-06: τ=20k unchanged at
+  ρ=1.0; Bayesian-correct asymmetry is not a fixable LB cap).
+- Driver-cluster Path B cohort axis (2026-05-06: -0.4 to -0.9 bp NULL).
+- Within-Race quantile of LapTime_Delta (2026-05-06: K=21+1 +0.20 bp
+  NULL/marginal; +922 bp single-feat leak signal absorbed by pool).
+- Year×Stint as sparse-LR feature (2026-05-06: K=21+1 +0.05 bp NULL
+  despite ρ=0.844; structurally diverse but signal redundant).
+- Multi-target NN with shared trunk (2026-05-06: K=21+1 +0.086 bp NULL;
+  auxiliary inv_laps head ineffective at meta gate vs single-task NN).
+- TE fold-leak audit on d2a/d3a (2026-05-06: CLEAN; no leakage; OOF
+  discipline correct).
 
 ---
 

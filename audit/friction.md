@@ -25,6 +25,48 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   innovations can. Joint-explains FM-aug12 saturation, Move D NULL,
   Day-13/14 alt-axis 4-of-4, and TabPFN's 0.944 ceiling.
 
+- `tag: rho-alone-not-sufficient-for-meta-utility` — measured 13+
+  single-base candidates this session. Three with very low ρ vs
+  PRIMARY (extreme diversity) all NULL at meta gate: nn_embeddings
+  (ρ=0.918, +0.025 bp NULL), year_stint_sparse_lr (ρ=0.844, +0.05 bp),
+  stint_progress alone (ρ=0.252, NULL). The K=21 LR meta with
+  expand([raw,rank,logit]) reproduces high-diversity bases as
+  convex combinations of pool when the test-time-distinct signal
+  is linearly recoverable. **Fix:** when BOTE-ing single-base
+  additions, do NOT credit ρ < 0.95 as predictive of meta lift.
+  Instead require evidence that the candidate's signal is sourced
+  from *outside* the pool's prediction span (e.g., target-derived
+  reformulation like `inv_laps_until_pit`, NOT model-class diversity
+  alone). Codify this in `scripts/probe.py FAMILY_PRIORS` —
+  `nn_or_fe_diversity_alone` family with P=0.10, bp band (0, 0, 1).
+- `tag: marginal-bin-span-not-predictive-lift` — id-order audit found
+  LapNumber_mod_10 marginal target span 566 bp; lap_mod_features
+  LGBM with explicit mod features got K=21+1 +0.002 bp NULL.
+  The 566 bp marginal pattern was fully captured by existing GBDT
+  feature interactions (LapNumber × other features). **Fix:**
+  marginal-bin-span findings are NOT a reliable EV proxy for
+  predictive lift; need a "joint-model holdout" check (refit LGBM
+  WITHOUT the candidate feature; measure ΔAUC; if ΔAUC < 0.5 bp
+  the candidate adds nothing).
+- `tag: target-derived-vs-meta-derived-orthogonality` — empirical
+  separation now established: `d12_lr_meta` (= K=21 LR-meta-OOF)
+  produced +1.348 bp OOF but LB regress -4 bp; `inv_laps_until_pit`
+  (LGBM regression on 1/(1+laps_until_pit), target-derived) produced
+  +1.899 bp OOF. Both have similar ρ (~0.99) and superficially
+  similar OOF lift, but the orthogonal-signal criterion separates
+  them mechanistically. The target-derived candidate has not yet
+  been LB-tested but should NOT be subject to the meta-derivative
+  failure mode. **Pre-flight rule:** before treating any K=K_pool+1
+  candidate as Path-B-amp-eligible, classify the candidate's signal
+  source: (a) target-derived (PASS), (b) feature-engineered from
+  raw inputs (PASS conditional), (c) meta-derivative / convex-combo
+  of existing pool predictions (FAIL — discount Path B amp by 10×).
+- `tag: cpu-contention-multi-probe-batch` — running 7 LightGBM/NN
+  probes simultaneously made each ~4× slower than alone. KD probe
+  reached `max_iter=400` without early-stop on any fold; FE-combo
+  was killed after fold 0 took 62 min. **Fix:** Cap to 3 concurrent
+  CPU-heavy probes max in future batches. Schedule cheap probes
+  (<30 s each) ahead of slow ones to free CPU for the slow batch.
 - `tag: path-b-amp-needs-orthogonal-signal-not-meta-derivatives` —
   Path B family-conditional amplification (prior precedents: Stint
   +0.86 bp OOF → +7 bp LB at 11.6×; Compound×Stint +1.0 bp OOF →
