@@ -2,6 +2,36 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-06 PM (branch `claude/read-kaggle-handover-rsi2Q`)
+
+- `tag: recipe-over-judgment` — Day-16 PI question: "we ran 16 days of
+  disciplined experiment loops and never asked WHAT'S THE BEST SINGLE
+  MODEL? We jumped to stacking on Day 2." Diagnosis: (a) we treated FE
+  additions as "+1 feature to existing base" probes, never built a
+  kitchen-sink feature factory; (b) once K=21 was saturated, every
+  candidate was at ρ≈0.999 → tiny lift → NULL, and we labelled this
+  `lr-meta-rank-lock-strong-anchor` instead of asking "what if a NEW
+  base had ALL the FE we never tried?"; (c) Rozen 0.95354 recipe was
+  publicly available the entire time at 19-72 votes, never pulled.
+  Lessons promoted to skill `improvements.md` (6 entries: kickoff Q5b
+  data+task description, guardrail 13 single-model-first, pre-baseline
+  gate items 8-11 public-notebook + TE inventory + physics features +
+  single-model OOF target, day-loop public-notebook re-scan trigger,
+  guardrail 14 family-falsification needs ≥3 variants, guardrail 15
+  framework is scaffolding not authorship).
+
+- `tag: family-falsification-too-quick` — Day-3 d3a `unified_te_2way_keys`
+  tested ONE smoothing × ONE 2-way key, scored +0.1 bp NULL at meta-add,
+  closed the entire TE family. The 3-way (Driver, Race, Year) at smoothing
+  20 was the comp's load-bearing single trick (~+200 bp standalone for
+  any single LGBM). One null does not falsify a family.
+
+- `tag: kitchen-sink-fe-beats-stack-without-fe` — Day-16 evening: single
+  LGBM with Rozen's 65 features (50 engineered + 6 CV target encodings
+  + 9 raw cats) hit Fold-1 OOF 0.95084, matching K=22+Path-B-hier-meta
+  PRIMARY at OOF 0.95090. Single-model FE recovers ~95-100% of stacking
+  lift on this comp.
+
 ## 2026-05-16 (branch `claude/read-handover-lA8Nr`)
 
 - `tag: twin-pool-2-meta-collapses-rank-info` — Day-16 H2 built two LR

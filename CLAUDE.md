@@ -97,6 +97,40 @@ ff-merge before reading state below.
     PI corollary: the calendar/budget belongs to PI; agents do
     not propose timelines or "today/tomorrow" framings — execute
     until PI says stop.
+20. **Single-model-first / kitchen-sink FE before stacking.** Before
+    adding a 2nd base or LR-meta, build the kitchen-sink feature
+    factory (≥30 engineered features + CV target encoding on every
+    high-card combo, **including 3-way**) and a SINGLE model first.
+    That OOF is the floor; stacking adds on top, it does NOT replace
+    it. Origin: s6e5 Day-16 PI question after we ran 16 days of
+    stack-mechanism work without ever asking what's the best single
+    model. Single LGBM with Rozen's recipe matched our K=22+Path-B
+    PRIMARY OOF on Fold-1 alone.
+21. **Family falsification requires ≥3 variants.** A mechanism
+    family (TE, FM, lag, target-reform, pseudo, calibration) is
+    only "dead" after ≥3 distinct configs of the key hyperparameter
+    (smoothing, polynomial order, field count, key cardinality,
+    regularisation). Single-variant nulls update the prior on that
+    VARIANT, not on the family. Origin: s6e5 d3a closed TE family
+    on Day-3 single 2-way × single smoothing variant; the 3-way
+    (Driver, Race, Year) at smoothing 20 was the comp's +200 bp
+    standalone trick that sat unused for 13 days.
+22. **Public-notebook scan at every plateau.** Triggered on 3
+    consecutive nulls, 5 saturations at same LB, 50% checkpoint, or
+    "redecompose": pull top 5 Kaggle public notebooks for the comp
+    slug (≥10 votes), list their features + OOF AUCs + model classes.
+    Question: which features are NOT in our pool? Build that gap as
+    the next experiment. Strengthens Rule 7 with comp-specific recipe
+    intelligence. Origin: s6e5 Day-16 — Rozen's 0.95354 recipe sat
+    at 19-72 votes the entire comp without us pulling it.
+23. **Framework is scaffolding, not authorship.** The framework
+    (BOTE → gate → submit, 7-step, ISSUES tree) optimises HOW to
+    evaluate. It does NOT generate WHAT to evaluate. Reserve ≥1 slot
+    per 3-day cycle for free-form FE creativity uncoupled from
+    existing pool. Triggered when 3+ days pass without a probe whose
+    source idea is NOT a 1-step variant of an existing experiment.
+    Origin: s6e5 16-day plateau where every probe was a rank-locked
+    stack-add variant; discipline is necessary but not sufficient.
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
