@@ -64,8 +64,7 @@ script lines 117-129). **First action this session:**
   4. Verify status: `kaggle kernels status chrisleitescha/d12-tabpfn-finetune-strat`.
   5. T4×2 wall 5-7h. **Only live 10bp shot.** EV +5-15bp std-alone,
      +1-3bp stack median, +3-9bp tail. Runs in background.
-  6. On completion (next session), pull artifacts via
-     `kaggle kernels output chrisleitescha/d12-tabpfn-finetune-strat -p kernels/d12-tabpfn-finetune-gpu/output/`.
+  6. On completion: `kaggle kernels output chrisleitescha/d12-tabpfn-finetune-strat -p kernels/d12-tabpfn-finetune-gpu/output/`.
 
 ### Move B — build 3 FM-class diversification variants (cheap CPU)
 Each 2-3h CPU. Builds on d9f's 2-way 4/4 sweet spot finding:
