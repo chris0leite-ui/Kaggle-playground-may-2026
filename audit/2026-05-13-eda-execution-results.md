@@ -76,12 +76,59 @@ public LB (Day-12 GroupKF rebuild: FM −9 bp under GKF vs GBDT −200 to
 
 Recommended: **K=23 add** (matches d9h S2 pattern, OOF 1bp higher than swap).
 
-## Status
+## Status — H1 SUBMITTED, FALSIFIED
 
-- 4 hypotheses executed, 3 falsified, 1 candidate.
-- Submission file ready: `submissions/submission_K23_add_H1_FM_aug15.csv`.
-- **Submission requires PI sign-off (Rule 1).**  EV midpoint +1 bp; tail
-  +4 bp.  Cost: 1 of today's 9 remaining tokens.
+PI approved.  Submitted `submission_K23_add_H1_FM_aug15.csv` at 06:58 UTC.
+
+**LB 0.95032** = -2 bp vs PRIMARY-of-record anchor 0.95034.  Lands in
+the pre-submit "LB -1 to -3 bp" outcome zone.
+
+### What this falsifies
+
+The d9h FM-field-augmentation lever does NOT generalise to arbitrary new
+field types.  3 new fields (CRT = Compound × TL_q5 × RP_q5, Cdpl =
+cumdeg_per_lap_q5, Ldz = LapTime_Delta_zr_q5) added noise that the LR-meta
+could not downweight on Strat OOF.  The 4 fields d9h added (next_compound,
+prev_compound, Cum_Deg_q5, LapTime_Delta_q5) were a specific lucky pull,
+not a structural property of "FM with more fields".
+
+### Updated FM-class precedent table
+
+| Submit | Std OOF | ρ vs PRIMARY | K-stack OOF Δ bp | LB Δ vs prior | Outcome |
+|---|---:|---:|---:|---:|---|
+| d9c FM_solo | 0.9207 | 0.899 | min-meta +0.18 | +3 | LB-amplify |
+| d9f FM partition | 0.825 / 0.884 | 0.487 / 0.861 | K=21 swap +0.29 | +2 | LB-amplify |
+| d9h FM_aug12 add | 0.9254 | 0.917 | K=22 add +0.013 | +3 | LB-amplify (300×) |
+| d9i FM partition aug | 0.881 / 0.886 | 0.720 / 0.863 | K=21 swap -0.19 | +3 | LB-amplify (direction-flip) |
+| d13 V1 5/3 multi-FM | (similar) | sim | +0.06 | 0 | TIE |
+| **H1 FM_aug15 add** | **0.9271** | **0.909** | **K=23 add -0.02** | **-2** | **REGRESS** |
+
+H1 had the strongest standalone OOF and the most-diverse ρ of any FM
+attempt to date — and still regressed.  Lever is saturated.
+
+### Strategic implication
+
+Pivot away from FM-field augmentation.  The TabPFN-2.5 fine-tuned kernel
+prepared on Day-12 (`kernels/d12-tabpfn-finetune-gpu/`) is the only live
+"+10 bp shot" remaining and now the highest-priority Day-14 move.
+
+### Side discovery from polling submissions
+
+Current actual LB-best on this account is **0.95041**
+(`submission_d13_path_b_stint_tau100000.csv`, posted today 05:34 UTC) —
++7 bp over the d9h/d9i 0.95034 PRIMARY-of-record.  Despite failing the
+G3 leakage flip-ratio gate (0.211 FAIL), the per-Stint EB-shrunk
+segmented LR-meta lifted LB +7 bp.  CLAUDE.md current_state and the
+EDA synthesis treated 0.95034 as PRIMARY; it is now 0.95041.  Gap to
+top-5% (0.95345) closes 31 bp → 24 bp.
+
+Implication: G3 may be over-conservative.  Worth a Day-14 re-audit of
+the 4-gate leakage filter for per-segment LR-meta candidates.  Not
+the EDA branch's scope.
+
+### Submission token spend
+
+1 / 9 remaining used today.  8 tokens left.
 
 ## Pointers
 
