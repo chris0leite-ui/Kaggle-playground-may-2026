@@ -4,6 +4,24 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
 
 ## 2026-05-06
 
+- `tag: target-construction-layer-leakage` — when computing a regression
+  target from `y` per-group (e.g., `reverse_cum = total_pits - cumsum`,
+  `inv_laps_until_pit`, `pit_horizon` bucket), the per-group computation
+  must use ONLY rows in the current fold's training set. Using all-train
+  labels per group leaks val-row labels into tr-row targets via the
+  group-level aggregation. Even with strict (X[tr], y[tr]) → predict
+  X[va] LightGBM training, the TARGET ITSELF is contaminated. Confirmed
+  via strict-OOF audit (per-fold target construction with `mask=tr_only`):
+  reverse_cum +4.867 → -0.005 bp (100%); pit_horizon +3.191 → +0.302
+  (90%); inv_laps +1.899 → +0.234 (88%); joint +7.667 → +0.275 (96%).
+  Same failure mode as `tag: path-b-amp-needs-orthogonal-signal-not-meta-
+  derivatives`. **Fix:** for any per-group target derived from y, pass
+  a fold-mask to the target-computation function. For TEST predictions,
+  full-train target + full-train fit is correct. Audit at
+  `audit/2026-05-06-target-reform-leakage-audit.md`. Held candidates
+  built on these targets (path_b_K22_invlaps_*, path_b_K23_dae_invlaps_*,
+  path_b_K25_megapool_*) **must not be submitted**.
+
 - `tag: synthetic-dgp-conditionally-near-independent` — Day-14 PM:
   d14 DGP-residuals probe (masked-column self-prediction; SAINT/
   TabNet/VIME class). Trained 4 LGBM regressors to predict
