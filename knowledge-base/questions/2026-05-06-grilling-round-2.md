@@ -28,8 +28,21 @@ and where it breaks. Likely candidates from `CLAUDE.md`:
 - Rule 19(a) BOTE SKIP/DEFER/PURSUE verdicts — when have they been
   ignored? When have they correctly killed something?
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).**
+> - Good instance: **BOTE** — "includes a check to see if an approach
+>   really looks promising or not." (PI did not know what BOTE stood
+>   for; flagged as jargon-drift friction —
+>   see [`friction/2026-05-06-jargon-drift.md`](../friction/2026-05-06-jargon-drift.md).)
+> - Bad instance: **pre-BOTE fine-tuning waste** — significant time
+>   spent moving the public LB by tiny steps, before BOTE existed.
+>   Specifics deferred to [F1.2](./2026-05-06-grilling-round-3.md#f12).
+>
+> Meta-finding: PI read `CLAUDE.md` for the first time on this date.
+> Authorship of CLAUDE.md surfaced as a deeper structural question
+> ([F1.3](./2026-05-06-grilling-round-3.md#f13)). PI also flagged
+> CLAUDE.md length and suggested moving the hypothesis board / the
+> calibration ladder ("escalation letter" — transcription artifact)
+> elsewhere; not addressed yet.
 
 ---
 
