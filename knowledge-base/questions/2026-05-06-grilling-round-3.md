@@ -25,8 +25,11 @@ i.e. it produces a verdict on probes the agent was going to run anyway,
 and never actually causes a stop. That's a very different (weaker)
 mechanism than "focus-setting".
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** BOTE has been applied; some probes have
+> been rejected ("defected" → rejected; voice-to-text). PI has not
+> audited each verdict in detail and flags that this becomes more
+> extreme at scale. **No specific instance cited.** Followed up in
+> [F1.1.1](./2026-05-06-grilling-round-4.md#f111).
 
 ---
 
@@ -49,8 +52,17 @@ Need:
 This also gives us a calibration anchor: how much waste BOTE prevents
 per comp.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** Concrete instance: **TabPFN fine-tuning,
+> Day-14**. Multiple GPU hours already spent. If PI had not
+> intervened, the agent would have run a full 5-fold evaluation
+> (>10h GPU). PI insisted on **smoke / fold-0 first** (Rule 2). At
+> fold-0 the model returned ~0.94439 — AUC ceiling ~0.944, gap to
+> PRIMARY -64bp, **DEAD**.
+>
+> **Critical wrinkle**: this is *post*-BOTE, so PI's example is not a
+> pre-BOTE failure — it is a case where BOTE/Rule 2 nearly failed and
+> **PI override** was the operative focus mechanism. Followed up in
+> [F1.1.1](./2026-05-06-grilling-round-4.md#f111).
 
 ---
 
@@ -82,8 +94,14 @@ It also touches the [trust question (Q3)](./2026-05-06-grilling-round-1.md#q3-�
 if you don't fully own the framework, can you trust audits that
 appeal to it?
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** Confirmed: **PI did not write CLAUDE.md.**
+> PI plans to keep a section where they are the author, and is willing
+> to let the agent author the parts the agent is better at — PI will
+> not manually log those. PI wants to **review carefully and often**,
+> and explicitly asked Claude to **flag points warranting careful PI
+> review**. Filed as standing duty in
+> [`knowledge-base/README.md`](../README.md#claudes-standing-duties).
+> Concrete next step in [F1.5](./2026-05-06-grilling-round-4.md#f15).
 
 ---
 

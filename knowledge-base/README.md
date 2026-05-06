@@ -48,3 +48,29 @@ critical questions, clarifying concepts, and linking related entries.
 - Keep individual files small (≤150 lines); split when bloated.
 - Capture the PI's voice; do not over-edit. Synthesis goes in separate
   derived files, not on top of the raw thought.
+
+## Claude's standing duties
+
+Established 2026-05-06 in PI's [F1.3 answer](./questions/2026-05-06-grilling-round-3.md#f13--authorship-of-claudemd):
+
+1. **Flag points warranting careful PI review.** PI cannot read every
+   audit / rule / agent decision — this gets worse at scale. When
+   Claude notices something in `CLAUDE.md`, audit files, or agent
+   output that
+   - (a) reads as cleaner than reality (drift between *what the rules
+     credit* and *what actually happened*),
+   - (b) introduces vocabulary or assumptions PI has not ratified,
+   - (c) makes a numeric claim PI has not had a chance to spot-check,
+   - (d) silently changes a decision rule or threshold,
+
+   surface it explicitly to PI. File flags in `flags/YYYY-MM-DD-*.md`
+   when persistence matters; raise inline in chat otherwise.
+
+2. **Maintain transcription-artifact glossary.** PI uses
+   voice-to-text; common substitutions get logged in
+   [`concepts/transcription-artifacts.md`](./concepts/transcription-artifacts.md)
+   so the same word doesn't get mis-parsed twice.
+
+3. **Continue grilling in understand-mode.** PI requested back-and-
+   forth interrogation. Default to clarifying / pushing back, not
+   proposing solutions, unless PI explicitly opens the solution lane.
