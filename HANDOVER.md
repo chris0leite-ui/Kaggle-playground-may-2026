@@ -6,135 +6,145 @@
 
 ---
 
-## Today's session — Day 13 (2026-05-13)
+## Today's session — Day 14 (2026-05-14)
 
 **Read order on session start** (skip the default; this is the synthesis):
 
-1. `CLAUDE.md` — state block + Rules 1-16 (Q7 still PROPOSED)
-2. `audit/2026-05-12-d12-master-synthesis.md` — Day-12 6-option overnight; load-bearing
-3. `audit/2026-05-12-d12-groupkf-rebuild.md` — Option 1 STRUCTURAL FINDING
-4. `audit/2026-05-12-d12-tabpfn-finetune-prep.md` — Option 2 Kaggle GPU kernel ready
-5. `audit/2026-05-08-data-probe-results.md` — P1-P10 priors (P3 inverted by Option 4)
-6. `scripts/pre_submit_diff.py` — MANDATORY before submit (ρ < 0.999)
+1. `CLAUDE.md` — state block + Rules 1-16
+2. `audit/2026-05-13-d13-path-b-hier-meta.md` — Path B mechanism (load-bearing)
+3. `audit/2026-05-13-d13d-path-b-gkf-probe.md` — GKF amplification confirms private-robust
+4. `audit/2026-05-12-d12-master-synthesis.md` — Day-12 leakage-robust thesis
+5. `audit/2026-05-12-d12-tabpfn-finetune-prep.md` — TabPFN GPU kernel READY
+6. `scripts/pre_submit_diff.py` — MANDATORY before submit
 
 Open with a 3-bullet read-back of state + first action.
 
-## Where we are (Day 13 morning)
+## Where we are (Day 14 morning)
 
-- **PRIMARY** = `d9h_K22_add_aug12` / `d9i_S1_K21_swap_aug2way` (TIED) LB **0.95034**.
-- **HEDGE candidates**: `d9f_K21_swap_partA_partB` LB 0.95031; `d12_groupkf_meta` (held; ρ=0.9914 vs PRIMARY — most diverse meta-output to date; reserve for R5).
-- **Gap**: −1.7bp (narrowed from −2.4 on Day-11).
-- **Headroom to top-5%** (0.95345): **31.1bp**.
-- **14 days remaining** (deadline 2026-05-31). 9 slots/day available.
-- **Submits used**: 19/270 total; Day-12 0/9 (subagent night, no submits per Rule 1).
+- **PRIMARY** = `d13_path_b_stint_tau100000` LB **0.95041** (NEW Day-13; +7bp from prior PRIMARY).
+- **HEDGE** = `d9h_K22_add_aug12` / `d9i_S1_K21_swap_aug2way` (TIED) LB 0.95034.
+- **Gap to top-5%** (0.95345): **30.4bp** (narrowed from 31.1bp).
+- **13 days remaining** (deadline 2026-05-31). 9 slots/day.
+- **Submits used**: 22/270 total; Day-13 3/9 (V1 5/3 multi-FM TIE LB 0.95032; d13c Compound τ=100000 LB 0.95033; d13 Stint τ=100000 LB 0.95041 NEW PRIMARY).
 
-## Day-12 close: 6 wider-step options, 1 structural finding
+## Day-13 close: Path B hier-meta is a NEW MODEL CLASS
 
-Per `audit/2026-05-12-d12-master-synthesis.md`. Of 6 parallel
-subagents: 1 structural (Option 1), 1 kernel-ready (Option 2), 4
-falsified (Options 3/4/5/9 — see `mechanism_families_explored`).
+`d13_path_b_stint_tau100000` is the load-bearing finding. Per-segment
+empirical-Bayes hierarchical LR meta over the K=21 PRIMARY pool. Stint
+segmentation (5 levels), shrinkage τ=100000.
 
-**THE finding (Option 1):** under GroupKFold(Race,Driver,Year,Stint),
-K=21 LR-meta produces test predictions with ρ=**0.9914** vs Strat-meta
-(below the 0.999 RHO_TIE threshold). Bases split into 2 populations:
-- 13 GBDTs drop **−200 to −343bp** under GKF (leakage eaters)
-- 7 FM/rule/sparse-LR drop only **−9 to −43bp** (leakage robust)
-- **FM is 23–37× more leakage-robust than every GBDT.**
+| | Pre-submit | Result |
+|---|---|---|
+| OOF Δ vs d9f | +0.86bp | (built-in) |
+| ρ vs d9f | 0.998 (sub-tie) | (built-in) |
+| G3 flip ratio | 0.211 (FAIL) | benign — aligned with public LB |
+| **LB** | predicted ~−1bp | **+10bp vs d9f, +7bp vs d9h/d9i** |
+| **Upside** | n/a | **11.6× OOF→LB** |
 
-L1 reshuffles dramatically: cb_slow-wide-bag −17 ranks,
-e5_optuna_lgbm −13; **FM jumps +15 (#20→#5)**, R6_next_compound +11.
+**d13d GKF probe confirms mechanism is leakage-robust:** Strat lift
++0.90bp → GKF lift +2.59bp = **2.9× AMPLIFIED** (stronger than the
+FM-class 2.3× amplification in d10b/c). Three independent leak-blocking
+probes converge: public-LB +7bp transfers to private at median +4-6bp,
+conservative +2-3bp, bull +6-8bp.
 
-**Reframe:** rank-lock at ρ=0.9999 is substantially a Strat-leakage
-artifact. Pool's diversification frontier lives entirely WITHIN the
-leakage-robust population.
+**Insight**: hierarchical-meta heuristics are NOT the same as base-class
+heuristics. G3/ρ/R7 thresholds derived from d9c/d9f/d9h all failed for
+d13 Stint. New mechanism family → recompute the GKF probe BEFORE
+applying prior gates. (See `audit/friction.md` tag
+`pred-lb-heuristics-broken-for-hier-meta`.)
 
-## Day-13 first-action plan (parallel: A + B; then C)
+## Day-14 first-action plan (40bp gap, structural moves only)
 
-### Move A — push TabPFN-2.5 fine-tune kernel to Kaggle (PI action)
-Kernel ready at `kernels/d12-tabpfn-finetune-gpu/`. Set `TABPFN_TOKEN`
-secret (license accept on ux.priorlabs.ai). T4×2 wall 5-7h. **Only
-live 10bp shot.** EV +5-15bp std-alone, +1-3bp stack median, +3-9bp
-tail. Single PI action; runs in background.
+PI directive Day-13 evening: **"we want to improve by 40bp not 2."**
++1-3bp tuning probes are off the table for the comp middle. Each
+candidate below is a structural model-class lift.
 
-### Move B — build 3 FM-class diversification variants (cheap CPU)
-Each 2-3h CPU. Builds on d9f's 2-way 4/4 sweet spot finding:
-1. **5/3 multi-FM partition** — 5 driver-state + 3 race-context fields
-2. **4/4 alternative split** — Compound × TyreLife axis with new
-   partner field (variant of d9i's aug-2way)
-3. **Augmented 2-way (different fields)** — pick top-12 augmented
-   fields from d9h_aug12 by L1, split into 2 partitions
+### Move A — push TabPFN-2.5 fine-tune kernel (PI provides token)
+**BLOCKED on TABPFN_TOKEN.** Kernel at `kernels/d12-tabpfn-finetune-gpu/`.
+PI: license-accept at https://ux.priorlabs.ai → set Kaggle Secret
+`TABPFN_TOKEN` → `kaggle kernels push`. T4×2 5-7h. **Only live ≥10bp
+single-shot candidate.** EV +5-15bp standalone, +1-5bp stack tail.
 
-Each candidate: standalone OOF, ρ vs PRIMARY, min-meta gate, K=22
-add stack. **Use both Strat AND GroupKF as gates** (first time GKF
-is a secondary gate — Day-12 finding mandates this).
+### Move B — pseudo-label cascade at K=21+hier-meta level (~3-4h CPU)
+d5 partial pseudo got +14bp standalone but only +2.5bp at K=14 stack —
+tighter cascade at K=21+hier-meta ceiling could compound:
+1. Pseudo-labels from d13 Stint PRIMARY (LB 0.95041)
+2. Confidence-filter (top 30% by spread); retrain 5 fastest bases on (train + pseudo)
+3. Re-stack K=21 with pseudo bases + hier-meta; Round 2 if ρ < 0.999
 
-### Move C — pool refactor (after Move B lands ≥1 winner)
-Drop 3 most-leakage-eating GBDTs (e5_optuna_lgbm, cb_slow-wide-bag,
-e1_cb_sub — all ΔAUC ≤ −215bp under GKF) and replace with Move B
-winners. Build K=21 stack with swapped pool. Submit only if OOF
-Strat ≥ PRIMARY AND ρ < 0.9995.
+EV +5-10bp. Risk: pseudo over-amp (d5 widened gap on m5q).
 
-### Day-14 — Move D + E (second-tier)
-- **D: DeepFM-lite** (FM + 2-layer MLP head). 4-6h CPU.
-- **E: Regularised FFM re-attempt** (k=4, L2=0.5, dropout-on-fields).
-  d9e FFM died from overfit at 4× FM params; reduced capacity may
-  earn slot.
+### Move C — DeepFM-lite (~3-4h CPU)
+FM pairwise + 2-layer MLP head on 21-base expanded space. New class
+beyond d9c/d9f/d9h. EV +3-8bp standalone, +1-3bp stacked. Risk:
+overfit without dropout (d9e FFM precedent — 4× params died).
 
-## Falsified / dead — do NOT retry (Day-12 additions in **bold**)
+### Move D — new FM-input feature engineering (parallel agent's Day-13 finding)
+V1/V2/V3 sweep proved **same-12-field FM-partition reshuffle is dead**.
+New FM lift needs NEW INPUTS: pit-window-since-last-pit, hazard-decay,
+compound-pressure, race-stage. Build 4-6 features, train unified FM
+on aug12 + new fields, gate vs PRIMARY. EV +2-6bp.
 
-- Big sequence (P1); kNN/retrieval/TabR/Hopular/TabPFN-ICL (P2)
-- RealMLP bagging (Day-7); broad pseudo-labeling (Day-5)
-- TabM-D smoke + extended 200ep lr=3e-4 (Day-9/11)
-- T1.4 Hazard NN — Day-9/10 (230bp leak; leakfree zero signal)
+### Move D — Compound × Stint hier-meta SUBMIT (held variants)
+HELD. Two candidates per `audit/2026-05-13-d13-path-b-hier-meta.md`:
+- `d13e_compound_stint_tau20000.csv` (+1.00bp OOF, ρ=0.996, projects ~+2bp LB)
+- `d13e_compound_stint_tau100000.csv` (+0.82bp OOF, ρ=0.9996 vs Stint winner; HEDGE-grade)
+
+ONLY submit if Day-14 doesn't produce a structural Move A/B/C/D winner.
+
+### Research-loop trigger (Rule 7) IF Day-14 yields no ≥+5bp move
+Pause submits. Web-search top-5 finishers' writeups from comparable
+playground tabular comps. Identify untried mechanism families. Honest
+read: **40bp gap may not be tractable from current architecture**.
+Top finishers likely have a structural insight (target reformulation /
+unique FE / external data) we haven't found.
+
+## Falsified / dead — do NOT retry
+
+- Big-sequence (P1); kNN/TabR/Hopular/TabPFN-ICL (P2)
+- RealMLP bagging; broad pseudo-labeling; TabM-D extended 200ep
+- Hazard NN (230bp leak; leakfree zero signal)
 - d9 10 math heuristic rule_residuals; d9b R14 K=20 swap+L4 (TIE)
-- d9d FM hparam sweep + 3-seed bag; d9e FFM (overfit at default cap);
-  d9g 3-way multi-FM (REGRESSION −0.46bp); d9h K=22 add (TIE_EXPECTED
-  but LB +3bp from FM-class amplification)
-- **T1.2 multi-formulation 4-of-4** (Day-8 Poisson + Day-12
-  censored/ratio/survival)
-- **Year-segmented specialist** (cohort-split strips cross-Year reg.;
-  Year=2023 is EASIEST segment, P3 inverted)
-- **Adversarial validation reweighting** (AV-AUC=0.502; train/test
-  i.i.d.; no shift to exploit)
-- **LambdaRank meta** (-86bp); **AUC-pairwise XGB base** (-451bp
-  fold-0); LR-meta on [raw,rank,logit] retains seat
-- **Single-bag e3 5seed** (-19bp; K=21 complexity JUSTIFIED, not
-  OOF-noise overfit)
-- **External real-world priors on synth** — C1 TIE + C2 Pirelli
-  DEPRECATED Day-12
+- d9d FM sweep+bag; d9e FFM (overfit); d9g 3-way; d9h K=22 add (TIE)
+- T1.2 multi-formulation 4-of-4 (Poisson/censored/ratio/survival)
+- Year-specialist; AV reweighting (i.i.d.); LambdaRank meta (-86bp)
+- AUC-pairwise XGB (-451bp); external real-world priors on synth
+- **d10d leak-corrected meta** (G3 flip ratio 0.001; over-credits FM)
+- **Day-13 Move B V1/V2/V3 same-field FM partitions** — V1 5/3 SUBMITTED
+  LB 0.95032 TIE; V2/V3 held dead. Same-12-field FM-partition vein FULLY
+  MINED. Future FM lift needs NEW INPUT FIELDS, not new partitions.
 
 ## Held submissions (do NOT submit)
 
-- BURNED: `d5_partial_pseudo_m5q.csv` (LB 0.94963), `d9_k19_hazard_nn_stack.csv` (LB 0.94711)
-- TIE/DEAD held: `d7_realmlp_bag_part[BC]`, `d8_{l3_blend,k19_q12,k19_poisson}`,
-  `d9_{hazard_nn,k20_neighbor,k19_sc_prob}`, `d9b_K20_swap_R14_L4` (LB 0.95025 TIE),
-  `d10_hazard_nn_leakfree`, `d9d_*` FM sweep variants, **d12 t12c/d/e bases**,
-  **d12 year_specialist / advweight bases**, **d12 lambdarank_meta**,
-  **d12 e3/cb single bags**, **d12_groupkf_meta** (HEDGE for R5 only)
+- BURNED: `d5_partial_pseudo_m5q.csv` (LB 0.94963), `d9_k19_hazard_nn_stack` (LB 0.94711)
+- TIE/DEAD held (full list in CLAUDE.md): d7-d10 variants, d12 t12/year/AV/lambda
+  bases, **d12_groupkf_meta** (HEDGE-eligible R5), **d10d** (G3 fail),
+  **d13b Stint τ=20000**, **d13c Compound τ=100000** (LB 0.95033 result),
+  **d13e Compound×Stint** 4 τ-variants (only submit if no Move A/B/C win)
 
 ## Critical operating rules
 
 1. **Pre-submit-diff before EVERY submit**, ρ < 0.999.
-2. **At ρ < 0.99**, downgrade pred-LB by additional 30bp until recalibrated.
-3. **Rule 16 Q6** (ρ vs FULL pool, not just PRIMARY): binding gate; pre-flight.
-4. **Rule 16 Q7** (target-construction leak): ×0.1 EV unless GroupKF OOF.
-5. **NEW Day-12: GroupKF as secondary gate.** New candidate must
-   either pass Strat AND not regress GroupKF, OR pass GroupKF if it
-   is a leakage-robust class (FM/rule/sparse-LR).
-6. **Strat-only Day-3+ (R1)** — but GroupKF is now a secondary gate,
-   not a primary. Public LB stays the truth (U3: i.i.d. row split).
-7. **Submit budget** 19/270; 14 days × 9 slots = 126 remaining. Spend
-   3-4 calibration probes Day-13-15 on held TIEs at sub-0.99 ρ.
-8. **Model-class > tuning AND > external info on synth.** FM proved
-   model-class diversity lifts; Day-12 confirms within-class
-   diversification is the live lever.
+2. **NEW Day-13: ρ/G3/R7 heuristics DO NOT apply to new mechanism
+   families.** Confirm via GKF probe before assuming a sub-tie ρ
+   candidate will under-perform.
+3. **Rule 16 Q6** (ρ vs FULL pool, not just PRIMARY): binding gate.
+4. **GroupKF as secondary gate** (Day-12 finding). For new bases:
+   pass Strat AND not regress GKF, OR pass GKF if leakage-robust class.
+5. **Strat-only Day-3+ (R1)** for primary OOF. Public LB stays the
+   truth (U3: i.i.d. row split). GKF is the private-LB proxy probe.
+6. **Submit budget** 21/270; 13 days × 9 = 117 remaining. **40bp gap
+   means structural moves only**; tuning probes deferred to R5.
+7. **Model-class diversification > tuning** (d9c FM, d13 hier-meta both
+   confirmed). New base class > new τ on existing meta.
 
 ## Pointers
 
-- `audit/2026-05-12-d12-master-synthesis.md` — Day-12 unifying frame
-- `audit/2026-05-12-d12-groupkf-rebuild.md` — Option 1 detail
-- `audit/2026-05-12-d12-tabpfn-finetune-prep.md` — Move A specifics
-- `audit/2026-05-09-d9c-fm.md`, `audit/2026-05-10-d9f-multi-fm.md` — FM thread
-- `scripts/{d9c_fm.py, d9c_kn_stack.py, d9f_multi_fm.py}` — Move B templates
+- `audit/2026-05-13-d13-path-b-hier-meta.md` + `d13d-path-b-gkf-probe.md` — load-bearing
+- `audit/2026-05-13-d13-move-b-fm-variants.md` — same-field FM-partition death
+- `audit/2026-05-12-d12-master-synthesis.md` + `d12-tabpfn-finetune-prep.md`
+- `audit/2026-05-10-d10b-groupkf-stack-rebuild.md` + `d10d-leak-corrected-meta.md`
+- `audit/friction.md` — Day-13 frictions appended
+- `scripts/d13{,b,c,d,e}_path_b_*.py` — Path B family
+- `scripts/d13_move_b_fm_variants.py` — V1/V2/V3 (parallel agent)
 - `kernels/d12-tabpfn-finetune-gpu/` — Move A kernel
-- `scripts/{d12_groupkf_meta.py, d6_multi_rule.py, pre_submit_diff.py}`
