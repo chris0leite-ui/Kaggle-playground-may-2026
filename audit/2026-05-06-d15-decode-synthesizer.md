@@ -122,33 +122,66 @@ LR-meta), d12_lr_meta 4.69 (dominates).
    PitNextLap among original rows with this LapTime" become a leaked
    posterior.
 
-## Submit result (2026-05-06 13:03 UTC)
+## Submit #2 (2026-05-06 14:43 UTC) — clean architecture-controlled probe
 
-Submitted `submission_d15_K22_add_orig_transfer.csv` (K=22 LR-meta =
-K=21 + d15_orig_transfer). Pre-submit ρ vs PRIMARY = 0.9953
-(structurally different).
+`submissions/submission_d15_path_b_K22_orig_transfer.csv`
+Hier-meta Compound×Stint τ=20k on K=22 = K=21 + d15_orig_transfer
+(same architecture as PRIMARY).
 
-**LB 0.95039** vs PRIMARY 0.95049 — **regressed −10 bp**.
+```
+                                  OOF       ρ vs PRIMARY  flips +/−   LB
+PRIMARY (K=21 hier-meta):       0.95083        1.000000      0/0    0.95049
+K=22 + orig_transfer hier-meta: 0.95094        0.998440     36/144  0.95049 (TIE)
+                                +1.127 bp                  total 180 (R7 ≤200 → HEDGE)
+```
 
-Diagnosis: this submit holds the *base pool* mechanism (orig_transfer
-is genuinely orthogonal at ρ=0.565) but uses the *wrong meta
-architecture* (plain LR-meta). PRIMARY (0.95049) is hier-meta(K=21,
-Compound×Stint, τ=20k). LR-meta(K=22) ≈ 0.95039 ≤ LR-meta(K=21)
-baseline (≈ 0.95035, extrapolated from hier-meta uplift Δ +0.014 bp
-OOF → +14 bp LB). So the +0.778 bp OOF gain is consistent with
-landing ~0.95040 LB; the 10 bp gap to PRIMARY is the meta-architecture
-delta, not the base addition.
+Pre-submit diff: ρ=0.9984, 50.9% rows differ >1e-3, max abs 0.106.
 
-**Mechanism is NOT yet falsified** — the orthogonal new-class signal
-should ride a hier-meta. The clean follow-up probe is **hier-meta on
-K=22** (PRIMARY architecture + d15_orig_transfer added to the pool).
-That isolates whether orig_transfer adds incremental LB on top of the
-PRIMARY. Tag: `meta-arch-required-for-orthogonal-base-eval`.
+**LB ties at 5-decimal display** (0.95049 == 0.95049). Predicted-LB
+band per `probe.py` at this ρ was [0, 0.5, 2] bp; tie sits on the
+conservative end. Mechanism (orig_transfer base, ρ=0.565 vs PRIMARY
+single-row) is **not falsified** — OOF lift +1.127 bp confirms hier-meta
+extracts incremental signal from the orthogonal new-class base —
+but the public-LB delta lands inside Kaggle's quantization floor.
 
-Friction: pre-submit BOTE under-weighted the meta-arch axis. Rule-19
-BOTE for new-base candidates should specify which meta architecture
-will be used for evaluation; LR-meta vs hier-meta is a 14 bp delta
-on this comp and dominates +0.778 bp base-add lifts.
+Compare to Submit #1 (LR-meta K=22, +0.778 bp OOF, LB −10 bp): the
+hier-meta gives ~1.5× the OOF lift AND removes the meta-arch confound,
+landing within ε of PRIMARY instead of regressing. Confirms the 14 bp
+LR→hier-meta gap dominates +0.78 bp base-add gains.
+
+## Status update
+
+- **PRIMARY** unchanged: `d13e_compound_stint_tau20000` LB 0.95049.
+- **HEDGE candidate added**: `d15_path_b_K22_orig_transfer` LB 0.95049
+  at ρ=0.998 — eligible for R5 final-3-day OOF-best probe (Rule 4) and
+  R7 HEDGE slot (180 flips < 200 cap, no PI sign-off needed).
+- **Submit budget**: today 3/10, total 27/270.
+- **Mechanism family `external_data_aggregate`**: confirmed working
+  (LB tie, OOF +1.127). Rule 19 BOTE prior (P=0.20, band [0, 1, 4] bp)
+  remains calibrated; the LB upside likely sits at the band's lower
+  end on this comp because synth public-LB is row-iid and the GBDT
+  pool already captures most of the DGP via TyreLife/RaceProgress.
+
+## Day-15 follow-ups (refreshed)
+
+The hier-meta(K=22) probe **rules out a single-LGBM orig_transfer as
+a structural advance** but **opens 3 cheap diversification paths**:
+
+1. **Multi-arch orig_transfer bag** (~1h CPU). Train CatBoost +
+   XGBoost + Optuna-tuned LGBM on the original 99k rows; each predicts
+   on synth. Each base ≈ ρ=0.56 vs PRIMARY (orthogonal-class). Bag
+   them or add as 3 separate K=22/K=23/K=24 bases. EV: each
+   incremental orig-arch may add +0.5-1 bp OOF; bag may compound to
+   +2-3 bp at hier-meta.
+2. **Mixed-source LGBM** (~2-3h CPU): `concat(orig 99k + synth 439k)`
+   with sample-weights ∝ density-ratio (AV-classifier). Risk: AV-AUC
+   was 0.502 in d12, so density ratio likely uninformative; but the
+   orig rows act as ground-truth anchors which AV can't see.
+3. **Decoded-LapTime per-row leak**: 95% of synth `LapTime` values
+   exist in original. For each synth row, look up the original rows
+   with that exact LapTime, take median PitNextLap → leaked-posterior
+   feature. Add to a synth-trained LGBM. EV: small standalone (the
+   join is many-to-many) but might be the cleanest "data leak" feature.
 
 ## Artifacts
 
