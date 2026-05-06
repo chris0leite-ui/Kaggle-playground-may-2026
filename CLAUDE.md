@@ -129,7 +129,7 @@ mechanism_families_explored:
   - factorization_machine_aug2way   # d9i FM_A_aug + FM_B_aug 2-way partition K=21 swap LB 0.95034 (+3bp tied)
   - groupkf_stack_rebuild_audit     # d10b/c -- FM-class lift +2.01bp under Race-only GKF vs +0.87bp Strat (2.3× AMPLIFIED); FM_B is #1 L1 component under GKF; PRIMARY private-LB robust
   - leak_corrected_lr_meta          # d10d -- refit LR on GKF OOFs; G3 fail (flip ratio 0.001); FM dominance over-credits, smooths GBDT row-extremes; held
-  - empirical_bayes_hier_lr_meta    # d13/d13b -- per-Stint partial-pooled LR meta τ=100000; OOF +0.86bp PASS, ρ=0.998 borderline, G3 flip ratio 0.211 FAIL; HELD as R5 OOF-best candidate
+  - empirical_bayes_hier_lr_meta    # d13 Stint τ=100000 -- LB 0.95041 NEW PRIMARY (+7bp; 11.6× OOF upside); GKF lift +2.59bp 2.9× AMPLIFIED per d13d probe -- mechanism leakage-robust, private-LB-likely-real
   - t12_censored_regression         # d12 -- LGBM weighted-regression on log(laps_until_pit); std 0.544, FAIL min-meta
   - t12_ratio_target                # d12 -- LGBM regression on pits/stints + heuristic; std 0.674, FAIL min-meta
   - t12_stintlevel_survival         # d12 -- stint-level LGBM duration → row hazard; std 0.601, FAIL min-meta
@@ -214,7 +214,7 @@ headroom_to_top5pct: 0.00311      # 0.95345 − 0.95034 = 31.1bp
 | d10b_K13_baseline (Strat / GKF-Race) | 0.95043 | 0.92744 | n/a | 13 GBDT/baseline; gap −229.92bp (leakage signature) |
 | d10b_K15_+FMA+FMB (Strat / GKF-Race) | 0.95052 | 0.92764 | n/a | FM-class lift +0.87bp Strat → **+2.01bp GKF (2.3× amplified)**; FM_B L1 #1 under GKF |
 | d10d_leak_corrected_meta | n/a | 0.92764 | n/a | held; G3 FAIL (rare-class flip 0.001); rebalances FM_B L1=6.96 but smooths away GBDT row-extremes; pred-LB 0.95001 |
-| **d13_path_b_stint_tau100000** | **0.95082** | n/a | **0.95041** | **NEW PRIMARY**; +7bp LB over d9h/d9i (0.95034); 11.6× OOF upside on +0.86bp; G3 flip ratio "fail" 0.211 was BENIGN — per-Stint reshuffling aligns with public LB |
+| **d13_path_b_stint_tau100000** | **0.95082** | **0.94600** | **0.95041** | **NEW PRIMARY**; +7bp LB; 11.6× OOF upside; **GKF lift +2.59bp = 2.9× AMPLIFIED vs Strat +0.90bp** (mechanism leakage-robust per d13d) |
 | d13b_path_b_stint_tau20000 | **0.95082** | n/a | n/a | held; +0.88bp OOF; ρ=0.996; flip ratio 0.220; tau=100000 superseded by submit |
 | d13_path_b_compound_tau100000 | 0.95076 | n/a | **0.95033** | calibration probe; LB +2bp on +0.30bp OOF (6.7× upside); ρ=0.9990; demoted by Stint variant |
 | d12_groupkf_meta (K=21 GKF) | 0.95069 / **GKF 0.94776** | n/a | n/a | **Day-12 STRUCTURAL FINDING**: ρ(Strat-vs-GKF meta-test)=0.9914 — rank-lock partial dissolves; FM ΔAUC −9bp vs GBDT −200 to −343bp |
@@ -314,17 +314,15 @@ headroom_to_top5pct: 0.00311      # 0.95345 − 0.95034 = 31.1bp
         TRANSFERS to hier-meta architecture.
 - DONE: d13 Path B Stint τ=100000 SUBMITTED at 05:34 UTC.
         **LB 0.95041, +7bp lift over d9h/d9i tied PRIMARY → NEW
-        PRIMARY**. 11.6× LB upside on +0.86bp OOF prediction. The
-        G3 flip ratio 0.211 ("FAIL"), the ρ=0.998 sub-tie penalty,
-        AND the R7 253-flip threshold ALL turned out to be wrong
-        heuristics for this mechanism. Per-Stint partial-pooled LR
-        meta produces row-extreme reshuffling that BETTER aligns
-        with public LB than PRIMARY's flat meta. Gap to top-5%
-        narrowed -4.0 → -3.0bp. Mechanism: stint-specific
-        FM-vs-GBDT mixture ratios — later stints lean FM (FM_B
-        L1 boost), earlier stints lean GBDT row-extremes.
-        **Hierarchical meta is a genuinely new model class lift,
-        comparable to d9c FM in magnitude and importance.**
+        PRIMARY**. 11.6× LB upside on +0.86bp OOF prediction.
+- DONE: d13d GroupKF probe of hier-meta. K=20 GKF pool (no realmlp).
+        Global LR meta GKF OOF 0.94574; Stint hier τ=100000 GKF OOF
+        **0.94600 (+2.59bp)**. Strat lift +0.90bp → GKF lift +2.59bp
+        = **2.9× AMPLIFIED** (stronger than FM-class 2.3× in d10b/c).
+        Hier-meta mechanism is leakage-robust. **Public-LB +7bp lift
+        is mechanism-driven, not sample variance.** Revised private-LB
+        estimate: median +4 to +6bp over HEDGE (conservative +2bp,
+        bull +7bp). Three independent leak-blocking probes agree.
 - LATER: External-data Pirelli pit-window scrape (Tier-2 highest
         absolute EV), EmbMLP CPU (different model class), hazard NN
         (GPU; d9 hazard_nn_stack regressed 315bp — implementation
@@ -420,4 +418,5 @@ headroom_to_top5pct: 0.00311      # 0.95345 − 0.95034 = 31.1bp
 - `audit/2026-05-10-d10b-groupkf-stack-rebuild.md` — FM-class lift +2.01bp GKF vs +0.87bp Strat (2.3× AMPLIFIED); FM_B is #1 L1 under GKF.
 - `audit/2026-05-10-d10d-leak-corrected-meta.md` — leak-corrected LR meta gate-FAILs (G3 flip ratio 0.001) but informative; Bayesian hierarchical is correct synthesis.
 - `audit/2026-05-13-d13-path-b-hier-meta.md` — Path B empirical-Bayes; Stint τ=100000 +0.86bp OOF, ρ=0.998, G3 0.211 FAIL; R5 candidate held.
+- `audit/2026-05-13-d13d-path-b-gkf-probe.md` — Path B GKF probe; Stint hier-meta lift +0.90bp Strat → +2.59bp GKF (2.9× AMPLIFIED) — mechanism leakage-robust.
 - `audit/friction.md` — friction one-liners.
