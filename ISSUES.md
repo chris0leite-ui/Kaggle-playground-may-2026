@@ -107,6 +107,29 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
   Risk: public-LB row-iid leak-eaters carry signal (d13c T2/T3).
   `[owner: unclaimed | status: open]`
 
+## 7. Gauge p_synth (overnight research sweep, 2026-05-06 PM)
+
+Umbrella: translate "what is the synthesizer's learned p(X,y)" into
+prediction signal. Three threads × 19 probes. CPU-only. 0 submits.
+
+- **7a.** Diagnostic measurement of synth↔orig divergence (5 probes:
+  SDV QualityReport, marginal KS/chi-sq, pairwise chi-sq grid, class-
+  conditional divergence, per-stratum divergence).
+  `[owner: autoencoder-synthetic-data-pEMB6 | status: wip]`
+- **7b.** Density ratio r̂(x)=p_synth/p_orig (4 probes: AV-AUC + SHAP,
+  r̂ as feature, r̂-weighted orig_transfer, r̂-median split).
+  `[owner: autoencoder-synthetic-data-pEMB6 | status: wip]`
+- **7c.** Generative model on orig → log p_orig(x_synth) feature
+  (3 probes: GMM, KDE, MAF normalizing flow).
+  `[owner: autoencoder-synthetic-data-pEMB6 | status: wip]`
+- **7d.** Orig-transfer feature-subset diversification (4 probes:
+  drop-LapTime, drop-TyreLife/RP, cat-only, cont-only).
+  `[owner: autoencoder-synthetic-data-pEMB6 | status: wip]`
+- **7e.** Path B with r̂ / log p_orig as cohort axis (3 probes:
+  r̂_q5, log p_orig_q5, Compound × r̂_q5 cross). Amp-eligible per
+  `path-b-amp-only-fires-on-meta-arch-not-base-add`.
+  `[owner: autoencoder-synthetic-data-pEMB6 | status: wip]`
+
 ---
 
 ## Falsified or dead (do not re-claim)
