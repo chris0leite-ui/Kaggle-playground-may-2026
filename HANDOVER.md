@@ -85,12 +85,8 @@ New FM lift needs NEW INPUTS: pit-window-since-last-pit, hazard-decay,
 compound-pressure, race-stage. Build 4-6 features, train unified FM
 on aug12 + new fields, gate vs PRIMARY. EV +2-6bp.
 
-### Move D — Compound × Stint hier-meta SUBMIT (held variants)
-HELD. Two candidates per `audit/2026-05-13-d13-path-b-hier-meta.md`:
-- `d13e_compound_stint_tau20000.csv` (+1.00bp OOF, ρ=0.996, projects ~+2bp LB)
-- `d13e_compound_stint_tau100000.csv` (+0.82bp OOF, ρ=0.9996 vs Stint winner; HEDGE-grade)
-
-ONLY submit if Day-14 doesn't produce a structural Move A/B/C/D winner.
+### Move E — Compound × Stint hier-meta SUBMIT (held; only if Move A-D miss)
+`d13e_compound_stint_tau{20000,100000}.csv` (+0.82-1.00bp OOF, ρ=0.996+).
 
 ### Research-loop trigger (Rule 7) IF Day-14 yields no ≥+5bp move
 Pause submits. Web-search top-5 finishers' writeups from comparable
@@ -113,6 +109,13 @@ unique FE / external data) we haven't found.
 - **Day-13 Move B V1/V2/V3 same-field FM partitions** — V1 5/3 SUBMITTED
   LB 0.95032 TIE; V2/V3 held dead. Same-12-field FM-partition vein FULLY
   MINED. Future FM lift needs NEW INPUT FIELDS, not new partitions.
+- **Day-13/14 alternative-axis branch (4-of-4 nulls):** G1 within-stint
+  LGBM FE (-0.38bp), G2' cross-driver LGBM FE (+0.03), G3 stint-grouped
+  LambdaMART (smoke 0.74), H1 FM aug13 CTRq 3-way (-0.13). All low ρ
+  (0.92-0.97) but min-meta zero/neg. **Lesson: single-base FE additions
+  hit a noise wall regardless of model class** — Path B hier-meta has
+  absorbed signal from existing-class new features. **EDA H1/H6 family
+  (3-way concat / Year×Stint partition FM) DEMOTED to ~0bp EV.**
 
 ## Held submissions (do NOT submit)
 
@@ -140,11 +143,7 @@ unique FE / external data) we haven't found.
 
 ## Pointers
 
-- `audit/2026-05-13-d13-path-b-hier-meta.md` + `d13d-path-b-gkf-probe.md` — load-bearing
-- `audit/2026-05-13-d13-move-b-fm-variants.md` — same-field FM-partition death
-- `audit/2026-05-12-d12-master-synthesis.md` + `d12-tabpfn-finetune-prep.md`
-- `audit/2026-05-10-d10b-groupkf-stack-rebuild.md` + `d10d-leak-corrected-meta.md`
-- `audit/friction.md` — Day-13 frictions appended
-- `scripts/d13{,b,c,d,e}_path_b_*.py` — Path B family
-- `scripts/d13_move_b_fm_variants.py` — V1/V2/V3 (parallel agent)
-- `kernels/d12-tabpfn-finetune-gpu/` — Move A kernel
+- `audit/2026-05-13-d13-{path-b-hier-meta,d13d-path-b-gkf-probe}.md` — load-bearing
+- `audit/2026-05-13-d13-{problem-decomposition,g-results,eda-deep-dive-synthesis}.md` — Day-13/14 alt-axis (4 nulls; H1 family demoted)
+- `audit/2026-05-12-d12-{master-synthesis,tabpfn-finetune-prep}.md`; `audit/friction.md`
+- `scripts/d13{,b,c,d,e}_path_b_*.py` (Path B); `scripts/d13_g{1,2,3,5}_*.py` + `d14_h1_*.py` (null branch); `kernels/d12-tabpfn-finetune-gpu/`
