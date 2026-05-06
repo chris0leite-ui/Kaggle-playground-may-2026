@@ -22,10 +22,11 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
 
 ## 1. New model class (existing classes saturated within pool)
 
-- **1a.** TabPFN-2.6 fine-tuned (Kaggle GPU). v2.6 OOM fix landed
-  (cap 150k rows); resume fold-0 probe. EV: +5–15bp std-alone,
-  +1–3bp stack median, tail +3–9bp. Live "10bp shot" per Day-12
-  master synthesis. `[owner: unclaimed | status: open]`
+- **1a.** TabPFN fine-tuned (v2.5 or v2.6). **DEAD.**
+  v2.5 @ 50k and 150k rows: fold-0 AUC 0.9444 both (flat training loss;
+  fine-tuning not learning). v2.6 OOM on P100 at any row count (model
+  weights ≈15.37GB > 16GB). AUC ceiling -64bp vs PRIMARY. ρ=0.960
+  diverse but gap too large. `[owner: read-handover-8hsZh | status: null]`
 - **1b.** EmbMLP CPU baseline. Embedding-MLP for the leakage-robust
   population. Cheap, untried.
   `[owner: unclaimed | status: open]`
@@ -86,6 +87,11 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
 - Drop-GBDT leak-eaters (d13c T2/T3 falsified -2.5/-2.6bp Strat).
 - Single-base FE additions in LGBM/FM class (d13/d14 alt-axis G1/G2'/G3/H1
   4-of-4 NULL).
+- FM-field-augmentation beyond 12 fields (Move D / d14 FM_aug16): +20bp
+  standalone but min-meta -0.07bp FAIL. New input types (PitWindow, HazardDecay,
+  CompoundPressure, RaceStage) confirm saturation — FM interactions already
+  cover this signal space. Dead across aug13/aug16.
+- TabPFN fine-tuning v2.5 + v2.6 (see 1a above).
 - Path B cohort sweep on Year, Year×Stint, Race axes (d14 9 variants NULL).
 - Hazard NN (d9 -315bp; main-branch leakfree confirmed dead OOF 0.92013).
 - 2-level stacking via meta-as-base (2026-05-06: K=22 + d12_lr_meta
