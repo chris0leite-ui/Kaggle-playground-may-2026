@@ -27,8 +27,10 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
   +1–3bp stack median, tail +3–9bp. Live "10bp shot" per Day-12
   master synthesis. `[owner: unclaimed | status: open]`
 - **1b.** EmbMLP CPU baseline. Embedding-MLP for the leakage-robust
-  population. Cheap, untried.
-  `[owner: unclaimed | status: open]`
+  population. Cheap, untried. Day-15 reframed: Jahrer-style swap-noise
+  DAE + LGBM-on-latent (Porto Seguro precedent) is the strict upgrade —
+  unsupervised, orthogonal to the supervised pool.
+  `[owner: read-handover-LgbQ4 | status: wip]`
 - **1c.** DeepFM-lite (FM + 2-layer MLP head). Extends d9c FM with
   non-linear interactions. Cheap CPU.
   `[owner: unclaimed | status: open]`
