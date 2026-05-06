@@ -26,7 +26,7 @@ Open with a 3-bullet read-back of state + first action.
 - **Gap**: −1.7bp (narrowed from −2.4 on Day-11).
 - **Headroom to top-5%** (0.95345): **31.1bp**.
 - **14 days remaining** (deadline 2026-05-31). 9 slots/day available.
-- **Submits used**: 19/270 total; Day-12 0/9 (subagent night, no submits per Rule 1).
+- **Submits used**: 20/270 total; Day-13 1/9 (V1 LB 0.95032 TIE PRIMARY).
 
 ## Day-12 close: 6 wider-step options, 1 structural finding
 
@@ -66,28 +66,24 @@ script lines 117-129). **First action this session:**
      +1-3bp stack median, +3-9bp tail. Runs in background.
   6. On completion: `kaggle kernels output chrisleitescha/d12-tabpfn-finetune-strat -p kernels/d12-tabpfn-finetune-gpu/output/`.
 
-### Move B — DONE Day-13. **V1 5/3 PASS_BOTH_GATES.**
+### Move B — DONE Day-13. **V1 SUBMITTED LB 0.95032 (-0.02bp TIE).**
 Built 3 FM-class variants. Result table (Strat Δ / **GKF Δ** vs
 leakage-blocked baseline 0.94776):
-  - **V1 5/3 (D,C,S,T,Ln + R,Y,Rp): +0.06bp / +0.97bp PASS_BOTH_GATES**
-    — ρ A vs B = 0.402 (d9f sweet spot); FM_5fA in L1 top-15.
-  - V2 4/4 alt (C,T,S,Rp + D,R,Y,P): −0.36bp / +0.85bp PASS_GKF_ONLY
-    — ρ A vs B = 0.186 (most-orthogonal pair to date).
-  - V3 6/6 aug alt: −0.27bp / +0.54bp PASS_GKF_ONLY.
+  - **V1 5/3 (D,C,S,T,Ln + R,Y,Rp): SUBMITTED LB 0.95032** — TIE
+    PRIMARY 0.95034. OOF +0.06bp / GKF +0.97bp; pred-LB +0.06bp,
+    actual −0.02bp. **FM-class amplification precedent BROKEN** —
+    same fields already absorbed by existing pool FMs.
+  - V2 4/4 alt: held DEAD (same-field-set thesis falsified by V1).
+  - V3 6/6 aug alt: held DEAD (same).
 
-**Day-13 submit candidate: V1** at
-`submissions/submission_d13_V1_5_3_K22_add.csv` (HELD per Rule 1).
-Pred-LB Strat 0.95035 (TIE PRIMARY 0.95034); FM-class LB
-amplification precedent (d9c +3bp / d9f +2bp / d9h +3bp on similar
-OOF deltas) suggests realistic +0.5-3bp lift. PI decision per Rule
-1; pre-submit-diff first (ρ=0.99963 vs PRIMARY).
-
-V2 and V3 reserved as R5 final-3-day GKF-robust HEDGE candidates.
+**KEY DAY-13 FINDING:** Same-field FM partition variants are dead.
+The leakage-robust vein within the current 12-field augmented set is
+fully mined by d9c FM + d9f FM_A/B + d9h aug12. Future FM-class work
+needs **NEW INPUT FIELDS**, not new partitions.
 
 ### Move C — pool refactor BLOCKED (no swap-class winners)
-None of the 3 V variants beats PRIMARY on Strat OOF (V1 ties at
-+0.06bp). Drop-and-replace can't proceed without a +1bp+ Strat
-winner. **Pivoted to Move D + feature engineering instead.**
+None of the 3 V variants beats PRIMARY on Strat OOF. **Pivoted to
+Move D (DeepFM-lite) + Move F (new FM-input features).**
 
 ### Day-14 — Move D + E + F (second-tier; Move C falsified)
 - **D: DeepFM-lite** (FM + 2-layer MLP head; d9h_aug12 fields). 4-6h CPU.
@@ -109,7 +105,7 @@ winner. **Pivoted to Move D + feature engineering instead.**
 - **LambdaRank meta** (-86bp); **AUC-pairwise XGB base** (-451bp fold-0)
 - **Single-bag e3 5seed** (-19bp; K=21 complexity JUSTIFIED)
 - **External real-world priors on synth** — C1 TIE + C2 Pirelli DEPRECATED
-- **Day-13 Move B V2/V3 K=22 add** Strat regress; held as GKF-only HEDGE only
+- **Day-13 Move B V1 K=22 5/3** SUBMITTED LB 0.95032 TIE; same-field FM partition variants closed. V2/V3 dead (same thesis).
 
 ## Held submissions (do NOT submit)
 
