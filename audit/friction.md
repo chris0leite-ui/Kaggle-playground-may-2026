@@ -389,3 +389,64 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   WAIT for explicit "submit" / "yes" / "go ahead and submit"
   before calling `kaggle competitions submit`. Do not auto-submit
   even when EV is positive.
+
+- `tag: pred-lb-heuristics-broken-for-hier-meta` — Day-13: my
+  pre-submit gates ALL FAILED for d13 Stint τ=100000 yet it landed
+  LB 0.95041 (+7bp NEW PRIMARY, 11.6× OOF→LB upside):
+  - G3 rare-class flip ratio 0.211 < 0.5 ("FAIL") — was actually
+    benign; row-extreme reshuffling aligned with public LB
+  - ρ=0.998 sub-tie ("expect -1 to -2bp LB penalty") — was actually
+    +10bp lift vs the d9f K=21 swap
+  - R7 253-flips > 200 ("HEDGE-only") — was a PRIMARY-grade lift
+  Three precedent-driven heuristics all wrong simultaneously means
+  this is a new model class, not a tuning variant. The hier-meta's
+  per-segment partial-pooling produces predictions whose row-extreme
+  structure is GENUINELY DIFFERENT from the global-LR meta's, in
+  ways that align with public LB. Fix: when a candidate is in a
+  *new mechanism family* (FM-class was, hier-meta is), the
+  precedent-derived heuristics from prior families do not apply;
+  treat OOF lift + leakage-robustness probe as the primary gates,
+  not the G3/ρ/R7 thresholds. Compute the GKF probe BEFORE
+  assuming a sub-tie ρ candidate will under-perform.
+
+- `tag: lr-convergence-stall-on-small-segments` — Day-13: d13
+  Compound×Stint hier-meta sweep ran 41 minutes at 99% CPU stuck
+  past fold-2 logs. Cause: per-segment LR fits on 24-row segments
+  didn't converge within max_iter=2000 lbfgs iterations on the
+  63-feature expanded space; lbfgs oscillated indefinitely.
+  Fix in d13e: min_rows=1000 (skip small segments to global
+  fallback) AND max_iter=500 (cap pathological convergence). 5-fold
+  Compound×Stint sweep then completed in 7 minutes total.
+  Generalization: any per-segment LR routine with arbitrary segment
+  sizes needs a min_rows guard PLUS a sanity-bounded max_iter — the
+  lbfgs solver in scikit-learn does not raise on convergence
+  failure, just keeps iterating until max_iter.
+
+- `tag: leak-corrected-meta-over-corrects-row-extremes` — Day-12/13:
+  d10d attempted to fix the Strat-meta's leakage bias by refitting
+  LR on GKF OOFs and applying coefficients to GKF-test predictions.
+  FM_B got the predicted L1=6.96 dominance, but G3 flip ratio came
+  out 0.001 (1751 rows demoted out of top-1% vs only 2 promoted).
+  The reasoning failure: GKF OOFs structurally cannot see test-row-
+  specific extremes (a held-out Race has no train-mate context), so
+  the GKF-fit meta over-credits FM bases by under-crediting GBDT
+  row-specific signal — but the i.i.d. test set DOES contain those
+  row-extremes, so smoothing them away destroys real predictive
+  value. Path B (per-segment partial-pooled meta) is the correct
+  synthesis: preserves global-LR's row-extreme calibration on
+  common segments while letting FM dominate on rare/edge segments.
+  Fix: when correcting a leakage bias in validation, identify what
+  the unbiased validation REMOVES that you NEED to keep; per-segment
+  partial-pooling beats wholesale re-fit-on-leak-blocked-OOFs every
+  time the test set is i.i.d. with train.
+
+- `tag: 1-3bp-probes-cannot-close-40bp-gap` — Day-13 evening: PI
+  pushed back on a "submit τ=20000 for +2bp" recommendation: "we
+  want to improve by 40bp not 2." Fair pushback. The agent had
+  drifted into incremental τ-tuning after the d13 Stint +7bp win.
+  Sequencing fix: after a structural-breakthrough submit (FM-class
+  d9c, hier-meta d13), the next move should be ANOTHER structural
+  candidate (TabPFN, SCARF, DeepFM, pseudo-label cascade) — not
+  τ-sweep tuning of the same mechanism. Tuning candidates belong
+  in the calibration-probe budget (1 per day max during the comp
+  middle, R5 final-window only at end).
