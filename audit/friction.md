@@ -2,6 +2,33 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-13/14
+
+- `tag: single-base-fe-additions-noise-wall` — Day-13/14 alternative-axis
+  branch ran 4 candidates (G1 within-stint LGBM FE, G2' cross-driver
+  LGBM FE, G3 stint-grouped LambdaMART, H1 FM aug13 CTRq 3-way) chosen
+  from probe + EDA findings to span (LGBM, FM) × (relative FE,
+  cross-row FE, 3-way concat). All 4 hit min-meta zero/negative
+  despite 0.92-0.97 ρ vs PRIMARY (very high disagreement). H1 was
+  the closing data point — it ALSO failed the gate even with +9.9bp
+  standalone OOF lift over d9h_aug12. **Lesson: Path B's K=21 +
+  hier-meta has absorbed signal from any single new base built on
+  existing-class new features.** Future +bp axes are (1) genuinely
+  new model classes (TabPFN), (2) further meta-layer innovations,
+  (3) target reformulation upstream of the K=21 pool, (4) external
+  data revisit. **Process fix:** before running ≥30 min compute on a
+  new candidate, run a 10-min standalone-vs-PRIMARY ρ-and-min-meta
+  spot check on a SUBSAMPLE (e.g. 100k rows, 1 epoch FM / 200 LGBM
+  rounds). All 4 candidates would have shown low EV at the spot
+  check; would have saved ~2 wall-hours over 4 candidates.
+- `tag: torch-not-in-requirements` — bootstrap.sh installs from
+  requirements.txt which doesn't pin torch, but FM scripts (d9c, d9f,
+  d9h, d9i, d13_move_b, d14_h1) all `import torch`. First run of
+  d14_h1 errored on `ModuleNotFoundError: No module named 'torch'`.
+  Cost: one extra round-trip + `pip install torch` (~30s wall, ~3GB
+  download). **Fix:** add `torch` to `requirements.txt` so future
+  bootstraps don't require manual install.
+
 ## 2026-05-12
 
 - `tag: multi-agent-handover-collision` — Day-12 session on
@@ -450,3 +477,78 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   τ-sweep tuning of the same mechanism. Tuning candidates belong
   in the calibration-probe budget (1 per day max during the comp
   middle, R5 final-window only at end).
+
+## 2026-05-13 PM (branch `claude/review-ml-handover-VTvWw`)
+
+- `tag: fm-class-amplification-not-universal` — Day-13 PM: d13a S3
+  K=24 (5 FMs in pool, ρ=0.99976 vs PRIMARY) submitted at OOF
+  +0.20bp pred → LB 0.95032 = TIE/−0.02bp regress. Five prior
+  FM-class submits (d9c, d9f, d9h, d9i) showed 5–300× OOF→LB
+  amplification at similar ρ. The discriminating variable is
+  whether the FM adds NEW INPUT FIELDS (Cd/Ld/Nx/Pv augmentation
+  in d9h/d9i) vs only RESHUFFLES the existing 12-field set
+  (d13a/d13d V2/V3). Same-field reshuffles are TIE-class even
+  when ρ < 0.9998. Fix: separate "new-field FM" and "new-partition
+  FM" as distinct axes in the EV calculus. Pre-flight Q5 (gate
+  precedent) should match on NEW INPUT presence, not just ρ band.
+  Pre_submit_diff ρ>0.999 → TIE warning *was correct* here, even
+  though d9h/d9i previously beat it.
+
+- `tag: gkf-vs-strat-stack-pool-refactor-asymmetry` — Day-13 PM:
+  d13b GKF FULL_22 stack matrix says "drop d9c_FM costs −0.01bp"
+  (substitutable). d13c Strat refactor confirms (T1 K=23 = T0 K=24,
+  −0.01bp). BUT d13c also says "drop GBDT leak-eaters
+  (e5_optuna_lgbm + cb_slow-wide-bag) costs −2.5 to −2.6bp Strat"
+  — the same bases that drop −209 to −247bp under GKF. **Pool-
+  refactor decisions need BOTH gates.** Single-axis (GKF-only) read
+  of d12 Option 1 would have wrongly dropped GBDTs and burned 2.5bp
+  on submit. Fix: amend HANDOVER critical-rule §4 — for pool-removal
+  decisions, the candidate must be substitutable on BOTH Strat AND
+  GKF; substitutability on GKF alone (rank-lock dissolution under
+  leak-blocking) is a necessary but not sufficient gate. Public LB
+  is row-iid (U3); GBDT leak-eaters absorb fold-mate signal that
+  IS in test rows.
+
+- `tag: cross-branch-converging-same-conclusion-redundant-submit` —
+  Day-13 PM: main and this branch independently submitted
+  same-12-field FM-partition probes (main's V1 5/3 with Ln,
+  ours d13a S3 K=24 with Cd). Both landed LB 0.95032 TIE.
+  Multi-agent independent confirmation IS valuable for dead-listing,
+  but two slot-burns on the same conclusion at 9-slots/day budget
+  is wasteful. **Cause**: this session merged origin/main only after
+  experiments completed (when preparing handover) — the parallel
+  V1 5/3 commit was already on main when we started d13a, but we
+  didn't fetch. Fix: session-start ritual — `git fetch origin && git
+  log --oneline HEAD..origin/main && git diff HEAD..origin/main
+  HANDOVER.md` BEFORE any base build, not after. Each agent's
+  HANDOVER read on start is stale within ~30min of parallel work;
+  refresh-then-act prevents same-mechanism re-runs.
+
+- `tag: review-branch-bootstrap-cost` — Day-13 PM: claude/review-ml-handover-VTvWw
+  container started with empty `data/` and no numpy/torch/pandas.
+  ~3 min spent on `pip install numpy pandas scikit-learn scipy
+  torch` + `kaggle competitions download -c playground-series-s6e5`
+  before first experiment. Not blocking but wasted 5% of session.
+  Fix: SessionStart hook for review/feature-branch sessions that
+  pip-installs requirements.txt + kaggle-downloads data into `data/`
+  if absent. Hook should be idempotent (skip if `data/train.csv`
+  exists). See `~/.claude/skills/session-start-hook` skill.
+
+### Process improvements (Day-13 PM consolidated)
+
+1. **Session-start ritual** = `git fetch origin && git log
+   HEAD..origin/main && diff HANDOVER.md` BEFORE any base build.
+   Single-author HANDOVER not enough when parallel agents commit
+   bases mid-session.
+2. **Encode mechanism family in submission description** — e.g.
+   `family=fm-partition-reshuffle` or `family=hier-meta-segment` —
+   so cross-agent dedup is grep-able from `kaggle competitions
+   submissions` log.
+3. **Pool-refactor needs BOTH Strat AND GKF gates**, not just one.
+   GKF-substitutability ⊂ Strat-substitutability for leak-eaters.
+4. **FM-class precedent applies only to new-input FMs**, not
+   partition-reshuffles. Add to do-and-dont.md: "Reshuffling the
+   same fields across FM partitions is a meta-routing change, not
+   a base-class change. Expect TIE_EXPECTED."
+5. **Pre-warm hook for review branches** — pip install + kaggle
+   download in SessionStart, idempotent.

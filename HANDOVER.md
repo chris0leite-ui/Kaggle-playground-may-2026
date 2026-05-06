@@ -25,7 +25,27 @@ Open with a 3-bullet read-back of state + first action.
 - **HEDGE** = `d9h_K22_add_aug12` / `d9i_S1_K21_swap_aug2way` (TIED) LB 0.95034.
 - **Gap to top-5%** (0.95345): **30.4bp** (narrowed from 31.1bp).
 - **13 days remaining** (deadline 2026-05-31). 9 slots/day.
-- **Submits used**: 22/270 total; Day-13 3/9 (V1 5/3 multi-FM TIE LB 0.95032; d13c Compound τ=100000 LB 0.95033; d13 Stint τ=100000 LB 0.95041 NEW PRIMARY).
+- **Submits used**: 23/270 total; Day-13 4/9 (V1 5/3 multi-FM TIE LB 0.95032; d13c Compound τ=100000 LB 0.95033; d13 Stint τ=100000 LB 0.95041 NEW PRIMARY; d13a S3 K=24 TIE LB 0.95032).
+
+## Day-13 PM addendum (branch `claude/review-ml-handover-VTvWw`)
+
+4 probes on FM-partition + Move-C axis; reinforces main's "same-field
+partition mined" + adds a **load-bearing falsification**:
+
+- **d13a 5/3 (D,C,S,T,Cd / R,Y,Rp)**: TIE Strat; GKF Δ −41.6 / −2.9bp — both leakage-robust ✓
+- **d13b GKF FULL_22 matrix**: **d9c_FM REDUNDANT given d9f+d13a** (FULL_22 0.94607, SWAP_21 0.94606 = −0.01bp)
+- **d13c Strat Move C**: T1 drop-d9c K=23 = T0 K=24 (no regress); **T2/T3 drop-GBDT FALSIFIED (−2.5 / −2.6bp)**
+- **d13d V2 4/4 CT-axis + V3 6/6 alt**: TIE on Strat; partition saturation across **6 shapes** total
+- **d13a S3 K=24 SUBMITTED**: LB **0.95032** TIE (ρ 0.99976; FM-amplification didn't fire)
+
+**Move C revised thesis**: drop d9c (free), do NOT drop GBDT
+leak-eaters (they carry row-iid public-LB signal — public LB ≠ GKF).
+
+**Calibration update**: FM-class amplification (d9h 300×, d9i flip)
+required NEW INPUT signal (Cd/Ld/Nx/Pv augmentation), not partition
+shape alone. pre_submit_diff ρ>0.999 → TIE warning held for S3.
+
+Audits: `audit/2026-05-13-d13{a,b,c,d}-*.md`.
 
 ## Day-13 close: Path B hier-meta is a NEW MODEL CLASS
 
@@ -85,12 +105,16 @@ New FM lift needs NEW INPUTS: pit-window-since-last-pit, hazard-decay,
 compound-pressure, race-stage. Build 4-6 features, train unified FM
 on aug12 + new fields, gate vs PRIMARY. EV +2-6bp.
 
-### Move D — Compound × Stint hier-meta SUBMIT (held variants)
-HELD. Two candidates per `audit/2026-05-13-d13-path-b-hier-meta.md`:
-- `d13e_compound_stint_tau20000.csv` (+1.00bp OOF, ρ=0.996, projects ~+2bp LB)
-- `d13e_compound_stint_tau100000.csv` (+0.82bp OOF, ρ=0.9996 vs Stint winner; HEDGE-grade)
+### Move E — Compound × Stint hier-meta SUBMIT (held; only if Move A-D miss)
+`d13e_compound_stint_tau{20000,100000}.csv` (+0.82-1.00bp OOF, ρ=0.996+).
 
-ONLY submit if Day-14 doesn't produce a structural Move A/B/C/D winner.
+### Move E — Path B hier-meta on Move-C-refactored K=23 pool (cheap)
+NEW Day-13 PM hypothesis. Path B Stint built on K=21 PRIMARY pool.
+Re-run on T1 K=23 pool (drop d9c, keep d9f + d13a partition FMs):
+EV +0-2bp; tests whether per-segment hier-meta lift compounds with
+Move C minimal refactor. Cost ~30s (LR-meta only). Fastest of all Day-14
+moves. Held: `submissions/submission_d13c_T1_drop_d9c.csv` is the K=23
+input pool; combine with `scripts/d13_path_b_stint_*.py` driver.
 
 ### Research-loop trigger (Rule 7) IF Day-14 yields no ≥+5bp move
 Pause submits. Web-search top-5 finishers' writeups from comparable
@@ -113,6 +137,19 @@ unique FE / external data) we haven't found.
 - **Day-13 Move B V1/V2/V3 same-field FM partitions** — V1 5/3 SUBMITTED
   LB 0.95032 TIE; V2/V3 held dead. Same-12-field FM-partition vein FULLY
   MINED. Future FM lift needs NEW INPUT FIELDS, not new partitions.
+- **Day-13 PM d13a S3 K=24 SUBMITTED** LB 0.95032 TIE (5 FMs in pool;
+  ρ 0.99976; FM-amplification didn't fire on same-field reshuffle).
+- **Day-13 PM d13d V2 4/4 CT-axis + V3 6/6 alt-split**: 6 partition
+  shapes total now confirmed saturated.
+- **Day-13 PM Move C drop-GBDT** (e5_optuna_lgbm + cb_slow-wide-bag):
+  −2.5 to −2.6bp Strat. GBDT leakage-eaters are LB-load-bearing.
+- **Day-13/14 alternative-axis branch (4-of-4 nulls):** G1 within-stint
+  LGBM FE (-0.38bp), G2' cross-driver LGBM FE (+0.03), G3 stint-grouped
+  LambdaMART (smoke 0.74), H1 FM aug13 CTRq 3-way (-0.13). All low ρ
+  (0.92-0.97) but min-meta zero/neg. **Lesson: single-base FE additions
+  hit a noise wall regardless of model class** — Path B hier-meta has
+  absorbed signal from existing-class new features. **EDA H1/H6 family
+  (3-way concat / Year×Stint partition FM) DEMOTED to ~0bp EV.**
 
 ## Held submissions (do NOT submit)
 
@@ -133,18 +170,14 @@ unique FE / external data) we haven't found.
    pass Strat AND not regress GKF, OR pass GKF if leakage-robust class.
 5. **Strat-only Day-3+ (R1)** for primary OOF. Public LB stays the
    truth (U3: i.i.d. row split). GKF is the private-LB proxy probe.
-6. **Submit budget** 21/270; 13 days × 9 = 117 remaining. **40bp gap
+6. **Submit budget** 23/270; 13 days × 9 = 115 remaining. **40bp gap
    means structural moves only**; tuning probes deferred to R5.
 7. **Model-class diversification > tuning** (d9c FM, d13 hier-meta both
    confirmed). New base class > new τ on existing meta.
 
 ## Pointers
 
-- `audit/2026-05-13-d13-path-b-hier-meta.md` + `d13d-path-b-gkf-probe.md` — load-bearing
-- `audit/2026-05-13-d13-move-b-fm-variants.md` — same-field FM-partition death
-- `audit/2026-05-12-d12-master-synthesis.md` + `d12-tabpfn-finetune-prep.md`
-- `audit/2026-05-10-d10b-groupkf-stack-rebuild.md` + `d10d-leak-corrected-meta.md`
-- `audit/friction.md` — Day-13 frictions appended
-- `scripts/d13{,b,c,d,e}_path_b_*.py` — Path B family
-- `scripts/d13_move_b_fm_variants.py` — V1/V2/V3 (parallel agent)
-- `kernels/d12-tabpfn-finetune-gpu/` — Move A kernel
+- `audit/2026-05-13-d13-{path-b-hier-meta,d13d-path-b-gkf-probe}.md` — load-bearing
+- `audit/2026-05-13-d13-{problem-decomposition,g-results,eda-deep-dive-synthesis}.md` — Day-13/14 alt-axis (4 nulls; H1 family demoted)
+- `audit/2026-05-12-d12-{master-synthesis,tabpfn-finetune-prep}.md`; `audit/friction.md`
+- `scripts/d13{,b,c,d,e}_path_b_*.py` (Path B); `scripts/d13_g{1,2,3,5}_*.py` + `d14_h1_*.py` (null branch); `kernels/d12-tabpfn-finetune-gpu/`
