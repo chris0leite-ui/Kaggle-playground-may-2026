@@ -1,0 +1,115 @@
+[{"stream_name":"stdout","time":4.146788829,"data":"[boot] GPU info: Tesla P100-PCIE-16GB, 16384 MiB\n"}
+,{"stream_name":"stdout","time":4.146861992,"data":"[setup] force-reinstall torch 2.4 (sm_60 / P100 support) ...\n"}
+,{"stream_name":"stdout","time":16.400227839,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 797.0/797.0 MB 2.1 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":18.461839906,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.0/7.0 MB 3.4 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":65.042639787,"data":"[setup] installing tabpfn (--no-deps to preserve torch 2.4 pin) ...\n"}
+,{"stream_name":"stdout","time":66.458484392,"data":"     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 42.0/42.0 kB 1.3 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":66.54298782,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 660.6/660.6 kB 12.5 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":69.037087043,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 240.2/240.2 kB 7.8 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":69.069023643,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 64.9/64.9 kB 3.8 MB/s eta 0:00:00\n"}
+,{"stream_name":"stderr","time":72.284339676,"data":"ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n"}
+,{"stream_name":"stderr","time":72.284409773,"data":"bigframes 2.35.0 requires google-cloud-bigquery-storage\u003c3.0.0,\u003e=2.30.0, which is not installed.\n"}
+,{"stream_name":"stderr","time":72.284418513,"data":"google-adk 1.25.1 requires google-cloud-bigquery-storage\u003e=2.0.0, which is not installed.\n"}
+,{"stream_name":"stderr","time":72.28442423,"data":"tabpfn 7.1.1 requires torch\u003e=2.5, but you have torch 2.4.1 which is incompatible.\n"}
+,{"stream_name":"stderr","time":72.284429927,"data":"google-colab 1.0.0 requires jupyter-server==2.14.0, but you have jupyter-server 2.12.5 which is incompatible.\n"}
+,{"stream_name":"stderr","time":72.284435304,"data":"google-colab 1.0.0 requires pandas==2.2.2, but you have pandas 2.3.3 which is incompatible.\n"}
+,{"stream_name":"stderr","time":72.284445693,"data":"google-colab 1.0.0 requires requests==2.32.4, but you have requests 2.33.1 which is incompatible.\n"}
+,{"stream_name":"stderr","time":72.284450108,"data":"gcsfs 2025.3.0 requires fsspec==2025.3.0, but you have fsspec 2026.2.0 which is incompatible.\n"}
+,{"stream_name":"stdout","time":75.011975904,"data":"[setup] torch version: 2.4.1+cu121\n"}
+,{"stream_name":"stdout","time":75.083029552,"data":"[setup] CUDA: 12.1, device 0: Tesla P100-PCIE-16GB, capability: (6, 0)\n"}
+,{"stream_name":"stdout","time":75.083063758,"data":"[setup] TABPFN_TOKEN already in env (good)\n"}
+,{"stream_name":"stdout","time":82.843273047,"data":"DEBUG ls /kaggle/input recursive (first 30):\n"}
+,{"stream_name":"stdout","time":82.847149785,"data":"  /kaggle/input/competitions\n"}
+,{"stream_name":"stdout","time":82.847177434,"data":"  /kaggle/input/competitions/playground-series-s6e5\n"}
+,{"stream_name":"stdout","time":82.84718434,"data":"  /kaggle/input/competitions/playground-series-s6e5/sample_submission.csv\n"}
+,{"stream_name":"stdout","time":82.847190256,"data":"  /kaggle/input/competitions/playground-series-s6e5/test.csv\n"}
+,{"stream_name":"stdout","time":82.847233516,"data":"  /kaggle/input/competitions/playground-series-s6e5/train.csv\n"}
+,{"stream_name":"stdout","time":82.848736735,"data":"Found train.csv at /kaggle/input/competitions/playground-series-s6e5/train.csv\n"}
+,{"stream_name":"stdout","time":82.848757131,"data":"Using data_dir=/kaggle/input/competitions/playground-series-s6e5\n"}
+,{"stream_name":"stdout","time":84.42836619,"data":"loaded train=(439140, 16) test=(188165, 15)  t=80.3s\n"}
+,{"stream_name":"stdout","time":84.511472659,"data":"raw X.shape=(439140, 14)  X_test.shape=(188165, 14)\n"}
+,{"stream_name":"stdout","time":84.584166853,"data":"\n"}
+,{"stream_name":"stdout","time":84.584210266,"data":"=== fold 0 (train=351312 val=87828) ===\n"}
+,{"stream_name":"stdout","time":84.586053581,"data":"  [smoke] subsampled train fold 351312 -\u003e 50000 rows\n"}
+,{"stream_name":"stdout","time":84.729724048,"data":"  [fold 0] fit (epochs=10, lr=3e-05, patience=3) ...\n"}
+,{"stream_name":"stderr","time":84.729724051,"data":"/usr/local/lib/python3.12/dist-packages/tabpfn/finetuning/finetuned_classifier.py:159: UserWarning: `use_fixed_preprocessing_seed` should only be used if `n_estimators_finetune` == `n_estimators_validation` == `n_estimators_final_inference`. Consider setting the number of estimators for validation and final inference to the same value as `n_estimators_finetune`(=2).\n"}
+,{"stream_name":"stderr","time":84.729787954,"data":"  super().__init__(\n"}
+,{"stream_name":"stderr","time":84.733732996,"data":"/usr/local/lib/python3.12/dist-packages/tabpfn/finetuning/finetuned_classifier.py:412: UserWarning: `output_dir` is not set. This means no checkpointing will be done and all progress will be lost if the training is interrupted.\n"}
+,{"stream_name":"stderr","time":84.733770347,"data":"  super().fit(X, y, X_val=X_val, y_val=y_val, output_dir=output_dir)\n"}
+,{"stream_name":"stderr","time":88.090821877,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stderr","time":216.319221591,"data":"\rFinetuning Epoch 1/10:   0%|          | 0/5 [00:00\u003c?, ?it/s]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":216.319288816,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":259.442135263,"data":"\rFinetuning Epoch 1/10:   0%|          | 0/5 [00:43\u003c?, ?it/s, loss=0.2627]\rFinetuning Epoch 1/10:  20%|██        | 1/5 [00:43\u003c02:53, 43.26s/it, loss=0.2627]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":259.442188074,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":302.455521653,"data":"\rFinetuning Epoch 1/10:  20%|██        | 1/5 [01:26\u003c02:53, 43.26s/it, loss=0.2600]\rFinetuning Epoch 1/10:  40%|████      | 2/5 [01:26\u003c02:09, 43.12s/it, loss=0.2600]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":302.455576478,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":345.472136394,"data":"\rFinetuning Epoch 1/10:  40%|████      | 2/5 [02:09\u003c02:09, 43.12s/it, loss=0.2677]\rFinetuning Epoch 1/10:  60%|██████    | 3/5 [02:09\u003c01:26, 43.07s/it, loss=0.2677]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":345.472200703,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":388.493354708,"data":"\rFinetuning Epoch 1/10:  60%|██████    | 3/5 [02:52\u003c01:26, 43.07s/it, loss=0.2592]\rFinetuning Epoch 1/10:  80%|████████  | 4/5 [02:52\u003c00:43, 43.05s/it, loss=0.2592]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":388.493438664,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":427.10964264,"data":"\rFinetuning Epoch 1/10:  80%|████████  | 4/5 [03:35\u003c00:43, 43.05s/it, loss=0.2666]\rFinetuning Epoch 1/10: 100%|██████████| 5/5 [03:35\u003c00:00, 43.04s/it, loss=0.2666]\rFinetuning Epoch 1/10: 100%|██████████| 5/5 [03:35\u003c00:00, 43.07s/it, loss=0.2666]\n"}
+,{"stream_name":"stderr","time":552.677350579,"data":"\rFinetuning Epoch 2/10:   0%|          | 0/5 [00:00\u003c?, ?it/s]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":552.677427756,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":595.73277673,"data":"\rFinetuning Epoch 2/10:   0%|          | 0/5 [00:43\u003c?, ?it/s, loss=0.2589]\rFinetuning Epoch 2/10:  20%|██        | 1/5 [00:43\u003c02:52, 43.02s/it, loss=0.2589]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":595.732844036,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":638.946276479,"data":"\rFinetuning Epoch 2/10:  20%|██        | 1/5 [01:26\u003c02:52, 43.02s/it, loss=0.2550]\rFinetuning Epoch 2/10:  40%|████      | 2/5 [01:26\u003c02:09, 43.04s/it, loss=0.2550]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":638.946336578,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":681.970103074,"data":"\rFinetuning Epoch 2/10:  40%|████      | 2/5 [02:09\u003c02:09, 43.04s/it, loss=0.2655]\rFinetuning Epoch 2/10:  60%|██████    | 3/5 [02:09\u003c01:26, 43.12s/it, loss=0.2655]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":681.970172009,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":724.989506035,"data":"\rFinetuning Epoch 2/10:  60%|██████    | 3/5 [02:52\u003c01:26, 43.12s/it, loss=0.2370]\rFinetuning Epoch 2/10:  80%|████████  | 4/5 [02:52\u003c00:43, 43.08s/it, loss=0.2370]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":724.989564965,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":763.610090055,"data":"\rFinetuning Epoch 2/10:  80%|████████  | 4/5 [03:35\u003c00:43, 43.08s/it, loss=0.2660]\rFinetuning Epoch 2/10: 100%|██████████| 5/5 [03:35\u003c00:00, 43.06s/it, loss=0.2660]\rFinetuning Epoch 2/10: 100%|██████████| 5/5 [03:35\u003c00:00, 43.07s/it, loss=0.2660]\n"}
+,{"stream_name":"stderr","time":889.211793541,"data":"\rFinetuning Epoch 3/10:   0%|          | 0/5 [00:00\u003c?, ?it/s]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":889.211854213,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":932.249274373,"data":"\rFinetuning Epoch 3/10:   0%|          | 0/5 [00:43\u003c?, ?it/s, loss=0.2650]\rFinetuning Epoch 3/10:  20%|██        | 1/5 [00:43\u003c02:52, 43.03s/it, loss=0.2650]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":932.24934441,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":975.482060705,"data":"\rFinetuning Epoch 3/10:  20%|██        | 1/5 [01:26\u003c02:52, 43.03s/it, loss=0.2399]\rFinetuning Epoch 3/10:  40%|████      | 2/5 [01:26\u003c02:09, 43.04s/it, loss=0.2399]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":975.482167134,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":1018.513380049,"data":"\rFinetuning Epoch 3/10:  40%|████      | 2/5 [02:09\u003c02:09, 43.04s/it, loss=0.2500]\rFinetuning Epoch 3/10:  60%|██████    | 3/5 [02:09\u003c01:26, 43.12s/it, loss=0.2500]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":1018.513444603,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":1061.537247971,"data":"\rFinetuning Epoch 3/10:  60%|██████    | 3/5 [02:52\u003c01:26, 43.12s/it, loss=0.2526]\rFinetuning Epoch 3/10:  80%|████████  | 4/5 [02:52\u003c00:43, 43.09s/it, loss=0.2526]/usr/local/lib/python3.12/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.\n"}
+,{"stream_name":"stderr","time":1061.537304153,"data":"  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]\n"}
+,{"stream_name":"stderr","time":1100.166064843,"data":"\rFinetuning Epoch 3/10:  80%|████████  | 4/5 [03:35\u003c00:43, 43.09s/it, loss=0.2484]\rFinetuning Epoch 3/10: 100%|██████████| 5/5 [03:35\u003c00:00, 43.07s/it, loss=0.2484]\rFinetuning Epoch 3/10: 100%|██████████| 5/5 [03:35\u003c00:00, 43.07s/it, loss=0.2484]\n"}
+,{"stream_name":"stdout","time":1223.90029916,"data":"  [fold 0] predict OOF ...\n"}
+,{"stream_name":"stdout","time":2692.77810072,"data":"  [fold 0] predict test ...\n"}
+,{"stream_name":"stdout","time":5218.926572101,"data":"  [fold 0] AUC=0.94439  wall=5134s (85.6min)\n"}
+,{"stream_name":"stdout","time":5218.926654615,"data":"  [smoke] 1-fold probe done. 5-fold projection: 7.1h. Set SMOKE_FOLD0_ONLY=False for full run.\n"}
+,{"stream_name":"stdout","time":5218.978241213,"data":"\n"}
+,{"stream_name":"stdout","time":5218.978284097,"data":"[d12] OOF Strat: 0.51778  std=0.00000\n"}
+,{"stream_name":"stdout","time":5218.978291852,"data":"  Δ baseline_two_anchor(0.94075): -4229.7bp\n"}
+,{"stream_name":"stdout","time":5218.978299262,"data":"  Δ realmlp_e4_fold0(0.94722): -4294.4bp\n"}
+,{"stream_name":"stdout","time":5218.978305759,"data":"Total wall: 5215s (86.9min)\n"}
+,{"stream_name":"stdout","time":5219.332406276,"data":"DONE {\n"}
+,{"stream_name":"stdout","time":5219.332458402,"data":"  \"model\": \"TabPFN-2.5_finetuned\",\n"}
+,{"stream_name":"stdout","time":5219.332467262,"data":"  \"oof_score\": 0.5177820865688395,\n"}
+,{"stream_name":"stdout","time":5219.33247417,"data":"  \"fold_std\": 0.0,\n"}
+,{"stream_name":"stdout","time":5219.332480666,"data":"  \"fold_scores\": [\n"}
+,{"stream_name":"stdout","time":5219.332485955,"data":"    0.9443940051139789\n"}
+,{"stream_name":"stdout","time":5219.332491021,"data":"  ],\n"}
+,{"stream_name":"stdout","time":5219.332496262,"data":"  \"fold_walls\": [\n"}
+,{"stream_name":"stdout","time":5219.332501348,"data":"    5134.342484474182\n"}
+,{"stream_name":"stdout","time":5219.332512709,"data":"  ],\n"}
+,{"stream_name":"stdout","time":5219.33251658,"data":"  \"cv\": \"StratifiedKFold(5)\",\n"}
+,{"stream_name":"stdout","time":5219.332520221,"data":"  \"metric\": \"roc_auc\",\n"}
+,{"stream_name":"stdout","time":5219.332523808,"data":"  \"delta_vs_baseline_bp\": -4229.679134311605,\n"}
+,{"stream_name":"stdout","time":5219.332527271,"data":"  \"delta_vs_realmlp_e4_bp\": -4294.3791343116045,\n"}
+,{"stream_name":"stdout","time":5219.332530744,"data":"  \"seed\": 42,\n"}
+,{"stream_name":"stdout","time":5219.332534163,"data":"  \"n_folds\": 5,\n"}
+,{"stream_name":"stdout","time":5219.332537603,"data":"  \"ft_lr\": 3e-05,\n"}
+,{"stream_name":"stdout","time":5219.332541087,"data":"  \"ft_epochs\": 10,\n"}
+,{"stream_name":"stdout","time":5219.332545536,"data":"  \"ft_early_stopping_patience\": 3,\n"}
+,{"stream_name":"stdout","time":5219.332564369,"data":"  \"ft_val_split_ratio\": 0.1,\n"}
+,{"stream_name":"stdout","time":5219.332570425,"data":"  \"ft_n_est_finetune\": 2,\n"}
+,{"stream_name":"stdout","time":5219.332576601,"data":"  \"ft_n_est_validation\": 2,\n"}
+,{"stream_name":"stdout","time":5219.332581757,"data":"  \"ft_n_est_final_inference\": 8,\n"}
+,{"stream_name":"stdout","time":5219.332586849,"data":"  \"ft_n_inference_subsample\": 50000,\n"}
+,{"stream_name":"stdout","time":5219.332591993,"data":"  \"total_wall_s\": 5215.209888219833,\n"}
+,{"stream_name":"stdout","time":5219.332597254,"data":"  \"notes\": \"TabPFN-2.5 fine-tuned (gradient updates, NOT zero-shot ICL). Strat-only per R1. Day-8 Tier-4 dismissal applied to ICL only; fine-tune is a different paradigm (foundation-model weights specialised to this DGP).\"\n"}
+,{"stream_name":"stdout","time":5219.332619364,"data":"}\n"}
+,{"stream_name":"stderr","time":5223.843197725,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":5223.843228565,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":5224.093220318,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":5224.093246295,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":5224.826054926,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":5225.756847768,"data":"[NbConvertApp] Writing 333705 bytes to __results__.html\n"}
+]
