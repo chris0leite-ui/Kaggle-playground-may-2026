@@ -77,11 +77,11 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 13                           # 2026-05-13 / Day-13: **PATH B STINT τ=100000 NEW PRIMARY LB 0.95041** (+7bp over d9h/d9i; 11.6× OOF upside)
+day: 13                           # 2026-05-13 / Day-13: **PATH B STINT τ=100000 NEW PRIMARY LB 0.95041** (+7bp over d9h/d9i, 11.6× OOF upside) | PM addendum: 6 FM partition shapes saturated, Move C minimal (drop d9c) ✓, drop-GBDT FALSIFIED
 lb_best_today: 0.95435            # leader; not refreshed
 our_lb_best: 0.95041              # d13 Path B Stint τ=100000 NEW PRIMARY; gap -3.0bp narrowed from -4.0bp; +7bp jump from d9h/d9i 0.95034
-submissions_used_today: 2         # 2/9 Day-13: d13c Compound τ=100000 LB 0.95033, d13 Stint τ=100000 LB 0.95041 NEW PRIMARY
-submissions_used_total: 21
+submissions_used_today: 5         # 5/9 Day-13: V1 5/3 LB 0.95032, Compound τ100k LB 0.95033, Stint τ100k LB 0.95041 NEW PRIMARY, K23_H1_aug15 LB 0.95032, d13a S3 K=24 LB 0.95032 (PM addendum, branch claude/review-ml-handover-VTvWw)
+submissions_used_total: 23
 saturation_count: 0               # Day-12 not a saturation; structural pivot to FM/rule-class diversification thesis
 mechanism_families_explored:
   - baseline_lgbm_raw_features
@@ -139,9 +139,14 @@ mechanism_families_explored:
   - aucpairwise_xgb_base            # d12 -- XGB rank:pairwise smoke -451bp fold-0; FAIL gate
   - single_bag_e3_5seed             # d12 -- standalone bag -19bp OOF; K=21 complexity JUSTIFIED (not OOF-noise)
   - groupkf_full_pool_meta          # d12 -- KEY FINDING: rank-lock partial dissolves; ρ(Strat-vs-GKF meta)=0.9914
+  - fm_partition_5_3_d13a           # d13a -- FM_A_53 (D,C,S,T,Cd) + FM_B_53 (R,Y,Rp); Strat S3 K=24 +0.20bp pred ρ 0.99976; LB 0.95032 TIE; GKF Δ -41.6/-2.9bp BOTH leakage-robust
+  - fm_partition_4_4_ct_axis_d13d   # d13d V2 -- FM_A_CT (C,T,Cd,Ld) + FM_B_DR (D,R,S,Y); K=25 add REGRESS -0.05bp; wheel-physics axis redundant w/ d9f+d13a
+  - fm_partition_6_6_alt_d13d       # d13d V3 -- FM_A_DH + FM_B_RT (T moved to B, Nx/Pv to A); K=25 add +0.03bp noise-floor; partition-shape SATURATED across 6 shapes
+  - gkf_full_22_stack_d13b          # d13b -- 4-FM (d9c+d9f A/B+d13a A_53/B_53) GKF stack +3.20bp; SWAP_21 (drop d9c) -0.01bp = REDUNDANT; Move C minimal validated under GKF
+  - move_c_strat_pool_refactor      # d13c -- T1 drop_d9c K=23 = T0 K=24 (no regress) ✓; T2/T3 drop GBDT leak-eaters -2.5/-2.6bp Strat FALSIFIED — leak-eaters carry public-LB row-iid signal
 plateau_days: 1                   # Day-11 (TabM-D dead) + Day-12 (5/6 falsified); but Option 1 + d10b/c/d structural advance, not plateau
-gate_status: cleared              # d9h/d9i Day-10 LB 0.95034 (+3bp tied PRIMARY); d12 no submits
-headroom_to_top5pct: 0.00311      # 0.95345 − 0.95034 = 31.1bp
+gate_status: cleared              # d13 Stint τ100k LB 0.95041 NEW PRIMARY (+7bp Day-13)
+headroom_to_top5pct: 0.00304      # 0.95345 − 0.95041 = 30.4bp
 ```
 
 ## Calibration ladder

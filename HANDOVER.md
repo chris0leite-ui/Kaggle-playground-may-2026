@@ -25,7 +25,27 @@ Open with a 3-bullet read-back of state + first action.
 - **HEDGE** = `d9h_K22_add_aug12` / `d9i_S1_K21_swap_aug2way` (TIED) LB 0.95034.
 - **Gap to top-5%** (0.95345): **30.4bp** (narrowed from 31.1bp).
 - **13 days remaining** (deadline 2026-05-31). 9 slots/day.
-- **Submits used**: 22/270 total; Day-13 3/9 (V1 5/3 multi-FM TIE LB 0.95032; d13c Compound τ=100000 LB 0.95033; d13 Stint τ=100000 LB 0.95041 NEW PRIMARY).
+- **Submits used**: 23/270 total; Day-13 4/9 (V1 5/3 multi-FM TIE LB 0.95032; d13c Compound τ=100000 LB 0.95033; d13 Stint τ=100000 LB 0.95041 NEW PRIMARY; d13a S3 K=24 TIE LB 0.95032).
+
+## Day-13 PM addendum (branch `claude/review-ml-handover-VTvWw`)
+
+4 probes on FM-partition + Move-C axis; reinforces main's "same-field
+partition mined" + adds a **load-bearing falsification**:
+
+- **d13a 5/3 (D,C,S,T,Cd / R,Y,Rp)**: TIE Strat; GKF Δ −41.6 / −2.9bp — both leakage-robust ✓
+- **d13b GKF FULL_22 matrix**: **d9c_FM REDUNDANT given d9f+d13a** (FULL_22 0.94607, SWAP_21 0.94606 = −0.01bp)
+- **d13c Strat Move C**: T1 drop-d9c K=23 = T0 K=24 (no regress); **T2/T3 drop-GBDT FALSIFIED (−2.5 / −2.6bp)**
+- **d13d V2 4/4 CT-axis + V3 6/6 alt**: TIE on Strat; partition saturation across **6 shapes** total
+- **d13a S3 K=24 SUBMITTED**: LB **0.95032** TIE (ρ 0.99976; FM-amplification didn't fire)
+
+**Move C revised thesis**: drop d9c (free), do NOT drop GBDT
+leak-eaters (they carry row-iid public-LB signal — public LB ≠ GKF).
+
+**Calibration update**: FM-class amplification (d9h 300×, d9i flip)
+required NEW INPUT signal (Cd/Ld/Nx/Pv augmentation), not partition
+shape alone. pre_submit_diff ρ>0.999 → TIE warning held for S3.
+
+Audits: `audit/2026-05-13-d13{a,b,c,d}-*.md`.
 
 ## Day-13 close: Path B hier-meta is a NEW MODEL CLASS
 
@@ -92,6 +112,14 @@ HELD. Two candidates per `audit/2026-05-13-d13-path-b-hier-meta.md`:
 
 ONLY submit if Day-14 doesn't produce a structural Move A/B/C/D winner.
 
+### Move E — Path B hier-meta on Move-C-refactored K=23 pool (cheap)
+NEW Day-13 PM hypothesis. Path B Stint built on K=21 PRIMARY pool.
+Re-run on T1 K=23 pool (drop d9c, keep d9f + d13a partition FMs):
+EV +0-2bp; tests whether per-segment hier-meta lift compounds with
+Move C minimal refactor. Cost ~30s (LR-meta only). Fastest of all Day-14
+moves. Held: `submissions/submission_d13c_T1_drop_d9c.csv` is the K=23
+input pool; combine with `scripts/d13_path_b_stint_*.py` driver.
+
 ### Research-loop trigger (Rule 7) IF Day-14 yields no ≥+5bp move
 Pause submits. Web-search top-5 finishers' writeups from comparable
 playground tabular comps. Identify untried mechanism families. Honest
@@ -113,6 +141,12 @@ unique FE / external data) we haven't found.
 - **Day-13 Move B V1/V2/V3 same-field FM partitions** — V1 5/3 SUBMITTED
   LB 0.95032 TIE; V2/V3 held dead. Same-12-field FM-partition vein FULLY
   MINED. Future FM lift needs NEW INPUT FIELDS, not new partitions.
+- **Day-13 PM d13a S3 K=24 SUBMITTED** LB 0.95032 TIE (5 FMs in pool;
+  ρ 0.99976; FM-amplification didn't fire on same-field reshuffle).
+- **Day-13 PM d13d V2 4/4 CT-axis + V3 6/6 alt-split**: 6 partition
+  shapes total now confirmed saturated.
+- **Day-13 PM Move C drop-GBDT** (e5_optuna_lgbm + cb_slow-wide-bag):
+  −2.5 to −2.6bp Strat. GBDT leakage-eaters are LB-load-bearing.
 
 ## Held submissions (do NOT submit)
 
@@ -133,7 +167,7 @@ unique FE / external data) we haven't found.
    pass Strat AND not regress GKF, OR pass GKF if leakage-robust class.
 5. **Strat-only Day-3+ (R1)** for primary OOF. Public LB stays the
    truth (U3: i.i.d. row split). GKF is the private-LB proxy probe.
-6. **Submit budget** 21/270; 13 days × 9 = 117 remaining. **40bp gap
+6. **Submit budget** 23/270; 13 days × 9 = 115 remaining. **40bp gap
    means structural moves only**; tuning probes deferred to R5.
 7. **Model-class diversification > tuning** (d9c FM, d13 hier-meta both
    confirmed). New base class > new τ on existing meta.
