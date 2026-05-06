@@ -238,3 +238,69 @@ web-search top finisher writeups for synthetic-tabular Playground.
 - `scripts/d15{a,b,c,d}_*.py` — branch implementations
 - `kernels/d15b-dae-gpu/` — Kaggle GPU kernel (v2 with sm_60 fix)
 - `submissions/submission_d15b_path_b_K22_dae_only_tau20000.csv` — submitted artifact
+
+---
+
+## Day-15 PM read-handover-lA8Nr addendum (virgin-axes complement)
+
+**Trigger:** PI re-entered Conn-McLean step 1 ("understand the problem,
+key hypotheses, additional ideas not in HANDOVER T1-T4"). Branch claimed
+ISSUES.md leaf 7 (a-i): nine candidates on the d13 problem-decomposition
+axes (α/β/δ/ε/ζ/η) that no other branch had executed. NO SUBMITS today
+(all probe-only / OOF-validation). All-night run with Kaggle GPU.
+
+**Cheap probes (Phase A) — ALL FALSIFIED.**
+
+- **H4 Year=2023 ∩ rare-Driver hard-mask post-process** (η1) — NULL,
+  best K=5 lifts +0.004 bp ceiling. PRIMARY already routes Y=2023 rare
+  rows to near-zero. d13 G4 (queued, never run) → falsified.
+- **H7 Conformal isotonic recalibration** (δ2/3) — NULL across all 4
+  schemes (Compound, Year×Compound, Year×Compound×Stint,
+  RaceProgress_q5×Compound). Inner-CV-validated to avoid posthoc
+  overfit; regress -2.5 to -9.6 bp. PRIMARY hier-meta is globally
+  well-calibrated.
+- **H10 Two-stage stint** (α5, d13 axis tree) — NULL std AUC 0.625;
+  stage-2 1-D logistic on (remaining-laps) too restrictive. Future
+  retry needs richer stage-2 LGBM. New friction tag
+  `two-stage-stint-needs-richer-stage-2`.
+- **H2 Twin parallel-pool 2-meta blend** (ε2) — FALSIFIED **Δ -1.79 bp**
+  vs single LR-meta(K=11). Pool A (6 GBDT) + Pool B (5 model-class
+  diverse) with ρ(metaA, metaB)=0.967 (real disagreement); top-level LR
+  over [metaA, metaB] (2-feat) collapses rank info that K=11 LR-meta
+  with [raw,rank,logit] expand captures across 33 dims. New friction
+  tag `twin-pool-2-meta-collapses-rank-info`.
+
+**In-flight (overnight) probes:**
+
+- **ε4 DeepGBM cat-LGBM stage-2** — KILLED at 16 min (over-engineered:
+  627 leaf-cat features × num_leaves=255 = combinatorial explosion).
+- **ε4b DeepGBM lean (sparse-LR head)** — running. Stage-1 LGBM
+  (300 trees, num_leaves=31) → leaf-onehot sparse → LR head.
+- **H9 transductive pseudo on full test** — restarted leaner
+  (500 boost / 31 leaves) after first version hung on 627k×1500 trees.
+- **H11 AV-sample-weight LGBM** — running. AV classifier (train vs
+  test) → AV-prob as base LGBM sample weight.
+- **H1 GRU sequence model** — Kaggle T4×2 RUNNING ~30 min in;
+  ETA ~2h.
+
+**New families added to `scripts/probe.py FAMILY_PRIORS`** (Rule 19):
+`twin_pool_meta` (P=0.05, falsified), `primary_hier_calibration_postprocess`
+(P=0.05, NULL), `sequence_temporal_model` (P=0.20, untested),
+`transductive_pseudo_full_test` (P=0.15, mid-EV), `adversarial_sample_weight`
+(P=0.10), `deepgbm_leaf_encoding` (P=0.15).
+
+**Friction tags added today (Day-16)** in `audit/friction.md`:
+- `twin-pool-2-meta-collapses-rank-info`
+- `primary-hier-meta-globally-calibrated`
+- `two-stage-stint-needs-richer-stage-2`
+
+**Pointers (Day-16):**
+- `audit/2026-05-16-d16-virgin-axes-results.md` — full results audit
+- `ISSUES.md` leaf 7 (a-i) — claimed `read-handover-lA8Nr`, all wip→done/null
+- `scripts/d16_h{4,7,10,11}_*.py`, `d16_h2_twin_pool_meta.py`,
+  `d16_h9_transductive_pseudo.py`, `d16_epsilon4{,_b}_*.py`
+- `scripts/d16_multi_min_meta.py` — K=22+N stack-add gate
+- `scripts/d16_compile_results.py` — final compile + multi-add
+- `kernels/d16-gru-sequence-gpu/` — Kaggle T4×2 GRU (RUNNING)
+
+**Final compile + min-meta gates pending arrival of in-flight probe artifacts.**

@@ -107,6 +107,42 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
   Risk: public-LB row-iid leak-eaters carry signal (d13c T2/T3).
   `[owner: unclaimed | status: open]`
 
+## 7. Virgin axes complement to HANDOVER T1–T4
+
+Day-15 PM Conn–McLean re-entry. T1–T4 (combine-bases / target-reform /
+DAE-variants / meta-arch redesign) is owned by other branches; this leaf
+covers the orthogonal axes from the d13 problem decomposition tree
+(α/β/δ/ε/ζ/η) that no branch has executed.
+
+- **7a.** α4 sequence-Tx / GRU on (Driver, Race) lap windows. Temporal
+  prediction-unit, untouched. GPU 3-4h Kaggle T4×2.
+  `[owner: read-handover-lA8Nr | status: wip]`
+- **7b.** ε2 twin parallel-pool seed-2 + 2-meta blend. Anchor-structure
+  change (not base-add). CPU ~90 min.
+  `[owner: read-handover-lA8Nr | status: wip]`
+- **7c.** ε3 minimal K=5 pool trained on aadigupta1601 ORIGINAL data
+  (not transfer). Different from orig_transfer's single base. CPU ~90 min.
+  `[owner: read-handover-lA8Nr | status: wip]`
+- **7d.** η1 Year=2023 ∩ rare-Driver hard-mask post-process. d13 G4
+  queued, never run. EV 0–2 bp. CPU 5 min.
+  `[owner: read-handover-lA8Nr | status: wip]`
+- **7e.** β3 ROC-Star / rank_xendcg LGBM base. AUC-direct loss family,
+  untested. CPU 60 min.
+  `[owner: read-handover-lA8Nr | status: wip]`
+- **7f.** δ2/3 conformal (Year, Compound) inner-CV recalibration on
+  PRIMARY OOF. Untested; inner-CV-validated to avoid posthoc overfit.
+  CPU 30 min.
+  `[owner: read-handover-lA8Nr | status: wip]`
+- **7g.** α5 two-stage stint model (E[T_stint] → soft-assignment).
+  d13 axis α3, untouched. CPU 45 min.
+  `[owner: read-handover-lA8Nr | status: wip]`
+- **7h.** ζ3 decoded-data KNN nearest-orig PitStop label feature.
+  Different lookup target from d15_decode_normalized_tyrelife. CPU 60 min.
+  `[owner: read-handover-lA8Nr | status: wip]`
+- **7i.** ε4 DeepGBM LGBM-leaf-encoding + 2nd-stage stack. Captures
+  non-linearity LR-meta cannot form. CPU 45 min.
+  `[owner: read-handover-lA8Nr | status: wip]`
+
 ---
 
 ## Falsified or dead (do not re-claim)
