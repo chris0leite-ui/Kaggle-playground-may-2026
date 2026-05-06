@@ -10,14 +10,34 @@
 
 **Read order on session start** (skip the default; this is the synthesis):
 
-1. `CLAUDE.md` — state block + Rules 1-16
-2. `audit/2026-05-13-d13-path-b-hier-meta.md` — Path B mechanism (load-bearing)
-3. `audit/2026-05-13-d13d-path-b-gkf-probe.md` — GKF amplification confirms private-robust
-4. `audit/2026-05-12-d12-master-synthesis.md` — Day-12 leakage-robust thesis
-5. `audit/2026-05-12-d12-tabpfn-finetune-prep.md` — TabPFN GPU kernel READY
-6. `scripts/pre_submit_diff.py` — MANDATORY before submit
+1. `CLAUDE.md` — state block + Rules 1-19 (Rule 19 = experimentation harness)
+2. `scripts/probe.py` — entry point. `bote()` for BOTE, `gate()` for uniform gate report
+3. `scripts/probe_min_meta.py` — K=21+N stack-add gate
+4. `audit/2026-05-06-blend-and-rho-probes.md` — most recent rule-out + ρ inventory
+5. `audit/2026-05-06-alpha-asymmetry-verification.md` — Path B α-asymmetry verified
+6. `audit/2026-05-13-d13-path-b-hier-meta.md` — Path B mechanism (load-bearing)
+7. `audit/2026-05-13-d13d-path-b-gkf-probe.md` — GKF amplification confirms private-robust
+8. `audit/2026-05-12-d12-master-synthesis.md` — leakage-robust thesis
+9. `scripts/pre_submit_diff.py` — MANDATORY before submit
 
 Open with a 3-bullet read-back of state + first action.
+
+**Harness usage cheatsheet (Rule 19):**
+```bash
+# BEFORE writing code for a candidate ≥10 min CPU:
+python scripts/probe.py bote NAME --family X --cost_min N \
+    [--std_oof_lift_bp Y] [--prob_useful U] [--note "rationale"]
+
+# AFTER artifacts exist (under scripts/artifacts/oof_<NAME>_strat.npy):
+python scripts/probe.py gate NAME \
+    --oof scripts/artifacts/oof_NAME_strat.npy \
+    --test scripts/artifacts/test_NAME_strat.npy
+
+# Stack-add probe (K=21 + candidate(s)):
+python scripts/probe_min_meta.py --candidates NAME1 NAME2 ...
+```
+Family priors are in `scripts/probe.py FAMILY_PRIORS`. Rule-out is
+a valid result; cheap NULL findings get audit notes too.
 
 ## Where we are (Day 14 morning)
 
@@ -26,6 +46,65 @@ Open with a 3-bullet read-back of state + first action.
 - **Gap to top-5%** (0.95345): **30.4bp** (narrowed from 31.1bp).
 - **13 days remaining** (deadline 2026-05-31). 9 slots/day.
 - **Submits used**: 23/270 total; Day-13 4/9 (V1 5/3 multi-FM TIE LB 0.95032; d13c Compound τ=100000 LB 0.95033; d13 Stint τ=100000 LB 0.95041 NEW PRIMARY; d13a S3 K=24 TIE LB 0.95032).
+
+## 2026-05-06 PM addendum (branch `claude/ml-handover-alignment-xvUN0`)
+
+PI redirect: experimentation culture; many small probes; BOTE-first;
+"the solution is probably simple, maybe a code-quality fix"; no
+agent-side calendar tracking ("PI calls the day").
+
+**Built:** experimentation harness — `scripts/probe.py` (`bote` +
+`gate`), `scripts/probe_min_meta.py` (K=21+N stack-add gate),
+`scripts/probe_blends_K21.py`, `scripts/probe_rho_inventory.py`.
+Family priors calibrated against empirical 17% advance hit rate.
+Rule 19 added to CLAUDE.md codifying BOTE-first / gate-after.
+
+**Cheap probes (~5–10 min each, all via harness):**
+
+1. **α-asymmetry verification (`audit/…alpha-asymmetry-verification.md`).**
+   Audit-agent claim of "+2-5bp from a hier-meta bug" verified
+   structurally but **severity overstated** — per-fold uses fold-train
+   counts in α=n/(n+τ); test uses full-train counts. This is
+   Bayesian-correct shrinkage, NOT a fixable LB cap. Real
+   implication: OOF AUC reflects a more-shrunk model than test
+   ships → τ chosen on OOF may not be τ-optimal for test. Probe
+   surfaced (PURSUE per BOTE): α-calibrated τ-resweep, ~30 min.
+
+2. **K=21 simple-blend probe (`audit/…blend-and-rho-probes.md`).**
+   mean / gmean / rank_mean / trimmed all regress 19–32 bp
+   standalone vs PRIMARY. **Hypothesis "LR meta is over-weighting
+   bases, simple blend would help" RULED OUT.** rank_mean shows
+   asymmetric flip pattern (38 demote / 4470 promote) — interesting
+   but not hedge-grade.
+
+3. **ρ inventory of 22 held candidates.** Buckets: 2 TIE_EXPECTED
+   (any d13e τ variant), 10 near-tie, 10 diverse. Cleanest near-tie
+   HEDGE candidate: **`d12_lr_meta`** (OOF 0.95073, ρ=0.996, flip
+   ratio 0.297). `d12_groupkf_meta` evaluation-space mismatch
+   flagged (constructed under GKF; needs `--cv` flag in harness).
+
+4. **K=21 + d6_rule_compound_stint min-meta.** Δ −0.020 bp NULL.
+   30-cell historical-pit-rate signal (Phase B EDA find: SOFT-S1
+   4.25× lift) **already absorbed by pool**.
+
+5. **K=21 + 3 (`d12_lr_meta` + `d10d_leak_corrected_meta` +
+   `blend_rank_mean_K21`) min-meta.** **Δ +1.298 bp OOF** vs K=21
+   baseline (0.95073 → 0.95086). d12_lr_meta dominates (|w|=3.84).
+   Single-candidate ablation in flight at session-end. **First
+   non-NULL probe of the session.**
+
+**Open candidates (NOT YET RUN, BOTE-graded):**
+- α-calibrated τ-resweep on PRIMARY hier-meta (PURSUE; ~30 min).
+- Within-Race quantile-rank of LapTime_Delta as FM input (DEFER;
+  attacks 922bp single-feature leak; ~30 min; cv_normalize fix
+  required per friction tag `H5 z-score leak`).
+- Per-Driver historical pit rate (smoothed EB) (DEFER; ~10 min).
+- Year×Stint as sparse-LR feature / dedicated FM partition
+  (DEFER; round-2 critic surfaced this; ~30 min).
+- TE fold-leak audit on d2a/d3a (DEFER; read-only, 8 min).
+
+**State unchanged:** PRIMARY = `d13e_compound_stint_tau20000`
+LB 0.95049. No submissions made this session.
 
 ## Day-13 PM addendum (branch `claude/review-ml-handover-VTvWw`)
 

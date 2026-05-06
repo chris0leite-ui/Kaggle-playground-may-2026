@@ -74,6 +74,29 @@ ff-merge before reading state below.
     status (`wip` → `done`/`null`/`parked`) at wrap-up. Re-decomposition
     of the tree fires on the same triggers as the strategy-critic-loop
     (plateau, saturation, kickoff, 50% checkpoint, "redecompose").
+19. **Experimentation harness (BOTE-first / gate-after).** Embed
+    BOTE in problem-solving. Workflow:
+    (a) Before any candidate ≥10 min CPU/GPU, run
+        `python scripts/probe.py bote NAME --family X --cost_min N`.
+        SKIP verdict → don't run; DEFER → only if cycles permit;
+        PURSUE → ok. Family priors are calibrated to empirical hit rate
+        (~17% for s6e5 base population; family-conditional adjustments
+        in `FAMILY_PRIORS` dict).
+    (b) After artifacts exist, run
+        `python scripts/probe.py gate NAME --oof PATH --test PATH`
+        for the uniform structured report (standalone OOF Δ, ρ vs
+        PRIMARY, predicted LB Δ, G3 flip ratio, verdict). DON'T write
+        bespoke gate logic per script.
+    (c) For K=21+N stack-add probes use
+        `python scripts/probe_min_meta.py --candidates ...`.
+    (d) Rule-out is a valid result. Cheap null findings get audit
+        notes too (`audit/YYYY-MM-DD-*.md`); don't only document wins.
+    (e) "Many small things" beats "one big bet": prefer 5×30-min
+        probes over 1×3-h NN unless EV/cost-min strongly favors the
+        big bet under the harness's BOTE.
+    PI corollary: the calendar/budget belongs to PI; agents do
+    not propose timelines or "today/tomorrow" framings — execute
+    until PI says stop.
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
@@ -94,8 +117,8 @@ ff-merge before reading state below.
 day: 14                           # 2026-05-14 / Day-14 morning. **PRIMARY LB 0.95049 (d13e Compound×Stint τ=20000)**, holds since end Day-13. Day-13 closed: 6/9 submits — 2 PRIMARY-advances (Stint τ=100k +7bp, Compound×Stint τ=20k +8bp), 4 TIE/regress; Day-13 PM added 6-shape FM partition saturation + Move C minimal (drop d9c) ✓ + drop-GBDT FALSIFIED; Day-13/14 alt-axis 4-of-4 NULL (G1/G2'/G3/H1); EDA deep-dive H1 FM_aug15 -2bp regress (FM-aug saturated); d14 Path B cohort sweep (Year, Year×Stint, Race) NULL (no variant beats current PRIMARY OOF).
 lb_best_today: 0.95435            # leader; not refreshed
 our_lb_best: 0.95049              # d13e Compound×Stint τ=20000 NEW PRIMARY; gap to top-5% -2.96bp; +8bp jump from Path B Stint 0.95041; +15bp from d9h/d9i 0.95034
-submissions_used_today: 0         # 0/9 Day-14 morning (Day-13 used 6/9: V1 5/3 LB 0.95032, Compound τ100k LB 0.95033, Stint τ100k LB 0.95041, K23_H1_aug15 LB 0.95032, d13a S3 K=24 LB 0.95032, d13e Compound×Stint τ=20k LB 0.95049 NEW PRIMARY)
-submissions_used_total: 24
+submissions_used_today: 1         # 1/10 (2026-05-06: K=22 Path B Compound×Stint τ=100k LB 0.95045 — REGRESSED -4 bp; Path B family-conditional amp NOT FIRED for meta-derivative addition; 2-level-stacking-as-base falsified)
+submissions_used_total: 25
 saturation_count: 0               # Path B is structural advance; partition-shape + alt-axis nulls are exploration coverage, not saturations
 mechanism_families_explored:
   - baseline_lgbm_raw_features
@@ -165,6 +188,7 @@ mechanism_families_explored:
   - stintgrouped_lambdamart         # d13 G3 -- pairwise loss; smoke fold-0 0.74585, killed (63% all-zero stints from probe Q1)
   - fm_aug13_3way_concat_field      # d14 H1 -- CTRq Compound×TL_q5×RP_q5 (114/125 levels); std 0.92639 (+9.9bp vs aug12), ρ **0.917** (most diverse), min-meta -0.13bp NULL
   - path_b_cohort_sweep_d14         # d14 -- Year(4)/Year×Stint(24)/Race(26) × τ∈{5k,20k,100k}; 9 variants, NONE beats current PRIMARY (Compound×Stint τ=20k) on OOF; best Year×Stint τ=20k OOF 0.95080 (-0.30bp). Cohort lever Compound axis dominates Year axis (2023 flat-rate generator defeats per-Year specialization).
+  - two_level_stacking_meta_as_base # 2026-05-06 -- K=21 + d12_lr_meta (= K=21 LR-meta-OOF itself) +1.348 bp OOF, but Path B Compound×Stint hier-meta on K=22 SUBMITTED LB 0.95045 (-4 bp REGRESS, predicted +5-11 bp via Path B amp). FALSIFIED: Path B amp requires orthogonal pool signal, NOT meta-derivatives whose info is already convex combo of pool. Friction tag `path-b-amp-needs-orthogonal-signal-not-meta-derivatives`. Harness: `two_level_stacking_meta_as_base` family added (P=0.10, bp band -2/0/1).
 plateau_days: 2                   # Day-13/14 alt-axis branch: 4-of-4 nulls (G1/G2'/G3/H1). Path B was Day-13 structural win on meta-layer axis; partition-shape Day-13 PM saturated across 6 shapes; d14 cohort sweep extends Path B null.
 gate_status: cleared              # d13e Compound×Stint τ=20000 LB 0.95049 NEW PRIMARY (+8bp Day-13 PM)
 headroom_to_top5pct: 0.00296      # 0.95345 − 0.95049 = 29.6bp (d13e Compound×Stint τ=20000)
