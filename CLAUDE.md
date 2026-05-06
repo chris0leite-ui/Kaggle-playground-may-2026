@@ -47,7 +47,10 @@ ff-merge before reading state below.
 15. **Handover protocol.** PI says **"handover"** → read `HANDOVER.md`
     and proceed per its instructions (skip the usual read-order;
     HANDOVER.md is the latest synthesis). PI says **"prepare handover"**
-    → update `HANDOVER.md` with the next-session brief.
+    → follow `WRAPUP.md` section B exactly. On a non-`main` branch,
+    write today's notes to a `## Day-N PM <branch-slug>` H2 section
+    inside HANDOVER.md (slug = part after `claude/`); never edit other
+    branches' sections. Scribe consolidates at handover time.
 16. **New-candidate pre-flight (5-question check).** Before committing
     CPU/GPU compute on any new base or meta variant, answer:
     (1) Is the underlying mechanism in `mechanism_families_explored`?
@@ -60,6 +63,10 @@ ff-merge before reading state below.
     Origin: `tag: menu-overcrediting-redundant-mechanism` (Day-8
     falsified T1.5/T1.3/T1.2 all of which passed research-agent EV
     ranking but failed the 5-question check retroactively).
+17. **Wrap-up + handover triggers.** PI says **"wrap up"** → follow
+    `WRAPUP.md` section A. PI says **"prepare handover"** → follow
+    `WRAPUP.md` section A then section B. Both end with a push to the
+    current branch. No manual PI transcription required.
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
@@ -401,6 +408,7 @@ headroom_to_top5pct: 0.00296      # 0.95345 − 0.95049 = 29.6bp (d13e Compound�
 ## Pointers
 
 - `HANDOVER.md` — next-session brief (Rule 15).
+- `WRAPUP.md` — wrap-up + prepare-handover procedure (Rule 17).
 - `comp-context.md` — settled-once facts.
 - `audit/2026-05-04-strategy-critique.md` — Rule 14 origin.
 - `audit/2026-05-04-catboost-research.md` — CatBoost lever map.
