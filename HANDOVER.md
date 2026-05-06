@@ -80,6 +80,60 @@ Rule 19 added to CLAUDE.md codifying BOTE-first / gate-after.
 - Per-Driver historical pit rate smoothed EB (DEFER; ~10 min).
 - Year×Stint sparse-LR / FM partition (DEFER; ~30 min).
 
+## 2026-05-06 PM addendum (branch `claude/decode-synthetic-data-uoPIn`)
+
+PI redirect: "we have synthetic data; how could we decode this and get
+the real DGP — give 3 options". Then "do it" (execute) → "submit"
+→ "do 1" (leak_lookup) — full thread.
+
+**Source confirmed**: `aadigupta1601/f1-strategy-dataset-pit-stop-prediction`
+is the verified parent of synth. 31/887 synth Drivers exact-match;
+all Races/Compounds/Years overlap. Host removed `Normalized_TyreLife`
+and added 856 ghost Driver codes.
+
+**Synthesizer fingerprint (CTGAN/CopulaGAN-style)**: 97.55% of synth
+`LapTime` values, 95% of `LapTime_Delta`, 99.95% of `RaceProgress`,
+87% of `Cumulative_Degradation` are drawn from the original's
+empirical marginals. Joint structure broken (only 5.8% of
+`(LapTime, TyreLife, Compound)` triples survive). NTL formula
+recovered: `NTL = TyreLife / D(Driver, Race, Year, Stint)`.
+
+**Probes run (5 base mechanisms × 3 hier-meta configs = 8 gate calls):**
+
+| Mechanism | Std OOF | min-meta Δ | hier-meta(K=22) Δ | LB |
+|---|---:|---:|---:|---:|
+| d15_orig_transfer (LGBM on orig) | 0.85138 | **+0.778** | **+1.127** | 0.95049 TIE |
+| d15_orig_cb / xgb / lgbm_t | 0.84-0.87 | — | K=23 +0.005 / K=24 +0.33 | not subm. |
+| d15_decode_normalized_tyrelife | 0.94162 | −0.008 NULL | — | — |
+| d15_physics_residual | 0.94228 | −0.036 NULL | — | — |
+| d15_leak_lookup | 0.94203 | +0.270 soft | K=22 −0.90 / K=23(+orig) +0.19 | not subm. |
+
+**Submits this branch (3 today)**:
+1. K=22 LR-meta + d15_orig_transfer → LB 0.95039 (−10 bp; meta-arch confound, NOT mechanism falsification)
+2. K=22 hier-meta + d15_orig_transfer → LB 0.95049 (TIE with old PRIMARY — HEDGE-tier, ρ=0.998 flips 180<200)
+3. None — slot saved (K=24 had R7 violation; K=23 leak+orig predicted tie)
+
+**Best held-not-submitted**: `submission_d15_path_b_K23_leak_orig.csv`
+(OOF 0.95096, ρ=0.9986, flips 198 R7 ✓; predicted LB tie at OLD
+PRIMARY 0.95049 → not submitted but ready for R5 final-window).
+
+**Net for the comp**: decoded-data thesis is **REAL but
+QUANTIZATION-BOUNDED** on this comp. orig-trained transfer base
+contributes +1.13 bp OOF at hier-meta with ρ=0.565 vs OLD PRIMARY
+single-row (most-diverse base since d9f FM_A) but lands within
+Kaggle's ~5 bp LB resolution. Combining with main's NEW PRIMARY
+(LB 0.95059, +10 bp via inv_laps + B-GPU dae) is the load-bearing
+next move — orthogonal mechanism families.
+
+**Audit**: `audit/2026-05-06-d15-decode-synthesizer.md` (fully
+detailed — fingerprint, gates, hier-meta probes, 4 ranked next-steps,
+3 friction tags).
+
+**Friction tags added**:
+- `external-data-arch-bag-redundant-when-shared-training-data`
+- `meta-arch-required-for-orthogonal-base-eval`
+- `lb-quantization-floor-defeats-decoded-data`
+
 ## Day-14 session — TabPFN + Move D results
 
 ### Move A — TabPFN fine-tune: DEAD

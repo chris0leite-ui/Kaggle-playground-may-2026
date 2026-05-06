@@ -235,19 +235,121 @@ Friction tag: `external-data-arch-bag-redundant-when-shared-training-data`.
 For future external-data work: vary either training-data subset OR
 target-engineering, not just architecture.
 
-## Artifacts
+## Artifacts (consolidated, 2026-05-06 wrap)
+
+### Reproduction
+
+```bash
+# Original dataset (gitignored, 13MB):
+kaggle datasets download -d aadigupta1601/f1-strategy-dataset-pit-stop-prediction \
+    -p data/original
+unzip data/original/*.zip -d data/original
+```
+
+### Scripts (committed)
 
 ```
-scripts/d15_decode_ntl.py
-scripts/d15_orig_transfer.py            ← THE WIN
-scripts/d15_physics_residual.py
-scripts/artifacts/oof_d15_decode_ntl_strat.npy
-scripts/artifacts/test_d15_decode_ntl_strat.npy
-scripts/artifacts/oof_d15_orig_transfer_strat.npy
-scripts/artifacts/test_d15_orig_transfer_strat.npy
-scripts/artifacts/oof_d15_physics_residual_strat.npy
-scripts/artifacts/test_d15_physics_residual_strat.npy
+scripts/d15_decode_ntl.py             # Lens 1: NTL lookup + stint-fraction est (NULL)
+scripts/d15_orig_transfer.py          # Lens 2 base: orig-trained LGBM (THE WIN)
+scripts/d15_physics_residual.py       # Lens 3: Ridge-residual physics (NULL)
+scripts/d15_orig_multi_arch.py        # CB+XGB+tuned-LGBM orig variants
+scripts/d15_leak_lookup.py            # 16 EB-smoothed leak features
+scripts/d15_path_b_K22_orig_transfer.py  # hier-meta K=22 probe
+scripts/d15_path_b_orig_bag.py        # hier-meta K=23/K=24 bag probe
+scripts/d15_path_b_leak.py            # hier-meta K=22(leak)/K=23(leak+orig)
+```
+
+### OOF / test artifacts (all committed, harness-format `(n,2)`)
+
+```
+oof_d15_decode_ntl_strat.npy           test_*  (NULL min-meta)
+oof_d15_orig_transfer_strat.npy        test_*  (HEDGE candidate base)
+oof_d15_orig_cb_strat.npy              test_*  (orig CatBoost)
+oof_d15_orig_xgb_strat.npy             test_*  (orig XGBoost)
+oof_d15_orig_lgbm_t_strat.npy          test_*  (orig tuned LGBM, redundant w/ transfer)
+oof_d15_physics_residual_strat.npy     test_*  (NULL min-meta)
+oof_d15_leak_lookup_strat.npy          test_*  (soft-pass min-meta)
+oof_d15_path_b_K22_orig_transfer_strat.npy   test_*  ← LB 0.95049 TIE (HEDGE)
+oof_d15_path_b_K23_orig_transfer_cb_strat.npy   test_*  (NULL incremental)
+oof_d15_path_b_K24_orig_transfer_cb_xgb_strat.npy  test_*  (R7 violation)
+oof_d15_path_b_K22_leak_strat.npy      test_*  (weaker than orig)
+oof_d15_path_b_K23_leak_orig_strat.npy  test_*  ← BEST OOF 0.95096 (held)
+```
+
+### Submitted CSVs
+
+```
+submissions/submission_d15_K22_add_orig_transfer.csv          # LB 0.95039 (LR-meta confound)
+submissions/submission_d15_path_b_K22_orig_transfer.csv       # LB 0.95049 TIE — HEDGE
+```
+
+### Held-not-submitted CSVs (ready for R5 final-window probe)
+
+```
+submissions/submission_d15_path_b_K23_orig_transfer_cb.csv
+submissions/submission_d15_path_b_K24_orig_transfer_cb_xgb.csv  (R7 cap exceeded)
+submissions/submission_d15_path_b_K22_leak.csv
+submissions/submission_d15_path_b_K23_leak_orig.csv             # BEST OOF held
+```
+
+### Probe JSONs (uniform gate reports)
+
+```
 scripts/artifacts/probe_min_meta__d15_*.json
-data/original/f1_strategy_dataset_v4.csv  (gitignored — 13MB; reproduce via
-  `kaggle datasets download -d aadigupta1601/f1-strategy-dataset-pit-stop-prediction -p data/original`)
+scripts/artifacts/d15_path_b_K22_orig_transfer_results.json
+scripts/artifacts/d15_path_b_orig_bag_results.json
+scripts/artifacts/d15_path_b_leak_results.json
+```
+
+## Next steps (ranked by EV / cost)
+
+Ordered for the next agent who consolidates branches. **Current PRIMARY
+on origin/main has advanced to LB 0.95059** (B-GPU's `d15b_dae_only` +
+`inv_laps_until_pit` features); this branch's `d15_orig_transfer`
+HEDGE was tied at the OLD PRIMARY 0.95049, so the gap to the NEW
+PRIMARY is −10 bp. The decoded-data thesis remains under-tested
+against the new pool composition.
+
+1. **Re-test d15_orig_transfer against the NEW K=22 pool** (~30 min CPU,
+   no submit). Take main's new pool (K=21 + inv_laps_until_pit) and
+   build hier-meta(K=23) with d15_orig_transfer added. If OOF lifts
+   meaningfully (>= +0.5 bp over the new PRIMARY OOF), recompute ρ vs
+   new PRIMARY test. Cost-justified because orig_transfer is
+   structurally orthogonal (ρ=0.565 vs OLD PRIMARY) and inv_laps_until_pit
+   is a within-synth derived feature; their signals likely don't overlap.
+
+2. **Stack d15_orig_transfer + d15b_dae_only** (~30 min CPU). DAE
+   embeddings + orig-DGP transfer are orthogonal mechanism families
+   (one is internal-augmentation, the other is external-data). Probe
+   K=23 = K=21 + dae_only + orig_transfer. EV: each contributed
+   ~+1 bp OOF independently; combined band [+0.5, +2, +4] bp.
+
+3. **Mixed-source LGBM** (~2-3 h CPU, parked). `concat(orig 99k +
+   synth 439k)` with sample-weights ∝ density-ratio. The d12 AV
+   probe found AV-AUC=0.502 (no domain shift), so density-ratio
+   may degenerate to uniform — but orig rows act as ground-truth
+   anchors regardless. Different mechanism axis from d15_orig_transfer
+   (mixed training vs pure transfer).
+
+4. **Per-row preimage join** (~2 h CPU, novel). For each synth row,
+   find original rows with EXACT match on `(LapTime, TyreLife,
+   Compound, Race)` (5.84% coverage). Use those rows' Normalized_TyreLife,
+   exact Stint, exact Driver as recovered features. Combines Lens 1
+   (lookup) + Lens 2 (use original directly) at row level — different
+   from `leak_lookup`'s aggregate-then-apply pattern.
+
+### Friction notes
+
+- `tag: external-data-arch-bag-redundant-when-shared-training-data` —
+  varying model architecture on the same training data gives
+  diminishing returns (~ρ 0.94-0.99 inter-arch). Vary training data
+  subset OR target engineering instead.
+- `tag: meta-arch-required-for-orthogonal-base-eval` — pre-submit BOTE
+  must specify which meta architecture (LR vs hier-meta) is used.
+  LR vs hier-meta = ~14 bp on this comp, dominates +0.5-1 bp base-add
+  gains. Today's Submit #1 lost 10 bp purely to this confound.
+- `tag: lb-quantization-floor-defeats-decoded-data` — at ρ ≥ 0.998
+  vs PRIMARY, even +1.13 bp OOF lifts land within Kaggle's ~5 bp LB
+  resolution. Decoded-data signals on this comp are real but bounded
+  by public-LB granularity.
 ```
