@@ -200,6 +200,7 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 | **d9i_S1_K21_swap_aug2way** | **0.95071** | n/a | **0.95034** | **NEW PRIMARY (TIED)**; +3bp LB; OOF predicted -0.19bp (regression!), actual +3bp lift; OOF direction-flipped |
 | d10b_K13_baseline (Strat / GKF-Race) | 0.95043 | 0.92744 | n/a | 13 GBDT/baseline; gap −229.92bp (leakage signature) |
 | d10b_K15_+FMA+FMB (Strat / GKF-Race) | 0.95052 | 0.92764 | n/a | FM-class lift +0.87bp Strat → **+2.01bp GKF (2.3× amplified)**; FM_B L1 #1 under GKF |
+| d10d_leak_corrected_meta | n/a | 0.92764 | n/a | held; G3 FAIL (rare-class flip 0.001); rebalances FM_B L1=6.96 but smooths away GBDT row-extremes; pred-LB 0.95001 |
 
 ## Hypothesis board (Day 9 evening)
 
@@ -272,6 +273,14 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
         2× the next base). When LR meta can't piggyback on within-
         group leakage from GBDTs, it routes hard through FM. PRIMARY
         d9f K=21 swap (LB 0.95031) is private-LB robust.
+- DONE: d10d leak-corrected LR meta (refit LR on GKF OOFs, apply to
+        GKF test preds). G3 rare-class flip ratio 0.001 (1751 rows
+        drop out of top-1%, 2 added). FM_B L1=6.96 dominates as
+        designed but smooths away GBDT row-specific extremes that
+        ARE genuine (i.i.d. test → those rows really do pit). HELD,
+        pred-LB 0.95001. Insight: GKF OOFs cannot see test-row-
+        specific signals, so they over-credit FM. Bayesian
+        hierarchical stacker (Path B) is the correct synthesis.
 - LATER: External-data Pirelli pit-window scrape (Tier-2 highest
         absolute EV), EmbMLP CPU (different model class), hazard NN
         (GPU; d9 hazard_nn_stack regressed 315bp — implementation
@@ -307,4 +316,5 @@ headroom_to_top5pct: 0.00319      # 0.95345 − 0.95026 = 31.9bp
 - `audit/2026-05-10-d9i-augmented-2way.md` — aug 2-way K=21 swap LB 0.95034 (+3bp NEW PRIMARY tied; OOF was -0.19bp regression).
 - `audit/2026-05-10-d10-groupkf-audit-fm-real.md` — strict GKF FM bases drop 2.5–54bp vs GBDTs −210bp.
 - `audit/2026-05-10-d10b-groupkf-stack-rebuild.md` — FM-class lift +2.01bp GKF vs +0.87bp Strat (2.3× AMPLIFIED); FM_B is #1 L1 under GKF.
+- `audit/2026-05-10-d10d-leak-corrected-meta.md` — leak-corrected LR meta gate-FAILs (G3 flip ratio 0.001) but informative; Bayesian hierarchical is correct synthesis.
 - `audit/friction.md` — friction one-liners.
