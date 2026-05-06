@@ -62,6 +62,15 @@ Cap ≤150 lines. This is a checklist agents follow verbatim.
    `audit/archive-YYYY-MM-DD-<topic>.md` BEFORE step 6 and update
    pointers. Never silently truncate.
 
+5b. **Override-rate report (Rule 20e).** Before commit, run
+    `python scripts/probe.py calibration` and report to PI:
+    - This session: agent recommended N candidates, PI overrode M.
+    - Rolling 7-day override rate (count outcomes in `bote_log.jsonl`
+      whose `verdict` differed from PI's actual go/no-go).
+    - If 0/M overrides for 2 consecutive wrap-ups, flag stamp risk
+      in HANDOVER.md `## Where we are`. The friction tag for this is
+      `tag: pi-stamp-risk`.
+
 6. **Commit.** Use HEREDOC, structured message:
    ```
    git commit -m "$(cat <<'EOF'

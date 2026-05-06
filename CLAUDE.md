@@ -121,6 +121,39 @@ ff-merge before reading state below.
     not propose timelines or "today/tomorrow" framings — execute
     until PI says stop.
 
+20. **PI interaction protocol (non-coding PI; added 2026-05-06).**
+    PI is read+strategy, not keyboard. Agent runs all Python; PI
+    ratifies and calibrates. Anti-rubber-stamp rituals:
+    (a) **Sealed-prediction order.** Before agent reveals its BOTE
+        `expected_lb_bp` for any candidate, agent FIRST asks:
+        "what's your LB Δ prediction in bp?" PI commits a number +
+        one-line rationale to chat. THEN agent reveals its number
+        and they go to `audit/bote_log.jsonl` together via
+        `--pi-predicted-lb-bp`. Agent revealing first poisons the
+        calibration loop via anchoring.
+    (b) **Three required questions on every BOTE.** Agent asks PI:
+        (i) PI-predicted LB Δ (sealed per (a));
+        (ii) Q6 — does training objective match row-AUC?;
+        (iii) which precedent is PI pricing this against? (cite a
+        calibration-ladder row). Skipping any → agent runs without
+        `--pi-predicted-lb-bp` and flags the omission in chat.
+    (c) **Devil's-advocate ritual.** Once per session, agent picks
+        its strongest current recommendation and argues *against* it
+        in 3 bullets. PI accepts the counter or rebuts it. Surfaces
+        blind spots cheaply; replaces "hand-run a probe" for non-
+        coding PI.
+    (d) **Daily deep-read.** PI picks one audit note end-to-end and
+        writes back: "load-bearing finding is X; the part I don't
+        follow is Y". Agent must explain Y. Builds mechanism
+        intuition without code.
+    (e) **Override-rate report at every wrap-up.** WRAPUP.md A ends
+        with "PI overrode agent N/M times this session; rolling 7-day
+        override rate X%". 0/M for 2 consecutive wrap-ups → agent
+        flags stamp risk in handover. Origin: rubber-stamp anti-
+        pattern (Sethserver; MLE-bench HITL literature).
+    Origin: `audit/2026-05-06-agentic-kaggle-research.md` HITL
+    section + non-coding-PI reframe (2026-05-06 chat).
+
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
 - **R1 — Two-anchor OOF.** *s6e5: GroupKF dropped Day-3+ (U3 confirms
