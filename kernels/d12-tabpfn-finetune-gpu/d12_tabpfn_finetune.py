@@ -44,7 +44,8 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 
 TARGET, ID_COL = "PitNextLap", "id"
-SEED, N_FOLDS = 42, 1   # 1-fold time-probe; bump to 5 after wall confirmed <9h
+SEED, N_FOLDS = 42, 5
+SMOKE_FOLD0_ONLY = True   # 1-fold time-probe; set False for full 5-fold run
 BASE_S = 0.94075          # baseline_two_anchor Strat OOF (LB-proxy anchor)
 REALMLP_E4 = 0.94722      # E4 fold-0 reference
 
@@ -286,6 +287,10 @@ def main():
         fold_scores.append(s)
         fold_walls.append(wall)
         print(f"  [fold {k}] AUC={s:.5f}  wall={wall:.0f}s ({wall/60:.1f}min)")
+        if SMOKE_FOLD0_ONLY:
+            print(f"  [smoke] 1-fold probe done. 5-fold projection: "
+                  f"{wall*5/3600:.1f}h. Set SMOKE_FOLD0_ONLY=False for full run.")
+            break
 
         # Save partial state every fold
         np.save(WORK / "oof_d12_tabpfn_finetune_strat.npy",
