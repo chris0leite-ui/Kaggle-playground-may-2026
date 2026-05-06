@@ -31,6 +31,22 @@ import sys
 import time
 from pathlib import Path
 
+# P100 (sm_60) compat: Kaggle silently routes GpuT4x2 jobs to P100 nodes.
+# Current torch (>=2.6) drops sm_60 wheels. Force-reinstall torch 2.4 BEFORE
+# any `import torch` so all subsequent torch usage targets the sm_60-capable
+# wheel. Same fix as kernels/realmlp-gpu/realmlp_gpu.py and
+# kernels/hazard-nn-smoke-gpu/hazard_nn_smoke_gpu.py.
+print("[boot] force-reinstall torch 2.4 (sm_60 P100 support) ...", flush=True)
+try:
+    subprocess.check_call([
+        sys.executable, "-m", "pip", "install", "--quiet",
+        "--force-reinstall", "--no-deps",
+        "torch==2.4.*", "torchvision==0.19.*",
+    ])
+except subprocess.CalledProcessError as e:
+    print(f"[boot] torch 2.4 reinstall failed (continuing with default): {e}",
+          flush=True)
+
 import numpy as np
 import pandas as pd
 import torch
