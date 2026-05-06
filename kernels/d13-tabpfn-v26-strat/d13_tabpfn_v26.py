@@ -5,8 +5,8 @@ _create_estimator method is hardcoded to ModelVersion.V2_5. We monkey-patch
 it to ModelVersion.V2_6 before instantiation (see install_tabpfn()).
 Weights: Prior-Labs/tabpfn_2_6 on HuggingFace.
 
-Head-to-head vs d12-tabpfn-finetune-strat (v2.5): same SMOKE_FOLD0_ONLY=True,
-SMOKE_N_ROWS=50k. Compare fold-0 AUC; better version gets the full 5-fold run.
+1-fold probe with FULL training data (351k rows) to close the 74bp AUC gap
+seen at 50k rows. SMOKE_N_ROWS=None. Expected fold-0 wall ~5-5.5h.
 
 This is NOT inference-only ICL. We use `tabpfn.finetuning.FinetunedTabPFNClassifier`
 to specialise the foundation-model weights to this DGP via gradient steps.
@@ -54,7 +54,7 @@ from sklearn.model_selection import StratifiedKFold
 TARGET, ID_COL = "PitNextLap", "id"
 SEED, N_FOLDS = 42, 5
 SMOKE_FOLD0_ONLY = True   # 1-fold time-probe; set False for full 5-fold run
-SMOKE_N_ROWS = 50_000     # Rule 2: smoke at 50k rows; set None for full data
+SMOKE_N_ROWS = None       # full training data (~351k rows per fold)
 BASE_S = 0.94075          # baseline_two_anchor Strat OOF (LB-proxy anchor)
 REALMLP_E4 = 0.94722      # E4 fold-0 reference
 
