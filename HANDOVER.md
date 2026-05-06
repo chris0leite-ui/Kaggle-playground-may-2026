@@ -107,6 +107,19 @@ Compound×Stint τ=20k = K=21 + inv_laps_until_pit (target-derived) | OOF +2.75b
 
 EV +0.5 to +2 bp K=21+1 OOF; +1 to +6 bp under Path B amp.
 
+### A2b — Re-test d15_orig_transfer against the NEW K=22 pool (~30 min CPU)
+
+`branch claude/decode-synthetic-data-uoPIn` confirmed `aadigupta1601` is
+the synth's source dataset and built `d15_orig_transfer` (LGBM trained on
+the original, predicts synth). Standalone synth-AUC 0.85138, ρ=0.565 vs
+OLD PRIMARY (most-diverse single base since d9f FM_A 0.487). At hier-meta(K=22,
+Compound×Stint, τ=20k) = K=21 + d15_orig_transfer: OOF +1.127 bp,
+ρ=0.99844, flips 180 (R7 ✓), submitted LB 0.95049 TIE with OLD PRIMARY.
+Branch pushed full artifacts. NEW PRIMARY (d15b_dae) brings K=22 inv_laps
+to a different baseline — re-test orig_transfer against `K=22 = K=21
++ inv_laps_until_pit` (NEW baseline) to see if the two orthogonal
+mechanism families stack. Audit: `audit/2026-05-06-d15-decode-synthesizer.md`.
+
 ### A3 — Pool composition: STRUCTURED replace, not naive drop
 
 d13c falsified naive drop. Structured swap (drop 2 leak-eaters AND add 2

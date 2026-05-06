@@ -143,6 +143,49 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   `scripts/probe.py FAMILY_PRIORS` with P(useful)≈0.10 and
   bp band (0, 0, 1) so BOTE catches this in the future.
 
+- `tag: external-data-arch-bag-redundant-when-shared-training-data` —
+  branch `decode-synthetic-data-uoPIn` 2026-05-06: trained 4 model
+  classes (LGBM-default, CB, XGB, LGBM-tuned) on the same
+  aadigupta1601 original 99k rows. Inter-arch ρ on synth test 0.94-0.99
+  (high overlap); ρ vs PRIMARY single-row 0.57-0.64. Hier-meta K=23
+  adding CB Δ +0.005bp NULL; K=24 adding XGB Δ +0.33bp but flips 293
+  > R7 200-cap. **Root cause**: same training data → architectures
+  share most of the underlying DGP signal; LR-meta absorbs
+  architectures redundantly. **Fix**: vary training-data subset
+  (e.g. mixed-source with weights) or target-engineering (e.g.
+  laps-until-pit regression instead of next-lap classification),
+  not just architecture. Add a `bag_same_training_data` discount
+  in `scripts/probe.py` FAMILY_PRIORS (-50% on per-arch increments
+  beyond the first).
+
+- `tag: meta-arch-required-for-orthogonal-base-eval` —
+  branch `decode-synthetic-data-uoPIn` 2026-05-06: submitted K=22
+  LR-meta + d15_orig_transfer → LB 0.95039 (-10 bp regress vs PRIMARY
+  hier-meta 0.95049). The OOF lift +0.778 bp under LR-meta(K=22) was
+  REAL but landed below PRIMARY's hier-meta architecture floor.
+  **Root cause**: pre-submit BOTE quoted "+0.778 bp" but didn't
+  specify which meta architecture would be used to evaluate; LR-meta
+  vs hier-meta = ~14 bp delta on this comp, dominating any +0.5-1 bp
+  base-add gain. The follow-up hier-meta(K=22) probe lifted +1.127 bp
+  OOF and landed LB 0.95049 TIE, confirming the mechanism but
+  validating the meta-arch confound. **Fix**: any new-base BOTE must
+  specify both `family` AND `eval_meta_arch` (LR or hier-meta-Cmpd-Stint).
+  Add `eval_meta_arch` to `scripts/probe.py bote()` signature.
+
+- `tag: lb-quantization-floor-defeats-decoded-data` —
+  branch `decode-synthetic-data-uoPIn` 2026-05-06: d15_orig_transfer
+  hier-meta(K=22) lifted +1.127 bp OOF at ρ=0.998 vs PRIMARY → LB tie
+  (5-decimal display 0.95049 == 0.95049). At ρ ≥ 0.998 vs the on-LB
+  reference, even +1 bp OOF lifts land within Kaggle's ~5 bp public-LB
+  resolution. **Root cause**: synth public LB is row-iid (U3 confirmed)
+  with 188k test × 20% public split = 37k scoring rows; AUC resolution
+  ≈ 1/(N_pos × N_neg)^0.5 ≈ 5e-5 floor. Decoded-data signals on this
+  comp are real but bounded by public-LB granularity. **Fix**: don't
+  consume LB submit slots on candidates predicting <2 bp at ρ ≥ 0.998
+  — they're calibration probes, not lift candidates. Update Rule 12
+  to "spend slots on predicted ≥3 bp candidates only". For sub-2-bp
+  candidates, hold as HEDGE/R5 final-window pool.
+
 ## 2026-05-13/14
 
 - `tag: single-base-fe-additions-noise-wall` — Day-13/14 alternative-axis
