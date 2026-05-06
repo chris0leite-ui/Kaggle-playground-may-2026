@@ -50,11 +50,22 @@ leakage-robust population.
 
 ## Day-13 first-action plan (parallel: A + B; then C)
 
-### Move A — push TabPFN-2.5 fine-tune kernel to Kaggle (PI action)
-Kernel ready at `kernels/d12-tabpfn-finetune-gpu/`. Set `TABPFN_TOKEN`
-secret (license accept on ux.priorlabs.ai). T4×2 wall 5-7h. **Only
-live 10bp shot.** EV +5-15bp std-alone, +1-3bp stack median, +3-9bp
-tail. Single PI action; runs in background.
+### Move A — re-push TabPFN-2.5 fine-tune kernel (PI provides token THIS session)
+**Status: BLOCKED on Day-12; PI confirmed will provide TABPFN_TOKEN
+this session.** Day-12 attempted push (`kaggle kernels push`) errored
+fast at the license check because no `TABPFN_TOKEN` Kaggle Secret
+was set. Kernel is at `kernels/d12-tabpfn-finetune-gpu/` — verified
+correct (handles token via `kaggle_secrets.UserSecretsClient` per
+script lines 117-129). **First action this session:**
+  1. PI provides token from https://ux.priorlabs.ai (one-time license accept).
+  2. Set Kaggle Secret named `TABPFN_TOKEN` on PI's Kaggle account
+     (web UI → Settings → Add-ons → Secrets, or via `kaggle config secret`).
+  3. Re-push: `cd kernels/d12-tabpfn-finetune-gpu && kaggle kernels push`.
+  4. Verify status: `kaggle kernels status chrisleitescha/d12-tabpfn-finetune-strat`.
+  5. T4×2 wall 5-7h. **Only live 10bp shot.** EV +5-15bp std-alone,
+     +1-3bp stack median, +3-9bp tail. Runs in background.
+  6. On completion (next session), pull artifacts via
+     `kaggle kernels output chrisleitescha/d12-tabpfn-finetune-strat -p kernels/d12-tabpfn-finetune-gpu/output/`.
 
 ### Move B — build 3 FM-class diversification variants (cheap CPU)
 Each 2-3h CPU. Builds on d9f's 2-way 4/4 sweet spot finding:
