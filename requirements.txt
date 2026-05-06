@@ -4,11 +4,15 @@ scikit-learn
 scipy
 matplotlib
 pytest
+pyarrow
 
 # Tabular models
 lightgbm
 xgboost
-# catboost   # uncomment if needed
+catboost
+
+# Neural / FM models (CPU build OK for local; Kaggle GPU kernels carry their own)
+torch>=2.0
 
 # Kaggle CLI
 kaggle>=1.6.0
