@@ -303,4 +303,52 @@ axes (α/β/δ/ε/ζ/η) that no other branch had executed. NO SUBMITS today
 - `scripts/d16_compile_results.py` — final compile + multi-add
 - `kernels/d16-gru-sequence-gpu/` — Kaggle T4×2 GRU (RUNNING)
 
-**Final compile + min-meta gates pending arrival of in-flight probe artifacts.**
+### Day-16 final summary (all probes complete, no submits today)
+
+| Probe | Axis | Std OOF | ρ vs PR | min-meta Δ | Verdict |
+|---|---|---:|---:|---:|---|
+| H4 Year=2023 mask | η1 | post-process | n/a | n/a | **NULL** +0.004 bp |
+| H7 Conformal isotonic 4 schemes | δ2/3 | post-process | n/a | n/a | **NULL** all 4 schemes |
+| H10 Two-stage stint logistic | α5 | 0.625 | 0.196 | (skip weak) | **NULL** stage-2 too crude |
+| H2 Twin parallel-pool 2-meta | ε2 | 0.95010 | 0.991 | -1.79 vs single LR(K=11) | **FALSIFIED** |
+| ε4 cat-LGBM stage-2 | ε4 | KILLED 16m | — | — | over-engineered |
+| ε4b sparse-LR head | ε4 | 0.92507 fold-0 | KILLED weak | — | KILLED |
+| H11 AV-sample-weight | ε  | KILLED 12m | — | — | stuck contention |
+| H9 Transductive pseudo | ζ6 | 0.93433 | **0.872** | **+0.631** vs LR-K22 | MARGINAL: -0.30 vs PRIMARY hier |
+| H1 GRU sequence (Kaggle T4x2) | α4 | 0.93066 | **0.919** | **-0.043 NULL** | **NULL** |
+| H9 + H2 multi-add | ε2+ζ6 | — | 0.9953 | +0.671 (≈H9) | NULL marginal |
+| H9 + GRU multi-add | α4+ζ6 | — | 0.9955 | +0.629 (≈H9) | NULL marginal |
+
+**No new PRIMARY.** All virgin axes from d13 problem-decomposition
+tree (α/β/δ/ε/ζ/η) are rank-locked under K=22 + Path-B-hier-meta.
+GRU at ρ=0.919 (most-diverse base of session) is the strongest
+falsification of "low-ρ guarantees meta utility" on this comp.
+
+**Load-bearing strategic synthesis:**
+The K=22 + Path-B-hier-meta architecture is rank-saturated against
+every base-add axis reachable via standalone OOF. The ONLY remaining
+amp-eligible axis is meta-architecture redesign (HANDOVER T4: non-
+Gaussian shrinkage, nested hierarchy, Yao/Vehtari covariance-BMA,
+alternative segmentation crosses) — owned by other branches.
+
+**4 new friction tags added today** (full text in `audit/friction.md`):
+- `twin-pool-2-meta-collapses-rank-info`
+- `primary-hier-meta-globally-calibrated`
+- `two-stage-stint-needs-richer-stage-2`
+- `temporal-axis-also-rank-locked-at-K22`
+- `lr-meta-multi-add-no-better-than-single-add`
+- `h9-transductive-pseudo-lifts-LR-meta-but-not-PRIMARY-hier`
+
+**Recommendation for tomorrow's session.** If HANDOVER T4 (meta-arch
+redesign) doesn't land in the parallel branch, the next axes are:
+(a) external second-source data (Ergast / FastF1) — never tested,
+fundamentally new signal source, not in any `mechanism_families_explored`;
+(b) full re-pool (replace 5 weakest GBDT clones with 5 fresh
+diverse-architecture bases) — d13c falsified naive drop but
+structured swap untested;
+(c) Pirelli scrape (HANDOVER A4 / ISSUES leaf 4a) — still open.
+
+R5 HEDGE candidates (final-3-day window):
+- d15b dae K=22 hier-meta (current PRIMARY)
+- d15b dae+inv_laps K=23 (held in `claude/ml-handover-alignment-xvUN0`)
+- d16_h9 transductive (if hier-meta variant redoes the +0.63 lift)

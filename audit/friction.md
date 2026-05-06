@@ -37,6 +37,48 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   axis itself, just of this implementation. Worth re-attempting if
   later sessions still need new bases.
 
+- `tag: temporal-axis-also-rank-locked-at-K22` — Day-16 H1 GRU
+  sequence model (causal GRU over (Driver, Race) lap windows; the
+  α4 prediction-unit axis from d13 problem-decomposition tree).
+  Trained on Kaggle T4×2 12 epochs × 5-fold ~58 min wall. Std OOF
+  0.93066, **ρ vs PRIMARY 0.919 (most-diverse single base of
+  session)** — confirming the temporal lap-sequence carries
+  meaningfully different signal at the standalone level. **Yet at
+  K=22+1 LR-meta gate Δ = -0.043 bp NULL.** Even the unique virgin
+  prediction-unit axis is fully absorbed by the K=22 LR-meta with
+  [raw, rank, logit] expand. This is the 5th cross-confirmation of
+  `lr-meta-rank-lock-strong-anchor` from a structurally distinct
+  angle (sequence vs per-row classification). **Strategic
+  implication:** standalone-OOF/ρ-band metrics are now empirically
+  insufficient predictors of meta-utility for ANY base-add on
+  this comp; meta-arch redesign (Path B) is the only amp-eligible
+  axis remaining.
+
+- `tag: lr-meta-multi-add-no-better-than-single-add` — Day-16 H9
+  alone +0.631 bp at K=22+1 LR-meta. H9+H2 multi-add (K=22+2): +0.671
+  bp (only +0.04 over H9 alone, despite H2's ρ=0.991 standalone
+  diversity at the meta level). H9+GRU multi-add (K=22+2): +0.629 bp
+  (effectively 0 over H9). Even with structurally diverse candidates
+  (H2 = twin-pool meta, GRU = α4 sequence; ρ to PRIMARY 0.991, 0.919),
+  the LR-meta with [raw,rank,logit] saturates on a SINGLE direction
+  contributed by the marginally-additive base. Multi-add does not
+  unlock additional orthogonal signal on this comp at the K=22 pool
+  size. **Pre-flight rule:** when 2 candidates each PASS K=22+1
+  individually with similar |w| and similar OOF Δ, expect K=22+2
+  multi-add Δ ≈ max(individual Δ), not sum.
+
+- `tag: h9-transductive-pseudo-lifts-LR-meta-but-not-PRIMARY-hier` —
+  Day-16 H9 (LGBM trained on synth_train + half-weighted PRIMARY-
+  pseudo-test 627k rows) std OOF 0.93433, ρ=0.872. K=22+1 LR-meta
+  gate +0.631 bp PASS — small but real positive signal. **But vs
+  PRIMARY hier-meta with Compound×Stint segmentation: Δ -0.30 bp
+  regress.** PRIMARY's hier-meta is +0.93 bp above LR-meta(K=22);
+  the H9 +0.63 gain at LR-meta erases when account for PRIMARY's
+  amp. Empirical confirmation of `path-b-amp-only-fires-on-meta-arch
+  -not-base-add`: even a marginal LR-meta lift doesn't transfer to
+  PRIMARY-grade if the base-add doesn't carry the per-segment
+  routing structure that hier-meta exploits.
+
 ## 2026-05-06
 
 - `tag: synthetic-dgp-conditionally-near-independent` — Day-14 PM:
