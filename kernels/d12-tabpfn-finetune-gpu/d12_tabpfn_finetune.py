@@ -46,7 +46,7 @@ from sklearn.model_selection import StratifiedKFold
 TARGET, ID_COL = "PitNextLap", "id"
 SEED, N_FOLDS = 42, 5
 SMOKE_FOLD0_ONLY = True   # 1-fold time-probe; set False for full 5-fold run
-SMOKE_N_ROWS = 50_000     # Rule 2: smoke at 50k rows; set None for full data
+SMOKE_N_ROWS = 150_000    # v2 probe: 150k rows (v2.6 OOM at 150k; v2.5 smaller, fits P100)
 BASE_S = 0.94075          # baseline_two_anchor Strat OOF (LB-proxy anchor)
 REALMLP_E4 = 0.94722      # E4 fold-0 reference
 
