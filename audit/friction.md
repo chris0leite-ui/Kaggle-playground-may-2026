@@ -2,6 +2,33 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-13/14
+
+- `tag: single-base-fe-additions-noise-wall` — Day-13/14 alternative-axis
+  branch ran 4 candidates (G1 within-stint LGBM FE, G2' cross-driver
+  LGBM FE, G3 stint-grouped LambdaMART, H1 FM aug13 CTRq 3-way) chosen
+  from probe + EDA findings to span (LGBM, FM) × (relative FE,
+  cross-row FE, 3-way concat). All 4 hit min-meta zero/negative
+  despite 0.92-0.97 ρ vs PRIMARY (very high disagreement). H1 was
+  the closing data point — it ALSO failed the gate even with +9.9bp
+  standalone OOF lift over d9h_aug12. **Lesson: Path B's K=21 +
+  hier-meta has absorbed signal from any single new base built on
+  existing-class new features.** Future +bp axes are (1) genuinely
+  new model classes (TabPFN), (2) further meta-layer innovations,
+  (3) target reformulation upstream of the K=21 pool, (4) external
+  data revisit. **Process fix:** before running ≥30 min compute on a
+  new candidate, run a 10-min standalone-vs-PRIMARY ρ-and-min-meta
+  spot check on a SUBSAMPLE (e.g. 100k rows, 1 epoch FM / 200 LGBM
+  rounds). All 4 candidates would have shown low EV at the spot
+  check; would have saved ~2 wall-hours over 4 candidates.
+- `tag: torch-not-in-requirements` — bootstrap.sh installs from
+  requirements.txt which doesn't pin torch, but FM scripts (d9c, d9f,
+  d9h, d9i, d13_move_b, d14_h1) all `import torch`. First run of
+  d14_h1 errored on `ModuleNotFoundError: No module named 'torch'`.
+  Cost: one extra round-trip + `pip install torch` (~30s wall, ~3GB
+  download). **Fix:** add `torch` to `requirements.txt` so future
+  bootstraps don't require manual install.
+
 ## 2026-05-12
 
 - `tag: multi-agent-handover-collision` — Day-12 session on

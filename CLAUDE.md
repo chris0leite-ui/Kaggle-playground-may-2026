@@ -77,12 +77,12 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 13                           # 2026-05-13 / Day-13: **PATH B STINT τ=100000 NEW PRIMARY LB 0.95041** (+7bp over d9h/d9i, 11.6× OOF upside) | PM addendum: 6 FM partition shapes saturated, Move C minimal (drop d9c) ✓, drop-GBDT FALSIFIED
+day: 14                           # 2026-05-14 / Day-14 morning. PRIMARY holds LB 0.95041 (Path B Stint τ=100000). Day-13 closed: 5/9 submits, 1 PRIMARY (+7bp), 4 TIE/regress; Day-13 PM added 6-shape FM partition saturation + Move C minimal (drop d9c) ✓ + drop-GBDT FALSIFIED; Day-13/14 alt-axis 4-of-4 NULL (G1/G2'/G3/H1).
 lb_best_today: 0.95435            # leader; not refreshed
-our_lb_best: 0.95041              # d13 Path B Stint τ=100000 NEW PRIMARY; gap -3.0bp narrowed from -4.0bp; +7bp jump from d9h/d9i 0.95034
-submissions_used_today: 5         # 5/9 Day-13: V1 5/3 LB 0.95032, Compound τ100k LB 0.95033, Stint τ100k LB 0.95041 NEW PRIMARY, K23_H1_aug15 LB 0.95032, d13a S3 K=24 LB 0.95032 (PM addendum, branch claude/review-ml-handover-VTvWw)
+our_lb_best: 0.95041              # d13 Path B Stint τ=100000 NEW PRIMARY; gap -3.04bp; held since Day-13 PM
+submissions_used_today: 0         # 0/9 Day-14 morning (Day-13 used 5/9: V1 5/3 LB 0.95032, Compound τ100k LB 0.95033, Stint τ100k LB 0.95041 PRIMARY, K23_H1_aug15 LB 0.95032, d13a S3 K=24 LB 0.95032)
 submissions_used_total: 23
-saturation_count: 0               # Day-12 not a saturation; structural pivot to FM/rule-class diversification thesis
+saturation_count: 0               # Path B is structural advance; partition-shape + alt-axis nulls are exploration coverage, not saturations
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -144,8 +144,12 @@ mechanism_families_explored:
   - fm_partition_6_6_alt_d13d       # d13d V3 -- FM_A_DH + FM_B_RT (T moved to B, Nx/Pv to A); K=25 add +0.03bp noise-floor; partition-shape SATURATED across 6 shapes
   - gkf_full_22_stack_d13b          # d13b -- 4-FM (d9c+d9f A/B+d13a A_53/B_53) GKF stack +3.20bp; SWAP_21 (drop d9c) -0.01bp = REDUNDANT; Move C minimal validated under GKF
   - move_c_strat_pool_refactor      # d13c -- T1 drop_d9c K=23 = T0 K=24 (no regress) ✓; T2/T3 drop GBDT leak-eaters -2.5/-2.6bp Strat FALSIFIED — leak-eaters carry public-LB row-iid signal
-plateau_days: 1                   # Day-11 (TabM-D dead) + Day-12 (5/6 falsified); but Option 1 + d10b/c/d structural advance, not plateau
-gate_status: cleared              # d13 Stint τ100k LB 0.95041 NEW PRIMARY (+7bp Day-13)
+  - within_stint_lgbm_fe            # d13 G1 -- 6 γ-pack feat (laps_into_stint etc); std 0.94194, ρ 0.965, min-meta -0.38bp NULL
+  - cross_driver_intra_race_lgbm_fe # d13 G2' -- 9 γ4 feat (block_tyrelife_std +0.29 row-corr); std 0.94250, ρ 0.957, min-meta +0.03bp NULL
+  - stintgrouped_lambdamart         # d13 G3 -- pairwise loss; smoke fold-0 0.74585, killed (63% all-zero stints from probe Q1)
+  - fm_aug13_3way_concat_field      # d14 H1 -- CTRq Compound×TL_q5×RP_q5 (114/125 levels); std 0.92639 (+9.9bp vs aug12), ρ **0.917** (most diverse), min-meta -0.13bp NULL
+plateau_days: 2                   # Day-13/14 alt-axis branch: 4-of-4 nulls (G1/G2'/G3/H1). Path B was Day-13 structural win on meta-layer axis; partition-shape Day-13 PM saturated across 6 shapes.
+gate_status: cleared              # d13 Path B Stint τ=100000 LB 0.95041 NEW PRIMARY (Day-13)
 headroom_to_top5pct: 0.00304      # 0.95345 − 0.95041 = 30.4bp
 ```
 
@@ -224,6 +228,9 @@ headroom_to_top5pct: 0.00304      # 0.95345 − 0.95041 = 30.4bp
 | d13e_compound_stint_tau100000 | 0.95081 | n/a | n/a | held; +0.82bp OOF; ρ=0.9996 vs Stint winner (TIE band); 55/98 flips (under R7 200); HEDGE-eligible if τ=20000 lands |
 | d13b_path_b_stint_tau20000 | **0.95082** | n/a | n/a | held; +0.88bp OOF; ρ=0.996; flip ratio 0.220; tau=100000 superseded by submit |
 | d13_path_b_compound_tau100000 | 0.95076 | n/a | **0.95033** | calibration probe; LB +2bp on +0.30bp OOF (6.7× upside); ρ=0.9990; demoted by Stint variant |
+| d13_g1_within_stint (LGBM, +6 γ FE) | 0.94194 | n/a | n/a | NULL; ρ=0.9651 vs PRIMARY (0.95073 anchor); min-meta -0.38bp; LGBM-class feature add dead |
+| d13_g2_cross_driver (LGBM, +9 γ4 FE) | 0.94250 | n/a | n/a | NULL; ρ=0.9572; min-meta +0.03bp; cross-driver intra-race signal already in pool |
+| d14_h1_fm_aug13_3way (FM, +CTRq) | **0.92639** | n/a | n/a | NULL vs Path B PRIMARY; ρ=**0.9169** (most diverse single base); min-meta -0.13bp; +9.9bp standalone over d9h_aug12 but no incremental signal at meta |
 | d12_groupkf_meta (K=21 GKF) | 0.95069 / **GKF 0.94776** | n/a | n/a | **Day-12 STRUCTURAL FINDING**: ρ(Strat-vs-GKF meta-test)=0.9914 — rank-lock partial dissolves; FM ΔAUC −9bp vs GBDT −200 to −343bp |
 | d12_groupkf_meta_no_realmlp K=20 | 0.95056 / **GKF 0.94577** | n/a | n/a | clean K=20 (no realmlp Strat anchor); ρ vs Strat-meta 0.9856; GroupKF-meta candidate HEDGE for R5 |
 | d12 single bags (e3 5seed / cb 3seed) | 0.94876 / 0.94790 | n/a | n/a | calibration probe -- regress -19/-28bp every segment vs PRIMARY; K=21 complexity JUSTIFIED, NOT OOF-noise overfit |
