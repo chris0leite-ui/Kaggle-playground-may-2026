@@ -162,7 +162,46 @@ LR→hier-meta gap dominates +0.78 bp base-add gains.
   end on this comp because synth public-LB is row-iid and the GBDT
   pool already captures most of the DGP via TyreLife/RaceProgress.
 
-## Multi-arch orig bag (2026-05-06 evening) — NULL
+## Leak-lookup probe (2026-05-06 evening) — soft pass, marginal stack
+
+`d15_leak_lookup` builds 16 EB-smoothed lookup features from the
+aadigupta1601 original (univariate `P(PitNextLap | feature=v)` for
+LapTime/LapTime_Delta/RaceProgress/Cumulative_Degradation/TyreLife/
+Position/LapNumber/Stint/Compound/Race; bivariate for (LapTime,
+TyreLife), (TyreLife, Compound), etc.; trivariate (TyreLife, Compound,
+Stint)). Synth row → look up ÷ apply.
+
+Standalone strongest leak features by AUC: `leak_tl_cmp_stint` 0.812,
+`leak_rp_stint` 0.787, `leak_rp_cmp` 0.760, `leak_stint` 0.747.
+
+LGBM with leak + standard features: standalone OOF 0.94203 (-67 bp
+vs e3). ρ vs PRIMARY 0.959 — much higher than orig_transfer's 0.565
+(less diverse, leak is closer to existing pool's signal).
+
+Min-meta(K=21 + leak): **+0.270 bp OOF**, ρ=0.9956. Soft pass.
+
+Hier-meta(Compound × Stint, τ=20k):
+
+| Pool                  | OOF       | Δ K=22(orig) | ρ vs PRIM | Flips    |
+|-----------------------|----------:|-------------:|----------:|----------|
+| K=22 (leak alone)     | 0.95085   | −0.90 bp     | 0.99982   |  71 (R7 ✓) |
+| K=23 (leak + orig)    | **0.95096** | **+0.19 bp** | 0.99861 | 198 (R7 ✓) |
+
+**Verdict: leak-lookup alone is weaker than orig_transfer at hier-meta.**
+Together they stack +0.19 bp incremental; K=23 is highest OOF on this
+branch (+1.29 bp over K=21 baseline). ρ=0.9986 predicts LB tie at
+PRIMARY 0.95049 per `probe.py` band. NOT submitted — slot saved.
+
+Two decoded-data mechanisms now calibrated:
+  - **model-transfer** (orig_transfer): +1.13 bp at K=22 hier-meta, LB tie
+  - **per-row leak-lookup**: +0.20 bp at K=22 alone, +0.19 bp incremental
+    when added on top of orig_transfer (K=23)
+
+Both saturate the public-LB quantization floor on this comp. The
+underlying DGP signal is recoverable but small; OOF gains are real
+but live below ~5 bp LB resolution. Net for the comp: 1 HEDGE-tier
+candidate (K=22 orig_transfer LB 0.95049 ρ=0.998); K=23 leak+orig
+held as additional HEDGE candidate.
 
 Trained 3 additional orig-trained bases:
   - `d15_orig_cb`     CatBoost  | held-out 0.99400 | synth 0.83722 | ρ vs PRIMARY 0.587
