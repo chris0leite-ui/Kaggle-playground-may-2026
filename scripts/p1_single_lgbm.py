@@ -135,11 +135,17 @@ def main():
         if orig is not None:
             print(f"  loaded orig {orig.shape}; building features...")
             orig_A, _ = make_features_A(orig, fit=False, state=state)
-            # TE features on orig: use full-train stats_full (proxied by global mean for missing keys)
+            # TE features on orig: use full-train stats_full (proxied by global mean for missing keys).
+            # Vectorised string concat (avoids agg axis=1 NaN crash).
+            def _key(df, cs):
+                s = df[cs[0]].fillna("MISSING").astype(str)
+                for c in cs[1:]:
+                    s = s + "__" + df[c].fillna("MISSING").astype(str)
+                return s
             for cols, smooth, te_name in TE_CONFIGS:
                 if all(c in orig_A.columns for c in cols):
-                    key_full = train_A[cols].astype(str).agg("__".join, axis=1)
-                    key_orig = orig_A[cols].astype(str).agg("__".join, axis=1)
+                    key_full = _key(train_A, cols)
+                    key_orig = _key(orig_A, cols)
                     target_arr = y.reset_index(drop=True)
                     stats_full = (pd.DataFrame({"key": key_full.values,
                                                 "target": target_arr.values})
