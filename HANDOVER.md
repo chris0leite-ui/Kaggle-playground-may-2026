@@ -6,118 +6,111 @@
 
 ---
 
-## Today's session — Day 12 (2026-05-12)
+## Today's session — Day 13 (2026-05-13)
 
 **Read order on session start** (skip the default; this is the synthesis):
 
 1. `CLAUDE.md` — state block + Rules 1-16 (Q7 still PROPOSED)
-2. `audit/2026-05-09-d9c-fm.md` — load-bearing FM breakthrough (NEW PRIMARY)
-3. `audit/2026-05-10-d9d-fm-sweep-bag.md` — FM sweep flat; pivot to FFM
-4. `audit/2026-05-11-d11-strategy-critique.md` — revised pivot (FM-aware)
-5. `audit/2026-05-11-d11-tabm-v3-extended-training-dead.md` — TabM closed
-7. `audit/2026-05-08-data-probe-results.md` — P1-P10 priors
-8. `scripts/pre_submit_diff.py` — MANDATORY before submit (ρ < 0.999)
+2. `audit/2026-05-12-d12-master-synthesis.md` — Day-12 6-option overnight; load-bearing
+3. `audit/2026-05-12-d12-groupkf-rebuild.md` — Option 1 STRUCTURAL FINDING
+4. `audit/2026-05-12-d12-tabpfn-finetune-prep.md` — Option 2 Kaggle GPU kernel ready
+5. `audit/2026-05-08-data-probe-results.md` — P1-P10 priors (P3 inverted by Option 4)
+6. `scripts/pre_submit_diff.py` — MANDATORY before submit (ρ < 0.999)
 
 Open with a 3-bullet read-back of state + first action.
 
-## Where we are (Day 12 morning)
+## Where we are (Day 13 morning)
 
-- **NEW PRIMARY** = `d9f_K21_swap_partA_partB` LB **0.95031** (Day-10 multi-FM, +2bp over d9c).
-- **HEDGE** = `d9c_K20_swap_FM` LB 0.95029 (held; demoted by d9f).
-- **Prior PRIMARY** = `d6_k18_multi_rule` LB 0.95026.
-- **Gap**: **−2.4bp** (narrowed from −2.6bp; from −3.9bp two days ago).
-- **Headroom to top-5%** (0.95345): **31.4bp**.
-- **15 days remaining** (deadline 2026-05-31). 9 slots/day.
-- **Submits used**: 17/270 total; Day-11 0/10 (d9f executed Day-10).
+- **PRIMARY** = `d9h_K22_add_aug12` / `d9i_S1_K21_swap_aug2way` (TIED) LB **0.95034**.
+- **HEDGE candidates**: `d9f_K21_swap_partA_partB` LB 0.95031; `d12_groupkf_meta` (held; ρ=0.9914 vs PRIMARY — most diverse meta-output to date; reserve for R5).
+- **Gap**: −1.7bp (narrowed from −2.4 on Day-11).
+- **Headroom to top-5%** (0.95345): **31.1bp**.
+- **14 days remaining** (deadline 2026-05-31). 9 slots/day available.
+- **Submits used**: 19/270 total; Day-12 0/9 (subagent night, no submits per Rule 1).
 
-## Day-11 close: TabM v3 dead, strategy reframed
+## Day-12 close: 6 wider-step options, 1 structural finding
 
-TabM v3 extended training (n_epochs=200, patience=50, lr=3e-4) returned
-fold-0 AUC **0.93926**, **−11.3bp worse than v2** (0.94039). Best val at
-epoch 11; 189 epochs of monotone drift after. Patience never tripped.
-**TabM-D dead at any plausible training schedule on this DGP.**
+Per `audit/2026-05-12-d12-master-synthesis.md`. Of 6 parallel
+subagents: 1 structural (Option 1), 1 kernel-ready (Option 2), 4
+falsified (Options 3/4/5/9 — see `mechanism_families_explored`).
 
-Strategy critique (Rule 14) — **REVISED** in light of d9c FM PASS. Of
-12 submits since Day-6 K=18 PRIMARY: 11 NULL, 1 PASS (FM at +3bp). The
-pattern is NOT "all bases tie"; it is "**bases inside K=18 hypothesis
-class tie; structurally different model classes can lift**". FM's
-low-rank pairwise interaction surface was the missing inductive bias
-GBDTs/MLPs couldn't reach.
+**THE finding (Option 1):** under GroupKFold(Race,Driver,Year,Stint),
+K=21 LR-meta produces test predictions with ρ=**0.9914** vs Strat-meta
+(below the 0.999 RHO_TIE threshold). Bases split into 2 populations:
+- 13 GBDTs drop **−200 to −343bp** under GKF (leakage eaters)
+- 7 FM/rule/sparse-LR drop only **−9 to −43bp** (leakage robust)
+- **FM is 23–37× more leakage-robust than every GBDT.**
 
-**Day-12 update (PI flag): C2 Pirelli DEPRECATED before execution.**
-External real-world priors don't transfer to the CTGAN synth (Year=2023
-mode-collapse + 4+-way joints broken + pool already absorbs the synth's
-empirical analog). C1 SC-prob TIE is direct prior evidence of the same
-failure mode. **Pivot direction: more model-class diversity (3-way
-multi-FM partition) AND different inductive bias (G4 SCARF) — both
-robust to synth artifacts. Skip new external info.**
+L1 reshuffles dramatically: cb_slow-wide-bag −17 ranks,
+e5_optuna_lgbm −13; **FM jumps +15 (#20→#5)**, R6_next_compound +11.
 
-## Day-12 first-action plan (synth-robust only; external info DEPRECATED)
+**Reframe:** rank-lock at ρ=0.9999 is substantially a Strat-leakage
+artifact. Pool's diversification frontier lives entirely WITHIN the
+leakage-robust population.
 
-### Path A — G4 SCARF on aadigupta1601 (overnight T4)
-**Promoted Day-12 PM** after d9g 3-way multi-FM REGRESSED (-0.46bp K=22
-swap; per-FM interaction surface over-fragments at 2-3 features each).
-Contrastive pretraining on aadigupta's 101k unlabeled rows (NOT in
-comp train) → fine-tune on labeled comp. Different inductive bias;
-synth-robust. 6-10h T4. EV +1-4bp. Sole un-falsified GPU candidate.
+## Day-13 first-action plan (parallel: A + B; then C)
 
-### Path B — Bayesian hierarchical stacking (Yao 2021)
-2-3h CPU PyMC+JAX. Per-segment (Compound, Stint, Year×Compound)
-weights under Gaussian partial-pooling. Different META structure;
-uses only existing pool OOFs. EV +1-3bp.
+### Move A — push TabPFN-2.5 fine-tune kernel to Kaggle (PI action)
+Kernel ready at `kernels/d12-tabpfn-finetune-gpu/`. Set `TABPFN_TOKEN`
+secret (license accept on ux.priorlabs.ai). T4×2 wall 5-7h. **Only
+live 10bp shot.** EV +5-15bp std-alone, +1-3bp stack median, +3-9bp
+tail. Single PI action; runs in background.
 
-### Path C — Adversarial validation instance weights (HIGH FLOOR)
-30 min CPU. p(test|x) density ratio as instance weight on K=N stack
-rebuild. EV 0-2bp, no harm. Year=2023 mixture rescue.
+### Move B — build 3 FM-class diversification variants (cheap CPU)
+Each 2-3h CPU. Builds on d9f's 2-way 4/4 sweet spot finding:
+1. **5/3 multi-FM partition** — 5 driver-state + 3 race-context fields
+2. **4/4 alternative split** — Compound × TyreLife axis with new
+   partner field (variant of d9i's aug-2way)
+3. **Augmented 2-way (different fields)** — pick top-12 augmented
+   fields from d9h_aug12 by L1, split into 2 partitions
 
-### DEPRECATED Day-12 — C2 Pirelli, F2 Q6 rebuild, 3-way multi-FM
-C2: synth-DGP incompatible (`audit/2026-05-12-d12-c2-pirelli-prep.md`).
-F2: 6× P10 confirmation = dead-list category. **3-way multi-FM
-REGRESSED Day-10** (`audit/2026-05-10-d9g-3way-multi-fm.md`); 2-way
-d9f is the partition sweet-spot.
+Each candidate: standalone OOF, ρ vs PRIMARY, min-meta gate, K=22
+add stack. **Use both Strat AND GroupKF as gates** (first time GKF
+is a secondary gate — Day-12 finding mandates this).
 
-### Path D — Calibration submits on held TIEs (1-2 day overlap)
-3-4 of 253 unused submits on held candidates (m5x, m5z, d6_k15,
-d8_k19_q12, d9_k19_sc_prob, d9_k20_neighbor, d9d_*) to recal
-`pred_lb` at sub-0.99 ρ where uncertainty is ~30bp. Single-shot R1.
+### Move C — pool refactor (after Move B lands ≥1 winner)
+Drop 3 most-leakage-eating GBDTs (e5_optuna_lgbm, cb_slow-wide-bag,
+e1_cb_sub — all ΔAUC ≤ −215bp under GKF) and replace with Move B
+winners. Build K=21 stack with swapped pool. Submit only if OOF
+Strat ≥ PRIMARY AND ρ < 0.9995.
 
-## Falsified / dead — do NOT retry (Day-11/12 additions in **bold**)
+### Day-14 — Move D + E (second-tier)
+- **D: DeepFM-lite** (FM + 2-layer MLP head). 4-6h CPU.
+- **E: Regularised FFM re-attempt** (k=4, L2=0.5, dropout-on-fields).
+  d9e FFM died from overfit at 4× FM params; reduced capacity may
+  earn slot.
+
+## Falsified / dead — do NOT retry (Day-12 additions in **bold**)
 
 - Big sequence (P1); kNN/retrieval/TabR/Hopular/TabPFN-ICL (P2)
 - RealMLP bagging (Day-7); broad pseudo-labeling (Day-5)
-- F5 aux-meta / Move B 2-base / per-Race-per-Stint isotonic / reintroduce Normalized_TyreLife
-- T1.5 Deotte L2/L3 (Day-8); T1.3 Q12 + T1.2 Poisson single-rule (Day-8)
-- TabM-D smoke default (Day-9); **TabM-D extended 200ep lr=3e-4** (Day-11)
-- C5 prev/next compound multi-rule (Day-9 K=20 TIE); C1 SC-prob lookup (Day-9 K=19 TIE)
-- T1.4 Hazard NN — Day-9/10 (230bp leak)
-- d9 10 math heuristic rule_residuals (cohort); d9b R14 hash-LR K=20 swap+L4 (TIE)
-- d9d FM hparam sweep + 3-seed bag (flat); d9e FFM (overfit); **d9g 3-way multi-FM (REGRESSION −0.46bp)**
-- **d9h FM_aug12 unified 12-feat (Day-10 evening): standalone +4.7bp, K=22 add stack +0.01bp ρ=0.99978 — strongest single FM ever but no stack lift**
-- **d9i augmented 2-way 6+6 partition (Day-10 evening): K=21 swap REGRESSION −0.19bp; ρ between FMs jumped 0.406 → 0.663. FM family CLOSED at single-feature-set level.**
-- **In-pool NN variants (whole class) 4×**; **single-rule rule_res on raw features 5×**
-- **External real-world priors on synth** — C1 TIE + **C2 Pirelli pre-flight DEPRECATED Day-12**
+- TabM-D smoke + extended 200ep lr=3e-4 (Day-9/11)
+- T1.4 Hazard NN — Day-9/10 (230bp leak; leakfree zero signal)
+- d9 10 math heuristic rule_residuals; d9b R14 K=20 swap+L4 (TIE)
+- d9d FM hparam sweep + 3-seed bag; d9e FFM (overfit at default cap);
+  d9g 3-way multi-FM (REGRESSION −0.46bp); d9h K=22 add (TIE_EXPECTED
+  but LB +3bp from FM-class amplification)
+- **T1.2 multi-formulation 4-of-4** (Day-8 Poisson + Day-12
+  censored/ratio/survival)
+- **Year-segmented specialist** (cohort-split strips cross-Year reg.;
+  Year=2023 is EASIEST segment, P3 inverted)
+- **Adversarial validation reweighting** (AV-AUC=0.502; train/test
+  i.i.d.; no shift to exploit)
+- **LambdaRank meta** (-86bp); **AUC-pairwise XGB base** (-451bp
+  fold-0); LR-meta on [raw,rank,logit] retains seat
+- **Single-bag e3 5seed** (-19bp; K=21 complexity JUSTIFIED, not
+  OOF-noise overfit)
+- **External real-world priors on synth** — C1 TIE + C2 Pirelli
+  DEPRECATED Day-12
 
 ## Held submissions (do NOT submit)
 
 - BURNED: `d5_partial_pseudo_m5q.csv` (LB 0.94963), `d9_k19_hazard_nn_stack.csv` (LB 0.94711)
 - TIE/DEAD held: `d7_realmlp_bag_part[BC]`, `d8_{l3_blend,k19_q12,k19_poisson}`,
   `d9_{hazard_nn,k20_neighbor,k19_sc_prob}`, `d9b_K20_swap_R14_L4` (LB 0.95025 TIE),
-  `d10_hazard_nn_leakfree`, `d9d_*` FM sweep variants
-
-## Calibration ladder snapshot (Day 12 morning)
-
-| Mechanism | Strat OOF | LB | Gap | Notes |
-|---|---:|---:|---:|---|
-| **d9f_K21_swap_partA_partB (PRIMARY)** | **0.95073** | **0.95031** | **−2.4bp** | +2bp LB; multi-FM partition |
-| d9c_K20_swap_FM (HEDGE) | 0.95070 | 0.95029 | −2.6bp | +3bp LB; 5.7× upside; demoted by d9f |
-| d6_k18_multi_rule (great-grandparent) | 0.95065 | 0.95026 | −3.9bp | initial K=18 stack |
-| m5q (M5h + RealMLP, K=14) | 0.95057 | 0.95005 | −5.2bp | grandparent |
-| d9f_FM_A (D/C/S/T_q5) std | 0.82505 | n/a | n/a | ρ=0.487 vs PRIMARY (most diverse since R14) |
-| d9f_FM_B (R/Y/Rp_q5/P_q5) std | 0.88438 | n/a | n/a | min-meta +0.04bp PASS |
-| d9c FM std | 0.92069 | n/a | n/a | most-diverse single base since RealMLP |
-| TabM v2 / **v3** fold-0 | 0.94039 / **0.93926** | n/a | n/a | gate FAIL; DEAD |
-| d9_k19_hazard_nn LEAKY | 0.95446 | **0.94711** | **−73.5bp** | burned |
-| d10 hazard leak-free | 0.92013 | n/a | n/a | DEAD (architecture zero-signal) |
+  `d10_hazard_nn_leakfree`, `d9d_*` FM sweep variants, **d12 t12c/d/e bases**,
+  **d12 year_specialist / advweight bases**, **d12 lambdarank_meta**,
+  **d12 e3/cb single bags**, **d12_groupkf_meta** (HEDGE for R5 only)
 
 ## Critical operating rules
 
@@ -125,19 +118,23 @@ d8_k19_q12, d9_k19_sc_prob, d9_k20_neighbor, d9d_*) to recal
 2. **At ρ < 0.99**, downgrade pred-LB by additional 30bp until recalibrated.
 3. **Rule 16 Q6** (ρ vs FULL pool, not just PRIMARY): binding gate; pre-flight.
 4. **Rule 16 Q7** (target-construction leak): ×0.1 EV unless GroupKF OOF.
-5. **Strat-only Day-3+** (R1) BUT GroupKFold load-bearing for within-group-future targets.
-6. **Mechanism-class-only**: 11× confirmed nulls + 1× model-class break (FM).
-   **Stop running NN arch variants in MLP+embed family + single-rule rule_residuals.**
-7. **Submit budget** 17/270; spend 3-4 calibration probes Day-12-14.
+5. **NEW Day-12: GroupKF as secondary gate.** New candidate must
+   either pass Strat AND not regress GroupKF, OR pass GroupKF if it
+   is a leakage-robust class (FM/rule/sparse-LR).
+6. **Strat-only Day-3+ (R1)** — but GroupKF is now a secondary gate,
+   not a primary. Public LB stays the truth (U3: i.i.d. row split).
+7. **Submit budget** 19/270; 14 days × 9 slots = 126 remaining. Spend
+   3-4 calibration probes Day-13-15 on held TIEs at sub-0.99 ρ.
 8. **Model-class > tuning AND > external info on synth.** FM proved
-   model-class diversity lifts; C2 deprecation confirms external
-   real-world priors do not transfer to CTGAN synth.
+   model-class diversity lifts; Day-12 confirms within-class
+   diversification is the live lever.
 
 ## Pointers
 
-- `audit/2026-05-09-d9c-fm.md`, `2026-05-10-d9d-fm-sweep-bag.md` — FM thread
-- `audit/2026-05-11-d11-strategy-critique.md` — revised pivot
-- `audit/2026-05-11-d11-tabm-v3-extended-training-dead.md` — TabM close
-- `audit/2026-05-08-data-probe-results.md` — P1-P10 priors
-- `scripts/{d9c_fm.py, d9c_kn_stack.py, d9d_fm_sweep_bag.py}` — FM templates
-- `scripts/{d6_multi_rule.py, pre_submit_diff.py}` — F2 template + MANDATORY gate
+- `audit/2026-05-12-d12-master-synthesis.md` — Day-12 unifying frame
+- `audit/2026-05-12-d12-groupkf-rebuild.md` — Option 1 detail
+- `audit/2026-05-12-d12-tabpfn-finetune-prep.md` — Move A specifics
+- `audit/2026-05-09-d9c-fm.md`, `audit/2026-05-10-d9f-multi-fm.md` — FM thread
+- `scripts/{d9c_fm.py, d9c_kn_stack.py, d9f_multi_fm.py}` — Move B templates
+- `kernels/d12-tabpfn-finetune-gpu/` — Move A kernel
+- `scripts/{d12_groupkf_meta.py, d6_multi_rule.py, pre_submit_diff.py}`
