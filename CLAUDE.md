@@ -67,6 +67,13 @@ ff-merge before reading state below.
     `WRAPUP.md` section A. PI says **"prepare handover"** → follow
     `WRAPUP.md` section A then section B. Both end with a push to the
     current branch. No manual PI transcription required.
+18. **Issue-tree claim before compute (BPS step 4).** Before any new
+    probe consuming >10 min CPU/GPU, read `ISSUES.md` and claim an
+    unclaimed `open` leaf by editing its `[owner: ...]` to your branch
+    slug (part after `claude/`). One open leaf per branch. Update
+    status (`wip` → `done`/`null`/`parked`) at wrap-up. Re-decomposition
+    of the tree fires on the same triggers as the strategy-critic-loop
+    (plateau, saturation, kickoff, 50% checkpoint, "redecompose").
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
@@ -409,6 +416,7 @@ headroom_to_top5pct: 0.00296      # 0.95345 − 0.95049 = 29.6bp (d13e Compound�
 
 - `HANDOVER.md` — next-session brief (Rule 15).
 - `WRAPUP.md` — wrap-up + prepare-handover procedure (Rule 17).
+- `ISSUES.md` — live problem decomposition / claim board (Rule 18).
 - `comp-context.md` — settled-once facts.
 - `audit/2026-05-04-strategy-critique.md` — Rule 14 origin.
 - `audit/2026-05-04-catboost-research.md` — CatBoost lever map.

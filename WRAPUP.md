@@ -24,6 +24,7 @@ Cap ≤150 lines. This is a checklist agents follow verbatim.
    - `HANDOVER.md`
    - `comp-context.md`
    - `WRAPUP.md`
+   - `ISSUES.md`
 
    Never `git add -A` / `git add .` — avoid sensitive files (`.env`,
    `kaggle.json`) and large binaries.
@@ -36,6 +37,15 @@ Cap ≤150 lines. This is a checklist agents follow verbatim.
    - `lb_best_today`, `our_lb_best`
    - `gate_status`, `headroom_to_top5pct`
    - `plateau_days`, `saturation_count`
+
+3b. **Update ISSUES.md leaf status (Rule 18).** For each leaf this
+    branch owned today, update its `[owner: ... | status: ...]` to
+    reflect outcome: `wip` → `done` (PASS), `null` (falsified), or
+    `parked` (blocked / deprioritised). When fully resolved with a
+    crisp result, move the one-liner to the "Falsified or dead"
+    section. If a re-decomposition trigger has fired (see bottom
+    of ISSUES.md), flag it in the commit message for the next
+    strategy-critic-loop owner.
 
 4. **Append friction one-liners.** To `audit/friction.md` under a
    `## YYYY-MM-DD` heading (create if absent today). Format already
