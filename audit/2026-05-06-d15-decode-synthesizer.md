@@ -143,7 +143,7 @@ scripts/artifacts/oof_d15_orig_transfer_strat.npy
 scripts/artifacts/test_d15_orig_transfer_strat.npy
 scripts/artifacts/oof_d15_physics_residual_strat.npy
 scripts/artifacts/test_d15_physics_residual_strat.npy
-scripts/artifacts/decode/NTL_{decoded,estimate,hybrid}_{train,test}.npy
 scripts/artifacts/probe_min_meta__d15_*.json
-data/original/f1_strategy_dataset_v4.csv  (gitignored — 13MB)
+data/original/f1_strategy_dataset_v4.csv  (gitignored — 13MB; reproduce via
+  `kaggle datasets download -d aadigupta1601/f1-strategy-dataset-pit-stop-prediction -p data/original`)
 ```
