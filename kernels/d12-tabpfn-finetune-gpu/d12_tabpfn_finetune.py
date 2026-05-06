@@ -94,9 +94,25 @@ def install_tabpfn():
       3. Else fall back to printing the manual-license URL — kernel will
          crash on the first .fit() with a clear message.
     """
-    print("[setup] installing tabpfn ...")
+    # P100 (sm_60) compat: Kaggle silently routes GpuT4x2 jobs to P100.
+    # torch>=2.5 dropped sm_60 support; 2.4 is the last release with it.
+    # Install torch 2.4 first, then tabpfn with --no-deps so pip does not
+    # upgrade torch above 2.4 (same workaround used in realmlp_gpu.py).
+    print("[setup] force-reinstall torch 2.4 (sm_60 / P100 support) ...")
     subprocess.check_call([
-        sys.executable, "-m", "pip", "install", "--quiet", "tabpfn==7.1.1",
+        sys.executable, "-m", "pip", "install", "--quiet",
+        "--force-reinstall", "--no-deps",
+        "torch==2.4.*", "torchvision==0.19.*",
+    ])
+    print("[setup] installing tabpfn (--no-deps to preserve torch 2.4 pin) ...")
+    subprocess.check_call([
+        sys.executable, "-m", "pip", "install", "--quiet",
+        "--no-deps", "tabpfn==7.1.1",
+    ])
+    # Install tabpfn's non-torch transitive deps
+    subprocess.check_call([
+        sys.executable, "-m", "pip", "install", "--quiet",
+        "scikit-learn", "numpy", "pandas", "scipy",
     ])
 
     import importlib
