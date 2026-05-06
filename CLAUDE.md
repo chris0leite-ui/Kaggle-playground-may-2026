@@ -77,12 +77,12 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 12                           # 2026-05-12 / Day-12: 6-option overnight; 5/6 falsified, Option 1 STRUCTURAL FINDING (rank-lock dissolves under GroupKF)
+day: 14                           # 2026-05-14 / Day-14 morning. **PRIMARY LB 0.95049 (d13e Compound×Stint τ=20000)**, holds since end Day-13. Day-13 closed: 6/9 submits — 2 PRIMARY-advances (Stint τ=100k +7bp, Compound×Stint τ=20k +8bp), 4 TIE/regress; Day-13 PM added 6-shape FM partition saturation + Move C minimal (drop d9c) ✓ + drop-GBDT FALSIFIED; Day-13/14 alt-axis 4-of-4 NULL (G1/G2'/G3/H1); EDA deep-dive H1 FM_aug15 -2bp regress (FM-aug saturated); d14 Path B cohort sweep (Year, Year×Stint, Race) NULL (no variant beats current PRIMARY OOF).
 lb_best_today: 0.95435            # leader; not refreshed
-our_lb_best: 0.95034              # d9h_K22_add_aug12 / d9i_S1_K21_swap_aug2way (TIED Day-10); gap -1.7bp; no submits Day-11/12
-submissions_used_today: 0         # 0/9 Day-12 (subagent night, no submits per Rule 1)
-submissions_used_total: 19
-saturation_count: 0               # Day-12 not a saturation; structural pivot to FM/rule-class diversification thesis
+our_lb_best: 0.95049              # d13e Compound×Stint τ=20000 NEW PRIMARY; gap to top-5% -2.96bp; +8bp jump from Path B Stint 0.95041; +15bp from d9h/d9i 0.95034
+submissions_used_today: 0         # 0/9 Day-14 morning (Day-13 used 6/9: V1 5/3 LB 0.95032, Compound τ100k LB 0.95033, Stint τ100k LB 0.95041, K23_H1_aug15 LB 0.95032, d13a S3 K=24 LB 0.95032, d13e Compound×Stint τ=20k LB 0.95049 NEW PRIMARY)
+submissions_used_total: 24
+saturation_count: 0               # Path B is structural advance; partition-shape + alt-axis nulls are exploration coverage, not saturations
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -127,6 +127,11 @@ mechanism_families_explored:
   - factorization_machine_partition # d9f FM_A driver-dynamics + FM_B race-context -- K=21 swap LB 0.95031 (+2bp NEW PRIMARY)
   - factorization_machine_aug12     # d9h unified 12-field FM + K=22 add LB 0.95034 (+3bp tied PRIMARY, 300× upside)
   - factorization_machine_aug2way   # d9i FM_A_aug + FM_B_aug 2-way partition K=21 swap LB 0.95034 (+3bp tied)
+  - factorization_machine_aug15     # d13 EDA H1 -- 12 d9h fields + CRT(Compound×TL_q5×RP_q5) + Cdpl(cumdeg/lap q5) + Ldz(LapTime_Delta race-z q5); std OOF 0.92711 (strongest FM ever, +1.7bp vs aug12), ρ=0.909 (most diverse), K=23 add LB 0.95032 (-2bp regress); FM-FIELD-AUGMENTATION LEVER SATURATED at 12 fields
+  - empirical_bayes_hierarchical_meta # d13 Path B -- per-segment LR meta over K=21 PRIMARY pool with τ-shrinkage to global. Compound (5 seg) τ=100k LB 0.95033 (+2bp, 6.7× upside); Stint (5 seg) τ=100k LB 0.95041 (+7bp, 11.6× upside; mechanism leakage-robust per d13d GKF probe 2.9× amplified); **Compound×Stint (24 seg) τ=20k LB 0.95049 NEW PRIMARY (+8bp, 8× upside)**; Year (4 seg)/Race (26 seg)/Year×Compound/Year×Stint UNTESTED
+  - groupkf_stack_rebuild_audit     # d10b/c -- FM-class lift +2.01bp under Race-only GKF vs +0.87bp Strat (2.3× AMPLIFIED); FM_B is #1 L1 component under GKF; PRIMARY private-LB robust
+  - leak_corrected_lr_meta          # d10d -- refit LR on GKF OOFs; G3 fail (flip ratio 0.001); FM dominance over-credits, smooths GBDT row-extremes; held
+  - empirical_bayes_hier_lr_meta    # d13 Stint τ=100000 -- LB 0.95041 NEW PRIMARY (+7bp; 11.6× OOF upside); GKF lift +2.59bp 2.9× AMPLIFIED per d13d probe -- mechanism leakage-robust, private-LB-likely-real
   - t12_censored_regression         # d12 -- LGBM weighted-regression on log(laps_until_pit); std 0.544, FAIL min-meta
   - t12_ratio_target                # d12 -- LGBM regression on pits/stints + heuristic; std 0.674, FAIL min-meta
   - t12_stintlevel_survival         # d12 -- stint-level LGBM duration → row hazard; std 0.601, FAIL min-meta
@@ -136,9 +141,19 @@ mechanism_families_explored:
   - aucpairwise_xgb_base            # d12 -- XGB rank:pairwise smoke -451bp fold-0; FAIL gate
   - single_bag_e3_5seed             # d12 -- standalone bag -19bp OOF; K=21 complexity JUSTIFIED (not OOF-noise)
   - groupkf_full_pool_meta          # d12 -- KEY FINDING: rank-lock partial dissolves; ρ(Strat-vs-GKF meta)=0.9914
-plateau_days: 1                   # Day-11 (TabM-D dead) + Day-12 (5/6 falsified); but Option 1 is structural advance, not plateau
-gate_status: cleared              # d9h/d9i Day-10 LB 0.95034 (+3bp tied PRIMARY); d12 no submits
-headroom_to_top5pct: 0.00311      # 0.95345 − 0.95034 = 31.1bp
+  - fm_partition_5_3_d13a           # d13a -- FM_A_53 (D,C,S,T,Cd) + FM_B_53 (R,Y,Rp); Strat S3 K=24 +0.20bp pred ρ 0.99976; LB 0.95032 TIE; GKF Δ -41.6/-2.9bp BOTH leakage-robust
+  - fm_partition_4_4_ct_axis_d13d   # d13d V2 -- FM_A_CT (C,T,Cd,Ld) + FM_B_DR (D,R,S,Y); K=25 add REGRESS -0.05bp; wheel-physics axis redundant w/ d9f+d13a
+  - fm_partition_6_6_alt_d13d       # d13d V3 -- FM_A_DH + FM_B_RT (T moved to B, Nx/Pv to A); K=25 add +0.03bp noise-floor; partition-shape SATURATED across 6 shapes
+  - gkf_full_22_stack_d13b          # d13b -- 4-FM (d9c+d9f A/B+d13a A_53/B_53) GKF stack +3.20bp; SWAP_21 (drop d9c) -0.01bp = REDUNDANT; Move C minimal validated under GKF
+  - move_c_strat_pool_refactor      # d13c -- T1 drop_d9c K=23 = T0 K=24 (no regress) ✓; T2/T3 drop GBDT leak-eaters -2.5/-2.6bp Strat FALSIFIED — leak-eaters carry public-LB row-iid signal
+  - within_stint_lgbm_fe            # d13 G1 -- 6 γ-pack feat (laps_into_stint etc); std 0.94194, ρ 0.965, min-meta -0.38bp NULL
+  - cross_driver_intra_race_lgbm_fe # d13 G2' -- 9 γ4 feat (block_tyrelife_std +0.29 row-corr); std 0.94250, ρ 0.957, min-meta +0.03bp NULL
+  - stintgrouped_lambdamart         # d13 G3 -- pairwise loss; smoke fold-0 0.74585, killed (63% all-zero stints from probe Q1)
+  - fm_aug13_3way_concat_field      # d14 H1 -- CTRq Compound×TL_q5×RP_q5 (114/125 levels); std 0.92639 (+9.9bp vs aug12), ρ **0.917** (most diverse), min-meta -0.13bp NULL
+  - path_b_cohort_sweep_d14         # d14 -- Year(4)/Year×Stint(24)/Race(26) × τ∈{5k,20k,100k}; 9 variants, NONE beats current PRIMARY (Compound×Stint τ=20k) on OOF; best Year×Stint τ=20k OOF 0.95080 (-0.30bp). Cohort lever Compound axis dominates Year axis (2023 flat-rate generator defeats per-Year specialization).
+plateau_days: 2                   # Day-13/14 alt-axis branch: 4-of-4 nulls (G1/G2'/G3/H1). Path B was Day-13 structural win on meta-layer axis; partition-shape Day-13 PM saturated across 6 shapes; d14 cohort sweep extends Path B null.
+gate_status: cleared              # d13e Compound×Stint τ=20000 LB 0.95049 NEW PRIMARY (+8bp Day-13 PM)
+headroom_to_top5pct: 0.00296      # 0.95345 − 0.95049 = 29.6bp (d13e Compound×Stint τ=20000)
 ```
 
 ## Calibration ladder
@@ -208,6 +223,17 @@ headroom_to_top5pct: 0.00311      # 0.95345 − 0.95034 = 31.1bp
 | d9i_FM_A_aug (D/C/S/T/Cd/Ld) | 0.88123 | n/a | n/a | aug FM_A; ρ vs d9f PRIMARY 0.720 |
 | d9i_FM_B_aug (R/Y/Rp/P/Nx/Pv) | 0.88561 | n/a | n/a | aug FM_B; ρ 0.863 |
 | **d9i_S1_K21_swap_aug2way** | **0.95071** | n/a | **0.95034** | **NEW PRIMARY (TIED)**; +3bp LB; OOF predicted -0.19bp (regression!), actual +3bp lift; OOF direction-flipped |
+| d10b_K13_baseline (Strat / GKF-Race) | 0.95043 | 0.92744 | n/a | 13 GBDT/baseline; gap −229.92bp (leakage signature) |
+| d10b_K15_+FMA+FMB (Strat / GKF-Race) | 0.95052 | 0.92764 | n/a | FM-class lift +0.87bp Strat → **+2.01bp GKF (2.3× amplified)**; FM_B L1 #1 under GKF |
+| d10d_leak_corrected_meta | n/a | 0.92764 | n/a | held; G3 FAIL (rare-class flip 0.001); rebalances FM_B L1=6.96 but smooths away GBDT row-extremes; pred-LB 0.95001 |
+| d13_path_b_stint_tau100000 | 0.95082 | 0.94600 | 0.95041 | demoted by d13e; +7bp LB; 11.6× OOF upside; GKF lift +2.59bp = 2.9× AMPLIFIED vs Strat +0.90bp (leakage-robust per d13d) |
+| **d13e_compound_stint_tau20000** | **0.95083** | n/a | **0.95049** | **NEW PRIMARY**; +8bp LB over Path B Stint; 8× OOF upside (+1.00bp OOF); ρ=0.9958 vs d9f; 24 seg cross |
+| d13e_compound_stint_tau100000 | 0.95081 | n/a | n/a | held; +0.82bp OOF; ρ=0.9996 vs Stint winner (TIE band); 55/98 flips (under R7 200); HEDGE-eligible if τ=20000 lands |
+| d13b_path_b_stint_tau20000 | **0.95082** | n/a | n/a | held; +0.88bp OOF; ρ=0.996; flip ratio 0.220; tau=100000 superseded by submit |
+| d13_path_b_compound_tau100000 | 0.95076 | n/a | **0.95033** | calibration probe; LB +2bp on +0.30bp OOF (6.7× upside); ρ=0.9990; demoted by Stint variant |
+| d13_g1_within_stint (LGBM, +6 γ FE) | 0.94194 | n/a | n/a | NULL; ρ=0.9651 vs PRIMARY (0.95073 anchor); min-meta -0.38bp; LGBM-class feature add dead |
+| d13_g2_cross_driver (LGBM, +9 γ4 FE) | 0.94250 | n/a | n/a | NULL; ρ=0.9572; min-meta +0.03bp; cross-driver intra-race signal already in pool |
+| d14_h1_fm_aug13_3way (FM, +CTRq) | **0.92639** | n/a | n/a | NULL vs Path B PRIMARY; ρ=**0.9169** (most diverse single base); min-meta -0.13bp; +9.9bp standalone over d9h_aug12 but no incremental signal at meta |
 | d12_groupkf_meta (K=21 GKF) | 0.95069 / **GKF 0.94776** | n/a | n/a | **Day-12 STRUCTURAL FINDING**: ρ(Strat-vs-GKF meta-test)=0.9914 — rank-lock partial dissolves; FM ΔAUC −9bp vs GBDT −200 to −343bp |
 | d12_groupkf_meta_no_realmlp K=20 | 0.95056 / **GKF 0.94577** | n/a | n/a | clean K=20 (no realmlp Strat anchor); ρ vs Strat-meta 0.9856; GroupKF-meta candidate HEDGE for R5 |
 | d12 single bags (e3 5seed / cb 3seed) | 0.94876 / 0.94790 | n/a | n/a | calibration probe -- regress -19/-28bp every segment vs PRIMARY; K=21 complexity JUSTIFIED, NOT OOF-noise overfit |
@@ -271,10 +297,49 @@ headroom_to_top5pct: 0.00311      # 0.95345 − 0.95034 = 31.1bp
         GBDT-pool OOF. Three consecutive FM-class submits (d9c +3bp,
         d9f +2bp, d9h +3bp, d9i +3bp) confirm. **OOF Δ is a LOWER
         BOUND on LB Δ for FM-class candidates at ρ ≈ 0.9997.**
-- NEXT: Spend remaining 5/10 today on more FM-class probes since
-        the OOF→LB amplification is much stronger than the prior
-        believed. Candidates: d9g S3 K=25 (all FMs), d9h K=20 swap
-        (FM_aug12 replaces d9f), d9i S2 K=23 (aug 2-way + d9f).
+- DONE: d10 GroupKF audit — under strict (Race,Driver,Year,Stint)
+        GKF, FM bases drop only 2.5–54bp vs GBDTs dropping 209–247bp
+        under Race-only GKF. FM bases are leakage-robust at the
+        standalone level.
+- DONE: d10b/c GroupKF stack rebuild — built K=13/K=15 stacks under
+        BOTH Strat and Race-only GKF (apples-to-apples). FM-class
+        lift: **+0.87bp Strat → +2.01bp GKF (2.3× AMPLIFIED)**.
+        L1 inversion: under Strat FMs are mid-pack (FM_B L1=0.138,
+        rank 13/15); under GKF FM_B is **#1 dominant** (L1=6.96,
+        2× the next base). When LR meta can't piggyback on within-
+        group leakage from GBDTs, it routes hard through FM. PRIMARY
+        d9f K=21 swap (LB 0.95031) is private-LB robust.
+- DONE: d10d leak-corrected LR meta (refit LR on GKF OOFs, apply to
+        GKF test preds). G3 rare-class flip ratio 0.001 (1751 rows
+        drop out of top-1%, 2 added). FM_B L1=6.96 dominates as
+        designed but smooths away GBDT row-specific extremes that
+        ARE genuine (i.i.d. test → those rows really do pit). HELD,
+        pred-LB 0.95001. Insight: GKF OOFs cannot see test-row-
+        specific signals, so they over-credit FM. Bayesian
+        hierarchical stacker (Path B) is the correct synthesis.
+- DONE: d13/d13b Path B empirical-Bayes hierarchical LR meta.
+        Per-segment partial-pooled LR with shrinkage τ. Sweep:
+        Compound (5 seg) τ=100000 → +0.30bp OOF, ρ=0.9990 PASS;
+        **Stint (5/6 seg) τ=100000 → +0.86bp OOF, ρ=0.9984**, flip
+        ratio 0.211 FAIL G3 (but 4-5× better balanced than d10d).
+        Compound×Stint segmentation killed at fold 2; Year×Compound
+        not run. Stint variants held for R5 final-window OOF-best.
+- DONE: d13c Path B Compound τ=100000 SUBMITTED at 05:31 UTC.
+        **LB 0.95033, +2bp lift over d9f K=21 swap PRIMARY** (-1bp
+        from d9h/d9i tied PRIMARY at 0.95034). 6.7× LB upside on
+        +0.30bp OOF prediction — FM-class amplification pattern
+        TRANSFERS to hier-meta architecture.
+- DONE: d13 Path B Stint τ=100000 SUBMITTED at 05:34 UTC.
+        **LB 0.95041, +7bp lift over d9h/d9i tied PRIMARY → NEW
+        PRIMARY**. 11.6× LB upside on +0.86bp OOF prediction.
+- DONE: d13d GroupKF probe of hier-meta. K=20 GKF pool (no realmlp).
+        Global LR meta GKF OOF 0.94574; Stint hier τ=100000 GKF OOF
+        **0.94600 (+2.59bp)**. Strat lift +0.90bp → GKF lift +2.59bp
+        = **2.9× AMPLIFIED** (stronger than FM-class 2.3× in d10b/c).
+        Hier-meta mechanism is leakage-robust. **Public-LB +7bp lift
+        is mechanism-driven, not sample variance.** Revised private-LB
+        estimate: median +4 to +6bp over HEDGE (conservative +2bp,
+        bull +7bp). Three independent leak-blocking probes agree.
 - LATER: External-data Pirelli pit-window scrape (Tier-2 highest
         absolute EV), EmbMLP CPU (different model class), hazard NN
         (GPU; d9 hazard_nn_stack regressed 315bp — implementation
@@ -366,4 +431,9 @@ headroom_to_top5pct: 0.00311      # 0.95345 − 0.95034 = 31.1bp
 - `audit/2026-05-12-d12-monolithic-bag-probe.md` — Option 9 K=21 complexity justified.
 - `audit/2026-05-10-d9h-fm-augmented.md` — FM_aug12 standalone strongest; K=22 add LB 0.95034 (+3bp NEW PRIMARY tied).
 - `audit/2026-05-10-d9i-augmented-2way.md` — aug 2-way K=21 swap LB 0.95034 (+3bp NEW PRIMARY tied; OOF was -0.19bp regression).
+- `audit/2026-05-10-d10-groupkf-audit-fm-real.md` — strict GKF FM bases drop 2.5–54bp vs GBDTs −210bp.
+- `audit/2026-05-10-d10b-groupkf-stack-rebuild.md` — FM-class lift +2.01bp GKF vs +0.87bp Strat (2.3× AMPLIFIED); FM_B is #1 L1 under GKF.
+- `audit/2026-05-10-d10d-leak-corrected-meta.md` — leak-corrected LR meta gate-FAILs (G3 flip ratio 0.001) but informative; Bayesian hierarchical is correct synthesis.
+- `audit/2026-05-13-d13-path-b-hier-meta.md` — Path B empirical-Bayes; Stint τ=100000 +0.86bp OOF, ρ=0.998, G3 0.211 FAIL; R5 candidate held.
+- `audit/2026-05-13-d13d-path-b-gkf-probe.md` — Path B GKF probe; Stint hier-meta lift +0.90bp Strat → +2.59bp GKF (2.9× AMPLIFIED) — mechanism leakage-robust.
 - `audit/friction.md` — friction one-liners.
