@@ -8,6 +8,11 @@ cd "$(dirname "$0")"
 
 COMP="playground-series-s6e5"
 
+if [[ -z "${KAGGLE_API_TOKEN:-}" && -n "${KAGGLE_KEY:-}" ]]; then
+    KAGGLE_API_TOKEN="$KAGGLE_KEY"
+    export KAGGLE_API_TOKEN
+fi
+
 echo "--- installing requirements ---"
 pip install -q -r requirements.txt
 
@@ -15,11 +20,6 @@ if [[ -f data/train.csv && -f data/test.csv ]]; then
     echo "--- data already present, skipping download ---"
     ls -lh data/*.csv
     exit 0
-fi
-
-if [[ -z "${KAGGLE_API_TOKEN:-}" && -n "${KAGGLE_KEY:-}" ]]; then
-    KAGGLE_API_TOKEN="$KAGGLE_KEY"
-    export KAGGLE_API_TOKEN
 fi
 if [[ -z "${KAGGLE_API_TOKEN:-}" ]]; then
     read -rsp "Kaggle API token (KGAT_...): " KAGGLE_API_TOKEN
