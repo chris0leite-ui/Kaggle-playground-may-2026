@@ -91,6 +91,34 @@ nulls update the prior on that variant, not on the family.
 3-way (Driver, Race, Year) at smoothing 20 was the comp's load-bearing trick.
 ```
 
+### [ ] kickoff-runbook.md / day-loop.md — keep top public notebooks as repo reference
+
+**Tag:** `recipe-over-judgment`. **Origin:** s6e5 Day-16 PI suggestion.
+
+Keep top 3-5 public Kaggle notebooks (those with the highest published
+OOF / LB scores or vote counts) checked into the comp repo under
+`external/kernels/` as **reference examples**. Don't copy their code
+into our pipeline; keep them as a separate library to:
+
+1. Reverse-engineer feature engineering tricks at every plateau (Rule 22).
+2. Sanity-check our `make_features_*` against published recipes — if
+   they have a feature we don't, justify the absence or add it.
+3. Build a small library of "known-good single-model recipes" across
+   comps (FE patterns + hparam regimes that empirically work) — the
+   long-run version of `improvements.md` for tactics rather than process.
+
+**Periodic review.** At end-of-comp wrap-up: review the saved kernels,
+extract reusable FE patterns, promote 2-3 to a cross-comp `examples/`
+or `recipes/` folder under the skill. **Track candidate recipes here**
+under a "Recipe library" section as an indexed list.
+
+**Recipe library (seed entries):**
+- `s6e5/romanrozen/f1-pit-driver-race-year-encoding-0-95354.ipynb` —
+  CV TE on 6 high-card combos (incl. 3-way), ~50 engineered FE,
+  Rozen-LGBM hparams (lr=0.025, leaves=255, max_depth=10, ff=0.65).
+  Single LGBM OOF 0.95241, blend LB 0.95354. Pull-and-keep pattern
+  validated on s6e5 Day-16.
+
 ### [ ] guardrails.md — Guardrail 15: framework is scaffolding, not authorship
 
 **Tag:** `recipe-over-judgment`. **Origin:** s6e5 Day-16 16-day plateau.

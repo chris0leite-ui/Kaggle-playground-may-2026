@@ -32,6 +32,15 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   PRIMARY at OOF 0.95090. Single-model FE recovers ~95-100% of stacking
   lift on this comp.
 
+- `tag: keep-playbook-as-repo-reference` — PI suggestion Day-16 PM: keep
+  top 3-5 public Kaggle notebooks under `external/kernels/` as
+  **reference examples**, not copy-pasted code. Use them to (1) reverse-
+  engineer FE at every plateau, (2) sanity-check our feature factory vs
+  published recipes, (3) build a cross-comp recipe library. Periodic
+  review at end-of-comp wrap-up; promote durable patterns to skill
+  `examples/` or `recipes/`. Seed entry:
+  `s6e5/romanrozen/f1-pit-driver-race-year-encoding-0-95354.ipynb`.
+
 ## 2026-05-16 (branch `claude/read-handover-lA8Nr`)
 
 - `tag: twin-pool-2-meta-collapses-rank-info` — Day-16 H2 built two LR
