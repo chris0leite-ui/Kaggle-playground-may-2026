@@ -5,8 +5,8 @@ _create_estimator method is hardcoded to ModelVersion.V2_5. We monkey-patch
 it to ModelVersion.V2_6 before instantiation (see install_tabpfn()).
 Weights: Prior-Labs/tabpfn_2_6 on HuggingFace.
 
-1-fold probe with FULL training data (351k rows) to close the 74bp AUC gap
-seen at 50k rows. SMOKE_N_ROWS=None. Expected fold-0 wall ~5-5.5h.
+1-fold probe with 150k rows (v2 cap: P100 OOM'd at full 351k). SMOKE_N_ROWS=150_000.
+Expected fold-0 wall ~4-5h (3× the 50k-row v2.5 run of 5134s).
 
 This is NOT inference-only ICL. We use `tabpfn.finetuning.FinetunedTabPFNClassifier`
 to specialise the foundation-model weights to this DGP via gradient steps.
@@ -54,7 +54,7 @@ from sklearn.model_selection import StratifiedKFold
 TARGET, ID_COL = "PitNextLap", "id"
 SEED, N_FOLDS = 42, 5
 SMOKE_FOLD0_ONLY = True   # 1-fold time-probe; set False for full 5-fold run
-SMOKE_N_ROWS = None       # full training data (~351k rows per fold)
+SMOKE_N_ROWS = 150_000    # P100 OOM at 351k (16GB exhausted); 150k ≈ 43% load → safe
 BASE_S = 0.94075          # baseline_two_anchor Strat OOF (LB-proxy anchor)
 REALMLP_E4 = 0.94722      # E4 fold-0 reference
 
@@ -377,4 +377,6 @@ def main():
 
 
 if __name__ == "__main__":
+    # Reduce CUDA memory fragmentation (P100 16GB OOM fix for 351k rows).
+    os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
     main()
