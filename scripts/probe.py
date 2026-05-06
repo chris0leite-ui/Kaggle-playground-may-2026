@@ -65,6 +65,10 @@ FAMILY_PRIORS = {
     "pseudo_label_cheap":       (0.15, (0.0,  1.0,  3.0)),
     "single_base_fe_addition":  (0.05, (0.0,  0.5,  2.0)),  # 4-of-4 NULL
     "pool_addition_redundant":  (0.10, (0.0,  0.3,  1.0)),
+    # 2-level stacking via meta-derivative-as-base produces +OOF that
+    # doesn't transfer (1-of-1 falsified 2026-05-06: Path B over K=22
+    # +0.99 bp OOF → -4 bp LB; tag `path-b-amp-needs-orthogonal-signal`).
+    "two_level_stacking_meta_as_base": (0.10, (-2.0, 0.0, 1.0)),
     "process_or_infrastructure": (1.00, (0.0,  0.0,  0.0)),  # not bp; utility
 }
 

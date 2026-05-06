@@ -2,6 +2,32 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-06
+
+- `tag: path-b-amp-needs-orthogonal-signal-not-meta-derivatives` —
+  Path B family-conditional amplification (prior precedents: Stint
+  +0.86 bp OOF → +7 bp LB at 11.6×; Compound×Stint +1.0 bp OOF →
+  +8 bp LB at 8×) DID NOT FIRE on a K=22 add of `d12_lr_meta`
+  (the K=21 LR-meta-OOF itself). +0.99 bp OOF predicted, actual LB
+  −4 bp (LB 0.95045 vs PRIMARY 0.95049). Cause: `d12_lr_meta` is a
+  convex combination of the same 21 base predictions already in
+  the K=21 pool — adding it as a 22nd "base" creates a 2-level
+  stack but no orthogonal signal flow into the segment routers.
+  The hier-meta gains OOF AUC by exploiting fold-structure of the
+  inner-meta-OOF that does NOT survive at test-time (where the
+  inner meta is fit on full-train, not per-fold).
+  **Lesson:** Path B amplification is conditional on the K_pool
+  addition carrying new/orthogonal SIGNAL (FM-class diverse vs
+  GBDT-class; sparse-LR diverse vs dense-LR; etc.), NOT on adding
+  a meta-derivative whose information is already in the pool.
+  Pre-flight rule: before treating a K=K_pool+1 candidate as
+  Path-B-amp-eligible, classify the candidate signal axis vs the
+  existing K_pool axes. Meta-derivative / convex-combo additions
+  → discount Path B amp by 10× (treat as `tuning_existing` not
+  `meta_arch_redesign`). Add a `two_level_stacking` family in
+  `scripts/probe.py FAMILY_PRIORS` with P(useful)≈0.10 and
+  bp band (0, 0, 1) so BOTE catches this in the future.
+
 ## 2026-05-13/14
 
 - `tag: single-base-fe-additions-noise-wall` — Day-13/14 alternative-axis
