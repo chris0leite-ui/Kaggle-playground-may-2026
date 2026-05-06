@@ -100,6 +100,29 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
   G3 fail). Hold for final-window decision.
   `[owner: unclaimed | status: open]`
 
+## 8. Single-model path (PI hypothesis P1)
+
+External Kaggle notebook `romanrozen/f1-pit-driver-race-year-encoding-0-95354`
+publishes a single LGBM at OOF AUC **0.95241** (and single XGB 0.95232,
+RealMLP-A 0.95260). Recipe: ~118 engineered features (tyre/compound/
+race-progress/lag-rolling/within-stint/combo-cats) + CV target encoding
+of (Driver×Race×Year), (Driver×Race), (Driver×Compound), (Race×Compound),
+(Race×Year), (Driver×Race×Compound). Their final blend lands LB **0.95354**.
+
+- **8a.** Replicate Rozen single LGBM with our 5-fold StratifiedKFold(seed=42).
+  Variants: raw_only / feA / feA_te / feA_te_orig × {Rozen-hparams, project-hparams}.
+  Expected OOF ≈ 0.952; +160 bp over PRIMARY 0.95059 if LB transfer holds.
+  `[owner: read-kaggle-handover-rsi2Q | status: wip]`
+- **8b.** Single CatBoost with the same recipe (Rozen OOF 0.95127). HEDGE.
+  `[owner: unclaimed | status: open]`
+- **8c.** Single RealMLP (PyTabKit RealMLP_TD) with Rozen MLP_PARAMS;
+  Rozen OOF-A 0.95260 / OOF-B 0.95259. Needs Kaggle GPU.
+  `[owner: unclaimed | status: open]`
+- **8d.** Add the new single-model OOF as a 23rd base in K=22 + Path-B
+  hier-meta to test if the ~+200 bp standalone signal also amplifies stacked
+  (separate hypothesis from 8a; depends on 8a passing).
+  `[owner: unclaimed | status: open]`
+
 ## 6. Pool composition surgery
 
 - **6a.** Replace 3 most leakage-eating GBDTs with FM-class bases.
