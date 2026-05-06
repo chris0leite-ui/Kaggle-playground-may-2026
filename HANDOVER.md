@@ -66,29 +66,39 @@ script lines 117-129). **First action this session:**
      +1-3bp stack median, +3-9bp tail. Runs in background.
   6. On completion: `kaggle kernels output chrisleitescha/d12-tabpfn-finetune-strat -p kernels/d12-tabpfn-finetune-gpu/output/`.
 
-### Move B — build 3 FM-class diversification variants (cheap CPU)
-Each 2-3h CPU. Builds on d9f's 2-way 4/4 sweet spot finding:
-1. **5/3 multi-FM partition** — 5 driver-state + 3 race-context fields
-2. **4/4 alternative split** — Compound × TyreLife axis with new
-   partner field (variant of d9i's aug-2way)
-3. **Augmented 2-way (different fields)** — pick top-12 augmented
-   fields from d9h_aug12 by L1, split into 2 partitions
+### Move B — DONE Day-13. **V1 5/3 PASS_BOTH_GATES.**
+Built 3 FM-class variants. Result table (Strat Δ / **GKF Δ** vs
+leakage-blocked baseline 0.94776):
+  - **V1 5/3 (D,C,S,T,Ln + R,Y,Rp): +0.06bp / +0.97bp PASS_BOTH_GATES**
+    — ρ A vs B = 0.402 (d9f sweet spot); FM_5fA in L1 top-15.
+  - V2 4/4 alt (C,T,S,Rp + D,R,Y,P): −0.36bp / +0.85bp PASS_GKF_ONLY
+    — ρ A vs B = 0.186 (most-orthogonal pair to date).
+  - V3 6/6 aug alt: −0.27bp / +0.54bp PASS_GKF_ONLY.
 
-Each candidate: standalone OOF, ρ vs PRIMARY, min-meta gate, K=22
-add stack. **Use both Strat AND GroupKF as gates** (first time GKF
-is a secondary gate — Day-12 finding mandates this).
+**Day-13 submit candidate: V1** at
+`submissions/submission_d13_V1_5_3_K22_add.csv` (HELD per Rule 1).
+Pred-LB Strat 0.95035 (TIE PRIMARY 0.95034); FM-class LB
+amplification precedent (d9c +3bp / d9f +2bp / d9h +3bp on similar
+OOF deltas) suggests realistic +0.5-3bp lift. PI decision per Rule
+1; pre-submit-diff first (ρ=0.99963 vs PRIMARY).
 
-### Move C — pool refactor (after Move B lands ≥1 winner)
-Drop 3 most-leakage-eating GBDTs (e5_optuna_lgbm, cb_slow-wide-bag,
-e1_cb_sub — all ΔAUC ≤ −215bp under GKF) and replace with Move B
-winners. Build K=21 stack with swapped pool. Submit only if OOF
-Strat ≥ PRIMARY AND ρ < 0.9995.
+V2 and V3 reserved as R5 final-3-day GKF-robust HEDGE candidates.
 
-### Day-14 — Move D + E (second-tier)
-- **D: DeepFM-lite** (FM + 2-layer MLP head). 4-6h CPU.
+### Move C — pool refactor BLOCKED (no swap-class winners)
+None of the 3 V variants beats PRIMARY on Strat OOF (V1 ties at
++0.06bp). Drop-and-replace can't proceed without a +1bp+ Strat
+winner. **Pivoted to Move D + feature engineering instead.**
+
+### Day-14 — Move D + E (second-tier; Move C falsified)
+- **D: DeepFM-lite** (FM + 2-layer MLP head). 4-6h CPU. Same fields
+  as d9h_aug12; non-linear capacity above the FM bilinear layer.
 - **E: Regularised FFM re-attempt** (k=4, L2=0.5, dropout-on-fields).
   d9e FFM died from overfit at 4× FM params; reduced capacity may
   earn slot.
+- **F: Feature engineering for new FM inputs.** Move B falsified the
+  hypothesis "split current 12 fields differently." Need fields the
+  current FMs don't see: pit-window-since-last-pit, hazard-decay
+  terms, compound-pressure ratios, Race-stage indicators.
 
 ## Falsified / dead — do NOT retry (Day-12 additions in **bold**)
 
