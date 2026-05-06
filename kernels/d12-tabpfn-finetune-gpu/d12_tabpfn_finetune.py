@@ -260,7 +260,7 @@ def main():
             n_estimators_final_inference=FT_N_EST_FINAL_INFERENCE,
             n_inference_subsample_samples=FT_N_INFERENCE_SUBSAMPLE,
             random_state=SEED,
-            eval_metric="roc",
+            eval_metric="roc_auc",
             extra_classifier_kwargs={
                 "categorical_features_indices": cat_indices,
                 "ignore_pretraining_limits": True,
