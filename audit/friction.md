@@ -67,6 +67,58 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   was killed after fold 0 took 62 min. **Fix:** Cap to 3 concurrent
   CPU-heavy probes max in future batches. Schedule cheap probes
   (<30 s each) ahead of slow ones to free CPU for the slow batch.
+
+- `tag: path-b-amp-only-fires-on-meta-arch-not-base-add` — Day-15
+  d15b_path_b_K22_dae_only_tau20000 SUBMITTED at LB 0.95059 (+1.0bp
+  NEW PRIMARY) on +0.715bp OOF — realised amp 1.4×, well below Path B
+  amp 6-11.6× central. Cross-confirmed by parallel main-branch agent
+  same day: K=22 + orig_transfer base-add LB 0.95049 (TIE at +1.127bp
+  OOF). The amp pattern (d13 Compound 6.7×, Compound×Stint 8×, Stint
+  11.6×) is conditional on the LIFT being a meta-architecture redesign
+  (e.g. segmentation refinement Stint→Compound×Stint), NOT on
+  K_pool→K_pool+1 base additions even when the new base is genuinely
+  orthogonal-class (DAE ρ_test 0.9477 standalone, Jahrer Porto-Seguro
+  precedent). Base-additions get standard ρ-band treatment per
+  probe.py predicted_lb_delta_bp, with a small positive deviation from
+  the diverse new-class signal. Refines `path-b-amp-needs-orthogonal-
+  signal-not-meta-derivatives` (which excluded meta-derivatives from amp
+  eligibility): even a true orthogonal base-add does not fire amp.
+  Lesson: Day-16 priority should be META-ARCH REDESIGN candidates
+  (non-Gaussian shrinkage prior on hier-meta, Yao/Vehtari covariance-
+  modelled BMA, alternative segmentation cross like Year×Compound or
+  Compound×TyreLife_q5), not more orthogonal base-add candidates.
+  Pre-flight rule: classify candidate as `meta_arch_redesign` (amp-
+  eligible) or `pool_addition` (ρ-band only); discount EV for the latter
+  by ~3-5× regardless of standalone OOF diversity.
+
+- `tag: kaggle-p100-fallback-reproduced-day15` — 8 days after first
+  encountered (Day-3 RealMLP), pushed Day-15 d15b-dae-lgbm-gpu kernel
+  with `machine_shape: GpuT4x2` per the prior friction lesson; v1 ran
+  on P100 (sm_60) anyway, ERRORed at first GPU op
+  (`cudaErrorNoKernelImageForDevice`). The friction tag was internalised
+  but the FIX was not pre-applied — I should have copy-pasted the
+  torch 2.4 force-reinstall pattern from realmlp_gpu.py into the new
+  kernel BEFORE pushing v1. Cost: one wasted Kaggle queue + ~5 min
+  diagnose + push v2. Skill amendment: when creating any new torch-
+  based GPU kernel, START from `kernels/hazard-nn-smoke-gpu/` boilerplate
+  (force-reinstall already wired in), don't fork from a kernel that
+  doesn't have the fix. Add to do-and-dont.md GPU template list.
+
+- `tag: subagent-friction-4-of-4-recurrence` — Day-15 4-branch parallel
+  probe: ALL FOUR dispatched general-purpose subagents fired the same
+  pre-existing frictions `subagent-monitor-truncation` /
+  `subagent-non-execution`. Subagent A wrote a script and exited;
+  Subagent B ran smoke for 30+ min then exited mid-LGBM; Subagent C
+  ran fold 0 then exited; Subagent D wrote KNN feature script then
+  exited mid-LGBM-fold-0. Main thread had to relaunch Branches A and
+  D and supervise C/B's tail. Lesson: the friction tag is well-known
+  but I keep dispatching general-purpose agents for long-running
+  python jobs. Cost: 2× wall (subagents wasted ~30-60 min each before
+  main-thread takeover). **Permanent fix: do NOT dispatch
+  general-purpose subagents for `python script.py >log` jobs that
+  exceed ~5 min wall.** Spawn the python directly from the main thread
+  via Bash run_in_background=True. Document in skill.
+
 - `tag: path-b-amp-needs-orthogonal-signal-not-meta-derivatives` —
   Path B family-conditional amplification (prior precedents: Stint
   +0.86 bp OOF → +7 bp LB at 11.6×; Compound×Stint +1.0 bp OOF →

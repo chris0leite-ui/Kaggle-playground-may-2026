@@ -1,0 +1,65 @@
+[{"stream_name":"stdout","time":0.951093012,"data":"[boot] force-reinstall torch 2.4 (sm_60 P100 support) ...\n"}
+,{"stream_name":"stdout","time":13.0680165,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 797.0/797.0 MB 2.1 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":15.058155508,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.0/7.0 MB 3.6 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":65.155758995,"data":"[boot] Python 3.12.12, torch 2.4.1+cu121\n"}
+,{"stream_name":"stdout","time":65.220631852,"data":"[boot] CUDA: 12.1, device 0: Tesla P100-PCIE-16GB, capability: (6, 0)\n"}
+,{"stream_name":"stdout","time":65.220670434,"data":"[boot] WARNING: device capability \u003c sm_70; PyTorch sm_60 (P100) may not support current torch ops. T4 (sm_75) expected.\n"}
+,{"stream_name":"stdout","time":70.336548238,"data":"[boot] lightgbm 4.6.0 present\n"}
+,{"stream_name":"stdout","time":70.336588833,"data":"[main] writing outputs under /kaggle/working\n"}
+,{"stream_name":"stdout","time":70.340015298,"data":"[data] found train.csv at /kaggle/input/competitions/playground-series-s6e5/train.csv\n"}
+,{"stream_name":"stdout","time":71.987112968,"data":"[data] train (439140, 16), test (188165, 15), prior 0.1990\n"}
+,{"stream_name":"stdout","time":73.455967324,"data":"[encode] DAE input train (439140, 21) test (188165, 21) d=21\n"}
+,{"stream_name":"stdout","time":78.541158428,"data":"[dae] train: n=627305 d=21 hidden=(256, 512, 256) epochs=20 batch=4096 device=cuda\n"}
+,{"stream_name":"stdout","time":79.214783466,"data":"  epoch  0 mse=0.1878 wall=0.7s\n"}
+,{"stream_name":"stdout","time":79.610531024,"data":"  epoch  1 mse=0.1455 wall=0.4s\n"}
+,{"stream_name":"stdout","time":79.998596889,"data":"  epoch  2 mse=0.1394 wall=0.4s\n"}
+,{"stream_name":"stdout","time":80.393356242,"data":"  epoch  3 mse=0.1336 wall=0.4s\n"}
+,{"stream_name":"stdout","time":80.786817833,"data":"  epoch  4 mse=0.1244 wall=0.4s\n"}
+,{"stream_name":"stdout","time":81.18762325,"data":"  epoch  5 mse=0.1218 wall=0.4s\n"}
+,{"stream_name":"stdout","time":81.616968558,"data":"  epoch  6 mse=0.1269 wall=0.4s\n"}
+,{"stream_name":"stdout","time":82.029598908,"data":"  epoch  7 mse=0.1269 wall=0.4s\n"}
+,{"stream_name":"stdout","time":82.437233366,"data":"  epoch  8 mse=0.1225 wall=0.4s\n"}
+,{"stream_name":"stdout","time":82.832151931,"data":"  epoch  9 mse=0.1275 wall=0.4s\n"}
+,{"stream_name":"stdout","time":83.286543449,"data":"  epoch 10 mse=0.1236 wall=0.4s\n"}
+,{"stream_name":"stdout","time":83.681166128,"data":"  epoch 11 mse=0.1239 wall=0.4s\n"}
+,{"stream_name":"stdout","time":84.073463214,"data":"  epoch 12 mse=0.1213 wall=0.4s\n"}
+,{"stream_name":"stdout","time":84.469073531,"data":"  epoch 13 mse=0.1145 wall=0.4s\n"}
+,{"stream_name":"stdout","time":84.865154951,"data":"  epoch 14 mse=0.1207 wall=0.4s\n"}
+,{"stream_name":"stdout","time":85.260456627,"data":"  epoch 15 mse=0.1192 wall=0.4s\n"}
+,{"stream_name":"stdout","time":85.656780636,"data":"  epoch 16 mse=0.1186 wall=0.4s\n"}
+,{"stream_name":"stdout","time":86.053540365,"data":"  epoch 17 mse=0.1203 wall=0.4s\n"}
+,{"stream_name":"stdout","time":86.467661556,"data":"  epoch 18 mse=0.1170 wall=0.4s\n"}
+,{"stream_name":"stdout","time":86.859158877,"data":"  epoch 19 mse=0.1190 wall=0.4s\n"}
+,{"stream_name":"stdout","time":86.859220891,"data":"[dae] total wall: 13.4s\n"}
+,{"stream_name":"stdout","time":89.336818277,"data":"[dae] latent train (439140, 768) test (188165, 768) extract wall 2.5s\n"}
+,{"stream_name":"stdout","time":91.952105689,"data":"\n"}
+,{"stream_name":"stdout","time":91.952206723,"data":"========= Variant A: raw + latent (d15b_lgbm_dae_full) =========\n"}
+,{"stream_name":"stdout","time":91.952857357,"data":"[lgbm] d15b_lgbm_dae_full: X_train (439140, 782) X_test (188165, 782)\n"}
+,{"stream_name":"stdout","time":523.365933886,"data":"  fold 0: AUC=0.94413 iters=725 wall=431.4s\n"}
+,{"stream_name":"stdout","time":948.019017936,"data":"  fold 1: AUC=0.94287 iters=726 wall=424.6s\n"}
+,{"stream_name":"stdout","time":1381.706015987,"data":"  fold 2: AUC=0.94327 iters=728 wall=433.7s\n"}
+,{"stream_name":"stdout","time":1754.561593969,"data":"  fold 3: AUC=0.94256 iters=589 wall=372.9s\n"}
+,{"stream_name":"stdout","time":2247.220323214,"data":"  fold 4: AUC=0.94348 iters=868 wall=492.7s\n"}
+,{"stream_name":"stdout","time":2247.331093792,"data":"[lgbm] d15b_lgbm_dae_full: OOF AUC = 0.94325\n"}
+,{"stream_name":"stdout","time":2247.343337895,"data":"\n"}
+,{"stream_name":"stdout","time":2247.343384427,"data":"========= Variant B: latent only (d15b_lgbm_dae_only) =========\n"}
+,{"stream_name":"stdout","time":2247.344302974,"data":"[lgbm] d15b_lgbm_dae_only: X_train (439140, 768) X_test (188165, 768)\n"}
+,{"stream_name":"stdout","time":2659.768449096,"data":"  fold 0: AUC=0.94208 iters=785 wall=412.4s\n"}
+,{"stream_name":"stdout","time":3176.653642365,"data":"  fold 1: AUC=0.93886 iters=1094 wall=516.9s\n"}
+,{"stream_name":"stdout","time":3566.94352529,"data":"  fold 2: AUC=0.94013 iters=726 wall=390.3s\n"}
+,{"stream_name":"stdout","time":3988.047897622,"data":"  fold 3: AUC=0.93945 iters=852 wall=421.1s\n"}
+,{"stream_name":"stdout","time":4378.699726621,"data":"  fold 4: AUC=0.93997 iters=788 wall=390.6s\n"}
+,{"stream_name":"stdout","time":4378.802958137,"data":"[lgbm] d15b_lgbm_dae_only: OOF AUC = 0.94007\n"}
+,{"stream_name":"stdout","time":4378.81964497,"data":"[save] oof_d15b_lgbm_dae_full_strat.npy + test_d15b_lgbm_dae_full_strat.npy\n"}
+,{"stream_name":"stdout","time":4378.828675019,"data":"[save] oof_d15b_lgbm_dae_only_strat.npy + test_d15b_lgbm_dae_only_strat.npy\n"}
+,{"stream_name":"stdout","time":4378.829131137,"data":"\n"}
+,{"stream_name":"stdout","time":4378.829143446,"data":"[done] total wall 4314s\n"}
+,{"stream_name":"stdout","time":4378.829153381,"data":"[done] OOF full: 0.94325  only: 0.94007\n"}
+,{"stream_name":"stdout","time":4378.829157206,"data":"[done] results JSON: d15b_dae_lgbm_gpu_results.json\n"}
+,{"stream_name":"stderr","time":4383.352041082,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":4383.352105271,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":4383.612770308,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":4383.61280164,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":4384.335302115,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":4385.785116897,"data":"[NbConvertApp] Writing 357719 bytes to __results__.html\n"}
+]

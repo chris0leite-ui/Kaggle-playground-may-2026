@@ -69,6 +69,13 @@ FAMILY_PRIORS = {
     # doesn't transfer (1-of-1 falsified 2026-05-06: Path B over K=22
     # +0.99 bp OOF → -4 bp LB; tag `path-b-amp-needs-orthogonal-signal`).
     "two_level_stacking_meta_as_base": (0.10, (-2.0, 0.0, 1.0)),
+    # Day-15 4-branch additions. DAE: Jahrer Porto-Seguro winner recipe
+    # (unsupervised swap-noise autoencoder + LGBM-on-latent). ET: ExtraTrees
+    # as cheap diversity slot (NVIDIA Grandmaster Playbook). KNN: within-
+    # segment density features feed Path-B routers directly.
+    "dae_unsupervised":      (0.25, (1.0,  3.0,  7.0)),
+    "extra_trees_ensemble":  (0.35, (2.0,  6.0, 12.0)),
+    "knn_distance_features": (0.10, (0.0,  0.8,  3.0)),
     "process_or_infrastructure": (1.00, (0.0,  0.0,  0.0)),  # not bp; utility
 }
 

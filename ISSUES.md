@@ -4,12 +4,16 @@
 > when the strategy-critic-loop fires (plateau, saturation, kickoff,
 > 50% checkpoint). Cap ≤150 lines.
 
-**Problem (BPS step 1).** Close the −29.6bp gap to top-5% (leader
-LB 0.95345 vs ours 0.95049) in 13 remaining days, given that
-FM-class augmentation, Path-B hier-meta, and the GBDT pool are
-all saturated within current configurations (Day-13/14 alt-axis
-4-of-4 NULL; d14 Path B cohort sweep on Year/Year×Stint/Race
-also NULL).
+**Problem (BPS step 1).** Close the −28.6bp gap to top-5% (leader
+LB 0.95345 vs ours 0.95059 = d15b_path_b_K22_dae_only_tau20000) in
+12 remaining days. Day-15 confirmed that orthogonal new-base additions
+land at +0–1bp LB regardless of standalone diversity (DAE-class ρ
+0.9477 standalone → +1bp LB; new friction
+`path-b-amp-only-fires-on-meta-arch-not-base-add`). Day-16+ priority
+is META-ARCH REDESIGN axis (non-Gaussian shrinkage, Yao/Vehtari
+covariance-Σ BMA, alternative segmentation cross), which IS
+Path-B-amp-eligible. Pending PI decision: submit
+`path_b_K22_invlaps τ=20k` (OOF +2.75bp, predicted ~+4bp LB).
 
 **Claim convention.** Pick an unclaimed `open` leaf. Edit its
 `[owner: ...]` field to your branch slug (part after `claude/`).
@@ -27,9 +31,14 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
   fine-tuning not learning). v2.6 OOM on P100 at any row count (model
   weights ≈15.37GB > 16GB). AUC ceiling -64bp vs PRIMARY. ρ=0.960
   diverse but gap too large. `[owner: read-handover-8hsZh | status: null]`
-- **1b.** EmbMLP CPU baseline. Embedding-MLP for the leakage-robust
-  population. Cheap, untried.
-  `[owner: unclaimed | status: open]`
+- **1b.** EmbMLP CPU baseline → reframed as Jahrer swap-noise DAE +
+  LGBM-on-latent. **DONE 2026-05-06**: GPU kernel d15b-dae-lgbm-gpu v2
+  ran on P100 (torch 2.4 sm_60 fix). std OOF 0.94007, ρ_test 0.9477
+  (most-diverse since FM_A_53), min-meta +0.793bp at ρ 0.99547.
+  K=22 Path B Compound×Stint τ=20000 OOF +0.715bp. **SUBMITTED LB
+  0.95059 (+1.0bp NEW PRIMARY).** Realised amp 1.4× (well below Path-B-amp
+  6-11.6× central) — new friction `path-b-amp-only-fires-on-meta-arch-not-base-add`.
+  `[owner: read-handover-LgbQ4 | status: done]`
 - **1c.** DeepFM-lite (FM + 2-layer MLP head). Extends d9c FM with
   non-linear interactions. Cheap CPU.
   `[owner: unclaimed | status: open]`
