@@ -46,40 +46,6 @@ a valid result; cheap NULL findings get audit notes too.
 - **Gap to top-5%** (0.95345): **29.6bp**. 13 days remaining.
 - **Submits used**: 24/270 total (Day-13 used 6/9, Day-14 used 0).
 
-## 2026-05-06 PM addendum (branch `claude/ml-handover-alignment-xvUN0`)
-
-PI redirect: experimentation culture; many small probes; BOTE-first;
-"the solution is probably simple, maybe a code-quality fix".
-
-**Built:** experimentation harness — `scripts/probe.py` (`bote` +
-`gate`), `scripts/probe_min_meta.py` (K=21+N stack-add gate),
-`scripts/probe_blends_K21.py`, `scripts/probe_rho_inventory.py`.
-Rule 19 added to CLAUDE.md codifying BOTE-first / gate-after.
-
-**Cheap probes (all via harness):**
-
-1. **α-asymmetry verification.** OOF uses fold-train counts in α=n/(n+τ);
-   test uses full-train counts. Bayesian-correct shrinkage, NOT a fixable LB
-   cap. **PURSUE**: α-calibrated τ-resweep (~30 min).
-
-2. **K=21 simple-blend probe.** mean/gmean/rank_mean/trimmed all regress
-   19–32bp standalone vs PRIMARY. LR-meta-stays-best CONFIRMED.
-
-3. **ρ inventory of 22 held candidates.** Best near-tie HEDGE: **`d12_lr_meta`**
-   (OOF 0.95073, ρ=0.996, flip ratio 0.297).
-
-4. **K=21 + d6_rule_compound_stint min-meta.** Δ −0.020bp NULL (already absorbed).
-
-5. **K=21 + 3 (`d12_lr_meta` + `d10d_leak_corrected_meta` + `blend_rank_mean_K21`).**
-   **Δ +1.298bp OOF** (0.95073 → 0.95086). `d12_lr_meta` dominates. **First non-NULL.**
-
-**Open candidates (NOT YET RUN, BOTE-graded):**
-- α-calibrated τ-resweep on PRIMARY hier-meta (PURSUE; ~30 min).
-- `d12_lr_meta` single-candidate ablation (was in flight at session-end).
-- Within-Race quantile-rank of LapTime_Delta as FM input (DEFER; H5 z-score leak fix needed).
-- Per-Driver historical pit rate smoothed EB (DEFER; ~10 min).
-- Year×Stint sparse-LR / FM partition (DEFER; ~30 min).
-
 ## Day-14 session — TabPFN + Move D results
 
 ### Move A — TabPFN fine-tune: DEAD
@@ -140,6 +106,27 @@ All prior entries remain. Additional dead from Day-14:
 
 - `audit/2026-05-13-d13-{path-b-hier-meta,d13d-path-b-gkf-probe}.md` — load-bearing
 - `audit/2026-05-06-{blend-and-rho-probes,alpha-asymmetry-verification}.md` — Day-14 probes
+- `audit/2026-05-06-d14-dgp-residuals.md` — masked-column self-prediction NULL + load-bearing DGP diagnostic
+- `audit/archive-2026-05-06-handover-xvUN0-addendum.md` — archived per-branch addendum (consolidated at merge)
 - `scripts/d13_move_f_features.py` + `scripts/d13_move_f_fm_aug16.py` — Move D
+- `scripts/d14_dgp_residuals.py` — DGP-residual probe
 - `scripts/artifacts/d13_move_f_fm_aug16_results.json` + `d12_tabpfn_finetune_150k_results.json`
+- `scripts/artifacts/d14_dgp_residuals_results.json` + `probe_min_meta__d14_dgp_residuals.json`
 - `kernels/d12-tabpfn-finetune-gpu/` (v2.5) + `kernels/d13-tabpfn-v26-strat/` (v2.6) — archived
+
+## Day-14 PM `assess-synthetic-data-features-NYZuK`
+
+PI thesis: predict every column from the rest, exploit emergent DGP
+structure. Implemented in `scripts/d14_dgp_residuals.py` (4 LGBM
+regressors → z-residuals + L1 anomaly as 5 new LGBM features; 11 min
+wall). **Family CLOSED.** Std OOF 0.94200 (Δ −88 bp), K=2 min-meta
+−0.025 bp NULL, K=22 add +0.17 bp at ρ=0.9958 → pred LB **−1.3 bp**.
+
+Load-bearing diagnostic: across all 4 targets OOF RMSE ≈ marginal σ
+within 3 sig figs — synthetic NN-DGP added near-independent per-
+feature noise within rows. **Jointly explains** FM-aug12 saturation,
+Move D NULL, Day-13/14 alt-axis 4-of-4 NULL, TabPFN 0.944 ceiling.
+Per-row FE / self-supervised pretraining cannot break the ceiling;
+single-base FE additions across LGBM/FM/DGP-residual now dead-listed.
+Path forward: meta-layer (Path B variants), new model class (EmbMLP,
+DeepFM-lite), or external data only. Detail: `audit/2026-05-06-d14-dgp-residuals.md`.

@@ -99,6 +99,15 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
   LB 0.95045, regressed -4 bp; Path B amp does NOT fire on
   meta-derivative additions per friction tag
   `path-b-amp-needs-orthogonal-signal-not-meta-derivatives`).
+- Masked-column self-prediction / DGP-residual features (2026-05-06,
+  Day-14: SAINT/TabNet/VIME class). 4 LGBM regressors → z-residuals +
+  L1 anomaly as 5 new LGBM features. Std OOF 0.94200 (-88bp), K=2
+  min-meta -0.025bp NULL, K=22 add +0.172bp at ρ=0.9958 (pred LB
+  -1.3bp). Load-bearing diagnostic: OOF RMSE ≈ marginal σ for all 4
+  targets — synthetic NN-DGP is conditionally near-independent within
+  rows. Friction tag `synthetic-dgp-conditionally-near-independent`.
+  Joint-explains FM-aug12 saturation, Day-13/14 alt-axis 4-of-4 NULL,
+  TabPFN 0.944 ceiling. See `audit/2026-05-06-d14-dgp-residuals.md`.
 
 ---
 
