@@ -4,6 +4,27 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
 
 ## 2026-05-06
 
+- `tag: synthetic-dgp-conditionally-near-independent` — Day-14 PM:
+  d14 DGP-residuals probe (masked-column self-prediction; SAINT/
+  TabNet/VIME class). Trained 4 LGBM regressors to predict
+  LapTime_Delta / Cumulative_Degradation / Position / LapNumber
+  from the rest of the row. **Across all 4 targets, OOF RMSE ≈
+  marginal σ within 3 sig figs** (LapTime_Delta 41.05/41.06;
+  CumDeg 34.94/34.97; Position 3.491/3.491; LapNumber 1.559/1.559).
+  Conditional-given-rest variance ≈ marginal variance — the synthetic
+  NN-DGP added near-independent per-feature noise within rows.
+  Stack outcome: standalone OOF 0.94200 (Δ −88bp vs PRIMARY); K=2
+  min-meta −0.025bp NULL; K=22 add +0.172bp at ρ=0.996 (pred LB
+  −1.3bp under harness band). Family closed.
+  **Lesson**: this is the 5th independent NULL of the same axis
+  (Day-13 G1/G2'/G3, Day-14 H1/Move-D, now d14 DGP-residuals): the
+  K=21 + Path-B-hier-meta has fully absorbed every cross-feature
+  signal extractable from the synthetic DGP within a single row.
+  Per-row feature engineering / self-supervised pretraining cannot
+  break the ceiling — only meta-layer / model-class / external-data
+  innovations can. Joint-explains FM-aug12 saturation, Move D NULL,
+  Day-13/14 alt-axis 4-of-4, and TabPFN's 0.944 ceiling.
+
 - `tag: path-b-amp-needs-orthogonal-signal-not-meta-derivatives` —
   Path B family-conditional amplification (prior precedents: Stint
   +0.86 bp OOF → +7 bp LB at 11.6×; Compound×Stint +1.0 bp OOF →
