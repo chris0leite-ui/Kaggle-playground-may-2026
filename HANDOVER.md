@@ -21,11 +21,11 @@ Open with a 3-bullet read-back of state + first action.
 
 ## Where we are (Day 14 morning)
 
-- **PRIMARY** = `d13_path_b_stint_tau100000` LB **0.95041** (NEW Day-13).
+- **PRIMARY** = `d13_path_b_stint_tau100000` LB **0.95041** (NEW Day-13; +7bp from prior PRIMARY).
 - **HEDGE** = `d9h_K22_add_aug12` / `d9i_S1_K21_swap_aug2way` (TIED) LB 0.95034.
 - **Gap to top-5%** (0.95345): **30.4bp** (narrowed from 31.1bp).
 - **13 days remaining** (deadline 2026-05-31). 9 slots/day.
-- **Submits used**: 21/270 total; Day-13 2/9 (d13c LB 0.95033, d13 Stint LB 0.95041).
+- **Submits used**: 22/270 total; Day-13 3/9 (V1 5/3 multi-FM TIE LB 0.95032; d13c Compound τ=100000 LB 0.95033; d13 Stint τ=100000 LB 0.95041 NEW PRIMARY).
 
 ## Day-13 close: Path B hier-meta is a NEW MODEL CLASS
 
@@ -59,38 +59,38 @@ PI directive Day-13 evening: **"we want to improve by 40bp not 2."**
 +1-3bp tuning probes are off the table for the comp middle. Each
 candidate below is a structural model-class lift.
 
-### Move A — push TabPFN-2.5 fine-tune kernel to Kaggle (PI action)
-Kernel ready at `kernels/d12-tabpfn-finetune-gpu/`. Set `TABPFN_TOKEN`
-secret (license accept on ux.priorlabs.ai). T4×2 wall 5-7h. **Only
-live single-shot ≥10bp candidate.** EV +5-15bp std-alone, +1-5bp
-stack tail. Single PI action; runs in background. 
+### Move A — push TabPFN-2.5 fine-tune kernel (PI provides token)
+**BLOCKED on TABPFN_TOKEN.** Kernel at `kernels/d12-tabpfn-finetune-gpu/`.
+PI: license-accept at https://ux.priorlabs.ai → set Kaggle Secret
+`TABPFN_TOKEN` → `kaggle kernels push`. T4×2 5-7h. **Only live ≥10bp
+single-shot candidate.** EV +5-15bp standalone, +1-5bp stack tail.
 
-### Move B — pseudo-label cascade at K=21+hier-meta level (CPU)
-~3-4h CPU. d5 partial pseudo got +14bp standalone on m5q but only
-+2.5bp at K=14 stack — tighter cascade at the new K=21 ceiling could
-compound:
-1. Generate test pseudo-labels from d13 Stint τ=100000 PRIMARY (LB 0.95041)
-2. Round 1: confidence-filter (top 30% by predicted prob spread); retrain 5 fastest bases on (train + filtered pseudo)
-3. Re-stack K=21 with pseudo-trained bases + hier-meta
-4. Round 2 if Round 1 ρ < 0.999 vs PRIMARY
+### Move B — pseudo-label cascade at K=21+hier-meta level (~3-4h CPU)
+d5 partial pseudo got +14bp standalone but only +2.5bp at K=14 stack —
+tighter cascade at K=21+hier-meta ceiling could compound:
+1. Pseudo-labels from d13 Stint PRIMARY (LB 0.95041)
+2. Confidence-filter (top 30% by spread); retrain 5 fastest bases on (train + pseudo)
+3. Re-stack K=21 with pseudo bases + hier-meta; Round 2 if ρ < 0.999
 
-EV +5-10bp incremental. Risk: pseudo over-amp (d5 widened gap on m5q).
+EV +5-10bp. Risk: pseudo over-amp (d5 widened gap on m5q).
 
-### Move C — DeepFM-lite (CPU)
-~3-4h CPU. FM low-rank pairwise + 2-layer MLP head over the 21-base
-expanded space. Fundamentally new base class:
-- FM: ⟨v_i, v_j⟩ pairwise interaction surface (current d9c/d9f)
-- + MLP head: f(W₂ · σ(W₁ · concat(v_i)) + b) for higher-order interactions
+### Move C — DeepFM-lite (~3-4h CPU)
+FM pairwise + 2-layer MLP head on 21-base expanded space. New class
+beyond d9c/d9f/d9h. EV +3-8bp standalone, +1-3bp stacked. Risk:
+overfit without dropout (d9e FFM precedent — 4× params died).
 
-EV +3-8bp standalone, +1-3bp stacked. Risk: 2-layer MLP may overfit
-without dropout (d9e FFM precedent — 4× params died).
+### Move D — new FM-input feature engineering (parallel agent's Day-13 finding)
+V1/V2/V3 sweep proved **same-12-field FM-partition reshuffle is dead**.
+New FM lift needs NEW INPUTS: pit-window-since-last-pit, hazard-decay,
+compound-pressure, race-stage. Build 4-6 features, train unified FM
+on aug12 + new fields, gate vs PRIMARY. EV +2-6bp.
 
 ### Move D — Compound × Stint hier-meta SUBMIT (held variants)
 HELD. Two candidates per `audit/2026-05-13-d13-path-b-hier-meta.md`:
 - `d13e_compound_stint_tau20000.csv` (+1.00bp OOF, ρ=0.996, projects ~+2bp LB)
 - `d13e_compound_stint_tau100000.csv` (+0.82bp OOF, ρ=0.9996 vs Stint winner; HEDGE-grade)
 
-ONLY submit if Day-14 doesn't produce a structural Move A/B/C winner.
+ONLY submit if Day-14 doesn't produce a structural Move A/B/C/D winner.
 
 ### Research-loop trigger (Rule 7) IF Day-14 yields no ≥+5bp move
 Pause submits. Web-search top-5 finishers' writeups from comparable
@@ -110,6 +110,9 @@ unique FE / external data) we haven't found.
 - Year-specialist; AV reweighting (i.i.d.); LambdaRank meta (-86bp)
 - AUC-pairwise XGB (-451bp); external real-world priors on synth
 - **d10d leak-corrected meta** (G3 flip ratio 0.001; over-credits FM)
+- **Day-13 Move B V1/V2/V3 same-field FM partitions** — V1 5/3 SUBMITTED
+  LB 0.95032 TIE; V2/V3 held dead. Same-12-field FM-partition vein FULLY
+  MINED. Future FM lift needs NEW INPUT FIELDS, not new partitions.
 
 ## Held submissions (do NOT submit)
 
@@ -137,9 +140,11 @@ unique FE / external data) we haven't found.
 
 ## Pointers
 
-- `audit/2026-05-13-d13-path-b-hier-meta.md` + `d13d-path-b-gkf-probe.md`
+- `audit/2026-05-13-d13-path-b-hier-meta.md` + `d13d-path-b-gkf-probe.md` — load-bearing
+- `audit/2026-05-13-d13-move-b-fm-variants.md` — same-field FM-partition death
 - `audit/2026-05-12-d12-master-synthesis.md` + `d12-tabpfn-finetune-prep.md`
 - `audit/2026-05-10-d10b-groupkf-stack-rebuild.md` + `d10d-leak-corrected-meta.md`
 - `audit/friction.md` — Day-13 frictions appended
 - `scripts/d13{,b,c,d,e}_path_b_*.py` — Path B family
+- `scripts/d13_move_b_fm_variants.py` — V1/V2/V3 (parallel agent)
 - `kernels/d12-tabpfn-finetune-gpu/` — Move A kernel
