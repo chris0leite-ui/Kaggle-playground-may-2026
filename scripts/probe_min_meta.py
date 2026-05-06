@@ -142,9 +142,14 @@ def main():
         np.save(ART / f"oof_{args.save_prefix}_strat.npy", oof2)
         np.save(ART / f"test_{args.save_prefix}_strat.npy", test2)
         print(f"\n  → saved oof/test_{args.save_prefix}_strat.npy")
-    json_out = ART / "probe_min_meta_last.json"
-    json_out.write_text(json.dumps(summary, indent=2))
-    print(f"  → {json_out}")
+    # Per-candidate-set JSON (no overwrite); plus _last for convenience.
+    slug = "+".join(args.candidates).replace("/", "_")
+    json_named = ART / f"probe_min_meta__{slug}.json"
+    json_named.write_text(json.dumps(summary, indent=2))
+    json_last = ART / "probe_min_meta_last.json"
+    json_last.write_text(json.dumps(summary, indent=2))
+    print(f"  → {json_named}")
+    print(f"  → {json_last}")
 
 
 if __name__ == "__main__":
