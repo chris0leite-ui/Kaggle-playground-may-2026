@@ -77,12 +77,12 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 14                           # 2026-05-14 / Day-14: morning. Path B PRIMARY holds LB 0.95041; Day-13/14 alternative-axis branch (G1/G2'/G3/H1) ALL NULL.
+day: 14                           # 2026-05-14 / Day-14 morning. PRIMARY holds LB 0.95041 (Path B Stint τ=100000). Day-13 closed: 5/9 submits, 1 PRIMARY (+7bp), 4 TIE/regress; Day-13 PM added 6-shape FM partition saturation + Move C minimal (drop d9c) ✓ + drop-GBDT FALSIFIED; Day-13/14 alt-axis 4-of-4 NULL (G1/G2'/G3/H1).
 lb_best_today: 0.95435            # leader; not refreshed
 our_lb_best: 0.95041              # d13 Path B Stint τ=100000 NEW PRIMARY; gap -3.04bp; held since Day-13 PM
-submissions_used_today: 0         # 0/9 Day-14 (Day-13 used 3/9: V1 5/3 multi-FM TIE 0.95032, d13c Compound 0.95033, d13 Stint 0.95041 PRIMARY)
-submissions_used_total: 22
-saturation_count: 0               # Path B is structural advance; alternative-axis branch nulls don't count as saturations (different exploration vector)
+submissions_used_today: 0         # 0/9 Day-14 morning (Day-13 used 5/9: V1 5/3 LB 0.95032, Compound τ100k LB 0.95033, Stint τ100k LB 0.95041 PRIMARY, K23_H1_aug15 LB 0.95032, d13a S3 K=24 LB 0.95032)
+submissions_used_total: 23
+saturation_count: 0               # Path B is structural advance; partition-shape + alt-axis nulls are exploration coverage, not saturations
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -139,11 +139,16 @@ mechanism_families_explored:
   - aucpairwise_xgb_base            # d12 -- XGB rank:pairwise smoke -451bp fold-0; FAIL gate
   - single_bag_e3_5seed             # d12 -- standalone bag -19bp OOF; K=21 complexity JUSTIFIED (not OOF-noise)
   - groupkf_full_pool_meta          # d12 -- KEY FINDING: rank-lock partial dissolves; ρ(Strat-vs-GKF meta)=0.9914
+  - fm_partition_5_3_d13a           # d13a -- FM_A_53 (D,C,S,T,Cd) + FM_B_53 (R,Y,Rp); Strat S3 K=24 +0.20bp pred ρ 0.99976; LB 0.95032 TIE; GKF Δ -41.6/-2.9bp BOTH leakage-robust
+  - fm_partition_4_4_ct_axis_d13d   # d13d V2 -- FM_A_CT (C,T,Cd,Ld) + FM_B_DR (D,R,S,Y); K=25 add REGRESS -0.05bp; wheel-physics axis redundant w/ d9f+d13a
+  - fm_partition_6_6_alt_d13d       # d13d V3 -- FM_A_DH + FM_B_RT (T moved to B, Nx/Pv to A); K=25 add +0.03bp noise-floor; partition-shape SATURATED across 6 shapes
+  - gkf_full_22_stack_d13b          # d13b -- 4-FM (d9c+d9f A/B+d13a A_53/B_53) GKF stack +3.20bp; SWAP_21 (drop d9c) -0.01bp = REDUNDANT; Move C minimal validated under GKF
+  - move_c_strat_pool_refactor      # d13c -- T1 drop_d9c K=23 = T0 K=24 (no regress) ✓; T2/T3 drop GBDT leak-eaters -2.5/-2.6bp Strat FALSIFIED — leak-eaters carry public-LB row-iid signal
   - within_stint_lgbm_fe            # d13 G1 -- 6 γ-pack feat (laps_into_stint etc); std 0.94194, ρ 0.965, min-meta -0.38bp NULL
   - cross_driver_intra_race_lgbm_fe # d13 G2' -- 9 γ4 feat (block_tyrelife_std +0.29 row-corr); std 0.94250, ρ 0.957, min-meta +0.03bp NULL
   - stintgrouped_lambdamart         # d13 G3 -- pairwise loss; smoke fold-0 0.74585, killed (63% all-zero stints from probe Q1)
   - fm_aug13_3way_concat_field      # d14 H1 -- CTRq Compound×TL_q5×RP_q5 (114/125 levels); std 0.92639 (+9.9bp vs aug12), ρ **0.917** (most diverse), min-meta -0.13bp NULL
-plateau_days: 2                   # Day-13/14 alternative-axis branch: 4-of-4 nulls (G1/G2'/G3/H1). Path B was a structural Day-13 win on the meta-layer axis.
+plateau_days: 2                   # Day-13/14 alt-axis branch: 4-of-4 nulls (G1/G2'/G3/H1). Path B was Day-13 structural win on meta-layer axis; partition-shape Day-13 PM saturated across 6 shapes.
 gate_status: cleared              # d13 Path B Stint τ=100000 LB 0.95041 NEW PRIMARY (Day-13)
 headroom_to_top5pct: 0.00304      # 0.95345 − 0.95041 = 30.4bp
 ```
