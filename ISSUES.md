@@ -88,6 +88,11 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
   4-of-4 NULL).
 - Path B cohort sweep on Year, Year×Stint, Race axes (d14 9 variants NULL).
 - Hazard NN (d9 -315bp; main-branch leakfree confirmed dead OOF 0.92013).
+- 2-level stacking via meta-as-base (2026-05-06: K=22 + d12_lr_meta
+  +1.348 bp OOF, but K=22 Path B Compound×Stint τ=100k SUBMITTED
+  LB 0.95045, regressed -4 bp; Path B amp does NOT fire on
+  meta-derivative additions per friction tag
+  `path-b-amp-needs-orthogonal-signal-not-meta-derivatives`).
 
 ---
 
