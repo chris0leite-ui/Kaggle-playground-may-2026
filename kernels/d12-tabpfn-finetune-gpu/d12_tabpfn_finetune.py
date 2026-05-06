@@ -46,6 +46,7 @@ from sklearn.model_selection import StratifiedKFold
 TARGET, ID_COL = "PitNextLap", "id"
 SEED, N_FOLDS = 42, 5
 SMOKE_FOLD0_ONLY = True   # 1-fold time-probe; set False for full 5-fold run
+SMOKE_N_ROWS = 50_000     # Rule 2: smoke at 50k rows; set None for full data
 BASE_S = 0.94075          # baseline_two_anchor Strat OOF (LB-proxy anchor)
 REALMLP_E4 = 0.94722      # E4 fold-0 reference
 
@@ -233,7 +234,13 @@ def main():
         print(f"\n=== fold {k} (train={len(tr)} val={len(va)}) ===")
 
         # Per-fold encoding using union of train_fold + val_fold + test
-        X_tr = X.iloc[tr].copy().reset_index(drop=True)
+        tr_use = tr
+        if SMOKE_N_ROWS and len(tr) > SMOKE_N_ROWS:
+            rng = np.random.default_rng(SEED + k)
+            tr_use = rng.choice(tr, size=SMOKE_N_ROWS, replace=False)
+            print(f"  [smoke] subsampled train fold {len(tr)} -> {len(tr_use)} rows")
+        X_tr = X.iloc[tr_use].copy().reset_index(drop=True)
+        y_tr_sub = y[tr_use]
         X_va = X.iloc[va].copy().reset_index(drop=True)
         X_te = X_test.copy()
 
@@ -272,7 +279,7 @@ def main():
         # Fine-tune on train fold; validation split is internal
         print(f"  [fold {k}] fit (epochs={FT_EPOCHS}, lr={FT_LR}, "
               f"patience={FT_EARLY_STOPPING_PATIENCE}) ...")
-        clf.fit(X_tr.values, y[tr])
+        clf.fit(X_tr.values, y_tr_sub)
 
         # Predict OOF + test
         print(f"  [fold {k}] predict OOF ...")
