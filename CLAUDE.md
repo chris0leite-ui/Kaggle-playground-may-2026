@@ -215,6 +215,8 @@ headroom_to_top5pct: 0.00311      # 0.95345 − 0.95034 = 31.1bp
 | d10b_K15_+FMA+FMB (Strat / GKF-Race) | 0.95052 | 0.92764 | n/a | FM-class lift +0.87bp Strat → **+2.01bp GKF (2.3× amplified)**; FM_B L1 #1 under GKF |
 | d10d_leak_corrected_meta | n/a | 0.92764 | n/a | held; G3 FAIL (rare-class flip 0.001); rebalances FM_B L1=6.96 but smooths away GBDT row-extremes; pred-LB 0.95001 |
 | **d13_path_b_stint_tau100000** | **0.95082** | **0.94600** | **0.95041** | **NEW PRIMARY**; +7bp LB; 11.6× OOF upside; **GKF lift +2.59bp = 2.9× AMPLIFIED vs Strat +0.90bp** (mechanism leakage-robust per d13d) |
+| d13e_compound_stint_tau20000 | **0.95083** | n/a | n/a | held; +1.00bp OOF over d9f, +0.17bp over Stint winner; ρ=0.9958 vs d9f / 0.9985 vs Stint winner; 122/99 flips vs Stint (balanced) |
+| d13e_compound_stint_tau100000 | 0.95081 | n/a | n/a | held; +0.82bp OOF; ρ=0.9996 vs Stint winner (TIE band); 55/98 flips (under R7 200); HEDGE-eligible if τ=20000 lands |
 | d13b_path_b_stint_tau20000 | **0.95082** | n/a | n/a | held; +0.88bp OOF; ρ=0.996; flip ratio 0.220; tau=100000 superseded by submit |
 | d13_path_b_compound_tau100000 | 0.95076 | n/a | **0.95033** | calibration probe; LB +2bp on +0.30bp OOF (6.7× upside); ρ=0.9990; demoted by Stint variant |
 | d12_groupkf_meta (K=21 GKF) | 0.95069 / **GKF 0.94776** | n/a | n/a | **Day-12 STRUCTURAL FINDING**: ρ(Strat-vs-GKF meta-test)=0.9914 — rank-lock partial dissolves; FM ΔAUC −9bp vs GBDT −200 to −343bp |
