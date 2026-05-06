@@ -89,16 +89,11 @@ None of the 3 V variants beats PRIMARY on Strat OOF (V1 ties at
 +0.06bp). Drop-and-replace can't proceed without a +1bp+ Strat
 winner. **Pivoted to Move D + feature engineering instead.**
 
-### Day-14 — Move D + E (second-tier; Move C falsified)
-- **D: DeepFM-lite** (FM + 2-layer MLP head). 4-6h CPU. Same fields
-  as d9h_aug12; non-linear capacity above the FM bilinear layer.
-- **E: Regularised FFM re-attempt** (k=4, L2=0.5, dropout-on-fields).
-  d9e FFM died from overfit at 4× FM params; reduced capacity may
-  earn slot.
-- **F: Feature engineering for new FM inputs.** Move B falsified the
-  hypothesis "split current 12 fields differently." Need fields the
-  current FMs don't see: pit-window-since-last-pit, hazard-decay
-  terms, compound-pressure ratios, Race-stage indicators.
+### Day-14 — Move D + E + F (second-tier; Move C falsified)
+- **D: DeepFM-lite** (FM + 2-layer MLP head; d9h_aug12 fields). 4-6h CPU.
+- **E: Regularised FFM** (k=4, L2=0.5, dropout); d9e overfit at 4× cap.
+- **F: New FM-input features** (Move B falsified same-12-field reshuffle):
+  pit-window-since-last-pit, hazard-decay, compound-pressure, race-stage.
 
 ## Falsified / dead — do NOT retry (Day-12 additions in **bold**)
 
