@@ -57,3 +57,4 @@ Thumbs.db
 
 # CatBoost training artifacts (auto-generated)
 catboost_info/
+kernels/d15b-dae-gpu/output/d15b_dae_X_*_latent.npy
