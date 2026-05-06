@@ -51,18 +51,25 @@ ff-merge before reading state below.
     write today's notes to a `## Day-N PM <branch-slug>` H2 section
     inside HANDOVER.md (slug = part after `claude/`); never edit other
     branches' sections. Scribe consolidates at handover time.
-16. **New-candidate pre-flight (5-question check).** Before committing
+16. **New-candidate pre-flight (6-question check).** Before committing
     CPU/GPU compute on any new base or meta variant, answer:
     (1) Is the underlying mechanism in `mechanism_families_explored`?
     (2) Does the candidate fall in {meta-only, rule_residual-on-raw,
     GBDT-on-binary-target, formulation-already-in-pool}? If yes,
     rank-lock-vulnerable. (3) Predict standalone OOF (cite precedent).
     (4) Predict ρ vs PRIMARY (cite closest base). (5) At that ρ,
-    cite the closest gate-PASS/FAIL precedent. If 1–5 don't return
-    a coherent answer, downgrade EV midpoint by 0.3× before ranking.
-    Origin: `tag: menu-overcrediting-redundant-mechanism` (Day-8
-    falsified T1.5/T1.3/T1.2 all of which passed research-agent EV
-    ranking but failed the 5-question check retroactively).
+    cite the closest gate-PASS/FAIL precedent. **(6) Does the training
+    objective match the row-level AUC metric?** Pairwise-rank /
+    group-rank / multi-task-aux objectives ≠ row-AUC and trigger a
+    one-tier verdict downgrade in BOTE (`bote(metric_aligned=True/
+    False)` or `--metric-aligned`; unanswered = forced SKIP). Q6
+    origin: d12 LambdaRank meta -86bp + AUC-pairwise XGB -451bp
+    fold-0 + MAST FM-2.6 reasoning-action-mismatch (arXiv 2503.13657).
+    If 1–6 don't return a coherent answer, downgrade EV midpoint by
+    0.3× before ranking. Origin: `tag: menu-overcrediting-redundant-
+    mechanism` (Day-8 falsified T1.5/T1.3/T1.2 all of which passed
+    research-agent EV ranking but failed the 5-question check
+    retroactively).
 17. **Wrap-up + handover triggers.** PI says **"wrap up"** → follow
     `WRAPUP.md` section A. PI says **"prepare handover"** → follow
     `WRAPUP.md` section A then section B. Both end with a push to the
@@ -94,6 +101,22 @@ ff-merge before reading state below.
     (e) "Many small things" beats "one big bet": prefer 5×30-min
         probes over 1×3-h NN unless EV/cost-min strongly favors the
         big bet under the harness's BOTE.
+    (f) **Calibration loop (added 2026-05-06).** Every BOTE call
+        accepts `--metric-aligned true/false` (Q6, mandatory) and
+        `--pi-predicted-lb-bp X` (PI's own LB-Δ prediction tracked
+        next to the agent's `expected_lb_bp`). Records append to
+        `audit/bote_log.jsonl`. After a submit lands, run
+        `python scripts/probe.py record-outcome NAME --actual-lb-bp X`
+        to close the loop; `python scripts/probe.py calibration`
+        emits PI vs agent vs actual error per family.
+    (g) **Family kickoff seed (added 2026-05-06).** When opening a
+        NEW mechanism family (one not in `mechanism_families_explored`),
+        run `python scripts/research_seed.py FAMILY` to generate a
+        web-retrieval stub at `audit/research-seed-<slug>-DATE.md`,
+        then fill it via WebSearch (≥5 sources, ≥2 prior-comp, ≥1
+        paper, ≥1 GM blog). Origin: MLE-STAR's web-retrieval seed
+        accounts for most of its +47bp over AIDE on MLE-bench-Lite
+        (arXiv 2506.15692).
     PI corollary: the calendar/budget belongs to PI; agents do
     not propose timelines or "today/tomorrow" framings — execute
     until PI says stop.

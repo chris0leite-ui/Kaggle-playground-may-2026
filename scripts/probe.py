@@ -42,6 +42,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 
 ART = Path("scripts/artifacts")
+BOTE_LOG = Path("audit/bote_log.jsonl")  # PI/agent prediction calibration
 TARGET = "PitNextLap"
 SEED, N_FOLDS = 42, 5
 
@@ -101,6 +102,10 @@ def bote(name: str,
          override_pessimistic: float | None = None,
          override_optimistic: float | None = None,
          prob_useful_override: float | None = None,
+         metric_aligned: bool | None = None,
+         metric_check_note: str = "",
+         pi_predicted_lb_bp: float | None = None,
+         log_path: Path | str | None = BOTE_LOG,
          note: str = "") -> dict:
     """Back-of-envelope EV calc. Run BEFORE any compute on a candidate.
 
@@ -112,6 +117,20 @@ def bote(name: str,
         OOF lift, pass it here; otherwise the family median is used.
       override_*: replace the default (P, M, O) with custom values.
       prob_useful_override: replace family prior P with custom.
+      metric_aligned: 5-Q Q6 (added 2026-05-06 per audit
+        2026-05-06-agentic-kaggle-research). Does the candidate's
+        TRAINING OBJECTIVE match the competition METRIC (row-level AUC)?
+        True = matches (binary log-loss / row-AUC / target regression).
+        False = mismatch (pairwise rank, group-level loss, etc) →
+        verdict downgraded by one tier. None = unanswered → forced SKIP
+        with a warning. Origin: d12 LambdaRank meta -86bp + AUC-pairwise
+        XGB -451bp fold-0; MAST FM-2.6 reasoning-action-mismatch (13.2%).
+      metric_check_note: free-text on why metric_aligned is True/False.
+      pi_predicted_lb_bp: PI's own LB-delta prediction in bp, recorded
+        next to the agent/family prior so we can calibrate PI vs agent
+        across submits. Optional but encouraged (see audit doc tip 1).
+      log_path: append the BOTE record as JSONL to this path for later
+        calibration analysis. Pass None to disable.
       note: free-text rationale to print.
     """
     if family not in FAMILY_PRIORS:
@@ -133,6 +152,24 @@ def bote(name: str,
     else:
         verdict = "SKIP"
 
+    # Q6 metric-objective alignment downgrade
+    metric_warning = ""
+    if metric_aligned is None:
+        metric_warning = (
+            "Q6 unanswered: 'does training objective match row-level AUC?' "
+            "Set metric_aligned=True/False explicitly. Forcing SKIP."
+        )
+        verdict = "SKIP"
+    elif metric_aligned is False:
+        if verdict == "PURSUE":
+            verdict = "DEFER"
+        elif verdict == "DEFER":
+            verdict = "SKIP"
+        metric_warning = (
+            "Q6 metric mismatch: training objective ≠ row-level AUC. "
+            "Verdict downgraded one tier. Cite a precedent if pursuing."
+        )
+
     res = dict(
         name=name, family=family,
         prob_useful=float(p),
@@ -142,6 +179,10 @@ def bote(name: str,
         cost_min=float(cost_min),
         expected_lb_bp=float(expected_bp),
         cost_efficiency_bp_per_min=float(cost_efficiency),
+        metric_aligned=metric_aligned,
+        metric_check_note=metric_check_note,
+        pi_predicted_lb_bp=(None if pi_predicted_lb_bp is None
+                            else float(pi_predicted_lb_bp)),
         verdict=verdict,
     )
     print(f"\n=== BOTE: {name} ===")
@@ -149,9 +190,29 @@ def bote(name: str,
         print(f"  note: {note}")
     print(f"  family: {family}  P(useful): {p:.2f}")
     print(f"  bp band (P/M/O): {pess:.1f} / {med:.1f} / {opt:.1f}")
-    print(f"  cost: {cost_min:.0f} min  →  expected LB: {expected_bp:+.2f} bp")
+    print(f"  cost: {cost_min:.0f} min  →  expected LB (agent): {expected_bp:+.2f} bp")
+    if pi_predicted_lb_bp is not None:
+        delta = pi_predicted_lb_bp - expected_bp
+        print(f"  PI-predicted LB:  {pi_predicted_lb_bp:+.2f} bp  "
+              f"(Δ vs agent: {delta:+.2f} bp)")
     print(f"  cost-efficiency: {cost_efficiency:.3f} bp/min")
+    print(f"  Q6 metric_aligned: {metric_aligned}"
+          f"{f' — {metric_check_note}' if metric_check_note else ''}")
+    if metric_warning:
+        print(f"  ⚠ {metric_warning}")
     print(f"  verdict: {verdict}")
+
+    if log_path is not None:
+        try:
+            from datetime import datetime, timezone
+            rec = dict(res)
+            rec["ts"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+            rec["note"] = note
+            Path(log_path).parent.mkdir(parents=True, exist_ok=True)
+            with open(log_path, "a") as f:
+                f.write(json.dumps(rec) + "\n")
+        except Exception as e:
+            print(f"  [bote_log append failed: {e}]")
     return res
 
 
@@ -330,6 +391,14 @@ def _min_meta_gate(y, cand_oof, cand_test, pool_oofs_paths, pool_tests_paths,
 
 # ---- CLI -------------------------------------------------------------
 def _cli_bote(args):
+    if args.metric_aligned is None:
+        ma = None
+    elif args.metric_aligned.lower() in ("true", "yes", "1", "y"):
+        ma = True
+    elif args.metric_aligned.lower() in ("false", "no", "0", "n"):
+        ma = False
+    else:
+        raise SystemExit(f"--metric-aligned must be true/false, got {args.metric_aligned!r}")
     bote(
         name=args.name,
         family=args.family,
@@ -338,8 +407,74 @@ def _cli_bote(args):
         override_pessimistic=args.bp_pessimistic,
         override_optimistic=args.bp_optimistic,
         prob_useful_override=args.prob_useful,
+        metric_aligned=ma,
+        metric_check_note=args.metric_check_note or "",
+        pi_predicted_lb_bp=args.pi_predicted_lb_bp,
+        log_path=None if args.no_log else BOTE_LOG,
         note=args.note or "",
     )
+
+
+def _cli_record(args):
+    """Append a submitted-LB outcome to BOTE_LOG so calibration can be
+    computed later. Indexed by candidate name; multiple outcomes per
+    candidate are allowed (e.g. retried after K_pool changed)."""
+    from datetime import datetime, timezone
+    rec = dict(
+        kind="outcome",
+        name=args.name,
+        actual_lb_bp=float(args.actual_lb_bp),
+        ts=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        note=args.note or "",
+    )
+    BOTE_LOG.parent.mkdir(parents=True, exist_ok=True)
+    with open(BOTE_LOG, "a") as f:
+        f.write(json.dumps(rec) + "\n")
+    print(f"recorded outcome for {args.name!r}: actual LB Δ {args.actual_lb_bp:+.2f}bp"
+          f"  →  {BOTE_LOG}")
+
+
+def _cli_calibration(args):
+    """Pair predictions to outcomes in BOTE_LOG and emit per-family
+    PI-vs-agent-vs-actual error. Last-prediction-before-each-outcome wins."""
+    if not BOTE_LOG.exists():
+        raise SystemExit(f"no log at {BOTE_LOG}")
+    preds: dict[str, dict] = {}
+    rows: list[dict] = []
+    with open(BOTE_LOG) as f:
+        for line in f:
+            rec = json.loads(line)
+            if rec.get("kind") == "outcome":
+                p = preds.get(rec["name"])
+                if p is None:
+                    continue
+                rows.append(dict(
+                    name=rec["name"], family=p.get("family", "?"),
+                    actual=rec["actual_lb_bp"],
+                    agent=p.get("expected_lb_bp"),
+                    pi=p.get("pi_predicted_lb_bp"),
+                ))
+            else:
+                preds[rec["name"]] = rec
+    if not rows:
+        print("no paired predictions/outcomes yet")
+        return
+    def _fmt(v: float | None, w: int) -> str:
+        return f"{v:+.2f}".rjust(w) if v is not None else "–".rjust(w)
+
+    print(f"{'name':<40} {'family':<28} {'actual':>8} {'agent':>8} "
+          f"{'PI':>8} {'agent_err':>10} {'pi_err':>8}")
+    for r in rows:
+        actual = r["actual"]
+        agent = r["agent"]
+        pi = r["pi"]
+        agent_err = (agent - actual) if agent is not None else None
+        pi_err = (pi - actual) if pi is not None else None
+        name = r["name"][:40]
+        family = r["family"][:28]
+        print(f"{name:<40} {family:<28} {actual:>+8.2f} "
+              f"{_fmt(agent, 8)} {_fmt(pi, 8)} "
+              f"{_fmt(agent_err, 10)} {_fmt(pi_err, 8)}")
 
 
 def _cli_gate(args):
@@ -369,6 +504,16 @@ def main():
     b.add_argument("--bp_pessimistic", type=float, default=None)
     b.add_argument("--bp_optimistic", type=float, default=None)
     b.add_argument("--prob_useful", type=float, default=None)
+    b.add_argument("--metric-aligned", type=str, default=None,
+                   help="Q6 of the 5-Q pre-flight: does training objective "
+                        "match row-AUC? true/false; unanswered → SKIP.")
+    b.add_argument("--metric-check-note", type=str, default=None,
+                   help="Free-text on why metric_aligned is True/False.")
+    b.add_argument("--pi-predicted-lb-bp", type=float, default=None,
+                   help="PI's own LB-delta prediction (bp), tracked next "
+                        "to the agent's expected_lb_bp for calibration.")
+    b.add_argument("--no-log", action="store_true",
+                   help="Skip appending to audit/bote_log.jsonl.")
     b.add_argument("--note", type=str, default=None)
     b.set_defaults(func=_cli_bote)
 
@@ -382,6 +527,18 @@ def main():
     g.add_argument("--min-meta", action="store_true")
     g.add_argument("--json-out", default=None)
     g.set_defaults(func=_cli_gate)
+
+    r = sub.add_parser("record-outcome",
+                       help="append actual LB Δ for a logged BOTE prediction")
+    r.add_argument("name")
+    r.add_argument("--actual-lb-bp", type=float, required=True,
+                   help="realised LB delta in bp vs the PRIMARY at submit time")
+    r.add_argument("--note", type=str, default=None)
+    r.set_defaults(func=_cli_record)
+
+    c = sub.add_parser("calibration",
+                       help="pair predictions to outcomes in audit/bote_log.jsonl")
+    c.set_defaults(func=_cli_calibration)
 
     args = ap.parse_args()
     args.func(args)
