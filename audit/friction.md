@@ -4,6 +4,44 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
 
 ## 2026-05-07 PM (branch `claude/review-handover-solutions-oE78b`)
 
+- `tag: cross-row-aggregates-fire-where-own-row-sequence-doesnt`
+  — Probe 4 (`scripts/probe_field_state.py`) added field-state
+  aggregates per (Race, Year, LapNumber) and per (Race, Year,
+  LapNumber, Compound) computed from train+test combined: n_drivers
+  pitting at this lap, cumulative pit count in race, mean/std
+  TyreLife across active field, etc. PitStop is feature column not
+  label (Rule 25 PASS, AV-AUC=0.502). **Standalone single-LGBM OOF
+  lift over raw 14 features = +15.58 bp** (F3 0.94230 vs F2 0.94074).
+  `fs_cum_pits` single-feature AUC = **0.7972 — highest single-feat
+  on this comp** (raw TyreLife alone 0.6989). After 17 days and 21+
+  bases, no FE recipe in pool computed cross-row pit-state aggregates.
+  GBDT cannot reconstruct group-aggregate values from a single row's
+  features — this is the structural axis Probe 1 (own-row lead/lag)
+  attacked on the wrong side. Distinct from `combined-frame-leadlag-
+  premium-evaporates-at-gbdt`: own-row sequence shifts are absorbed
+  by GBDT interactions; cross-row aggregates of OTHER rows' columns
+  are NOT. **Fix:** before declaring own-row FE saturated, run a
+  cross-row aggregate probe over (Race, Year, LapNumber) groups.
+
+- `tag: field-state-mechanism-fires-on-train-only-too-no-combined-premium`
+  — F3 (combined-frame field-state) = 0.94230, F4 (train-only) =
+  0.94241. Combined-frame premium = -1.08 bp NEGATIVE. The mechanism
+  is the field-state aggregate itself, not the train+test combination.
+  Per-(R, Y, L) groups are large (~50 rows/cell on average) so
+  train-only stats are already stable; combined adds little. The
+  combined-frame transductive benefit identified by Rule 25 only fires
+  when group cells are SPARSE in train — for race-lap aggregates with
+  20-30 drivers per cell, train-only is sufficient.
+
+- `tag: family-prior-single-base-fe-addition-mis-calibrated-for-cross-row`
+  — FAMILY_PRIORS["single_base_fe_addition"] in `scripts/probe.py` is
+  (p=0.05, band [0, 0.5, 2.0]) calibrated on 4-of-4 row-feature
+  NULLs (M5g, M5h, etc.). Cross-row aggregate features are a separate
+  class with much fatter tails — Probe 4 hit +15.58 bp OOF, 30× the
+  optimistic band. **Fix:** when next BOTE on a cross-row-aggregate
+  candidate fires, use a new family `single_base_cross_row_aggregate`
+  with p=0.30 (1, 5, 15) bp until calibration data accumulates.
+
 - `tag: host-quote-trivial-refers-to-original-not-reconstructible`
   — brief.md: "we intentionally remove `Normalized_TyreLife` which
   makes the prediction trivial". Surface read suggests reconstructing
