@@ -252,6 +252,14 @@ re-run Phase 5 with the actual K=21 PRIMARY pool (TODO follow-up).
   - Year 2023 has lowest mean-KS (0.094); HARD compound also low (0.068).
     Reconfirms d12 finding "2023 is the easiest segment".
 
+**Submission result (2026-05-07).** **🎯 NEW PRIMARY: LB 0.95089 🎯**
+(`submission_d16_path_b_K22_continuous_only_tau20000.csv`, ref 52410696).
+Previous PRIMARY 0.95059 → **+3.0 bp LB lift**. Realised amp on +3.10 bp
+OOF advance: ~1.0× (slightly below the 1.4× central of
+`path-b-amp-only-fires-on-meta-arch-not-base-add`, but within noise band).
+Top-5% gap closes −28.6 bp → **−25.6 bp** (leader 0.95345). Slot used:
+1/9 today.
+
 **Submission candidate (NOT autosubmitted, Rule 1).**
 `d16_path_b_K22_continuous_only_tau{5k,20k,100k}` is in flight.
 At K=21+1 +3.33 bp OOF and ρ=0.995, the Path-B Compound×Stint hier-meta

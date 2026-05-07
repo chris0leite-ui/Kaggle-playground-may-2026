@@ -8,7 +8,10 @@
 
 ## Where we are
 
-- **PRIMARY** = `d13e_compound_stint_tau20000` LB **0.95049** (Day-13 PM advance).
+- **PRIMARY** = `d16_path_b_K22_continuous_only_tau20000` LB **0.95089** (Day-16 PM advance, 2026-05-07).
+  - K=22 = K=21 + d16_orig_continuous_only (orig-LGBM on 7 marginal-aligned features).
+  - +3.0 bp over previous PRIMARY (d15b_dae 0.95059); top-5% gap −25.6 bp.
+- _Previous PRIMARY (historical):_ `d13e_compound_stint_tau20000` LB **0.95049** (Day-13 PM advance).
 - **TOP SUBMISSION CANDIDATE (HELD):** `path_b_K22_invlaps_tau20000.csv`
   - OOF **0.95110** (+2.75 bp); largest non-meta-derivative single-add OOF advance ever.
   - **Target-derived** signal (LGBM regression on `1/(1+laps_until_pit)`); orthogonal-signal criterion satisfied.
@@ -243,12 +246,15 @@ web-search top finisher writeups for synthetic-tabular Playground.
 
 ## Day-16 PM autoencoder-synthetic-data-pEMB6 (overnight gauge-p-synth sweep)
 
+**🎯 NEW PRIMARY: LB 0.95089 🎯** (`submission_d16_path_b_K22_continuous_only_tau20000.csv`,
+ref 52410696, scored 2026-05-07). +3.0 bp over previous PRIMARY 0.95059.
+Top-5% gap closes −28.6 bp → −25.6 bp (leader 0.95345). Realised amp ~1.0×
+on +3.10 bp OOF advance.
+
 **Headline.** **`d16_path_b_K22_continuous_only_tau20000` OOF 0.95121** =
-HIGHEST OOF EVER (+3.10bp vs current PRIMARY 0.95090). Standalone base
+HIGHEST OOF EVER (+3.10bp vs prior PRIMARY OOF 0.95090). Standalone base
 `d16_orig_continuous_only` K=21+1 +3.331bp = LARGEST single-base K=21+1 of
-session (beats inv_laps +1.90 by 1.75×). At realised amp 1.4× per
-`path-b-amp-only-fires-on-meta-arch-not-base-add`, **predicted LB ~0.95103**,
-closing top-5% gap from -28.6→-24bp.
+session (beats inv_laps +1.90 by 1.75×).
 
 **Mechanism.** Selective feature-restriction transfer. Orig-trained LGBM on
 the 7 features the synthesizer left marginal-aligned (TyreLife KS=0.017,
@@ -281,13 +287,10 @@ Rule 1; 12h wall):
     continuous_only |w|=1.48 dominates) + K=22 Path B Compound×Stint
     sweep with continuous_only as 22nd base.
 
-**Submission decision pending PI**:
-  - τ=20k variant: OOF 0.95121, ρ=0.995, **468 flips top-1% > R7 200-cap →
-    needs PI sign-off**. Predicted LB ~0.95103 at 1.4× amp.
-  - τ=100k variant: OOF 0.95118, ρ=0.997, 278 flips → **HEDGE-eligible
-    without PI sign-off**.
-  - Submission CSVs ready: `submissions/submission_d16_path_b_K22_continuous_only_tau20000.csv`
-    (built from `test_d16_path_b_K22_continuous_only_tau20000_strat.npy[:,1]`).
+**Submission result**:
+  - τ=20k variant SUBMITTED 2026-05-07 (PI authorized; 468 flips override).
+    OOF 0.95121 → **LB 0.95089** (+3.0 bp over previous PRIMARY).
+  - τ=100k variant HELD as HEDGE-eligible candidate (R5 final-window probe).
 
 **Cross-branch awareness**: claude/ml-handover-alignment-xvUN0 has held
 candidate `path_b_K22_invlaps τ=20k` OOF 0.95110. d16's continuous_only
