@@ -49,8 +49,8 @@ WORK.mkdir(parents=True, exist_ok=True)
 WITH_ORIG_DATA = True       # item 7
 N_SEEDS = 1
 SEEDS_BAG = [42, 13, 71]    # used SEEDS_BAG[:N_SEEDS]
-MAX_ROUNDS = 2500
-SMOKE = False               # set True for 1-fold time-probe
+MAX_ROUNDS = 4000           # smoke v2 hit 2500 cap at fold-1 with model still improving
+SMOKE = False
 
 
 # === FE chain (verbatim from scripts/p1_features.py) ===
@@ -589,9 +589,9 @@ def main():
         orig_te = pd.read_csv(data_dir / "test.csv", usecols=[ID_COL])[ID_COL].values
         test_aligned = np.array([tests_seed[sd][id_to_pos[t]] for t in orig_te])
         auc = float(roc_auc_score(y, oofs_seed[sd]))
-        np.save(WORK / f"oof_p1_single_cb_v3_gpu_seed{sd}.npy",
+        np.save(WORK / f"oof_p1_single_cb_v4_gpu_seed{sd}.npy",
                 np.column_stack([1 - oof_aligned, oof_aligned]).astype(np.float64))
-        np.save(WORK / f"test_p1_single_cb_v3_gpu_seed{sd}.npy",
+        np.save(WORK / f"test_p1_single_cb_v4_gpu_seed{sd}.npy",
                 np.column_stack([1 - test_aligned, test_aligned]).astype(np.float64))
         results["by_seed"][f"seed{sd}"] = dict(
             oof_auc=auc, fold_aucs=fold_aucs_seed[sd],
@@ -613,18 +613,18 @@ def main():
         id_to_pos = {tid: i for i, tid in enumerate(order_te)}
         orig_te = pd.read_csv(data_dir / "test.csv", usecols=[ID_COL])[ID_COL].values
         test_bag_al = np.array([test_bag[id_to_pos[t]] for t in orig_te])
-        np.save(WORK / "oof_p1_single_cb_v3_gpu_bag.npy",
+        np.save(WORK / "oof_p1_single_cb_v4_gpu_bag.npy",
                 np.column_stack([1 - oof_bag_al, oof_bag_al]).astype(np.float64))
-        np.save(WORK / "test_p1_single_cb_v3_gpu_bag.npy",
+        np.save(WORK / "test_p1_single_cb_v4_gpu_bag.npy",
                 np.column_stack([1 - test_bag_al, test_bag_al]).astype(np.float64))
         # write submission for the bag
         sub = pd.read_csv(data_dir / "sample_submission.csv")
         sub[TARGET] = np.clip(test_bag_al, 0.001, 0.999)
-        sub.to_csv(WORK / "submission_p1_single_cb_v3_gpu_bag.csv", index=False)
+        sub.to_csv(WORK / "submission_p1_single_cb_v4_gpu_bag.csv", index=False)
         results["bag"] = dict(oof_auc=bag_auc, seeds=completed)
         print(f"[bag] OOF AUC = {bag_auc:.5f} ({len(completed)} seeds)")
 
-    (WORK / "p1_single_cb_v3_gpu_results.json").write_text(
+    (WORK / "p1_single_cb_v4_gpu_results.json").write_text(
         json.dumps(results, indent=2, default=str))
     print(f"\nDONE wall={time.time()-t0_total:.0f}s")
 
