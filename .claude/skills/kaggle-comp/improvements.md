@@ -170,6 +170,67 @@ Cross-comp: irrigation-water used the same trick at weight 0.5.
 (distribution shift risk; orig rows pull predictions off synth-test
 marginal).
 
+### [ ] recipes/ — Path-B pre-run base-routing audit gate
+
+`tag: pathb-amp-dead-when-pool-already-routes-segmentation-variable`.
+Before any new Path-B (per-segment hierarchical-meta LR-stacker)
+candidate, run a 1-minute audit: enumerate the K-pool's bases; for
+each, check whether it natively routes by the candidate segmentation
+axis (e.g. `Year` is routed by `cb_year-cat`; `Position` is routed
+by any continuous base that uses Position; `Stint` is NOT routed by
+any current K=24 base). If 1+ bases natively route by the axis,
+predict NULL ≥ 90% and require + 0.5 bp gate before allocating
+τ-sweep compute. Origin: s6e5 Day-18 — d18 (Compound × Year) +
+d18b (3 alt axes) ALL NULL/sub-gate after 18 min CPU each, all
+predictable from base-routing audit. Saves estimated 30-60 min
+CPU per future Path-B candidate. New file:
+`.claude/skills/kaggle-comp/recipes/path-b-prerun-base-routing-audit.md`.
+
+### [ ] guardrails.md — Monitor-discipline rule
+
+`tag: stale-monitor-noise-fills-chat-after-process-ends`. When arming
+a Monitor for a known-end-time process, use a natural-end command
+(e.g. `until [ -f result.json ]; do sleep 5; done` or a `tail -f log
+| grep -E "FINAL|→.*results" ; sleep 2; exit 0`) instead of an
+unbounded `tail -f`. Cancel stale monitors via TaskStop the moment
+the watched artifact appears. Origin: s6e5 Day-18 — ~12 stale
+events fired on d18 watcher after the run ended; chat-token cost
+visible.
+
+### [ ] PI-protocol — Sealed-prediction is non-optional even on "do it now"
+
+`tag: sealed-prediction-skipped-on-do-it-now-commands`. PI's
+authorisation to start a probe is NOT implicit ratification of the
+agent's BOTE (back-of-envelope expected-value calculation). When PI
+says "do it" / "do it now" / "execute this" on a probe with a written
+spec, the agent MUST still run Rule 26a (sealed-prediction): ask PI
+for LB Δ prediction in 1 line *before* allocating compute. Failing
+this poisons the calibration loop for the resulting decision. Origin:
+s6e5 Day-18 — d18 + d18b 18 min CPU each, no PI prediction logged in
+`audit/decisions.jsonl`; calibration data lost.
+
+### [ ] PI-protocol — No-unexplained-abbreviations rule
+
+`tag: pi-comm-no-unexplained-abbreviations`. Every abbreviation MUST
+be expanded on first use in a session. Methods/slang MUST include a
+one-line plain-English restatement when first introduced. Postmortem
+artifacts MUST include a glossary block at the top covering all
+jargon used inside. Reference list (s6e5): LR (Logistic Regression),
+GBDT (Gradient-Boosted Decision Trees), FM (Factorization Machines),
+CB (CatBoost), NN (Neural Network), DAE (Denoising Auto-Encoder),
+FE (Feature Engineering), TE (Target Encoding), OOF (Out-Of-Fold
+predictions), LB (Leaderboard), AUC (Area Under ROC), CV
+(Cross-Validation), K=N (pool of N base models), Path-B (per-segment
+hierarchical-meta LR-stacker), τ (tau, shrinkage strength), ρ (rho,
+Pearson correlation), bp (basis points = 0.0001 AUC), eff_rank
+(effective SVD rank), BOTE (back-of-envelope), PI (Principal
+Investigator = the human), HEDGE (backup submission). PI verbatim
+2026-05-07: "I often struggle to understand what we are doing with
+so many abbreviations and specific methods and slang. i need you to
+explain it to me in simple terms and for abbreviations always tell
+me what it is." This is a load-bearing communication rule, not a
+one-off ask.
+
 ---
 
 ## Applied

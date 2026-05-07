@@ -2,6 +2,62 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-07 PM (branch `claude/logistic-regression-ensemble-0PNkA`)
+
+- `tag: pathb-amp-dead-when-pool-already-routes-segmentation-variable`
+  (NEW; origin d18 + 3rd cross-confirmation across d18b 3 axes) —
+  Path-B `(Compound × Year)` τ-sweep on K=24 returned monotone-decay
+  to global, all τ at-or-below baseline (best τ=500k Δ -0.01 bp). The
+  K=24 pool already routes Year via `cb_year-cat`, so Path-B per-segment
+  LR-meta is redundant on Year-axis. d18b followed up with 3 alt axes
+  the K=24 pool does NOT natively route: `(Driver_cluster, Stint)` best
+  Δ +0.36 bp <gate; `(Race_class, TyreLife_q5)` Δ +0.01 bp NULL;
+  `(Position_q5, Compound)` Δ +0.00 bp NULL. **Mechanism:** Path-B
+  segmentation cross variable X fires amp only when no pool base
+  natively routes by X AND the residual cross-segment structure is
+  large at the meta-class. K=24 has cb_year-cat → Year dead. K=24
+  bases d16/v3/v4 carry Position continuously → Position×Compound
+  dead. K=24 has no Stint-native base → Compound×Stint fires (current
+  PRIMARY axis). **Strengthens** the prior friction
+  `path-b-amp-only-fires-on-meta-arch-not-base-add` from "meta-arch
+  redesign required" to "meta-arch redesign that introduces routing
+  the pool lacks AND captures non-trivial cross-segment structure
+  at meta-class." **Fix:** before any future Path-B alt-axis probe,
+  enumerate which pool bases natively route by the candidate axis.
+  If any base does → expect NULL. Predicting Path-B amp now requires
+  a base-routing audit, not just a segment-count check. Reconciliation
+  with Probe-5 LR-class +60.8 bp standalone lift on (Compound×Year):
+  same axis fires at LR-class (no Year-aware base in Probe-5 pool of
+  one mega LR) but is dead at meta-class (Year-aware base in K=24).
+
+- `tag: lr-eff-rank-bounded-at-2-by-pipeline-not-base-class` (origin
+  6-probe leverage sweep) — even with 5 LR variants spanning kbins +
+  ohe + dgp_rules + te_3way + mega FE, LR-bank effective-rank ceiling
+  is 2.0-2.19 (5 variants compress to ~2 directions). Adding LR pool
+  to K=24 GBDT pool yields combined eff_rank 3.33 — only +1.3
+  effective directions per LR-class (the LR class is ~1 direction at
+  the meta level, mostly captured already). Random-subspace bagging
+  REDUCES eff_rank to 1.67 (single dominant direction wins). LR-class
+  is structurally low-rank for s6e5; the diversity comes from the
+  GBDT-class first, FM-class second, LR-class is ~1 dim of net
+  signal. **Pre-flight rule:** LR-bank candidates that pursue
+  diversity-via-FE alone are bounded at +0.3-1 bp K=21+1 lift. To
+  break the LR ceiling, need (a) per-segment LR (Path-B style; +60 bp
+  standalone but dead at meta if pool routes the segmentation axis)
+  or (b) explicit non-linear lift via NN/FM/GBDT, not LR.
+
+- `tag: per-segment-mega-LR-fires-only-at-LR-class-not-meta-class`
+  (Probe-5 origin) — per-(Compound × Year) mega LR delivered +60.8
+  bp standalone over global mega (MEDIUM_2023 cell +1081 bp). Looks
+  like a load-bearing find. But same segmentation as Path-B-meta on
+  K=24 (d18) gave NULL (-2.05 to -0.01 bp). The +60 bp lift was
+  LR-vs-LR (no Year-aware base in 1-base pool); transferred to
+  meta-class on a Year-aware K=24 pool, lift collapses because
+  cb_year-cat already absorbs the cohort routing. **Generalisation:**
+  any "+X bp standalone lift" finding at LR-class transfers to
+  meta-class only if the pool lacks a base native to the segmentation
+  axis. Without that filter, LR-class probe lift is misleading.
+
 ## 2026-05-07 PM (branch `claude/read-handover-62BCt`)
 
 - `tag: recipe-gap-misdiagnosis-when-public-author-FE-not-fully-replicated`
