@@ -35,8 +35,16 @@ Question:
 "BOTE was right" actually means. Pre-commits you to either richer
 per-probe metadata or simpler-but-coarser dashboards.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** PI did not pick a stage. Pushed back on
+> the framing: predictions are intrinsically hard for novel things,
+> and OOF→backtest→live is "the typical [problem] in my work." Both
+> stages will always be there.
+>
+> PI moved the trust mechanism from outcome-rate to **decision
+> quality**. See [concepts/decision-quality-vs-outcome-quality.md](../concepts/decision-quality-vs-outcome-quality.md).
+> Re-drilled in [F1.6.1](./2026-05-06-grilling-round-6.md#f161) on
+> decision-time information capture (which is required regardless of
+> which stage you'd track).
 
 ---
 
@@ -67,8 +75,16 @@ the calibration only watches the PURSUE side of the matrix.
 half-blind. PI may legitimately accept the half-blind position — but
 should be conscious of it.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** Rejected the precision/recall framing.
+> Proposed alternative metric: **cumulative compute waste that, in
+> postmortem, was avoidable**. Self-flagged that this is hindsight-
+> biased. Landed on: **transparent decisions + a notion of "good
+> decision"** is the actual ask, not a success rate.
+>
+> Drilled into the decision-quality framing in
+> [`concepts/decision-quality-vs-outcome-quality.md`](../concepts/decision-quality-vs-outcome-quality.md).
+> Re-drilled in [F1.7.1](./2026-05-06-grilling-round-6.md#f171) on
+> rule extraction as a deliberate post-mortem step.
 
 ---
 
@@ -80,8 +96,10 @@ would you delete? F-2 today added empirical evidence Rule 19/BOTE
 itself was agent-drafted, so the question now has a concrete starting
 example.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** Deferred. PI plans to remove "many things"
+> from CLAUDE.md, will redo and check it, will monitor more closely
+> going forward. No structural pre-commitment. Closed for now; will
+> re-open empirically as PI's edits arrive.
 
 ---
 
