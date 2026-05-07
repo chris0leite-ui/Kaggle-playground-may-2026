@@ -171,6 +171,14 @@ def main():
     params["n_epochs"] = args.n_epochs
     params["batch_size"] = args.batch_size
 
+    # PyTorch threading: set ONCE at start (cannot change after parallel work starts)
+    import torch
+    torch.set_num_threads(2)
+    try:
+        torch.set_num_interop_threads(1)
+    except RuntimeError:
+        pass
+
     print(f"=== H1d full-recipe yekenot RealMLP ===")
     print(f"  params: n_ens={args.n_ens} n_epochs={args.n_epochs} batch={args.batch_size}")
     print(f"  budget: {args.time_budget_min:.0f} min  folds: {args.folds}")
@@ -247,11 +255,6 @@ def main():
 
         if fold == 0:
             print(f"  X_tr cols ({len(X_tr.columns)}): first 30 = {list(X_tr.columns)[:30]}")
-
-        # Cap n_threads via env (PyTabKit honors via PyTorch threading)
-        import torch
-        torch.set_num_threads(2)
-        torch.set_num_interop_threads(1)
 
         model = RealMLP_TD_Classifier(**params, device="cpu", n_threads=2)
         model.fit(X_tr, y_tr, X_val, y_val)
