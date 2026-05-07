@@ -35,12 +35,17 @@ parameters in CatBoost" Medium article.
 - Bernoulli is GPU/CPU symmetric (no `mvs_reg` strip needed). MVS
   is theoretically faster + more regularised but didn't pay off here.
 
-### 3. Column subsampling (rsm) was untested on s6e5
+### 3. Column subsampling (rsm) was untested on s6e5 — **CPU only**
 
 - All M3 / E1 / cb_lossguide / cb_slow-wide variants used default
   `rsm=1.0`. Adding `rsm=0.8` (~80% feature sample per tree) is a
   free regulariser — irrigation-water shipped this in their
   PRIMARY recipe.
+- **GPU restriction discovered 2026-05-07** (kernel v1 ERROR):
+  `rsm on GPU is supported for pairwise modes only`. With binary
+  Logloss CatBoost-GPU rejects `rsm`. CPU path keeps it; GPU path
+  drops it and relies on Bernoulli row-subsampling alone. Kernel v2
+  fixed in commit covering this audit.
 
 ### 4. min_data_in_leaf — irrigation's 2 is too aggressive at 350k rows
 

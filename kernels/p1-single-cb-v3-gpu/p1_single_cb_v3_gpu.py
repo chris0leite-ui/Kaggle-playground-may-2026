@@ -311,6 +311,10 @@ def feature_columns_for_lgbm(train_A):
 
 # === Recipe ===
 def cb_params(seed: int, max_iters: int, depth: int = 10) -> dict:
+    # NOTE: `rsm` (column subsampling) is **not supported on GPU** with
+    # binary Logloss — CatBoost only allows it for pairwise loss functions.
+    # We rely on Bernoulli row-subsampling alone for regularisation on
+    # the GPU path. CPU path can keep rsm=0.8.
     return dict(
         loss_function="Logloss",
         eval_metric="AUC",
@@ -321,7 +325,7 @@ def cb_params(seed: int, max_iters: int, depth: int = 10) -> dict:
         one_hot_max_size=10,
         bootstrap_type="Bernoulli",
         subsample=0.8,
-        rsm=0.8,
+        # rsm omitted (GPU restriction)
         min_data_in_leaf=20,
         od_type="Iter",
         od_wait=200,
@@ -329,7 +333,7 @@ def cb_params(seed: int, max_iters: int, depth: int = 10) -> dict:
         verbose=200,
         allow_writing_files=False,
         task_type="GPU",
-        devices="0:1",
+        devices="0",  # Kaggle P100 single GPU; works on T4×2 too
         border_count=254,
     )
 

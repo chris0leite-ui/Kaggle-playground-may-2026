@@ -136,10 +136,9 @@ def cb_params(use_gpu: bool, max_iters: int, seed: int, depth: int = 10) -> dict
         # correctly for binary class. Just set OHE threshold high enough
         # to one-hot Compound(5) + Year(4) + Stint(<=5).
         one_hot_max_size=10,
-        # row + column subsampling (Bernoulli is GPU/CPU symmetric)
+        # row subsampling (Bernoulli is GPU/CPU symmetric)
         bootstrap_type="Bernoulli",
         subsample=0.8,
-        rsm=0.8,
         # leaf regularization
         min_data_in_leaf=20,
         # ES
@@ -152,11 +151,16 @@ def cb_params(use_gpu: bool, max_iters: int, seed: int, depth: int = 10) -> dict
     )
     if use_gpu:
         p["task_type"] = "GPU"
-        p["devices"] = "0:1"
+        p["devices"] = "0"  # Kaggle gives P100 single-GPU on fallback
         p["border_count"] = 254  # docs: "set 254 for GPU max quality"
+        # NOTE: `rsm` (column subsampling) is GPU-restricted to pairwise
+        # losses. With binary Logloss it errors: "rsm on GPU is supported
+        # for pairwise modes only". GPU path relies on Bernoulli row-sub
+        # alone for regularisation.
     else:
         p["task_type"] = "CPU"
         p["thread_count"] = -1
+        p["rsm"] = 0.8  # CPU only: column subsampling
         # CPU default border_count=128 is fine.
     return p
 
