@@ -70,9 +70,13 @@ To close the −51 bp gap to top-5% (boundary 0.95405), ranked by EV/cost.
 | 6 | Pirelli tyre-curve scrape | 1-2 days | +10 to +30 bp | Same axis as #5 |
 | 7 | Per-Year specialists with v4 recipe | 30 min Kaggle GPU | ±5 bp | d12 found 2023 is easiest segment |
 | 8 | Cross-segmentation Path-B (Y×S, R×C) on K=23 v4+h1d | 20 min CPU | +0 to +3 bp | d14 falsified Y-axis without v4 |
+| **9** | **Path-B Compound × Year on K=24 (NEW; spec ready)** | **15 min CPU** | **+2 to +10 bp** | **Spec at `audit/2026-05-07-pathb-compound-year-probe-plan.md`. Motivated by LR-leverage Probe 5: per-Year LR specialists give +1081 bp on MEDIUM_2023, +865 on SOFT_2023, +725 on HARD_2023. Cohort-conditional DGP signal that Compound×Stint segmentation missed for 17 days. Path-B-amp-eligible (meta-arch redesign).** |
 
 Items 1-3 sum to ~+10-25 bp predicted; still below the 51 bp gap.
-Items 5-6 are the only single-mechanism path.
+Items 5-6 are the only single-mechanism path. **Item 9 is the highest-EV
+new probe to come out of the LR-leverage session and is fastest among
+non-external-data items at 15 min CPU; full spec + 6-Q + sealed-prediction
+template are in the audit doc.**
 
 ## 🔴 CRITICAL — held candidates INVALIDATED
 

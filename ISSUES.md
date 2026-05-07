@@ -353,6 +353,30 @@ falsified, parked, or killed.** Full audit
   auxiliary inv_laps head ineffective at meta gate vs single-task NN).
 - TE fold-leak audit on d2a/d3a (2026-05-06: CLEAN; no leakage; OOF
   discipline correct).
+- Path-B alternative segmentation crosses on K=24 (Day-18, branch
+  `claude/logistic-regression-ensemble-0PNkA`). Compound × Year
+  (d18) ALL τ ≤ baseline (-2.05 to -0.01 bp); 3 alt axes (d18b)
+  Driver_cluster × Stint best τ=100k +0.36 bp <gate, Race_class ×
+  TyreLife_q5 best +0.01 bp NULL, Position_q5 × Compound best +0.00
+  bp NULL. Friction `pathb-amp-dead-when-pool-already-routes-segmentation-variable`:
+  K=24 has cb_year-cat → Year axis dead; d16/v3/v4 carry Position
+  continuously → Position×Compound dead. The amp-eligible Path-B
+  axis on this pool is uniquely (Compound × Stint). HANDOVER A4
+  "alternative seg crosses" closed null. See
+  `audit/2026-05-07-d18-pathb-compound-year-result.md` and
+  `audit/2026-05-07-d18b-pathb-alt-axes-result.md`.
+- LR-bank diversity-via-FE alone is bounded (Day-17 PM, branch
+  `claude/logistic-regression-ensemble-0PNkA`). 15-variant LR bank
+  + 5 rich-FE variants, lr_mega ceiling OOF 0.92776; LR-bank
+  eff_rank 2.0-2.19; combined GBDT+LR pool eff_rank 3.33 (only
+  +1.3 directions per LR class). K=24 + mega LR sweep all NULL or
+  regress (-0.89 to -36.7 bp). Random subspace REDUCES diversity
+  to eff_rank 1.67. Friction `lr-eff-rank-bounded-at-2-by-pipeline-not-base-class`.
+  Per-segment mega LR (Probe-5) +60.8 bp standalone (Compound×Year)
+  but transfer to meta on K=24 = NULL — friction
+  `per-segment-mega-LR-fires-only-at-LR-class-not-meta-class`.
+  See `audit/2026-05-07-lr-leverage-six-probes.md` and
+  `audit/2026-05-07-simple-lr-playbook.md`.
 
 ---
 
