@@ -66,7 +66,7 @@ def load_pos(name):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--variant", choices=["k22_d18", "k23_d16_d18"],
+    ap.add_argument("--variant", choices=["k22_d18", "k23_d16_d18", "k28_full_dgp"],
                     required=True)
     args = ap.parse_args()
     t0 = time.time()
@@ -81,6 +81,12 @@ def main():
     elif args.variant == "k23_d16_d18":
         extras = ["d16_orig_continuous_only", "d18_chain_decomp"]
         outname = "d18_path_b_K23_d16_d18"
+    elif args.variant == "k28_full_dgp":
+        # K=21 + d16 + d18 + G + F2 + F5 + H + J (excludes I=mode_collapse, weakest |w|)
+        extras = ["d16_orig_continuous_only", "d18_chain_decomp",
+                  "d18_g_mode_id", "d18_f2_constraint", "d18_f5_class_cond_gmm",
+                  "d18_h_mode_lookup", "d18_j_cond_vector"]
+        outname = "d18_path_b_K28_full_dgp"
     pool_names = pool_names + extras
     print(f"variant={args.variant}  K={len(pool_names)} bases  "
           f"extras={extras}")
