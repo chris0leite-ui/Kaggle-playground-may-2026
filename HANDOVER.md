@@ -315,3 +315,36 @@ in next session.
 3. **Phase-5 re-test on full K=21**: cleanly disambiguate cohort-axis failure from missing-bases artifact.
 4. **Tune continuous_only LGBM**: feature subset is fixed; tune n_leaves, min_data, subsample on orig.
 5. **Multi-arch on continuous_only feature subset**: CatBoost / XGB with same 7 features (different from d15_orig_multi_arch which varied arch on full features).
+
+---
+
+## Day-17 AM autoencoder-synthetic-data-pEMB6 (status-only wrap)
+
+**No compute this session.** Session opened with a misgrounded clarifying
+question (proposed "Phase F" without first reading branch state); PI
+responded **"stop here. wrap up."** Inherited d17 Phase 0 + Phase A in flight
+from prior commit `1f442e8`. No LB submissions; no new OOF/ρ measurements.
+
+**Inherited artifacts staged in this wrap** (under `scripts/artifacts/`):
+- Phase 0 leakage cleanup: `d17_phase0_leakage_summary.json`,
+  `oof_d17_dr_weighted_orig_v2_strat.npy` + test pair.
+- Phase A K=22/K=23 stack-add OOF/test pairs (5 candidates, `_strat`):
+  `oof_d17_C1_K22_cont`, `oof_d17_C2_K23_cont_nolaptime`,
+  `oof_d17_C3_K23_cont_notyrerp`, `oof_d17_C4_K23_cont_catonly`,
+  `oof_d17_C5_K23_cont_invlaps_strict` (+ matching `test_*` files).
+
+**Phase B / Phase C unrun.** Scripts present and committed in `1f442e8`:
+- `scripts/d17_phase_b_extend.py` — multi-arch + N-sweep + physics
+  specialists + synth-restricted variants.
+- `scripts/d17_phase_c_meta_arch.py` — Path-B-amp meta-arch redesigns
+  (Student-t shrinkage, 3-level hierarchy, 75-seg Compound×Stint×r̂_q3).
+
+**Next agent:** read `1f442e8` commit message + the C1-C5 artifacts above,
+then either (a) gate the C-candidates with `probe_min_meta.py` to decide
+PRIMARY-advance vs HEDGE, or (b) execute Phase B / Phase C scripts.
+PRIMARY remains `d16_path_b_K22_continuous_only_tau20000` LB **0.95089**.
+
+**File-size flag:** HANDOVER.md is at 317 lines, over the 150-line cap in
+WRAPUP.md step 5. This bloat predates today's session; not archived here
+to avoid touching other branches' Day-N PM sections (Rule 15). Flag for
+the next merge-target scribe.
