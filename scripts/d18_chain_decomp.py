@@ -308,6 +308,8 @@ def main():
     ap.add_argument("--smoke", action="store_true", help="1 fold + tiny rounds")
     ap.add_argument("--n_synth_sample", type=int, default=0,
                     help="if >0, subsample synth-train/test for smoke")
+    ap.add_argument("--out_prefix", default="d18_chain_decomp",
+                    help="output filename prefix")
     args = ap.parse_args()
     t0 = time.time()
     smoke = args.smoke
@@ -379,7 +381,7 @@ def main():
                            pvalue=float(p)))
     ks.sort(key=lambda r: -r["ks_y0_vs_y1"])
     summary["class_conditional_ks"] = ks
-    (ART / "d18_chain_decomp_summary.json").write_text(json.dumps(summary, indent=2))
+    (ART / f"{args.out_prefix}_summary.json").write_text(json.dumps(summary, indent=2))
     print(f"  per-step KS y=0 vs y=1 (top 5): "
           f"{[(r['feature'], round(r['ks_y0_vs_y1'], 3)) for r in ks[:5]]}")
 
@@ -393,7 +395,7 @@ def main():
     te_X_raw = te_e[raw_cols].copy()
     y = tr_e[TARGET].astype(int).values
     oof_raw, test_raw = downstream_lgbm(tr_X_raw, y, te_X_raw, CAT_OK, smoke=smoke)
-    _save_oof_test("d18_chain_decomp_lgbm_only", oof_raw, test_raw)
+    _save_oof_test(f"{args.out_prefix}_lgbm_only", oof_raw, test_raw)
 
     # Variant B: raw + chain features (the candidate base)
     print(f"\n[downstream LGBM raw + chain features]")
@@ -402,13 +404,13 @@ def main():
     te_X = pd.concat([te_X_raw.reset_index(drop=True),
                       te_chain.reset_index(drop=True)], axis=1)
     oof, test = downstream_lgbm(tr_X, y, te_X, CAT_OK, smoke=smoke)
-    _save_oof_test("d18_chain_decomp", oof, test)
+    _save_oof_test(f"{args.out_prefix}", oof, test)
 
     summary["oof_auc_raw_only"] = float(roc_auc_score(y, oof_raw))
     summary["oof_auc_with_chain"] = float(roc_auc_score(y, oof))
     summary["delta_bp_chain_vs_raw"] = float(
         (summary["oof_auc_with_chain"] - summary["oof_auc_raw_only"]) * 1e4)
-    (ART / "d18_chain_decomp_summary.json").write_text(json.dumps(summary, indent=2))
+    (ART / f"{args.out_prefix}_summary.json").write_text(json.dumps(summary, indent=2))
 
     print(f"\n[done]  total wall: {time.time() - t0:.1f}s")
     print(f"  raw-only OOF AUC:    {summary['oof_auc_raw_only']:.5f}")
