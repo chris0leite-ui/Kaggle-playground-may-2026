@@ -32,8 +32,16 @@ fidelity (more often = less lost context) and noise (more often = more
 near-empty postmortems). It also determines whether the skill is
 something the agent runs autonomously or PI triggers manually.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** **Per Claude Code session** (start →
+> /exit). PI runs Claude Code in Anthropic cloud containers;
+> inter-session communication is git-only (GitHub/GitLab).
+>
+> Operational implication captured in
+> [`concepts/operational-environment.md`](../concepts/operational-environment.md):
+> the postmortem skill must produce a git-committable artifact
+> *before* /exit, predictions logged at decision-time (not at
+> session-end) to avoid post-hoc rationalisation. Replace-vs-augment
+> question opened in [F1.7.1.2](./2026-05-06-grilling-round-8.md#f1712).
 
 ---
 
@@ -64,8 +72,16 @@ is that we *would* make it again. If (c), the loop is fine but we
 should verify it actually fires at end-of-comp, before declaring it
 operational.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** Closest to (b), with a twist: *"most of
+> improvement ideas land in the friction part. There is maybe missing
+> clarity about what to communicate where. What to lock in which
+> file — the friction file or the improvements file — that needs
+> more clarity."*
+>
+> So it's a **role-clarity gap**, not absent distillation. Filed as
+> [friction entry](../friction/2026-05-06-friction-vs-improvements.md);
+> [flag F-3 updated](../flags/2026-05-06.md#f-3). Resolution drilled
+> in [F1.8.2](./2026-05-06-grilling-round-8.md#f182).
 
 ---
 
