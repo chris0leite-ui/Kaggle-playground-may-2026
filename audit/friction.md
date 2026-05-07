@@ -23,6 +23,23 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   are NOT. **Fix:** before declaring own-row FE saturated, run a
   cross-row aggregate probe over (Race, Year, LapNumber) groups.
 
+- `tag: cross-row-aggregates-survive-strict-fold-safe-audit`
+  — PI flagged probe 4 against Day-17 `target-construction-layer-
+  leakage`. Day-17 pattern: `df[df.PitNextLap==1].groupby(...).mean()`
+  uses LABEL → 491 bp inflation caught by 80/20 holdout. Probe 4
+  pattern: `df.groupby([R,Y,L]).PitStop.sum()` uses FEATURE column
+  (PitStop single-feat AUC 0.521 ≈ chance vs PitNextLap per U2). So
+  Rule 24 doesn't strictly apply, but the strict-fold-safe re-run is
+  the defensive audit pattern (`scripts/probe_field_state_strict.py`).
+  Result: F3-full +15.58 bp, F3-strict-per-fold +13.73 bp, F4-full
+  +16.66 bp, F4-strict-train-only +13.35 bp. **Strict retains 85% of
+  the lift** vs Day-17 collapse signature 88-100%. Verdict: fold-safe-
+  real. The residual ~2 bp loss under strict is "smaller source set
+  → noisier per-fold aggregate" not label leakage. **Fix promotion:**
+  always run strict-fold-safe variant on any group-aggregate FE before
+  treating standalone OOF lift as honest. Keep the F-strict number as
+  the calibration anchor; the F-full number is the upper bound.
+
 - `tag: field-state-mechanism-fires-on-train-only-too-no-combined-premium`
   — F3 (combined-frame field-state) = 0.94230, F4 (train-only) =
   0.94241. Combined-frame premium = -1.08 bp NEGATIVE. The mechanism

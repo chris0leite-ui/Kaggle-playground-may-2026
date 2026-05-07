@@ -125,6 +125,39 @@ recipe, retrain CB-v4-fs on Kaggle GPU; check standalone OOF; if v4-fs
 > v4 by ≥3 bp standalone, replace v4 with v4-fs in K=23 stack;
 otherwise add as 24th base. Either path is on the load-bearing axis.
 
+## Strict fold-safe re-run (2026-05-07 PM, post-PI flag)
+
+PI flagged: "isn't this a feature we tested already and discarded due to
+leakage?" — referring to Day-17 P1 v2 FS_A merge that inflated OOF by
+491 bp (caught by 80/20 holdout). The Day-17 pattern was
+`df[df.PitNextLap==1].groupby(...).mean()` (uses LABEL); probe 4 uses
+`df.groupby([R,Y,L]).PitStop.sum()` (uses PitStop, a feature column
+with single-feat AUC 0.521 ≈ chance vs target per U2). So strict Rule
+24 doesn't apply, but the strict-fold-safe re-run is the defensive
+audit pattern.
+
+`scripts/probe_field_state_strict.py` — for each CV fold, compute
+field-state aggregates from tr_fold rows ONLY (or tr_fold + test for
+combined variant), then merge into both tr and val rows.
+
+| Run | OOF AUC | Δ vs F2 raw | Δ vs full-train |
+|---|---:|---:|---:|
+| F2 raw 14 (baseline) | 0.94074 | — | — |
+| F3 full-train combined | 0.94230 | +15.58 bp | — |
+| **F3 strict per-fold combined** | **0.94211** | **+13.73 bp** | -1.87 bp |
+| F4 full-train tr-only | 0.94241 | +16.66 bp | — |
+| **F4 strict per-fold tr-only** | **0.94208** | **+13.35 bp** | -3.35 bp |
+
+**Verdict: FOLD-SAFE-REAL.** Strict retains 85% of the lift. Day-17
+target-reformulations collapsed 88-100% under the same audit; probe 4
+collapses 12-22%. The residual loss is consistent with "smaller source
+set → noisier per-fold aggregate" rather than label-leakage. Honest
+fold-safe estimate: **+13.35 to +13.73 bp** standalone OOF.
+
+This is the find of the day. PI's leakage skepticism was correct to
+demand the audit — and the audit cleared it. The structural axis
+(cross-row aggregates over OTHER rows' PitStop column) is real.
+
 ## Friction tags introduced
 
 - `cross-row-aggregates-fire-where-own-row-sequence-doesnt` — Probe 1
