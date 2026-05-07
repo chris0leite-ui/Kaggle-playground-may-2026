@@ -48,6 +48,7 @@ WORK.mkdir(parents=True, exist_ok=True)
 # v4 single-model max-effort
 WITH_ORIG_DATA = True       # item 7
 N_SEEDS = 1
+SEEDS_BAG = [42, 13, 71]    # used SEEDS_BAG[:N_SEEDS]
 MAX_ROUNDS = 2500
 SMOKE = False               # set True for 1-fold time-probe
 
