@@ -50,6 +50,18 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   Cost: <2h CPU answers pool-redundancy + interaction-hub +
   saturation-mechanism. Validated empirically on s6e5 across 3 arcs.
 
+- `tag: path-b-amp-requires-large-redundant-pool-not-saturated-pool`
+  — T1#3 Path-B with 3 alternative segmentations × 3 τ on K=10. ALL
+  9 within sub-bp of K=10 baseline (best S3 Driver_freq_q4 × Stint
+  τ=20k +0.27 bp); none reproduce d13e's +0.86 bp standalone (8× LB
+  amp on K=21). Refines old `path-b-amp-only-fires-on-meta-arch-not-
+  base-add`: Path-B's lift mechanism on K=21 was re-allocating weight
+  across segment-conditional sub-population structure of REDUNDANT
+  bases (eff_rank << pool size). On K=10 (eff_rank ≈ pool size),
+  there's no redundant weight to re-allocate. **Fix:** before any
+  meta-arch redesign probe, check pool eff_rank via E1; if eff_rank
+  ≈ pool size, segmentation Path-B is predicted null.
+
 ## 2026-05-07 PM (branch `claude/read-handover-62BCt`)
 
 - `tag: recipe-gap-misdiagnosis-when-public-author-FE-not-fully-replicated`
