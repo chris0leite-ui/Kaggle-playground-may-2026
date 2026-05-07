@@ -231,12 +231,12 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 17                           # 2026-05-07 AM. **PRIMARY UNCHANGED at LB 0.95059 (d15b_path_b_K22_dae_only_tau20000)**. Branch `claude/read-kaggle-handover-rsi2Q` ran P1 single-model thesis end-to-end (Rozen recipe replication). 7 probes / 4 LB submits / **P1 thesis CONCLUSIVELY FALSIFIED**. v1 OOF 0.94970 → LB 0.94107 (−863 bp gap from leaky stint-count cluster). v2 with FS_A merge fix OOF 0.95128 → holdout 0.94637 (FS_A target leak). v3 fold-safe FS_A: OOF **0.94563** (matches holdout, honest). Single-LGBM ceiling on this comp is ~0.946 OOF — 52 bp below PRIMARY OOF 0.95090. Stacking is necessary. Other branch landed `d16_path_b_K22_continuous_only_tau20000` LB 0.95089 (+30 bp; clean Path-B base-add candidate for Day-17+ PRIMARY-replace). 4 cross-comp lessons captured to skill: G16 fold-safe label-conditional aggregates, G17 transductive-features-need-AV-check, 80/20 holdout diagnostic, single-model-first / kitchen-sink FE before stacking. R20-R25 added to local CLAUDE.md.
+day: 17                           # 2026-05-07 PM. **🎯 NEW PRIMARY: LB 0.95149 (d18_path_b_K23_d16_d18_tau20000)** via branch `claude/reverse-engineer-data-generation-Hu8EK`. d18 chain-decomposition probe (per-step orig-DGP log-likelihood on causal chain) + d16 cont_only stacked into K=23 + Path-B Compound×Stint τ=20k. d18 standalone K=21+1 +7.365 bp (largest single-base advance of session). K=23 Path-B OOF 0.95184. Submission #33: LB 0.95149 (+6.0 bp over previous PRIMARY 0.95089, optimistic end of band). PI sealed prediction +3 bp; agent central +5 bp; realised +6 bp. Top-5% gap −19.6 bp (was −25.6 bp). 8 probes batch-run E1-E5: d18 v1/v2 chain-decomp variants, A0/A1 Path-B, E2 preimage kNN +1.88 bp, E5 chain_LL_q5 cohort REGRESS, E3/E4 deferred/parked.
 lb_best_today: 0.95435            # leader; not refreshed
-our_lb_best: 0.95059              # d15b_path_b_K22_dae_only_tau20000 (unchanged Day-16); gap to top-5% -2.86bp
-submissions_used_today: 4         # Day-17 AM: K22_add_p1_feA_te 0.94933, p1_single_v1 0.94107, K2_PRIM_v2 0.94996, (other branch) d16_continuous_only 0.95089
-submissions_used_total: 32
-saturation_count: 1               # Day-16 +1: K=22 rank-locked across all virgin base-add axes (5th cross-confirmation including α4 sequence)
+our_lb_best: 0.95149              # d18_path_b_K23_d16_d18_tau20000 (Day-17 PM NEW PRIMARY); gap to top-5% -19.6 bp
+submissions_used_today: 5         # Day-17: K22_add_p1_feA_te, p1_v1, K2_PRIM_v2, d16_cont_only, **d18_K23_d16_d18 LB 0.95149**
+submissions_used_total: 33
+saturation_count: 0               # reset on PRIMARY advance
 mechanism_families_explored:  # Q1 reference. Detail in audit/. Compressed 2026-05-06.
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -330,9 +330,13 @@ mechanism_families_explored:  # Q1 reference. Detail in audit/. Compressed 2026-
   - d16_transductive_pseudo_full   # Day-16 H9 ζ6 627k+pseudo half-weight; +0.631bp K=22 LR-meta but -0.30bp vs hier-meta; MARGINAL HEDGE
   - d16_gru_sequence_alpha4        # Day-16 H1 α4 GRU; ρ_test 0.919 most-diverse; -0.043bp NULL; 5th `lr-meta-rank-lock-strong-anchor` confirmation
   - p1_single_lgbm_kitchen_sink    # Day-17 P1 thesis FALSIFIED; v1 LB 0.94107 leaky; v3 fold-safe OOF 0.94563 honest; single-LGBM ceiling ~0.946 = -52bp from PRIMARY OOF (origin Rule R20/R24/R25)
-plateau_days: 1                   # Day-16 no advance: 4 NULL + 3 KILLED + 1 marginal H9. K=22 + Path-B-hier-meta architecture rank-saturated against EVERY base-add axis (per-row FE / calibration / α4 sequence / α5 two-stage / β rank loss / ε twin-pool / ε4 leaf-encoding / ε AV-weight / ζ6 transductive / η1 mask). Day-17 priority: META-ARCH REDESIGN (HANDOVER T4 — non-Gaussian shrinkage, nested hierarchy, Yao/Vehtari covariance-BMA, alt segmentation crosses). If T4 doesn't land: external second-source data (Ergast/FastF1) never tested; Pirelli scrape; structured pool-replace (drop 5 weakest GBDT clones + add 5 fresh diverse-architecture bases).
-gate_status: cleared              # d15b_path_b_K22_dae_only_tau20000 LB 0.95059 PRIMARY; d16_path_b_K22_continuous_only_tau20000 LB 0.95089 +3bp candidate-PRIMARY (Day-16, leakage-clean per Rule 24 audit)
-headroom_to_top5pct: 0.00256      # 0.95345 − 0.95089 = 25.6bp on d16 candidate-PRIMARY (vs 28.6bp on d15b PRIMARY)
+  - chain_decomposition_orig_likelihood  # Day-17 PM d18 v1 (causal+gauss): K=21+1 +7.365 bp (largest single-base of session); v2 (causal+q10) +1.43 bp (modeling-axis 5x); v3 reverse PARKED. Per-step orig-DGP log-likelihood on causal chain (Year→Race→Compound→Stint→LapNumber→TyreLife→RP→Position→LapTime→Delta→CumDeg→PosCh→PitStop). LANDED in K=23 PRIMARY LB 0.95149.
+  - dgp_preimage_join_knn          # Day-17 PM E2: kNN(K=10) per-Compound in orig over 7 KS-low feats; 7 aggregate features (preimage_y_mean/std/dist/ntl/match). Std OOF 0.94829, K=21+1 +1.88 bp at ρ=0.9944. PASS.
+  - dgp_chain_ll_q5_pathb_cohort   # Day-17 PM E5 c1: Path-B Compound×chain_LL_q5 cohort REGRESS -1.91 to -0.04 bp vs K=22 LR-meta. Friction `chain-ll-q5-cohort-weaker-than-compound-stint`. Disambiguates Phase-5 K=14-pool caveat.
+  - d18_path_b_K23_d16_d18_tau20000  # Day-17 PM 🎯 NEW PRIMARY LB 0.95149 (+6.0 bp). K=21+d16+d18 Path-B Compound×Stint τ=20k OOF 0.95184 (highest of session). Realised at optimistic end of band; PI sealed pred +3 bp, agent +5 bp, actual +6 bp.
+plateau_days: 0                   # Day-17 PM PRIMARY advance +6 bp via d18 chain-decomp + d16 cont_only stack. Next priorities: meta-arch redesign on K=23 (Student-t shrinkage / Yao-Vehtari Σ-BMA), E4 class-conditional chain (predict-batch optim), E3 CTGAN-replay on Kaggle GPU, v3 reverse-causal chain rerun, Pirelli external scrape.
+gate_status: cleared              # d18_path_b_K23_d16_d18_tau20000 LB 0.95149 NEW PRIMARY (Day-17 PM); +6 bp over d16 0.95089
+headroom_to_top5pct: 0.00196      # 0.95345 − 0.95149 = 19.6 bp on d18 K=23 PRIMARY
 ```
 
 ## Calibration ladder
@@ -367,8 +371,10 @@ OOF / closest precedent").
 | **d15b_lgbm_dae_only (DAE 768d → LGBM)** | 0.94007 | n/a | n/a | ρ_test 0.9477 (most-diverse since FM_A); min-meta +0.793bp |
 | **d15b_path_b_K22_dae_only_tau20000** | 0.95090 | n/a | **0.95059** | PRIMARY (Day-15); +1.0bp; flips 59/53; realised amp 1.4× |
 | d15c_extra_trees / d15d_knn_lgbm | 0.92967 / 0.94166 | n/a | n/a | min-meta +0.05-0.06bp; rank-lock at ρ≈0.996; R5 HEDGE only |
-| **d16_path_b_K22_continuous_only_tau20000** | n/a | n/a | **0.95089** | **CANDIDATE-PRIMARY (Day-16, +3.0bp)**; clean Path-B base-add (Rule 24 audit); supersedes d15b on advance |
+| **d16_path_b_K22_continuous_only_tau20000** | n/a | n/a | **0.95089** | OLD-PRIMARY (Day-16, +3.0bp); clean Path-B base-add; superseded by d18 K=23 |
 | target_reform_strict_oof_audit | n/a | n/a | n/a | Day-17 friction `target-construction-layer-leakage`: ALL invlaps/pit_horizon/reverse_cum collapse 88-100% under strict OOF |
+| d18_chain_decomp (v1 causal+gauss) | 0.94954 | 0.9914 | n/a | Day-17 PM K=21+1 **+7.365 bp** (largest single-base of session); per-step orig-DGP log-likelihood on causal chain |
+| **d18_path_b_K23_d16_d18_tau20000** | 0.95184 | 0.9923 | **0.95149** | **NEW PRIMARY (Day-17 PM, +6.0 bp)**; K=21+d16+d18 Path-B Compound×Stint τ=20k; PI sealed pred +3 bp, agent +5 bp, actual +6 bp |
 | p1_single_lgbm_v3_fold_safe | 0.94563 | n/a | n/a | Day-17 honest single-LGBM ceiling; -52bp from PRIMARY OOF; stacking justified |
 
 ## Hypothesis board (Day-17 AM)
