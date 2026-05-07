@@ -7,6 +7,21 @@ or required a human nag. See self-improvement.md for the full distillation proto
 
 ## Pending (not yet applied to skill files)
 
+### [ ] kickoff-runbook.md / day-1: simple-LR baseline as Day-1 ceiling probe
+
+`tag: lr-recipe-portable`. Day-1 of any new tabular comp, run the
+30-second LR baseline (`KBins(20, quantile, onehot)` on every numeric +
+`OneHot` on every cat → `LogisticRegression(C=1, solver='liblinear')`).
+On s6e5: AUC 0.92038 in 22 s, closing 88% of the GBDT-vs-`lr_raw` gap.
+Then run the mega LR (~8 min CPU, all FE families concatenated) — its
+gap to single-GBDT tells you if stacking is necessary (>100 bp gap →
+yes). Recipe + per-fold mechanics + mechanism map (LR vs GBDT vs NN
+FE preferences) at `examples/fe-recipe-simple-lr.md`. **Origin:** s6e5
+LR-bank experiment; `lr_kbins20_ohe` 0.92038 / `lr_mega` 0.92776 /
+GBDT pool 0.95385. Anti-patterns codified: tree-engineered FE *hurts*
+LR (Rozen FE: 0.857 vs raw+OHE 0.854 baseline); class_weight/L1/L2/
+C-sweep are AUC rank-no-ops (skip the variants).
+
 ### [ ] kickoff-runbook.md Q5b — data + task description (≤10 sentences)
 
 `tag: settled-once`. After Q5 EDA. (1) Each feature in domain terms,
