@@ -71,3 +71,5 @@ kernels/d18-f1-replay-forensics-gpu/output/
 scripts/artifacts/.*_announced
 scripts/artifacts/d18_seq_done.flag
 scripts/artifacts/d18_gate_hij_done.flag
+scripts/artifacts/d18_hij_gates_done.flag
+scripts/artifacts/d18_*_done.flag
