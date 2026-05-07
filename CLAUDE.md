@@ -231,11 +231,11 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 17                           # 2026-05-07 PM. **🎯 NEW PRIMARY: LB 0.95149 (d18_path_b_K23_d16_d18_tau20000)** via branch `claude/reverse-engineer-data-generation-Hu8EK`. d18 chain-decomposition probe (per-step orig-DGP log-likelihood on causal chain) + d16 cont_only stacked into K=23 + Path-B Compound×Stint τ=20k. d18 standalone K=21+1 +7.365 bp (largest single-base advance of session). K=23 Path-B OOF 0.95184. Submission #33: LB 0.95149 (+6.0 bp over previous PRIMARY 0.95089, optimistic end of band). PI sealed prediction +3 bp; agent central +5 bp; realised +6 bp. Top-5% gap −19.6 bp (was −25.6 bp). 8 probes batch-run E1-E5: d18 v1/v2 chain-decomp variants, A0/A1 Path-B, E2 preimage kNN +1.88 bp, E5 chain_LL_q5 cohort REGRESS, E3/E4 deferred/parked.
-lb_best_today: 0.95435            # leader; not refreshed
-our_lb_best: 0.95149              # d18_path_b_K23_d16_d18_tau20000 (Day-17 PM NEW PRIMARY); gap to top-5% -19.6 bp
-submissions_used_today: 5         # Day-17: K22_add_p1_feA_te, p1_v1, K2_PRIM_v2, d16_cont_only, **d18_K23_d16_d18 LB 0.95149**
-submissions_used_total: 33
+day: 17                           # 2026-05-07 PM-late. **🎯 NEW PRIMARY: LB 0.95368 (d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000)** via branch `claude/reverse-engineer-data-generation-Hu8EK`. K=27 = K=21 + v4 (CB yekenot pulled from main) + h1d (RealMLP yekenot pulled from main) + d16 + d18 + E2 + F2. Path-B Compound×Stint τ=100k OOF 0.95432. PI directive "combine main findings with our DGP-class" → solo-marginal probe over K=23 v4+h1d showed d16 +0.79 / E2 +0.42 / d18 +0.33 / F2 +0.25 add real (DAE NULLed +0.16, leak/d18b/Rozen/orig-transfer all <+0.1). K=27 Path-B τ=100k Δ vs main K=23 v4+h1d PRIMARY +1.7 bp OOF; ρ=0.999 borderline tie; flips 129/154 R7 OK. Submission #39: LB 0.95368 (+1.4 bp over previous PRIMARY 0.95354). PI band 0-2 bp; realised +1.4 bp dead-center. Top-5% gap −3.7 bp (was −5.1 bp; boundary 0.95405); leader 0.95476 (-10.8 bp). 14 probes this session in DGP-reverse-engineering arc (E1-E5 + F1-F6 + G/H/I/J/K).
+lb_best_today: 0.95476            # MILANFX leader (refreshed Day-17 PM-late)
+our_lb_best: 0.95368              # d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000 (Day-17 PM-late NEW PRIMARY); gap to top-5% -3.7 bp
+submissions_used_today: 8         # Day-17: K22_add_p1_feA_te, p1_v1, K2_PRIM_v2, d16_cont_only, d18_K23_d16_d18 LB 0.95149, d17_K22_v3 0.95143, d17_K24 0.95345, d17_K23_v4_h1d 0.95354, **d18_K27_v4h1d_d16_d18_e2_f2 LB 0.95368**
+submissions_used_total: 39
 saturation_count: 0               # reset on PRIMARY advance
 mechanism_families_explored:  # Q1 reference. Detail in audit/. Compressed 2026-05-06.
   - baseline_lgbm_raw_features
@@ -335,8 +335,8 @@ mechanism_families_explored:  # Q1 reference. Detail in audit/. Compressed 2026-
   - dgp_chain_ll_q5_pathb_cohort   # Day-17 PM E5 c1: Path-B Compound×chain_LL_q5 cohort REGRESS -1.91 to -0.04 bp vs K=22 LR-meta. Friction `chain-ll-q5-cohort-weaker-than-compound-stint`. Disambiguates Phase-5 K=14-pool caveat.
   - d18_path_b_K23_d16_d18_tau20000  # Day-17 PM 🎯 NEW PRIMARY LB 0.95149 (+6.0 bp). K=21+d16+d18 Path-B Compound×Stint τ=20k OOF 0.95184 (highest of session). Realised at optimistic end of band; PI sealed pred +3 bp, agent +5 bp, actual +6 bp.
 plateau_days: 0                   # Day-17 PM PRIMARY advance +6 bp via d18 chain-decomp + d16 cont_only stack. Next priorities: meta-arch redesign on K=23 (Student-t shrinkage / Yao-Vehtari Σ-BMA), E4 class-conditional chain (predict-batch optim), E3 CTGAN-replay on Kaggle GPU, v3 reverse-causal chain rerun, Pirelli external scrape.
-gate_status: cleared              # d18_path_b_K23_d16_d18_tau20000 LB 0.95149 NEW PRIMARY (Day-17 PM); +6 bp over d16 0.95089
-headroom_to_top5pct: 0.00196      # 0.95345 − 0.95149 = 19.6 bp on d18 K=23 PRIMARY
+gate_status: cleared              # d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000 LB 0.95368 NEW PRIMARY (Day-17 PM-late); +1.4 bp over main's K=23 v4+h1d 0.95354
+headroom_to_top5pct: 0.00037      # 0.95405 − 0.95368 = 3.7 bp on K=27 combined PRIMARY
 ```
 
 ## Calibration ladder
