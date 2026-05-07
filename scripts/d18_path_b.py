@@ -66,7 +66,9 @@ def load_pos(name):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--variant", choices=["k22_d18", "k23_d16_d18", "k28_full_dgp"],
+    ap.add_argument("--variant", choices=["k22_d18", "k23_d16_d18", "k28_full_dgp",
+                                          "k25_v4h1d_d16_e2", "k26_v4h1d_d16_d18_e2",
+                                          "k27_v4h1d_d16_d18_e2_f2"],
                     required=True)
     args = ap.parse_args()
     t0 = time.time()
@@ -87,6 +89,21 @@ def main():
                   "d18_g_mode_id", "d18_f2_constraint", "d18_f5_class_cond_gmm",
                   "d18_h_mode_lookup", "d18_j_cond_vector"]
         outname = "d18_path_b_K28_full_dgp"
+    elif args.variant == "k25_v4h1d_d16_e2":
+        # K=21 + v4 + h1d + d16 + E2 (top 2 solo marginals on K=23 v4+h1d)
+        extras = ["p1_single_cb_v4_gpu", "d17_h1d_yekenot_full",
+                  "d16_orig_continuous_only", "d18_e2_preimage_knn"]
+        outname = "d18_path_b_K25_v4h1d_d16_e2"
+    elif args.variant == "k26_v4h1d_d16_d18_e2":
+        extras = ["p1_single_cb_v4_gpu", "d17_h1d_yekenot_full",
+                  "d16_orig_continuous_only", "d18_chain_decomp",
+                  "d18_e2_preimage_knn"]
+        outname = "d18_path_b_K26_v4h1d_d16_d18_e2"
+    elif args.variant == "k27_v4h1d_d16_d18_e2_f2":
+        extras = ["p1_single_cb_v4_gpu", "d17_h1d_yekenot_full",
+                  "d16_orig_continuous_only", "d18_chain_decomp",
+                  "d18_e2_preimage_knn", "d18_f2_constraint"]
+        outname = "d18_path_b_K27_v4h1d_d16_d18_e2_f2"
     pool_names = pool_names + extras
     print(f"variant={args.variant}  K={len(pool_names)} bases  "
           f"extras={extras}")
