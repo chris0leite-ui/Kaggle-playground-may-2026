@@ -2,6 +2,65 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-07 PM (branch `claude/review-handover-solutions-oE78b`)
+
+- `tag: host-quote-trivial-refers-to-original-not-reconstructible`
+  — brief.md: "we intentionally remove `Normalized_TyreLife` which
+  makes the prediction trivial". Surface read suggests reconstructing
+  NTL from synth features should approach the trivial regime. FALSE.
+  Probe 3 (`scripts/probe_ntl_single_rule.py`) tested 5 NTL
+  reconstructions (within-stint max, within-(Compound,Year) max,
+  per-Compound p99) plus 13 threshold rules. Best single-feature OOF
+  AUC = 0.687 (R4 NTL_compound_year_max), **below raw TyreLife alone
+  at 0.699**. Threshold rules cap at 0.566. The "trivial" refers to
+  the unmasked original-column value (5.5% hard-join only). **Fix:**
+  before pricing a host-quote-driven hypothesis, sanity-check via
+  single-feature OOF on the reconstructed proxy. If it's below the
+  raw correlate, the proxy is corrupted past usefulness.
+
+- `tag: pitnextlap-target-cluster-decay-not-shift`
+  — Probe 2 (`scripts/probe_target_structure.py`) measured per-stint
+  target geometry. Findings: P(target=1 | lap_from_observed_stint_end)
+  decays monotonically 0.272 → 0.061 over 10 laps; multi-positive
+  stints have last positive at observed-last-lap 81% of the time;
+  65% of multi-positive stints have contiguous positives. BUT only
+  25% of positives align with ANY next-row state change (stint /
+  compound / tyrelife reset). Stint sz=4 has pos_max=4 — entire
+  stints can be all-positive. Target is therefore NOT a shifted
+  PitStop, NOT a deterministic stint-boundary indicator, and NOT a
+  windowed-shift; it's a noisy/synthetic decay-from-end signal with
+  cluster artifacts. Closes the "reverse-engineer-the-target" axis.
+
+- `tag: combined-frame-leadlag-premium-evaporates-at-gbdt`
+  — Probe 1 (`scripts/probe_combined_lead_lag.py`) tested whether
+  computing lead/lag features on train+test COMBINED (Rule 25 PASS via
+  AV-AUC 0.502) lifts a single LGBM. Single-feature L1 AUCs ALWAYS
+  gain +5 to +29 bp from combined-frame (lead_LapNumber_diff +29bp,
+  lead_TyreLife +9bp). At the LGBM level: L4 (raw + combined L/L) =
+  0.94096, L5 (raw + train-only L/L) = 0.94099. **L4-L5 = -0.36 bp**.
+  Combined-frame premium is NEGATIVE. Total lead/lag lift over raw =
+  +2-3 bp within fold_std 0.00058 noise. The GBDT extracts the
+  sequence-position signal from raw (TyreLife, Stint, LapNumber,
+  RaceProgress) interactions without explicit transductive lookup.
+  **Fix:** before pursuing combined-frame transductive features on a
+  GBDT pool, run the L1 single-feat AUC AND the L4-L5 control. The
+  L1 → L4 implication is unreliable: GBDT interactions may fully
+  absorb the combined-frame signal. Re-test only on a model class
+  with weak sequence-extraction (NN without positional encoding, FM
+  without field-aware sequence features).
+
+- `tag: pi-sealed-prediction-3for3-on-day17pm-diagnostic-axes`
+  — On a session offering "what's hiding in plain sight", PI
+  committed 0 bp for all 3 candidates before agent revealed BOTE.
+  All 3 returned 0 bp realised. Mechanism: agent's Day-17 PM thesis
+  ("missing-axis hypothesis after rank-lock saturation") generalised
+  too far — when 21+ bases × 16 days have hit a 0.95354 ceiling, the
+  remaining axes that look untried are mostly already-implicitly-
+  captured. PI's calibration on these axes is by now superior to
+  agent's. Skill `improvements.md` candidate: weight PI sealed
+  prediction by 1.5× when (a) agent thesis depends on "untried" claim
+  AND (b) ≥10 prior probes have hit the same ceiling.
+
 ## 2026-05-07 PM (branch `claude/read-handover-62BCt`)
 
 - `tag: recipe-gap-misdiagnosis-when-public-author-FE-not-fully-replicated`
