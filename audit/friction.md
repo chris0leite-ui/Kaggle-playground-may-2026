@@ -2,6 +2,137 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-07 PM (branch `claude/review-handover-solutions-oE78b`)
+
+- `tag: cross-row-aggregates-fire-where-own-row-sequence-doesnt`
+  — Probe 4 (`scripts/probe_field_state.py`) added field-state
+  aggregates per (Race, Year, LapNumber) and per (Race, Year,
+  LapNumber, Compound) computed from train+test combined: n_drivers
+  pitting at this lap, cumulative pit count in race, mean/std
+  TyreLife across active field, etc. PitStop is feature column not
+  label (Rule 25 PASS, AV-AUC=0.502). **Standalone single-LGBM OOF
+  lift over raw 14 features = +15.58 bp** (F3 0.94230 vs F2 0.94074).
+  `fs_cum_pits` single-feature AUC = **0.7972 — highest single-feat
+  on this comp** (raw TyreLife alone 0.6989). After 17 days and 21+
+  bases, no FE recipe in pool computed cross-row pit-state aggregates.
+  GBDT cannot reconstruct group-aggregate values from a single row's
+  features — this is the structural axis Probe 1 (own-row lead/lag)
+  attacked on the wrong side. Distinct from `combined-frame-leadlag-
+  premium-evaporates-at-gbdt`: own-row sequence shifts are absorbed
+  by GBDT interactions; cross-row aggregates of OTHER rows' columns
+  are NOT. **Fix:** before declaring own-row FE saturated, run a
+  cross-row aggregate probe over (Race, Year, LapNumber) groups.
+
+- `tag: lr-meta-rank-lock-strong-anchor` (6th cross-confirmation)
+  — Field-state-LGBM stack-add at K=24 (K=21 + v4 + h1d + field-state)
+  vs K=23 baseline (K=21 + v4 + h1d): Δ = -0.015 bp NULL. Per-cand
+  |w|: v4 0.5365 / h1d 0.4779 / field-state 0.0807. Standalone +13.35
+  bp lift evaporates despite ρ-decoupled features (cross-row aggregates
+  GBDT can't reconstruct from single rows). Mechanism: v4's yekenot
+  recipe (Race×Compound×LapNumber + KBins(RaceProgress,200)) + h1d's
+  CV TE on those keys absorb the per-(Race,Year,LapNumber) field-state
+  signal indirectly via interactions; the 24th base's predictions
+  correlate too tightly with v4+h1d joint output for LR rank space.
+  **Generalises to:** even ρ-decoupled-AT-FEATURE-LEVEL bases get
+  rank-locked at meta IF the strong anchor (v4+h1d) ALREADY encodes
+  the same (Race × Compound × LapNumber) interaction structure.
+  **Fix-by-design:** integrate orthogonal-feature signals INTO the
+  strong anchor by retraining (CB-v4-fs), not as a separate stacked
+  base. Bypasses rank-lock by changing the anchor, not stacking on top.
+
+- `tag: cross-row-aggregates-survive-strict-fold-safe-audit`
+  — PI flagged probe 4 against Day-17 `target-construction-layer-
+  leakage`. Day-17 pattern: `df[df.PitNextLap==1].groupby(...).mean()`
+  uses LABEL → 491 bp inflation caught by 80/20 holdout. Probe 4
+  pattern: `df.groupby([R,Y,L]).PitStop.sum()` uses FEATURE column
+  (PitStop single-feat AUC 0.521 ≈ chance vs PitNextLap per U2). So
+  Rule 24 doesn't strictly apply, but the strict-fold-safe re-run is
+  the defensive audit pattern (`scripts/probe_field_state_strict.py`).
+  Result: F3-full +15.58 bp, F3-strict-per-fold +13.73 bp, F4-full
+  +16.66 bp, F4-strict-train-only +13.35 bp. **Strict retains 85% of
+  the lift** vs Day-17 collapse signature 88-100%. Verdict: fold-safe-
+  real. The residual ~2 bp loss under strict is "smaller source set
+  → noisier per-fold aggregate" not label leakage. **Fix promotion:**
+  always run strict-fold-safe variant on any group-aggregate FE before
+  treating standalone OOF lift as honest. Keep the F-strict number as
+  the calibration anchor; the F-full number is the upper bound.
+
+- `tag: field-state-mechanism-fires-on-train-only-too-no-combined-premium`
+  — F3 (combined-frame field-state) = 0.94230, F4 (train-only) =
+  0.94241. Combined-frame premium = -1.08 bp NEGATIVE. The mechanism
+  is the field-state aggregate itself, not the train+test combination.
+  Per-(R, Y, L) groups are large (~50 rows/cell on average) so
+  train-only stats are already stable; combined adds little. The
+  combined-frame transductive benefit identified by Rule 25 only fires
+  when group cells are SPARSE in train — for race-lap aggregates with
+  20-30 drivers per cell, train-only is sufficient.
+
+- `tag: family-prior-single-base-fe-addition-mis-calibrated-for-cross-row`
+  — FAMILY_PRIORS["single_base_fe_addition"] in `scripts/probe.py` is
+  (p=0.05, band [0, 0.5, 2.0]) calibrated on 4-of-4 row-feature
+  NULLs (M5g, M5h, etc.). Cross-row aggregate features are a separate
+  class with much fatter tails — Probe 4 hit +15.58 bp OOF, 30× the
+  optimistic band. **Fix:** when next BOTE on a cross-row-aggregate
+  candidate fires, use a new family `single_base_cross_row_aggregate`
+  with p=0.30 (1, 5, 15) bp until calibration data accumulates.
+
+- `tag: host-quote-trivial-refers-to-original-not-reconstructible`
+  — brief.md: "we intentionally remove `Normalized_TyreLife` which
+  makes the prediction trivial". Surface read suggests reconstructing
+  NTL from synth features should approach the trivial regime. FALSE.
+  Probe 3 (`scripts/probe_ntl_single_rule.py`) tested 5 NTL
+  reconstructions (within-stint max, within-(Compound,Year) max,
+  per-Compound p99) plus 13 threshold rules. Best single-feature OOF
+  AUC = 0.687 (R4 NTL_compound_year_max), **below raw TyreLife alone
+  at 0.699**. Threshold rules cap at 0.566. The "trivial" refers to
+  the unmasked original-column value (5.5% hard-join only). **Fix:**
+  before pricing a host-quote-driven hypothesis, sanity-check via
+  single-feature OOF on the reconstructed proxy. If it's below the
+  raw correlate, the proxy is corrupted past usefulness.
+
+- `tag: pitnextlap-target-cluster-decay-not-shift`
+  — Probe 2 (`scripts/probe_target_structure.py`) measured per-stint
+  target geometry. Findings: P(target=1 | lap_from_observed_stint_end)
+  decays monotonically 0.272 → 0.061 over 10 laps; multi-positive
+  stints have last positive at observed-last-lap 81% of the time;
+  65% of multi-positive stints have contiguous positives. BUT only
+  25% of positives align with ANY next-row state change (stint /
+  compound / tyrelife reset). Stint sz=4 has pos_max=4 — entire
+  stints can be all-positive. Target is therefore NOT a shifted
+  PitStop, NOT a deterministic stint-boundary indicator, and NOT a
+  windowed-shift; it's a noisy/synthetic decay-from-end signal with
+  cluster artifacts. Closes the "reverse-engineer-the-target" axis.
+
+- `tag: combined-frame-leadlag-premium-evaporates-at-gbdt`
+  — Probe 1 (`scripts/probe_combined_lead_lag.py`) tested whether
+  computing lead/lag features on train+test COMBINED (Rule 25 PASS via
+  AV-AUC 0.502) lifts a single LGBM. Single-feature L1 AUCs ALWAYS
+  gain +5 to +29 bp from combined-frame (lead_LapNumber_diff +29bp,
+  lead_TyreLife +9bp). At the LGBM level: L4 (raw + combined L/L) =
+  0.94096, L5 (raw + train-only L/L) = 0.94099. **L4-L5 = -0.36 bp**.
+  Combined-frame premium is NEGATIVE. Total lead/lag lift over raw =
+  +2-3 bp within fold_std 0.00058 noise. The GBDT extracts the
+  sequence-position signal from raw (TyreLife, Stint, LapNumber,
+  RaceProgress) interactions without explicit transductive lookup.
+  **Fix:** before pursuing combined-frame transductive features on a
+  GBDT pool, run the L1 single-feat AUC AND the L4-L5 control. The
+  L1 → L4 implication is unreliable: GBDT interactions may fully
+  absorb the combined-frame signal. Re-test only on a model class
+  with weak sequence-extraction (NN without positional encoding, FM
+  without field-aware sequence features).
+
+- `tag: pi-sealed-prediction-3for3-on-day17pm-diagnostic-axes`
+  — On a session offering "what's hiding in plain sight", PI
+  committed 0 bp for all 3 candidates before agent revealed BOTE.
+  All 3 returned 0 bp realised. Mechanism: agent's Day-17 PM thesis
+  ("missing-axis hypothesis after rank-lock saturation") generalised
+  too far — when 21+ bases × 16 days have hit a 0.95354 ceiling, the
+  remaining axes that look untried are mostly already-implicitly-
+  captured. PI's calibration on these axes is by now superior to
+  agent's. Skill `improvements.md` candidate: weight PI sealed
+  prediction by 1.5× when (a) agent thesis depends on "untried" claim
+  AND (b) ≥10 prior probes have hit the same ceiling.
+
 ## 2026-05-07 PM (branch `claude/read-handover-62BCt`)
 
 - `tag: recipe-gap-misdiagnosis-when-public-author-FE-not-fully-replicated`
