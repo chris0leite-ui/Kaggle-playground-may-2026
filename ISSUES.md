@@ -209,7 +209,12 @@ Top 3 hypotheses launched in parallel. Audit at
   `[owner: read-handover-62BCt | status: wip]`
 - **9c.** H3 — ID-shift / row-position structural probe (s5e12 2nd-place
   precedent). AV-AUC at id_mod_N + sparse-LR base. Cost 20-40 min CPU.
-  PI-pred 0 bp; agent expected +0.6 bp. `[owner: read-handover-62BCt | status: wip]`
+  PI-pred 0 bp; agent expected +0.6 bp. `[owner: read-handover-62BCt | status: null]`
+  Result (245s): id_div_N AV-AUC ≈ 1.0 (train ids 0..439139, test 439140..627304,
+  zero overlap = labeling convention NOT distribution shift). Sparse-LR base on
+  4 high-AV id-div features OOF 0.50039 (chance). PI prediction 0 bp confirmed.
+  Audit `audit/2026-05-07-d17-h3-id-shift.md`. New friction-tag candidate
+  `synthetic-id-range-disjoint-but-decorrelated-from-target`.
 
 ## 8. Virgin axes complement to HANDOVER T1–T4 (Day-16 RESOLVED)
 
