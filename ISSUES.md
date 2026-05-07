@@ -178,6 +178,17 @@ prediction signal. 5 phases × 19 probes. CPU-only. 0 submits. Audit at
   New friction `path-b-on-pool-subset-conflates-cohort-axis-with-pool-size`.
   Re-test on full K=21 pool TODO.
   `[owner: autoencoder-synthetic-data-pEMB6 | status: null]`
+- **7f.** Iterative chain-decomposition of P(X) on orig (E1, foundation
+  probe). Domain-causal ordering Year → Race → Driver → Compound →
+  Stint → LapNumber → TyreLife → Position → LapTime,Delta,CumDeg →
+  RaceProgress, Position_Change. One small LGBM per step on orig
+  modelling P(X_k | X_{<k}). For each synth row compute per-step
+  log-likelihood + per-step residual z-score → ~24 features. Stack
+  as a candidate base (LGBM head on the 24 features + raw 14 features)
+  AND keep diagnostic CSV (per-row corruption profile reusable for
+  future probes). Mechanism: synthesizer's joint corruption shows up
+  as which step's likelihood drops; diagnostic for E2/E3/E4.
+  `[owner: reverse-engineer-data-generation-Hu8EK | status: wip]`
 
 ## 8. Virgin axes complement to HANDOVER T1–T4 (Day-16 RESOLVED)
 
