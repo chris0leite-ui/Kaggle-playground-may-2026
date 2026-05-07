@@ -25,8 +25,22 @@ evidence we have on whether the focus-setting rules work autonomously.
 The detail of what BOTE *said* (vs. what PI *did*) determines whether
 the rules need fixing or are simply being skipped.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** "BOTE was not established yet." → therefore
+> not blameworthy that BOTE didn't run.
+>
+> **Verification (Claude, 2026-05-06).** Confirmed via git log:
+> TabPFN fold-0 smoke completed at 08:11 UTC (`c54a4a4`); BOTE/probe.py
+> created at 09:57 UTC (`1e96c59`); Rule 19 added to CLAUDE.md at
+> 10:26 UTC (`e48820d`, merged from agent branch
+> `claude/ml-handover-alignment-xvUN0`).
+>
+> But: **Rule 2 was active** during TabPFN. Kernel iterated v7
+> (`N_FOLDS=1`), v8 (`SMOKE_FOLD0_ONLY`), v9 ("Rule 2 compliance").
+> So TabPFN was killed by **Rule 2 + PI override**, not by missing
+> BOTE. F1.2's framing implicitly credited BOTE; correction filed
+> as [flag F-1](../flags/2026-05-06.md#f-1--tabpfn-hypothesis-board-credits-framework-mechanism-was-pi-override--rule-2).
+> Authorship finding ([F-2](../flags/2026-05-06.md#f-2--standing-watch-rule-19bote-itself-was-agent-authored)):
+> Rule 19/BOTE itself was agent-authored.
 
 ---
 
@@ -52,8 +66,16 @@ Three plausible verification strategies:
 point to). Also determines what counts as an "incident" worth filing —
 is one bad BOTE verdict an incident, or only a pattern of bad ones?
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** **Aggregate metrics — calibration of
+> BOTE estimates / predictions / decisions.** PI explicitly accepts
+> this will be slow: trust must be earned over a track record.
+>
+> **Claude pushback.** "Calibration" is the right shape but
+> underspecified. Two stages exist (BOTE→OOF, OOF→LB) and the latter
+> is currently massively miscalibrated — see [synthesis](../thoughts/2026-05-06-bote-fresh-and-calibration-as-trust.md).
+> Plus: PI's plan covers PURSUE-precision but not SKIP-recall.
+> Drilled in [F1.6](./2026-05-06-grilling-round-5.md#f16) and
+> [F1.7](./2026-05-06-grilling-round-5.md#f17).
 
 ---
 
