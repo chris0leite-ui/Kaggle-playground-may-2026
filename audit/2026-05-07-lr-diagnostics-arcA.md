@@ -80,13 +80,42 @@ follow-up: global LR with Compound+Driver dummies, per-cell evaluation.
 only features. A pure-LR base on raw numerics is capped ~0.86 cell-AUC.
 Sets a **floor for new-base diversity tests** (A2/A3/A4 from the plan).
 
-## E8 — class_weight × C × penalty grid (LR-meta)
+## E8 — class_weight × C × penalty × input grid (LR-meta)
 
-[pending; 24 grid points × 5-fold]
+Pruned to 20 fits (l2 lbfgs, 2 input modes × 2 cw × 5 C); original
+saga+l1+tiny-C corner ran 1h+ before kill, salvaged 2 datapoints.
+
+| Input mode | Δ bp range | min ρ vs anchor |
+|---|---:|---:|
+| **full (P + rank + logit, 72d)** | [−0.03, +0.08] | 0.9996 |
+| **logit-only (24d)** | [−0.93, −0.87] | 0.9986 |
+| salvaged L1 saga (C ∈ {0.01, 0.1}) | {−0.59, +0.08} | 0.9989 |
+
+Anchor AUC 0.953845 = max of all 20 points within 0.08 bp.
+
+**Three load-bearing findings:**
+
+1. **Class-weight × C × L1/L2 are rank-no-op for binary-AUC LR-meta.**
+   The 12th-place s6e4 "three axes must all be true" recipe applies to
+   multinomial balanced-accuracy, NOT to binary AUC. Friction tag
+   candidate: `s6e4-recipe-3-axes-do-not-transfer-binary-auc`.
+2. **Logits-only is uniformly ~0.9 bp worse.** Dropping rank+P
+   features removes real signal. The probability and rank
+   transformations of the same OOF column carry distinct
+   meta-information.
+3. **Production config (full input, cw=None, C=1.0) is at ceiling**
+   to within sub-bp. We are not leaving signal on the table from
+   meta hyperparameters.
 
 ## Synthesis (Arc A)
 
-**Three findings, three durable lessons:**
+**Four findings, four durable lessons:**
+
+0. **Meta hyperparameter surface is flat — production is at ceiling**
+   (E8). Class-weight × C × L1/L2 are rank-no-op for binary AUC. The
+   s6e4 "three axes" recipe is metric-specific (balanced accuracy);
+   does not transfer to AUC. Tweaking the LR-meta cannot break
+   saturation. Logits-only input is −0.9 bp worse than P+rank+logit.
 
 1. **Pool redundancy is the root cause of K=22+ saturation** (E1).
    Eff_rank ≈3 of 24. Pool surgery candidate identified (E2):
