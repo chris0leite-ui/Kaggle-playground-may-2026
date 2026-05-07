@@ -238,3 +238,77 @@ web-search top finisher writeups for synthetic-tabular Playground.
 - `scripts/d15{a,b,c,d}_*.py` — branch implementations
 - `kernels/d15b-dae-gpu/` — Kaggle GPU kernel (v2 with sm_60 fix)
 - `submissions/submission_d15b_path_b_K22_dae_only_tau20000.csv` — submitted artifact
+
+---
+
+## Day-16 PM autoencoder-synthetic-data-pEMB6 (overnight gauge-p-synth sweep)
+
+**Headline.** **`d16_path_b_K22_continuous_only_tau20000` OOF 0.95121** =
+HIGHEST OOF EVER (+3.10bp vs current PRIMARY 0.95090). Standalone base
+`d16_orig_continuous_only` K=21+1 +3.331bp = LARGEST single-base K=21+1 of
+session (beats inv_laps +1.90 by 1.75×). At realised amp 1.4× per
+`path-b-amp-only-fires-on-meta-arch-not-base-add`, **predicted LB ~0.95103**,
+closing top-5% gap from -28.6→-24bp.
+
+**Mechanism.** Selective feature-restriction transfer. Orig-trained LGBM on
+the 7 features the synthesizer left marginal-aligned (TyreLife KS=0.017,
+Position 0.019, LapTime 0.056, LapTime_Delta 0.179, Cumulative_Degradation
+0.071, RaceProgress 0.186, LapNumber 0.188). Phase-1 KS-divergence diagnostic
+*literally* guided the choice. ρ vs PRIMARY 0.9946 — most-diverse positive
+single base since d15_orig_transfer (0.5653).
+
+**Sweep done overnight** (5 phases × 19 probes; CPU-only; 0 submits per
+Rule 1; 12h wall):
+  - **Phase 1 ✅** SDV overall 0.803; class-conditional structure SHARPER
+    in synth than orig (synth Stint y0-vs-y1 KS 0.43 vs orig 0.24).
+  - **Phase 2 v2 ✅** Density ratio r̂(x) (Driver/Race excluded after v1
+    AUC 0.9985 from ghost-Driver tells). r̂ as feature NULL; as sample
+    weight +0.78bp; as cohort router +1.32bp. New friction
+    `density-ratio-routes-or-weights-but-fails-as-feature`.
+  - **Phase 3 ✅** GMM 16-comp single-feat: ρ=0.503 (most-diverse single
+    base ever) but K=2 NULL — 4th confirmation of `rho-alone-insufficient-for-meta-utility`.
+    BGMM at reg_covar=1.0 oversmoothed (AUC 0.55 near-random) — new friction
+    `bgmm-default-oversmooths-at-reg-covar-1`.
+  - **Phase 4 v2 ✅ KEY WIN** Orig-transfer feature-subset variants. All
+    4 PASS K=21+1; continuous_only +3.33, no_laptime +1.87, no_tyrelife_rp
+    +0.86, dr_split +1.32. New friction
+    `feature-subset-orig-transfer-passes-where-arch-bag-fails`.
+  - **Phase 5 null+caveat** All 6 ran r̂_q5/logp_q5 cohort axes regress
+    -3 to -4bp. CAVEAT: ran on K=14 sub-pool (only 14/21 named bases
+    matched filenames). New friction
+    `path-b-on-pool-subset-conflates-cohort-axis-with-pool-size`.
+  - **Phase 6 ✅** K=21+1 individual gates + K=21+7 panel (+5.94bp;
+    continuous_only |w|=1.48 dominates) + K=22 Path B Compound×Stint
+    sweep with continuous_only as 22nd base.
+
+**Submission decision pending PI**:
+  - τ=20k variant: OOF 0.95121, ρ=0.995, **468 flips top-1% > R7 200-cap →
+    needs PI sign-off**. Predicted LB ~0.95103 at 1.4× amp.
+  - τ=100k variant: OOF 0.95118, ρ=0.997, 278 flips → **HEDGE-eligible
+    without PI sign-off**.
+  - Submission CSVs ready: `submissions/submission_d16_path_b_K22_continuous_only_tau20000.csv`
+    (built from `test_d16_path_b_K22_continuous_only_tau20000_strat.npy[:,1]`).
+
+**Cross-branch awareness**: claude/ml-handover-alignment-xvUN0 has held
+candidate `path_b_K22_invlaps τ=20k` OOF 0.95110. d16's continuous_only
+variant lifts another +1.10bp OOF over inv_laps and is mechanistically
+distinct (selective feature-restriction transfer vs target reformulation).
+Independent mechanism families — should consider K=23 stack-add of both
+in next session.
+
+**Pointers added today**:
+- `audit/2026-05-07-overnight-gauge-p-synth.md` — full overnight sweep audit (synthesis section finalized)
+- `audit/friction.md` — 5 new friction tags from this branch
+- `ISSUES.md` § 7 — umbrella `gauge-p-synth-overnight` with 5 sub-leaves (4 done, 1 null)
+- `scripts/d16_gauge_phase{1,2_v2,3_likelihood,3b_bgmm_fix,4_v2,5_pathb,6_wrapup}.py`
+- `scripts/d16_path_b_K22_continuous_only.py` — submission candidate generator
+- `submissions/submission_d16_path_b_K22_continuous_only_tau20000.csv` — submission CSV (NOT submitted; Rule 1)
+- 16+ d16 OOF/test pairs in `scripts/artifacts/oof_d16_*` and `test_d16_*`
+- `scripts/artifacts/d16_phase{1..5}_summary.json` + `d16_overnight_consolidated.json`
+
+**Next-session priorities (handover):**
+1. **PI submission decision**: τ=100k (HEDGE-safe) vs τ=20k (PI sign-off); predicted LB +4-5bp lift.
+2. **K=23 stack-add**: K=21 + d16_orig_continuous_only + path_b_K22_invlaps (cross-branch). Both PASS independently; orthogonal mechanisms; predict additive ~+4-5bp K=23 OOF.
+3. **Phase-5 re-test on full K=21**: cleanly disambiguate cohort-axis failure from missing-bases artifact.
+4. **Tune continuous_only LGBM**: feature subset is fixed; tune n_leaves, min_data, subsample on orig.
+5. **Multi-arch on continuous_only feature subset**: CatBoost / XGB with same 7 features (different from d15_orig_multi_arch which varied arch on full features).

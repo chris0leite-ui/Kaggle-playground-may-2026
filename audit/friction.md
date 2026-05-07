@@ -2,6 +2,64 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-07
+
+- `tag: feature-subset-orig-transfer-passes-where-arch-bag-fails` —
+  d16 Phase 4: 4 variants of orig-trained LGBM on different feature
+  subsets. K=21+1 gates: continuous_only +3.33bp (LARGEST single-base
+  K=21+1 of session, beating inv_laps +1.90 by 1.75×), no_laptime
+  +1.87, no_tyrelife_rp +0.86, categorical_only PASS via meta-stack.
+  Mechanism: orig-LGBM restricted to features the synthesizer left
+  marginal-aligned (TyreLife KS=0.017, Position KS=0.019, Position_Change
+  KS=0.015) generalises to synth far better than full-feature orig
+  (which uses heavily-corrupted LapNumber KS=0.188, Stint KS=0.175,
+  RaceProgress KS=0.186). **Refines** `external-data-arch-bag-redundant-when-shared-training-data`:
+  arch variation IS redundant; FEATURE-SUBSET variation is NOT, because
+  each subset emphasises a different region of the orig DGP. Pre-flight
+  for new orig-data probes: vary FEATURES, not architecture. Phase-1
+  KS-divergence diagnostic literally guided the discovery: the marginal-
+  aligned features the synth preserved are the lever for transfer.
+
+- `tag: density-ratio-routes-or-weights-but-fails-as-feature` — d16
+  Phase 2: r̂(x)=p_synth/p_orig used three ways. As single feature K=21+1
+  NULL (-0.07 bp). As sample weight in mixed-source training (P2.3)
+  K=21+1 +0.78 bp PASS. As cohort router for segment-calibrated orig
+  (P2.4) K=21+1 +1.32 bp PASS. **Lesson**: density ratio carries
+  across-distribution information but it's not pointwise predictive;
+  the productive uses are (a) re-weighting and (b) routing. CRITICAL
+  prerequisite: exclude high-cardinality cats (Driver, Race) from the
+  classifier. v1 with Driver included hit AUC 0.9985 from 856 ghost-
+  Driver tells; r̂(x) saturated at clip ceiling and was useless.
+
+- `tag: rho-alone-insufficient-for-meta-utility` — 4th independent
+  confirmation. d16 Phase 3 GMM single-feat: ρ vs PRIMARY 0.503 (most-
+  diverse single base ever measured, beating d9f FM_A 0.487 and
+  d15_orig_transfer 0.5653) but K=2 gate -0.10 bp NULL. Joins
+  nn_embeddings (ρ=0.918 NULL), year_stint_sparse_lr (ρ=0.844 NULL),
+  stint_progress (ρ=0.252 NULL). The K=21 LR-meta with [raw,rank,logit]
+  expand absorbs high-diversity-low-information bases as convex combos.
+  Already codified in `scripts/probe.py FAMILY_PRIORS`; this just adds
+  a fourth instance.
+
+- `tag: bgmm-default-oversmooths-at-reg-covar-1` — sklearn
+  BayesianGaussianMixture with reg_covar=1.0 (set after v1 crashed at
+  reg_covar=1e-3 with ill-defined empirical covariance) over-smoothed
+  the orig joint. BGMM single-feat AUC 0.55 (near-random) vs GMM 0.76
+  on the same data. ρ(GMM, BGMM) on synth_train = 0.81 — they correlate
+  but BGMM has lost most of the predictive structure. **Fix**: don't
+  use sklearn BGMM as a drop-in for GMM on this joint without a careful
+  reg_covar sweep; or use a proper VI implementation (numpyro / pyro).
+
+- `tag: path-b-on-pool-subset-conflates-cohort-axis-with-pool-size` —
+  d16 Phase 5 ran Path B on a K=14 sub-pool (only 14 of 21 named bases
+  existed under exact filenames). All r̂_q5 / logp_q5 cohort axes
+  regressed -3 to -4 bp vs PRIMARY (which uses K=21). Cannot cleanly
+  attribute the regression to cohort-axis failure vs missing-bases
+  artifact. **Fix**: when probing alternative cohort axes, the pool MUST
+  match PRIMARY exactly — load OOFs by file-glob with matching shapes,
+  not by named list. Re-test Phase 5 cohort-axis on full K=21 to
+  disambiguate.
+
 ## 2026-05-06
 
 - `tag: synthetic-dgp-conditionally-near-independent` — Day-14 PM:
