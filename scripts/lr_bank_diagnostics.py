@@ -39,6 +39,7 @@ K24_GBDT_BASES = [
 ]
 
 LR_BANK_DEFAULT = [
+    # Round 1: simple FE (raw + transforms)
     "lr_raw_std", "lr_raw_std_balanced",
     "lr_raw_freq", "lr_raw_te", "lr_raw_ohe",
     "lr_poly2_std", "lr_poly2_ohe", "lr_poly3_std",
@@ -48,6 +49,9 @@ LR_BANK_DEFAULT = [
     "lr_l1_lasso_kbins20", "lr_C_low_kbins20", "lr_C_high_kbins20", "lr_balanced_kbins20",
     "lr_perseg_compound", "lr_perseg_year",
     "lr_on_top_models",
+    # Round 2: rich FE
+    "lr_rozen_full", "lr_yekenot_full_recipe", "lr_dgp_rules",
+    "lr_te_3way_sweep", "lr_mega",
 ]
 
 
