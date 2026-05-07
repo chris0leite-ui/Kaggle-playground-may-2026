@@ -108,6 +108,52 @@ patterns to skill `examples/` or `recipes/`.
   Rozen-LGBM hparams (lr=0.025, leaves=255, max_depth=10, ff=0.65).
   CAVEAT: Rozen's reported OOF 0.95241 likely inflated by FS_A leak
   per s6e5 Day-17 audit; honest single-LGBM ceiling ~0.946.
+- `s6e5/yekenot/ps-s6-e5-realmlp-pytabkit.ipynb` —
+  6 load-bearing FE items (arithmetic ratios + floor-cat + count-
+  encoding + KBins + 2-way combo cats + CV TE inside fold loop) +
+  per-fold orig-aug stratified 4/5. Verified 5-fold OOF 0.95257
+  standalone on s6e5 (matches yekenot pub 0.95273 within 1.6 bp).
+  Full audit at `.claude/skills/kaggle-comp/examples/fe-recipe-
+  yekenot-realmlp-kitchen-sink.md`.
+
+### [ ] examples/ — yekenot FE transfers to GBDT (CatBoost) too
+
+`tag: recipe-over-judgment`. Research-branch audit caveats yekenot
+items 2 (floor-cat), 3 (count-encoding), 4 (KBinsDiscretizer) as
+"NN-specific (RealMLP can't derive these; CatBoost CAN via CTR +
+split-finding; expected lift smaller for CB)." **Empirically false
+on s6e5 Day-17 PM**: applying items 2/3/4 + item 7 (orig-aug) to a
+research-recipe CatBoost-GPU (Bernoulli + min_data_in_leaf=20 +
+Year/Stint cat + default CTR; "v3" → "v4") lifted standalone 5-fold
+OOF by **+20.7 bp** (0.94993 → 0.95200) and DOUBLED the K=21+1
+LR-meta contribution (+12.06 bp → +24.21 bp). Stacked K=23 + h1d
+landed **LB 0.95354** (s6e5 PRIMARY). Mechanism hypothesis: explicit
+floor/count/KBins as direct numeric/cat inputs interact with
+CatBoost's CTR + split-finding in ways pure native CTR doesn't
+capture — the GBDT split-finder benefits from pre-discretized
+columns at the same fineness yekenot tuned for the NN.
+
+**Apply yekenot's full FE recipe to both NN AND GBDT bases.**
+
+Origin: s6e5 Day-17 PM, commit 7d179d6 on
+`claude/optimize-model-performance-rruC2`. Friction tag candidate:
+`yekenot-floor-count-kbins-fires-on-gbdt-too`. Promote to
+`examples/cb-yekenot-transfer.md` when seen in a 2nd comp.
+
+### [ ] kickoff-runbook.md / day-loop.md — original-data row-augmentation default
+
+`tag: recipe-over-judgment`. For synthetic-tabular Playground comps
+with AV-classifier AUC < 0.55 (train/test ≈ i.i.d. with original):
+default to per-fold concat of the original (real-DGP) data,
+stratified 4/5 split, weight 1.0 (or downweighted if synthesizer
+has heavy label distribution shift). On s6e5 Day-17 PM, the v3 → v4
+single-CB lift was driven by the combination of yekenot FE items +
+this orig-aug item; never documented as a default kickoff move.
+Cross-comp: irrigation-water used the same trick at weight 0.5.
+
+**Pre-condition:** AV-classifier AUC < 0.55. Skip if AV > 0.55
+(distribution shift risk; orig rows pull predictions off synth-test
+marginal).
 
 ---
 

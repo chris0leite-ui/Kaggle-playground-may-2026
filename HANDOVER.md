@@ -6,30 +6,73 @@
 
 ---
 
-## Where we are (Day-16 PM, 2026-05-06 evening)
+## Where we are (Day-17 PM, 2026-05-07 evening)
 
-- **PRIMARY** = `d16_path_b_K22_continuous_only_tau20000` LB **0.95089**
-  (Day-17 advance via `claude/autoencoder-synthetic-data-pEMB6`, scored 2026-05-07).
-  K=22 = K=21 + `d16_orig_continuous_only` (orig-LGBM on 7 features the
-  synthesizer left marginal-aligned per Phase-1 KS-divergence diagnostic).
-  Mechanism: selective-feature-restriction transfer; not target-derived.
-- _Previous PRIMARY:_ `d15b_path_b_K22_dae_only_tau20000` LB **0.95059**
-  (Day-15 PM via DAE swap-noise → LGBM-on-latent). Both DAE-class and
-  selective-feature-restriction-transfer signals are legitimate (no
-  target-label leakage).
-- **Gap to top-5%** (0.95345): −25.6 bp.
-- **Top of LB ~0.955** (PI observation, end of session): leaders likely
-  use FEW or a SINGLE model with a structural mechanism we haven't found
-  yet. Stacking-with-target-derived-bases was chasing inflated OOF
-  (see leakage section below).
-- **Submissions used total:** 28/270.
-- **Branches active recently:**
-  - `claude/read-handover-lA8Nr` — Day-16 virgin-axes, 11 probes,
-    4 NULL / 1 falsified / 3 KILLED / 2 parked / 1 marginal (no advance).
-  - `claude/ml-handover-alignment-xvUN0` — harness + target-reformulation
-    thesis **falsified via strict-OOF audit**.
-  - `claude/autoencoder-synthetic-data-pEMB6` — d16 cont_only PRIMARY
-    advance (LB 0.95089, +3.0 bp) + d17 Phase 0/A in flight.
+- **PRIMARY** = `d17_path_b_K23_v4_h1d_tau100000` LB **0.95354** (Day-17 PM
+  advance via `claude/optimize-model-performance-rruC2`, scored 2026-05-07
+  13:27 UTC). K=23 = K=21 + `p1_single_cb_v4_gpu` (yekenot transfer
+  recipe; see CB-axis arc below) + `d17_h1d_yekenot_full` (RealMLP-
+  pytabkit replication imported from `claude/read-handover-62BCt`),
+  Path-B Compound×Stint hier-meta τ=100k. **Realised OOF→LB gap −6.1 bp.**
+- _Previous PRIMARIES (Day-17 trail):_
+  - `d17_K24_d18pool_h1d` LB 0.95345 (research-branch midday;
+    K=21 + d16_cont_only + p1_single_cb_v3 + h1d).
+  - `d18_path_b_K23_d16_d18_tau20000` LB 0.95149 (research-branch AM;
+    K=21 + d16_cont_only + d18_chain_decomp).
+  - `d16_path_b_K22_continuous_only_tau20000` LB 0.95089 (yesterday).
+  - `d15b_path_b_K22_dae_only_tau20000` LB 0.95059 (Day-15 PM).
+- **Rank: #98 of 893 = top 11%.** Tied with [QWERTY] Roman Rozen at
+  0.95354. Top-5% boundary moved up 60 bp today: was 0.95345 (stale),
+  now **0.95405** (rank 44). **Gap to top-5%: −51 bp.** Leader MILANFX
+  0.95476 (gap −122 bp).
+- **Submissions used total:** 38/270; today 7/10.
+- **Branches active recently (Day-17):**
+  - `claude/optimize-model-performance-rruC2` — **NEW PRIMARY LB 0.95354**
+    via CB-axis closure (v3→v4 yekenot transfer, +20.7 bp standalone OOF).
+  - `claude/read-handover-62BCt` — h1d (yekenot RealMLP replication,
+    OOF 0.95257) + K=24+h1d LB 0.95345 (intermediate Day-17 PM PRIMARY).
+  - `claude/reverse-engineer-data-generation-Hu8EK` — d18 chain_decomp
+    DGP probe (K=21+1 +7.37 bp) + d18 K=23 LB 0.95149 (Day-17 AM PRIMARY).
+  - `claude/research-agentic-kaggle-W6IAP` — yekenot recipe extraction
+    + h1d full-recipe replication.
+  - `claude/autoencoder-synthetic-data-pEMB6` — d16 cont_only LB 0.95089.
+
+## ⭐ Day-17 PM CB-axis arc + new PRIMARY
+
+This branch (`claude/optimize-model-performance-rruC2`) closed the CB
+recipe axis with a +20.7 bp single-model lift via yekenot FE transfer.
+Full audit: `audit/2026-05-07-d17-cb-v4-yekenot-transfer.md`.
+
+| Stage | OOF | LB | Key fact |
+|---|---:|---:|---|
+| LGBM v3 honest (Day-17 AM, P1) | 0.94563 | n/a | single-model honest ceiling |
+| **CB v3 (research-recipe)** | 0.94993 | **0.95143** | +43 bp over LGBM v3; K=21+1 +12.06 bp |
+| **CB v4 (yekenot transfer + orig-aug)** | **0.95200** | (held) | +20.7 bp over v3; K=21+1 **+24.21 bp** |
+| K=22 v4 Path-B C×S τ=20k | 0.95319 | (held) | Path-B amp +0.39 bp (friction re-confirmed) |
+| **K=23 v4+h1d Path-B τ=100k = NEW PRIMARY** | **0.95415** | **0.95354** | submitted; gap to LB top −122 bp; rank 98/893 |
+
+**Recipe transfer items 2/3/4 (floor-cat, count-encoding, KBins) fired
+on CatBoost despite research-branch audit caveat that they are
+"NN-specific."** New friction tag candidate
+`yekenot-floor-count-kbins-fires-on-gbdt-too`.
+
+## 🎯 Next-step priority list (Day-18+)
+
+To close the −51 bp gap to top-5% (boundary 0.95405), ranked by EV/cost.
+
+| # | Move | Cost | Predicted LB Δ | Notes |
+|---|---|---|---:|---|
+| 1 | **K=25 = K=21 + v4 + h1d + d16 + d18** | 10 min CPU | +3 to +8 bp | Cheapest near-term; combines all today's bases |
+| 2 | 3-seed bag of v4 (seeds 42/13/71) | 75 min Kaggle GPU | +1 to +3 bp | Variance reduction on load-bearing base |
+| 3 | XGB with v4-recipe FE | 30 min Kaggle GPU | +5 to +15 bp | New model class on same FE; ρ < 0.97 likely |
+| 4 | RealMLP n_ens=24 (h1d ran 4) | 3.5 h CPU/GPU | +2 to +5 bp standalone | Yekenot's published; +1-3 bp at K-meta |
+| 5 | **FastF1 lap-by-lap pit-call hard-join** | 1-2 days | +10 to +30 bp | HANDOVER A4; only single-mechanism path to top-5% |
+| 6 | Pirelli tyre-curve scrape | 1-2 days | +10 to +30 bp | Same axis as #5 |
+| 7 | Per-Year specialists with v4 recipe | 30 min Kaggle GPU | ±5 bp | d12 found 2023 is easiest segment |
+| 8 | Cross-segmentation Path-B (Y×S, R×C) on K=23 v4+h1d | 20 min CPU | +0 to +3 bp | d14 falsified Y-axis without v4 |
+
+Items 1-3 sum to ~+10-25 bp predicted; still below the 51 bp gap.
+Items 5-6 are the only single-mechanism path.
 
 ## 🔴 CRITICAL — held candidates INVALIDATED
 
