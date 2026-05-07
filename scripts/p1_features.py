@@ -79,13 +79,91 @@ def _load_hist_priors():
     return out
 
 
-def make_features_A(df_in: pd.DataFrame, fit: bool = False,
-                    state: dict | None = None) -> tuple[pd.DataFrame, dict]:
-    """Engineer features. Sorted by (Driver, Race, Year, LapNumber).
+def fit_fs_a(df_with_labels: pd.DataFrame) -> dict:
+    """Compute the LABEL-CONDITIONAL aggregates from a labelled subset.
 
-    fit=True on TRAIN populates state with all FS_A lookup tables and
-    factorize maps; fit=False on TEST/ORIG reuses state via .merge or
-    .map for consistent values across train/test.
+    Strict rule: this function uses ONLY rows in df_with_labels (which
+    must carry PitNextLap). Call once per CV fold using ti rows only;
+    call once on full train for the final test prediction (5-fold
+    averaging instead). Never include val/holdout labels in this fit.
+    """
+    if "PitNextLap" not in df_with_labels.columns:
+        raise ValueError("fit_fs_a requires PitNextLap column")
+    fs_a = {}
+    fs_a["pit_laps"] = (df_with_labels[df_with_labels["PitNextLap"] == 1]
+        .groupby(["Race", "Year"])["LapNumber"].mean()
+        .rename("race_avg_pit_lap"))
+    fs_a["total_laps"] = (df_with_labels.groupby(["Race", "Year"])["LapNumber"]
+        .max().rename("race_total_laps"))
+    fs_a["comp_life"] = (df_with_labels[df_with_labels["PitNextLap"] == 1]
+        .groupby("Compound")["TyreLife"].mean()
+        .rename("compound_avg_life"))
+    fs_a["race_stints"] = (df_with_labels.groupby(["Race", "Year"])["Stint"]
+        .max().rename("race_max_stint"))
+    fs_a["compound_race_lt"] = (df_with_labels.groupby(
+        ["Race", "Year", "Compound"])["LapTime (s)"].median()
+        .rename("compound_race_median_lt"))
+    fs_a["race_compound_max"] = (df_with_labels.groupby(
+        ["Race", "Year", "Compound"])["TyreLife"].max()
+        .rename("race_compound_max_life"))
+    fs_a["dc_avg_stint_life"] = (df_with_labels[df_with_labels["PitNextLap"] == 1]
+        .groupby(["Driver", "Compound"])["TyreLife"].mean()
+        .rename("dc_avg_stint_life"))
+    return fs_a
+
+
+def apply_fs_a(df: pd.DataFrame, fs_a: dict) -> pd.DataFrame:
+    """Merge an FS_A dict into df and compute the derived features.
+
+    df must already carry the static columns produced by
+    make_features_static (notably stint_start_lap and the raw cols).
+    """
+    df = df.copy()
+    df = df.merge(fs_a["pit_laps"].reset_index(),    on=["Race", "Year"], how="left")
+    df = df.merge(fs_a["total_laps"].reset_index(),  on=["Race", "Year"], how="left")
+    df = df.merge(fs_a["comp_life"].reset_index(),   on="Compound",      how="left")
+    df = df.merge(fs_a["race_stints"].reset_index(), on=["Race", "Year"], how="left")
+    df = df.merge(fs_a["compound_race_lt"].reset_index(),
+                  on=["Race", "Year", "Compound"], how="left")
+    df = df.merge(fs_a["race_compound_max"].reset_index(),
+                  on=["Race", "Year", "Compound"], how="left")
+    df = df.merge(fs_a["dc_avg_stint_life"].reset_index(),
+                  on=["Driver", "Compound"], how="left")
+
+    # Derived features (all from consistent lookups)
+    df["pit_window_flag"] = (np.abs(df["LapNumber"]
+        - df["race_avg_pit_lap"].fillna(35)) <= 3).astype(int)
+    df["tyre_vs_comp_avg"] = df["TyreLife"] - df["compound_avg_life"].fillna(25)
+    df["overdue_pit"] = (df["TyreLife"] > df["compound_avg_life"].fillna(25)).astype(int)
+    df["laps_remaining_race"] = df["race_total_laps"].fillna(60) - df["LapNumber"]
+    df["tyre_age_pct_race"] = df["TyreLife"] / (df["race_total_laps"].fillna(60) + 1)
+    df["stint_progress"] = df["Stint"] / (df["race_max_stint"].fillna(3) + 1)
+    df["tyre_life_pct"] = df["TyreLife"] / df["compound_avg_life"].fillna(25).clip(lower=1)
+    df["stint_end_est"] = df["stint_start_lap"] + df["compound_avg_life"].fillna(25)
+    df["laps_until_stop"] = (df["stint_end_est"] - df["LapNumber"]).clip(lower=-20)
+    df["pit_imminent"] = (df["laps_until_stop"] <= 2).astype(int)
+    df["pit_in_5"] = (df["laps_until_stop"] <= 5).astype(int)
+    df["lap_vs_compound_baseline"] = (df["LapTime (s)"]
+        - df["compound_race_median_lt"].fillna(df["LapTime (s)"])).clip(-5, 15)
+    df["tyre_freshness_pct"] = (1 - df["TyreLife"] / (df["race_compound_max_life"].fillna(40) + 1)).clip(0, 1)
+    df["driver_vs_avg_life"] = (df["TyreLife"] - df["dc_avg_stint_life"].fillna(25)).clip(-20, 20)
+    df["driver_overdue_personal"] = (df["TyreLife"] > df["dc_avg_stint_life"].fillna(25)).astype(int)
+
+    df["deg_x_win"] = df["Cumulative_Degradation"] * df["is_pit_window"]
+    df["over_x_win"] = df["overdue_pit"] * df["is_pit_window"]
+    df["tyre_x_pres"] = df["TyreLife"] * df["position_pressure"]
+    return df
+
+
+def make_features_static(df_in: pd.DataFrame, fit: bool = False,
+                         state: dict | None = None) -> tuple[pd.DataFrame, dict]:
+    """Engineer LABEL-INDEPENDENT features only.
+
+    These features depend ONLY on the row's own values (or aggregates
+    over rows in df_in WITHOUT using PitNextLap). Safe to compute on
+    full train+test or per-fold.
+
+    Pair with fit_fs_a + apply_fs_a for the label-conditional cluster.
     """
     if state is None:
         state = {}
@@ -93,7 +171,7 @@ def make_features_A(df_in: pd.DataFrame, fit: bool = False,
           .sort_values(["Driver", "Race", "Year", "LapNumber"])
           .reset_index(drop=True))
 
-    # === 1. Tyre / compound algebra (no train/test deps) ===
+    # === 1. Tyre / compound algebra ===
     df["tyre_life_sq"] = df["TyreLife"] ** 2
     df["tyre_life_log"] = np.log1p(df["TyreLife"])
     df["tyre_life_sqrt"] = np.sqrt(df["TyreLife"])
@@ -102,7 +180,7 @@ def make_features_A(df_in: pd.DataFrame, fit: bool = False,
     df["compound_tyre_norm"] = (df["TyreLife"] / df["compound_max_life"]).clip(0, 2)
     df["tyre_overdue_norm"] = (df["compound_tyre_norm"] > 0.85).astype(int)
 
-    # === 2. Race-progress family (no train/test deps) ===
+    # === 2. Race-progress family ===
     df["est_total_laps"] = (df["LapNumber"] / (df["RaceProgress"] + 1e-9)
                             ).round().clip(30, 80)
     df["laps_remaining"] = (df["est_total_laps"] - df["LapNumber"]).clip(lower=0)
@@ -118,7 +196,7 @@ def make_features_A(df_in: pd.DataFrame, fit: bool = False,
     df["norm_position"] = 1 - (df["Position"] - 1) / 19.0
     df["life_x_progress"] = df["TyreLife"] * df["RaceProgress"]
 
-    # === 3. Lag / rolling within (Driver, Race, Year). Same-split limit; small impact. ===
+    # === 3. Lag / rolling within (Driver, Race, Year) ===
     grp_id = (df["Driver"].astype(str) + "|"
               + df["Race"].astype(str) + "|"
               + df["Year"].astype(str)).factorize()[0]
@@ -146,78 +224,17 @@ def make_features_A(df_in: pd.DataFrame, fit: bool = False,
     df["lap_vs_r7"] = df["LapTime (s)"] - df["roll7_lt"]
     df["lap_vs_r15"] = df["LapTime (s)"] - df["roll15_lt"]
 
-    # `lap_in_stint` and `stint_start_lap` — Rozen pattern (NO count!)
     g_stint = df.groupby(["Driver", "Race", "Year", "Stint"])
     df["lap_in_stint"] = g_stint.cumcount()
     df["stint_start_lap"] = g_stint["LapNumber"].transform("min")
     df = df.drop(columns=["_grp_id"])
 
-    # === 4. FS_A: train-only aggregates → merge to all (CONSISTENT) ===
-    if fit:
-        if "PitNextLap" not in df.columns:
-            raise ValueError("fit=True but PitNextLap missing")
-        state["FS_A"] = {}
-        state["FS_A"]["pit_laps"] = (df[df["PitNextLap"] == 1]
-            .groupby(["Race", "Year"])["LapNumber"].mean()
-            .rename("race_avg_pit_lap"))
-        state["FS_A"]["total_laps"] = (df.groupby(["Race", "Year"])["LapNumber"]
-            .max().rename("race_total_laps"))
-        state["FS_A"]["comp_life"] = (df[df["PitNextLap"] == 1]
-            .groupby("Compound")["TyreLife"].mean()
-            .rename("compound_avg_life"))
-        state["FS_A"]["race_stints"] = (df.groupby(["Race", "Year"])["Stint"]
-            .max().rename("race_max_stint"))
-        state["FS_A"]["compound_race_lt"] = (df.groupby(
-            ["Race", "Year", "Compound"])["LapTime (s)"].median()
-            .rename("compound_race_median_lt"))
-        state["FS_A"]["race_compound_max"] = (df.groupby(
-            ["Race", "Year", "Compound"])["TyreLife"].max()
-            .rename("race_compound_max_life"))
-        state["FS_A"]["dc_avg_stint_life"] = (df[df["PitNextLap"] == 1]
-            .groupby(["Driver", "Compound"])["TyreLife"].mean()
-            .rename("dc_avg_stint_life"))
-
-    fsa = state["FS_A"]
-    df = df.merge(fsa["pit_laps"].reset_index(),    on=["Race", "Year"], how="left")
-    df = df.merge(fsa["total_laps"].reset_index(),  on=["Race", "Year"], how="left")
-    df = df.merge(fsa["comp_life"].reset_index(),   on="Compound",      how="left")
-    df = df.merge(fsa["race_stints"].reset_index(), on=["Race", "Year"], how="left")
-    df = df.merge(fsa["compound_race_lt"].reset_index(),
-                  on=["Race", "Year", "Compound"], how="left")
-    df = df.merge(fsa["race_compound_max"].reset_index(),
-                  on=["Race", "Year", "Compound"], how="left")
-    df = df.merge(fsa["dc_avg_stint_life"].reset_index(),
-                  on=["Driver", "Compound"], how="left")
-
-    # Derived from consistent lookups
-    df["pit_window_flag"] = (np.abs(df["LapNumber"]
-        - df["race_avg_pit_lap"].fillna(35)) <= 3).astype(int)
-    df["tyre_vs_comp_avg"] = df["TyreLife"] - df["compound_avg_life"].fillna(25)
-    df["overdue_pit"] = (df["TyreLife"] > df["compound_avg_life"].fillna(25)).astype(int)
-    df["laps_remaining_race"] = df["race_total_laps"].fillna(60) - df["LapNumber"]
-    df["tyre_age_pct_race"] = df["TyreLife"] / (df["race_total_laps"].fillna(60) + 1)
-    df["stint_progress"] = df["Stint"] / (df["race_max_stint"].fillna(3) + 1)
-    df["tyre_life_pct"] = df["TyreLife"] / df["compound_avg_life"].fillna(25).clip(lower=1)
-    df["stint_end_est"] = df["stint_start_lap"] + df["compound_avg_life"].fillna(25)
-    df["laps_until_stop"] = (df["stint_end_est"] - df["LapNumber"]).clip(lower=-20)
-    df["pit_imminent"] = (df["laps_until_stop"] <= 2).astype(int)
-    df["pit_in_5"] = (df["laps_until_stop"] <= 5).astype(int)
-    df["lap_vs_compound_baseline"] = (df["LapTime (s)"]
-        - df["compound_race_median_lt"].fillna(df["LapTime (s)"])).clip(-5, 15)
-    df["tyre_freshness_pct"] = (1 - df["TyreLife"] / (df["race_compound_max_life"].fillna(40) + 1)).clip(0, 1)
-    df["driver_vs_avg_life"] = (df["TyreLife"] - df["dc_avg_stint_life"].fillna(25)).clip(-20, 20)
-    df["driver_overdue_personal"] = (df["TyreLife"] > df["dc_avg_stint_life"].fillna(25)).astype(int)
-
-    # Cross-feature interactions
-    df["deg_x_win"] = df["Cumulative_Degradation"] * df["is_pit_window"]
-    df["over_x_win"] = df["overdue_pit"] * df["is_pit_window"]
-    df["tyre_x_pres"] = df["TyreLife"] * df["position_pressure"]
     df["lap_div_rp"] = (df["LapNumber"] / (df["RaceProgress"] + 1e-6)).astype(np.float32)
     df["tl_div_ln"] = (df["TyreLife"] / df["LapNumber"].clip(lower=1)).astype(np.float32)
     df["compound_ord"] = df["Compound"].map(
         {"SOFT": 2, "MEDIUM": 1, "HARD": 0, "INTERMEDIATE": 3, "WET": 4}).fillna(1)
 
-    # === 5. External historical priors (1950-2022) ===
+    # === 4. Historical priors (1950-2022, no train labels involved) ===
     if fit:
         state["hist"] = _load_hist_priors()
     hist = state.get("hist")
@@ -246,7 +263,7 @@ def make_features_A(df_in: pd.DataFrame, fit: bool = False,
             df[c] = 0.0
     df = df.drop(columns=["_dk", "_rk"], errors="ignore")
 
-    # === 6. Combo categoricals (factorize maps in state) ===
+    # === 5. Combo categoricals (factorize maps in state) ===
     for c1, c2 in COMBO_COLS:
         combo_str = df[c1].astype(str) + "_" + df[c2].astype(str)
         key = f"{c1}_{c2}_"
@@ -255,13 +272,30 @@ def make_features_A(df_in: pd.DataFrame, fit: bool = False,
             state[f"combo_{key}"] = {v: i for i, v in enumerate(uniques)}
         df[key] = combo_str.map(state[f"combo_{key}"]).fillna(-1).astype("int32")
 
-    # Raw cats encoded
     for c in ["Driver", "Race", "Compound"]:
         if fit:
             codes, uniques = df[c].astype(str).factorize()
             state[f"cat_{c}"] = {v: i for i, v in enumerate(uniques)}
         df[f"{c}_cat"] = df[c].astype(str).map(state[f"cat_{c}"]).fillna(-1).astype("int32")
 
+    return df, state
+
+
+def make_features_A(df_in: pd.DataFrame, fit: bool = False,
+                    state: dict | None = None) -> tuple[pd.DataFrame, dict]:
+    """LEGACY (LEAKY) v2 path — kept for reference; do not use for new probes.
+
+    The FS_A merge here uses df_in's own labels for label-conditional
+    aggregates, which leaks val labels into val features when called
+    on the full train. Use make_features_static + fit_fs_a + apply_fs_a
+    instead with proper per-fold FS_A fitting.
+    """
+    df, state = make_features_static(df_in, fit=fit, state=state)
+    if fit:
+        if "PitNextLap" not in df.columns:
+            raise ValueError("legacy make_features_A requires PitNextLap with fit=True")
+        state["FS_A"] = fit_fs_a(df)
+    df = apply_fs_a(df, state["FS_A"])
     return df.fillna(0), state
 
 
