@@ -1291,3 +1291,65 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
    a base-class change. Expect TIE_EXPECTED."
 5. **Pre-warm hook for review branches** — pip install + kaggle
    download in SessionStart, idempotent.
+
+## 2026-05-07 PM (branch `claude/reverse-engineer-data-generation-Hu8EK`)
+
+- `tag: pool-saturation-v4h1d-absorbs-dgp-class` — Combined-with-main
+  round: K=23 v4+h1d (mainline PRIMARY pool from `optimize-model-
+  performance-rruC2`) absorbs ~95% of our DGP-class signal. Solo
+  K=23+1 marginals: d16 +0.79 / E2 +0.42 / d18 +0.33 / F2 +0.25 /
+  F5 +0.21 / J +0.18 / DAE +0.16 / d18b/Rozen/orig-transfer all
+  <+0.1 bp. CTGAN mode-id features (G/H/I) FULLY absorbed by
+  CatBoost's CTR on combo-cats — v4 already covers that information
+  surface. Generalises main's `pool-saturation-v4h1d-absorbs-d16d18`.
+  **Implication**: future DGP-class probes must target mechanisms
+  ORTHOGONAL to v4's CTR + RealMLP's BatchNorm + yekenot kitchen-sink FE.
+  Sequence-level (within-group temporal) and membership-inference
+  (exact-row copy) are the candidates. Cross-feature mode-tuple
+  (joint vs marginal mode-id) also untested.
+
+- `tag: dae-wildcard-absorbed-by-mainline` — d15b LGBM-on-DAE was
+  ρ=0.9477 standalone (most-diverse base of session) and was the
+  natural wildcard for combination. Solo K=23 v4+h1d+1 with DAE-only:
+  +0.16 bp. With DAE-full (raw + latent): -0.05 bp. **The unsupervised
+  manifold signal (Jahrer swap-noise DAE) is captured by RealMLP's
+  representation in h1d.** RealMLP with yekenot FE provides similar
+  feature-manifold compression to DAE.
+
+- `tag: sequential-axis-untouched` — Across all probes E1-E5, F1-F6,
+  G/H/I/J/K/A1/A2 + their gates: ZERO probes used the within-(Driver,
+  Race, Year) sequence structure. CTGAN samples each row near-i.i.d.
+  internally; if it broke F1 strategy coherence (Compound transitions,
+  stint-length distributions, within-stint TyreLife progression),
+  the row-level probes are blind. Sequence-level fingerprinting is
+  the biggest remaining DGP-axis blind spot. Recommended next probe.
+
+- `tag: f1-replay-disc-features-orthogonal-to-target` — F1's
+  per-architecture discriminator features (CTGAN/CopulaGAN/TVAE/
+  GaussianCopula) all NULL as bases (-0.11 bp K=21+4). **Architecture-
+  bias signal is orthogonal to PitNextLap target signal.** The arch
+  ID is a foundational diagnostic (host = CTGAN-class), but the
+  per-row "how arch-X-typical is this row" features don't carry
+  target signal. Fix: future replay-discriminator probes should
+  target SUPERVISED conditioning (what cond-vector did host use?)
+  not unsupervised typicality.
+
+- `tag: parallel-lgbm-3way-contention-oom` — Process learning:
+  3 parallel LGBM downstream-train procs (F2 + F5 + G + each with
+  ~14 raw + 5-12 derived features × 5-fold × 800 rounds) hit OOM
+  under sandbox CPU contention. F2/F5/G all SIGHUP'd mid-fold-2,
+  no error, 3-hour wall wasted. **Fix**: cap to ≤2 parallel
+  CPU-heavy LGBM jobs; sequential is dozens-of-times faster than
+  oversubscribed parallel under CPU contention. Schedule cheap
+  probes (≤30s) ahead of slow ones; chain LGBM-heavy procs
+  sequentially via `setsid nohup bash -c 'python a; python b'`.
+
+- `tag: combined-pool-marginal-1bp-ceiling` — When mainline pool
+  (v4+h1d, OOF 0.95414) already saturates, the realistic LB ceiling
+  for adding 4-5 DGP-class bases is +1-2 bp (calibrated from K=27
+  Path-B τ=100k OOF 0.95432 → LB 0.95368 = +1.4 bp realised).
+  Path-B amp on base-add stays ~1.0× even on the augmented K=27
+  pool. The remaining 3.7 bp gap to top-5% won't close from more
+  DGP-class additions; it requires either external-data hard-join
+  (FastF1, Pirelli) or meta-arch redesign (Yao/Vehtari BMA, Student-t
+  shrinkage on K=27 pool).

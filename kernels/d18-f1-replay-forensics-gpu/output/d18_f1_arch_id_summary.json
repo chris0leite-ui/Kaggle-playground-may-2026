@@ -1,0 +1,115 @@
+{
+  "n_orig": 101305,
+  "n_train": 439140,
+  "n_test": 188165,
+  "epochs": {
+    "CTGAN": 150,
+    "TVAE": 150,
+    "CopulaGAN": 150
+  },
+  "archs": {
+    "GaussianCopula": {
+      "ks_vs_host": {
+        "Year": 0.05382381563965932,
+        "PitStop": 0.11486167782483947,
+        "LapNumber": 0.15570486223072372,
+        "Stint": 0.1765563014072961,
+        "TyreLife": 0.060953332877897726,
+        "Position": 0.07315288837272854,
+        "LapTime (s)": 0.1057101521154985,
+        "LapTime_Delta": 0.32021978685612795,
+        "Cumulative_Degradation": 0.2023160873525528,
+        "RaceProgress": 0.1563583640752379,
+        "Position_Change": 0.1315754269708977,
+        "mean": 0.14102115415667818
+      },
+      "disc_auc": 0.9966787125000002,
+      "disc_orig_vs_replay_train_auc": 0.9982814917328858,
+      "disc_synth_score_mean_train": 0.061323607506764445,
+      "disc_synth_score_mean_test": 0.06160952769284177
+    },
+    "CTGAN": {
+      "ks_vs_host": {
+        "Year": 0.13393926492690256,
+        "PitStop": 0.12126167782483954,
+        "LapNumber": 0.21458367946440776,
+        "Stint": 0.2071963014072961,
+        "TyreLife": 0.06285213963656233,
+        "Position": 0.051698162317256435,
+        "LapTime (s)": 0.0793230359338708,
+        "LapTime_Delta": 0.19745973721364485,
+        "Cumulative_Degradation": 0.10177004918704746,
+        "RaceProgress": 0.20993972400601174,
+        "Position_Change": 0.09856086942660647,
+        "mean": 0.13441678557676784
+      },
+      "disc_auc": 0.9884065124999999,
+      "disc_orig_vs_replay_train_auc": 0.9925453239228075,
+      "disc_synth_score_mean_train": 0.12855133164044297,
+      "disc_synth_score_mean_test": 0.12884390479854976
+    },
+    "TVAE": {
+      "ks_vs_host": {
+        "Year": 0.0642917046955413,
+        "PitStop": 0.06513167782483953,
+        "LapNumber": 0.2012837090677233,
+        "Stint": 0.11586630140729609,
+        "TyreLife": 0.23258902400145737,
+        "Position": 0.24108816231725644,
+        "LapTime (s)": 0.12888464362162408,
+        "LapTime_Delta": 0.2608258728423737,
+        "Cumulative_Degradation": 0.13038656237190877,
+        "RaceProgress": 0.18415031789406566,
+        "Position_Change": 0.18642542697089765,
+        "mean": 0.16462940027408945
+      },
+      "disc_auc": 0.9894334499999999,
+      "disc_orig_vs_replay_train_auc": 0.9930207146735107,
+      "disc_synth_score_mean_train": 0.11631265307584274,
+      "disc_synth_score_mean_test": 0.11558357849198544
+    },
+    "CopulaGAN": {
+      "ks_vs_host": {
+        "Year": 0.11152170469554129,
+        "PitStop": 0.07013167782483953,
+        "LapNumber": 0.2499537090677233,
+        "Stint": 0.17356630140729606,
+        "TyreLife": 0.05093220203124285,
+        "Position": 0.061828207860818885,
+        "LapTime (s)": 0.03401785125472517,
+        "LapTime_Delta": 0.2880207655872843,
+        "Cumulative_Degradation": 0.15461509814637697,
+        "RaceProgress": 0.21420418499795058,
+        "Position_Change": 0.1154108694266065,
+        "mean": 0.13856387020912775
+      },
+      "disc_auc": 0.9877167124999999,
+      "disc_orig_vs_replay_train_auc": 0.9914870172252109,
+      "disc_synth_score_mean_train": 0.1301033337608527,
+      "disc_synth_score_mean_test": 0.1305806358151639
+    }
+  },
+  "wall_s": 2589.0910930633545,
+  "ranking_by_composite": [
+    {
+      "arch": "CTGAN",
+      "mean_ks": 0.13441678557676784,
+      "disc_auc": 0.9884065124999999
+    },
+    {
+      "arch": "CopulaGAN",
+      "mean_ks": 0.13856387020912775,
+      "disc_auc": 0.9877167124999999
+    },
+    {
+      "arch": "GaussianCopula",
+      "mean_ks": 0.14102115415667818,
+      "disc_auc": 0.9966787125000002
+    },
+    {
+      "arch": "TVAE",
+      "mean_ks": 0.16462940027408945,
+      "disc_auc": 0.9894334499999999
+    }
+  ]
+}
