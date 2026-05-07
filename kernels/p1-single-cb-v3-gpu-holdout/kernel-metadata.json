@@ -1,0 +1,20 @@
+{
+  "id": "chrisleitescha/p1-single-cb-v3-gpu-holdout",
+  "title": "p1-single-cb-v3-gpu-holdout",
+  "code_file": "p1_single_cb_v3_gpu_holdout.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "keywords": ["gpu"],
+  "dataset_sources": [
+    "aadigupta1601/f1-strategy-dataset-pit-stop-prediction",
+    "debashish311601/formula-1-official-data-19502022"
+  ],
+  "kernel_sources": [],
+  "competition_sources": ["playground-series-s6e5"],
+  "model_sources": [],
+  "machine_shape": "GpuT4x2"
+}
