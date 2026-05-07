@@ -372,3 +372,79 @@ PRIMARY remains `d16_path_b_K22_continuous_only_tau20000` LB **0.95089**.
 WRAPUP.md step 5. This bloat predates today's session; not archived here
 to avoid touching other branches' Day-N PM sections (Rule 15). Flag for
 the next merge-target scribe.
+
+---
+
+## Day-17 AM read-kaggle-handover-rsi2Q
+
+P1 single-model thesis (PI hypothesis "leader at LB ~0.955 likely
+uses ONE strong model") — tested end-to-end via Rozen 0.95354 recipe
+replication. **CONCLUSIVELY FALSIFIED** under strict OOF discipline.
+
+### What ran
+- Pulled top 8 public s6e5 notebooks under `external/kernels/` as
+  reference (incl. `romanrozen/f1-pit-driver-race-year-encoding-0-95354`).
+- Pulled external datasets: `aadigupta_orig`, `f1_official_1950_2022`
+  (driver/circuit historical priors), `weather_woodshole`.
+- Built `make_features_A` v1 (50 engineered + 6 CV TE incl Driver×Race×Year).
+- v1 single LGBM OOF 0.94970 → submitted alone LB **0.94107** (gap −863 bp);
+  K=22 LR-meta-add OOF 0.95404 → submitted LB **0.94933** (−126 bp vs PRIMARY).
+- v2 fixed `stint_size_far` per-split-count cluster + added FS_A merge
+  aggregates. OOF 0.95128 (+38 bp over PRIMARY OOF — too good).
+  K=2 LR(PRIMARY, v2) submitted LB **0.94996** (−63 bp vs PRIMARY).
+- 80/20 honest holdout test (`scripts/p1_holdout.py`) caught FS_A target
+  leak: holdout AUC **0.94637** vs OOF 0.95128 = **−491 bp gap**.
+- v3 with **fold-safe FS_A** (`fit_fs_a` per-fold, `apply_fs_a` merge):
+  OOF **0.94563** matches holdout. Honest single-LGBM ceiling on this
+  comp.
+
+### What we now know
+- Single-LGBM with kitchen-sink Rozen-style FE achieves OOF ~0.946.
+- PRIMARY (K=22 + Path-B hier-meta, OOF 0.95090) is +52 bp ahead.
+- **Stacking is necessary for our LB position.** P1 thesis FALSIFIED.
+- Rozen's published 0.95241 single-LGB OOF is likely similarly inflated
+  by FS_A leak in his pipeline (he uses the same `df[df['PitNextLap']==1]
+  .groupby(...).mean()` pattern fit on full train); his real single-LGB
+  LB is probably ~0.946, blend wins via 5 external sources.
+
+### Other branch's win
+- **`claude/.../d16_path_b_K22_continuous_only_tau20000` LB 0.95089**
+  (+30 bp over PRIMARY 0.95059). Clean Path-B base-add candidate using
+  KS-divergence-identified marginal-aligned features; this is the
+  Day-17+ PRIMARY-replacement candidate to confirm.
+
+### Lessons captured (skill `improvements.md` + local CLAUDE.md R20-R25)
+- R20 single-model-first / kitchen-sink FE before stacking
+- R21 family falsification requires ≥3 variants
+- R22 public-notebook scan at every plateau
+- R23 framework is scaffolding, not authorship
+- **R24 fold-safe label-conditional aggregates** (NEW Day-17)
+- **R25 transductive features need AV check** (NEW Day-17 PI lesson)
+
+`scripts/p1_holdout.py` — 80/20 honest holdout test (independent seed).
+Mandatory before any new-FE-family LB submit.
+
+### Submissions used (all UTC days combined)
+Day-17: 4/10 used (3 by this branch + 1 d16 from another).
+Total: 32/270.
+
+### Files
+- `scripts/p1_features.py` — `make_features_static` + `fit_fs_a` +
+  `apply_fs_a` (v3 fold-safe). Legacy `make_features_A` flagged.
+- `scripts/p1_single_lgbm_v3.py` — fold-safe trainer.
+- `scripts/p1_single_lgbm.py` — v1/v2 trainer (legacy).
+- `scripts/p1_single_cb.py` — single CatBoost (deferred, not run).
+- `scripts/p1_holdout.py` — 80/20 honest holdout.
+- `scripts/p1_post.py`, `scripts/p1_gate_all.py` — gate harnesses.
+- `scripts/artifacts/oof_p1_single_lgbm_v3_feA_te_strat.npy` (+test).
+- `audit/2026-05-06-p1-single-model-{plan,results}.md`.
+- `external/kernels/{romanrozen,...}/` — 8 reference notebooks.
+- `external/{aadigupta_orig,f1_official_1950_2022,weather_woodshole,
+  makimakiai_idsafe,gkanamoto_tabm,pavloivanin_baseline}/`.
+
+### Open candidates from other branches
+- `d16_path_b_K22_continuous_only_tau20000` LB 0.95089 — verify and
+  consider as new PRIMARY.
+- v3 single LGBM OOF 0.94563 itself — too low standalone, but ρ=0.953
+  diversity. Genuine K=22+v3 stack-add lift only +3.40 bp OOF
+  (vs leaky +30.79 bp). Held; probably not worth a slot.

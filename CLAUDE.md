@@ -97,6 +97,66 @@ ff-merge before reading state below.
     PI corollary: the calendar/budget belongs to PI; agents do
     not propose timelines or "today/tomorrow" framings — execute
     until PI says stop.
+20. **Single-model-first / kitchen-sink FE before stacking.** Before
+    adding a 2nd base or LR-meta, build the kitchen-sink feature
+    factory (≥30 engineered features + CV target encoding on every
+    high-card combo, **including 3-way**) and a SINGLE model first.
+    That OOF is the floor; stacking adds on top, it does NOT replace
+    it. Origin: s6e5 Day-16 PI question after we ran 16 days of
+    stack-mechanism work without ever asking what's the best single
+    model. Single LGBM with Rozen's recipe matched our K=22+Path-B
+    PRIMARY OOF on Fold-1 alone.
+21. **Family falsification requires ≥3 variants.** A mechanism
+    family (TE, FM, lag, target-reform, pseudo, calibration) is
+    only "dead" after ≥3 distinct configs of the key hyperparameter
+    (smoothing, polynomial order, field count, key cardinality,
+    regularisation). Single-variant nulls update the prior on that
+    VARIANT, not on the family. Origin: s6e5 d3a closed TE family
+    on Day-3 single 2-way × single smoothing variant; the 3-way
+    (Driver, Race, Year) at smoothing 20 was the comp's +200 bp
+    standalone trick that sat unused for 13 days.
+22. **Public-notebook scan at every plateau.** Triggered on 3
+    consecutive nulls, 5 saturations at same LB, 50% checkpoint, or
+    "redecompose": pull top 5 Kaggle public notebooks for the comp
+    slug (≥10 votes), list their features + OOF AUCs + model classes.
+    Question: which features are NOT in our pool? Build that gap as
+    the next experiment. Strengthens Rule 7 with comp-specific recipe
+    intelligence. Origin: s6e5 Day-16 — Rozen's 0.95354 recipe sat
+    at 19-72 votes the entire comp without us pulling it.
+23. **Framework is scaffolding, not authorship.** The framework
+    (BOTE → gate → submit, 7-step, ISSUES tree) optimises HOW to
+    evaluate. It does NOT generate WHAT to evaluate. Reserve ≥1 slot
+    per 3-day cycle for free-form FE creativity uncoupled from
+    existing pool. Triggered when 3+ days pass without a probe whose
+    source idea is NOT a 1-step variant of an existing experiment.
+    Origin: s6e5 16-day plateau where every probe was a rank-locked
+    stack-add variant; discipline is necessary but not sufficient.
+24. **Fold-safe label-conditional aggregates.** ANY feature derived
+    from labels via groupby aggregation (target encoding, mean of
+    positives per group, target-conditional ratios) MUST be re-fit
+    inside each CV fold using ti rows only. Never include val/holdout
+    labels in the aggregate. For test prediction, either refit on full
+    train + apply, OR 5-fold-average models each with own ti-fitted
+    aggregate. **Diagnostic:** strict 80/20 holdout test (independent
+    seed, FE on 80% only, eval on 20%) detects this in <10 min CPU
+    without burning a slot. If holdout_AUC ≪ OOF_AUC by >10 bp, leak
+    present — debug before submit. Origin: Day-17 P1 v2 — FS_A merges
+    (`compound_avg_life`, `race_avg_pit_lap`, `dc_avg_stint_life`)
+    fit on full train inflated OOF by 491 bp (0.95128 vs honest
+    holdout 0.94637); v1 single LB 0.94107 (−863 bp gap); K=2 LR-meta
+    LB 0.94996 (−63 bp).
+25. **Transductive features need AV check.** Even using test FEATURE
+    values (not labels) at training time can be unsafe if train/test
+    distributions differ. Frequency encoding, quantile binning,
+    factorize maps, PCA/AE fit on combined train+test can encode
+    distributional structure that differs between train/test or
+    public/private LB. Rule: before any combined-set transform, run
+    adversarial validation (train-vs-test classifier AUC). If
+    AV-AUC ≈ 0.5, combined-set FE is safe. If AV-AUC > ~0.55, fit on
+    train only. (s6e5 AV-AUC = 0.502 per U3, so combined-FE was
+    safe here.) Companion to Rule 24 — Rule 24 covers label-derived
+    features; Rule 25 covers feature-value transforms. Origin:
+    PI Day-17 lesson on cross-comp generalisation discipline.
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
@@ -114,11 +174,11 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 16                           # 2026-05-16 PM. **PRIMARY UNCHANGED at LB 0.95059 (d15b_path_b_K22_dae_only_tau20000)**. Branch `claude/read-handover-lA8Nr` ran the virgin-axes complement to HANDOVER T1-T4 (axes α/β/δ/ε/ζ/η from d13 problem-decomposition tree, untouched by other branches). 8 probes / 4 NULL / 3 KILLED / 1 marginal. Load-bearing finding: **5th cross-confirmation of `lr-meta-rank-lock-strong-anchor`** — even GRU sequence model (causal RNN over (Driver,Race) lap windows) at ρ=0.919 standalone diversity (most-diverse base of session) is fully absorbed by K=22 LR-meta with [raw,rank,logit] expand at K=22+1 gate (Δ=-0.043bp NULL). H9 transductive pseudo +0.631bp at LR-meta(K=22) but -0.30bp vs PRIMARY hier-meta (Path-B-amp doesn't fire on base-add per friction). H9+H2 / H9+GRU multi-add ≈ same as H9 alone (+0.671 / +0.629 bp). No new PRIMARY; 0 submits today; meta-arch redesign (HANDOVER T4, owned by other branches) is the only amp-eligible axis remaining.
+day: 17                           # 2026-05-07 AM. **PRIMARY UNCHANGED at LB 0.95059 (d15b_path_b_K22_dae_only_tau20000)**. Branch `claude/read-kaggle-handover-rsi2Q` ran P1 single-model thesis end-to-end (Rozen recipe replication). 7 probes / 4 LB submits / **P1 thesis CONCLUSIVELY FALSIFIED**. v1 OOF 0.94970 → LB 0.94107 (−863 bp gap from leaky stint-count cluster). v2 with FS_A merge fix OOF 0.95128 → holdout 0.94637 (FS_A target leak). v3 fold-safe FS_A: OOF **0.94563** (matches holdout, honest). Single-LGBM ceiling on this comp is ~0.946 OOF — 52 bp below PRIMARY OOF 0.95090. Stacking is necessary. Other branch landed `d16_path_b_K22_continuous_only_tau20000` LB 0.95089 (+30 bp; clean Path-B base-add candidate for Day-17+ PRIMARY-replace). 4 cross-comp lessons captured to skill: G16 fold-safe label-conditional aggregates, G17 transductive-features-need-AV-check, 80/20 holdout diagnostic, single-model-first / kitchen-sink FE before stacking. R20-R25 added to local CLAUDE.md.
 lb_best_today: 0.95435            # leader; not refreshed
 our_lb_best: 0.95059              # d15b_path_b_K22_dae_only_tau20000 (unchanged Day-16); gap to top-5% -2.86bp
-submissions_used_today: 0         # Day-16: probe-only night, all OOF/min-meta gates, no LB submits
-submissions_used_total: 28
+submissions_used_today: 4         # Day-17 AM: K22_add_p1_feA_te 0.94933, p1_single_v1 0.94107, K2_PRIM_v2 0.94996, (other branch) d16_continuous_only 0.95089
+submissions_used_total: 32
 saturation_count: 1               # Day-16 +1: K=22 rank-locked across all virgin base-add axes (5th cross-confirmation including α4 sequence)
 mechanism_families_explored:
   - baseline_lgbm_raw_features
