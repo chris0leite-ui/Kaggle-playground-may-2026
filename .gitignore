@@ -67,3 +67,4 @@ external/makimakiai_idsafe/
 external/pavloivanin_baseline/
 external/weather_woodshole/
 # external/kernels/ (notebook sources) ARE checked in — small + load-bearing reference
+kernels/d18-f1-replay-forensics-gpu/output/
