@@ -185,7 +185,31 @@ prediction signal. 5 phases × 19 probes. CPU-only. 0 submits. Audit at
   Re-run `scripts/d17_phase_a_compose.py` to obtain canonical
   Δ vs K=21 / Δ vs PRIMARY / ρ for all 7 combos and pick a
   PRIMARY-advance candidate or fall back to PRIMARY-hold.
+  `[owner: read-handover-62BCt | status: done]` Result: all C1-C7 LR-meta
+  combos TIE/regress vs current d16 PRIMARY; C7 (K=24) +0.81 bp OOF /
+  ρ_test 0.99506 / pred LB Δ −0.69 bp. 5th cross-confirmation of
+  `path-b-amp-only-fires-on-meta-arch-not-base-add`. Audit at
+  `audit/2026-05-07-d17-phase-a-composition-gate.md`.
+
+## 9. Day-17 PM strategy-critic top-3 hypotheses (Rule 14 + Rule 7)
+
+PI directive 2026-05-07: "small probes don't matter. Revisit
+problem-solving loop. Find focus." Strategy-critic-loop diagnosis: the
+gap is RECIPE not POOL — our `realmlp` slot is a default-config single-
+fold smoke test (OOF 0.94582) vs yekenot's published recipe (~0.95273).
+Top 3 hypotheses launched in parallel. Audit at
+`audit/2026-05-07-d17-strategy-critique.md`.
+
+- **9a.** H1 — Yekenot RealMLP recipe replication (`new_model_class`).
+  Cost 30-90 min CPU. PI-pred 0 bp; agent expected +27 bp.
   `[owner: read-handover-62BCt | status: wip]`
+- **9b.** H2 — FastF1 / Ergast external join (DriverAheadPit +
+  TrackStatus + CumulativeTimeStint per Frontiers AI 2025 Bi-LSTM).
+  Cost 60-180 min CPU + network. PI-pred +5 bp; agent expected +3.6 bp.
+  `[owner: read-handover-62BCt | status: wip]`
+- **9c.** H3 — ID-shift / row-position structural probe (s5e12 2nd-place
+  precedent). AV-AUC at id_mod_N + sparse-LR base. Cost 20-40 min CPU.
+  PI-pred 0 bp; agent expected +0.6 bp. `[owner: read-handover-62BCt | status: wip]`
 
 ## 8. Virgin axes complement to HANDOVER T1–T4 (Day-16 RESOLVED)
 
