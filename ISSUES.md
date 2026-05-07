@@ -178,6 +178,14 @@ prediction signal. 5 phases × 19 probes. CPU-only. 0 submits. Audit at
   New friction `path-b-on-pool-subset-conflates-cohort-axis-with-pool-size`.
   Re-test on full K=21 pool TODO.
   `[owner: autoencoder-synthetic-data-pEMB6 | status: null]`
+- **7f.** d17 Phase-A composition gate: K=23/K=24 stack-add of d16
+  Phase-4 winners (continuous_only / no_laptime / no_tyrelife_rp /
+  categorical_only) ± cross-branch strict inv_laps. Inherited mid-run
+  (C1-C5 OOFs on disk via 1f442e8, summary JSON missing, C6/C7 unrun).
+  Re-run `scripts/d17_phase_a_compose.py` to obtain canonical
+  Δ vs K=21 / Δ vs PRIMARY / ρ for all 7 combos and pick a
+  PRIMARY-advance candidate or fall back to PRIMARY-hold.
+  `[owner: read-handover-62BCt | status: wip]`
 
 ## 8. Virgin axes complement to HANDOVER T1–T4 (Day-16 RESOLVED)
 
