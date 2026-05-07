@@ -1,13 +1,17 @@
 # Decision-time logging — design (MVP-first)
 
-> Recommendation drafted 2026-05-06 in response to PI's question
-> *"how would we best implement decision-time logging?"*. Pending PI
-> ratification; if approved, ship MVP.
+> **Status: shipped 2026-05-06.** PI greenlit; MVP merged into
+> `scripts/probe.py`. First real `probe.py bote` call creates
+> `audit/decisions.jsonl` and appends one row per call.
 >
 > Closes the F1.6.1 commitment ("really really need to lock decisions
 > together with framework state at decision-time") that the
 > [postmortem skill v1](../../.claude/skills/postmortem/SKILL.md)
 > deliberately did *not* address ([F1.6.2](../questions/2026-05-06-grilling-round-10.md#f162)).
+>
+> Smoke-test verified: schema well-formed, 13 fields, framework SHA
+> stamped from `git rev-parse HEAD` (= last committed state, not
+> working tree — correct semantics for "rules in force at decision").
 
 ## Substrate: extend `scripts/probe.py bote`
 

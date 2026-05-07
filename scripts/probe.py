@@ -31,7 +31,9 @@ when PRIMARY changes, update the constants below or pass explicit paths.
 from __future__ import annotations
 
 import argparse
+import datetime as _dt
 import json
+import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -44,6 +46,11 @@ from sklearn.model_selection import StratifiedKFold
 ART = Path("scripts/artifacts")
 TARGET = "PitNextLap"
 SEED, N_FOLDS = 42, 5
+
+# ---- Decision-time log (append-only JSONL) --------------------------
+# Per knowledge-base/concepts/decision-time-logging.md. Every BOTE call
+# appends one row, locking predictions + framework SHA at decision-time.
+DECISIONS_LOG = Path("audit/decisions.jsonl")
 
 # ---- PRIMARY defaults (update when PRIMARY changes) -----------------
 PRIMARY_OOF = ART / "oof_d13e_compound_stint_tau20000_strat.npy"
@@ -71,6 +78,50 @@ FAMILY_PRIORS = {
     "two_level_stacking_meta_as_base": (0.10, (-2.0, 0.0, 1.0)),
     "process_or_infrastructure": (1.00, (0.0,  0.0,  0.0)),  # not bp; utility
 }
+
+# ---- Decision-log helpers -------------------------------------------
+def _git(*args: str) -> str:
+    """Run a git query, return stripped stdout, or 'unknown' on failure."""
+    try:
+        return subprocess.check_output(
+            ["git", *args], text=True, stderr=subprocess.DEVNULL
+        ).strip()
+    except Exception:
+        return "unknown"
+
+
+def _append_decision_record(res: dict, note: str) -> None:
+    """Append a JSONL row capturing the BOTE decision at decision-time.
+
+    Schema (one event per line):
+      ts, tool, decision_id, family, verdict, prob_useful,
+      predicted_lift_bp_band [pess, med, opt], expected_lb_bp,
+      cost_min_estimate, cost_efficiency_bp_per_min,
+      framework_sha, agent_branch, note.
+
+    See knowledge-base/concepts/decision-time-logging.md for rationale.
+    """
+    record = {
+        "ts": _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds"),
+        "tool": "probe.py bote v1",
+        "decision_id": res["name"],
+        "family": res["family"],
+        "verdict": res["verdict"],
+        "prob_useful": res["prob_useful"],
+        "predicted_lift_bp_band": [
+            res["bp_pessimistic"], res["bp_median"], res["bp_optimistic"]
+        ],
+        "expected_lb_bp": res["expected_lb_bp"],
+        "cost_min_estimate": res["cost_min"],
+        "cost_efficiency_bp_per_min": res["cost_efficiency_bp_per_min"],
+        "framework_sha": _git("rev-parse", "HEAD"),
+        "agent_branch": _git("rev-parse", "--abbrev-ref", "HEAD"),
+        "note": note,
+    }
+    DECISIONS_LOG.parent.mkdir(parents=True, exist_ok=True)
+    with DECISIONS_LOG.open("a") as f:
+        f.write(json.dumps(record) + "\n")
+
 
 # ---- ρ → predicted-LB-delta band ------------------------------------
 def predicted_lb_delta_bp(d_oof_bp: float, rho: float) -> float:
@@ -145,6 +196,8 @@ def bote(name: str,
     print(f"  cost: {cost_min:.0f} min  →  expected LB: {expected_bp:+.2f} bp")
     print(f"  cost-efficiency: {cost_efficiency:.3f} bp/min")
     print(f"  verdict: {verdict}")
+    _append_decision_record(res, note)
+    print(f"  logged: {DECISIONS_LOG}")
     return res
 
 

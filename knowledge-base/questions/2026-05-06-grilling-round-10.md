@@ -71,7 +71,12 @@ where it's actually painful, say so — that's a defensible choice.
 > `scripts/probe.py bote` to append a JSONL record to
 > `audit/decisions.jsonl` on every call. ~30 lines in probe.py. Full
 > design + schema + rationale: [`concepts/decision-time-logging.md`](../concepts/decision-time-logging.md).
-> Pending PI ratification before implementation.
+>
+> **PI: "go" (2026-05-06).** **Shipped.** MVP merged into
+> `scripts/probe.py` (this branch); smoke-test verified the JSONL
+> schema parses cleanly with all 13 fields. First real BOTE call
+> will create `audit/decisions.jsonl`. Extensions (PI overrides,
+> realized outcomes, bypass detection) deferred per the design.
 
 ---
 

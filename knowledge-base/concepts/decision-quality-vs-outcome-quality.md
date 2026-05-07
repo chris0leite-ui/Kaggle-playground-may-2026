@@ -104,13 +104,13 @@ a slogan into the framework's actual update mechanism.
 For the decision-quality framing to function as a trust mechanism:
 
 1. **Decision-time logging** — schema, not prose.
-   *PI committed*: "really really need to lock the decision-time
-   capture." No infrastructure yet. Pending postmortem-skill design
-   ([F1.7.1.1](../questions/2026-05-06-grilling-round-7.md#f171)).
+   *Shipped 2026-05-06* via `scripts/probe.py bote` extension that
+   appends a JSONL row to `audit/decisions.jsonl` on every BOTE
+   call. Design: [`decision-time-logging.md`](./decision-time-logging.md).
 2. **Framework versioning** — which rule was active when.
-   *PI committed*: "lock our decisions together with the status of
-   the framework at the time that we took the decision." Currently
-   inferable only from git log.
+   *Shipped 2026-05-06*. Each decision-log row stamps `framework_sha`
+   from `git rev-parse HEAD` at decision-time, plus `agent_branch`.
+   Resolution by `git show <sha>:CLAUDE.md`.
 3. **Deliberate rule extraction** — explicit post-mortem step, not
    accidental.
    *Current state*: PI manually adds to `audit/friction.md` (580
@@ -134,10 +134,11 @@ For the decision-quality framing to function as a trust mechanism:
    [F1.8.2.1](../questions/2026-05-06-grilling-round-9.md#f1821).
 
 If any of these is missing, the framing degrades back to
-outcome-quality with extra prose. Today: 1 & 2 are committed
-(skill-based per-session capture, with framework SHA stamping), 3
-is gaining a postmortem trigger, 4 has a cadence (session-level)
-but trigger / criteria still open.
+outcome-quality with extra prose. Today: **1 & 2 shipped**
+(decision-time JSONL log + framework SHA stamping in
+`scripts/probe.py`); **3 shipped** (postmortem skill at WRAPUP step
+4b); **4 has a cadence** (session-level promotion) but trigger /
+criteria operationalised in postmortem skill step 3.
 
 ## Adjacent concepts
 
