@@ -1,16 +1,12 @@
-"""scripts/lr_diag_e8_grid.py — E8: class_weight × C × penalty grid.
+"""scripts/lr_diag_e8_grid.py — E8: pruned LR-meta hyperparameter grid.
 
-Diagnostic. Settles empirically (for our binary AUC) the 12th-place
-"three axes" claim. Grid over LR-meta(K=24):
-  - class_weight ∈ {None, 'balanced'}
-  - C ∈ {0.001, 0.01, 0.1, 1, 10, 100}
-  - penalty ∈ {l2, l1}  (l1 only for compatible solvers)
+Pruned (2026-05-07 PM): l2 only via lbfgs (saga+l1 was 1h+ on tiny C
+and prior partial datapoints gave Δ within 1 bp — the rank-no-op
+verdict survives without the slow corner). Adds the logits-only
+input ablation (P2 from prior plan) while we're here.
 
-Records OOF AUC + ρ vs anchor (class_weight=None, C=1.0, l2) so we
-see RANK-CORRELATION between configs (not just AUC). For binary AUC
-class_weight is theoretically rank-no-op; this experiment verifies.
-
-Output: scripts/artifacts/lr_diag_e8_grid.json + console.
+Grid: 2 cw × 5 C × 2 input_modes = 20 fits × 5-fold = 100 LR fits.
+Each ~3-8s on lbfgs C∈[0.01, 100] → estimated <5 min total.
 """
 from __future__ import annotations
 
@@ -40,29 +36,31 @@ EXTRAS = ["d16_orig_continuous_only", "p1_single_cb_v3_gpu",
 ALL_BASES = K21_BASES + EXTRAS
 
 
-def _pos(p: Path) -> np.ndarray:
+def _pos(p):
     a = np.load(p)
     return a[:, 1].astype(np.float64) if a.ndim == 2 else a.ravel()
 
 
-def _expand(P):
+def _expand_full(P):
     n = len(P)
     Pc = np.clip(P, 1e-9, 1 - 1e-9)
-    rk = np.column_stack([
-        np.argsort(np.argsort(c)) / n for c in P.T
-    ])
+    rk = np.column_stack([np.argsort(np.argsort(c)) / n for c in P.T])
     logit = np.log(Pc / (1 - Pc))
     return np.hstack([P, rk, logit])
 
 
-def _oof(F, y, cw, C, penalty):
+def _expand_logit_only(P):
+    Pc = np.clip(P, 1e-9, 1 - 1e-9)
+    return np.log(Pc / (1 - Pc))
+
+
+def _oof(F, y, cw, C):
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     oof = np.zeros(len(y))
-    solver = "saga" if penalty == "l1" else "lbfgs"
     for tr, va in skf.split(np.zeros(len(y)), y):
         lr = LogisticRegression(
-            C=C, class_weight=cw, penalty=penalty,
-            solver=solver, max_iter=4000
+            C=C, class_weight=cw, penalty="l2",
+            solver="lbfgs", max_iter=2000
         )
         lr.fit(F[tr], y[tr])
         oof[va] = lr.predict_proba(F[va])[:, 1]
@@ -72,65 +70,87 @@ def _oof(F, y, cw, C, penalty):
 def main():
     y = pd.read_csv("data/train.csv", usecols=[TARGET])[TARGET].astype(int).values
     P = np.column_stack([_pos(ART / f"oof_{b}_strat.npy") for b in ALL_BASES])
-    F = _expand(P)
 
-    # Anchor
-    print("Fitting anchor (cw=None, C=1.0, l2)...")
-    anchor_oof, anchor_auc = _oof(F, y, None, 1.0, "l2")
+    inputs = {
+        "full_72_P_rank_logit": _expand_full(P),
+        "logit_only_24": _expand_logit_only(P),
+    }
+
+    # Anchor = current production: full input, cw=None, C=1.0
+    print("Fitting anchor (full input, cw=None, C=1.0, l2 lbfgs)...")
+    anchor_oof, anchor_auc = _oof(inputs["full_72_P_rank_logit"], y, None, 1.0)
+    print(f"  anchor AUC: {anchor_auc:.6f}")
 
     grid = []
     cw_vals = [None, "balanced"]
-    C_vals = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
-    pen_vals = ["l2", "l1"]
-    total = len(cw_vals) * len(C_vals) * len(pen_vals)
+    C_vals = [0.01, 0.1, 1.0, 10.0, 100.0]
+    total = len(inputs) * len(cw_vals) * len(C_vals)
     i = 0
-    for cw in cw_vals:
-        for pen in pen_vals:
+    for input_name, F in inputs.items():
+        for cw in cw_vals:
             for C in C_vals:
                 i += 1
-                print(f"[{i}/{total}] cw={cw} C={C:>7g} penalty={pen} ...",
+                print(f"[{i}/{total}] input={input_name} cw={cw} C={C:>7g} ...",
                       end="", flush=True)
-                try:
-                    oof, auc = _oof(F, y, cw, C, pen)
-                    rho, _ = spearmanr(oof, anchor_oof)
-                    bp = (auc - anchor_auc) * 1e4
-                    print(f"  AUC={auc:.5f}  Δ={bp:+.2f}bp  ρ={rho:.5f}")
-                    grid.append({
-                        "class_weight": str(cw),
-                        "C": C,
-                        "penalty": pen,
-                        "oof_auc": round(auc, 6),
-                        "delta_bp_vs_anchor": round(float(bp), 3),
-                        "spearman_rho_vs_anchor": round(float(rho), 6),
-                    })
-                except Exception as e:
-                    print(f"  FAILED: {e}")
-                    grid.append({
-                        "class_weight": str(cw), "C": C, "penalty": pen,
-                        "error": str(e)[:80],
-                    })
+                oof, auc = _oof(F, y, cw, C)
+                rho, _ = spearmanr(oof, anchor_oof)
+                bp = (auc - anchor_auc) * 1e4
+                print(f"  AUC={auc:.5f}  Δ={bp:+.2f}bp  ρ={rho:.5f}")
+                grid.append({
+                    "input": input_name,
+                    "class_weight": str(cw),
+                    "C": C,
+                    "penalty": "l2",
+                    "oof_auc": round(auc, 6),
+                    "delta_bp_vs_anchor": round(float(bp), 3),
+                    "spearman_rho_vs_anchor": round(float(rho), 6),
+                })
 
     out = {
         "anchor_auc": round(anchor_auc, 6),
+        "anchor_config": {
+            "input": "full_72_P_rank_logit",
+            "class_weight": "None",
+            "C": 1.0,
+            "penalty": "l2",
+        },
         "grid": grid,
+        "salvaged_l1": [
+            {"class_weight": "None", "C": 0.01, "penalty": "l1",
+             "delta_bp_vs_anchor": -0.59, "spearman_rho_vs_anchor": 0.99890,
+             "note": "from killed run; rank-no-op confirmed"},
+            {"class_weight": "None", "C": 0.1, "penalty": "l1",
+             "delta_bp_vs_anchor": 0.08, "spearman_rho_vs_anchor": 0.99975,
+             "note": "from killed run; rank-no-op confirmed"},
+        ],
     }
     json_path = ART / "lr_diag_e8_grid.json"
     json_path.write_text(json.dumps(out, indent=2))
 
     print("\n=== E8 grid summary ===")
-    print(f"anchor (cw=None, C=1.0, l2): AUC={anchor_auc:.5f}")
-    rows_ok = [r for r in grid if "oof_auc" in r]
-    if rows_ok:
-        best = max(rows_ok, key=lambda r: r["oof_auc"])
-        worst = min(rows_ok, key=lambda r: r["oof_auc"])
-        print(f"best:  {best}")
-        print(f"worst: {worst}")
-        # rank-correlation perspective
-        rhos = [r["spearman_rho_vs_anchor"] for r in rows_ok]
-        print(f"Spearman ρ to anchor: min={min(rhos):.5f}, "
-              f"median={float(np.median(rhos)):.5f}, max={max(rhos):.5f}")
-        bps = [r["delta_bp_vs_anchor"] for r in rows_ok]
-        print(f"Δ bp range: [{min(bps):+.2f}, {max(bps):+.2f}]")
+    print(f"anchor: AUC={anchor_auc:.6f}\n")
+    print(f"{'input':<24s} {'cw':<10s} {'C':>8s} {'AUC':>9s} "
+          f"{'Δbp':>7s} {'ρ':>9s}")
+    print("-" * 80)
+    rows_sorted = sorted(grid, key=lambda r: -r["oof_auc"])
+    for r in rows_sorted:
+        print(f"{r['input']:<24s} {r['class_weight']:<10s} "
+              f"{r['C']:>8g} {r['oof_auc']:>9.5f} "
+              f"{r['delta_bp_vs_anchor']:>+7.2f} "
+              f"{r['spearman_rho_vs_anchor']:>9.5f}")
+    print("-" * 80)
+    rhos = [r["spearman_rho_vs_anchor"] for r in grid]
+    bps = [r["delta_bp_vs_anchor"] for r in grid]
+    print(f"Spearman ρ to anchor: min={min(rhos):.5f}, "
+          f"median={float(np.median(rhos)):.5f}, max={max(rhos):.5f}")
+    print(f"Δ bp range: [{min(bps):+.2f}, {max(bps):+.2f}]")
+    # split by input
+    full_bps = [r["delta_bp_vs_anchor"] for r in grid
+                if r["input"] == "full_72_P_rank_logit"]
+    logit_bps = [r["delta_bp_vs_anchor"] for r in grid
+                 if r["input"] == "logit_only_24"]
+    print(f"\nfull-input Δ range : [{min(full_bps):+.2f}, {max(full_bps):+.2f}]")
+    print(f"logit-only Δ range : [{min(logit_bps):+.2f}, {max(logit_bps):+.2f}]")
     print(f"\n→ JSON saved: {json_path}")
 
 
