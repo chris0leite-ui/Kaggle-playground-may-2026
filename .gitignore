@@ -57,3 +57,13 @@ Thumbs.db
 
 # CatBoost training artifacts (auto-generated)
 catboost_info/
+kernels/d15b-dae-gpu/output/d15b_dae_X_*_latent.npy
+
+# External Kaggle datasets pulled for reference (large CSVs; permissive licenses)
+external/aadigupta_orig/
+external/f1_official_1950_2022/
+external/gkanamoto_tabm/
+external/makimakiai_idsafe/
+external/pavloivanin_baseline/
+external/weather_woodshole/
+# external/kernels/ (notebook sources) ARE checked in — small + load-bearing reference

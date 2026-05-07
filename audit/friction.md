@@ -2,7 +2,367 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-06 PM (branch `claude/read-kaggle-handover-rsi2Q`)
+
+- `tag: recipe-over-judgment` — Day-16 PI question: "we ran 16 days of
+  disciplined experiment loops and never asked WHAT'S THE BEST SINGLE
+  MODEL? We jumped to stacking on Day 2." Diagnosis: (a) we treated FE
+  additions as "+1 feature to existing base" probes, never built a
+  kitchen-sink feature factory; (b) once K=21 was saturated, every
+  candidate was at ρ≈0.999 → tiny lift → NULL, and we labelled this
+  `lr-meta-rank-lock-strong-anchor` instead of asking "what if a NEW
+  base had ALL the FE we never tried?"; (c) Rozen 0.95354 recipe was
+  publicly available the entire time at 19-72 votes, never pulled.
+  Lessons promoted to skill `improvements.md` (6 entries: kickoff Q5b
+  data+task description, guardrail 13 single-model-first, pre-baseline
+  gate items 8-11 public-notebook + TE inventory + physics features +
+  single-model OOF target, day-loop public-notebook re-scan trigger,
+  guardrail 14 family-falsification needs ≥3 variants, guardrail 15
+  framework is scaffolding not authorship).
+
+- `tag: family-falsification-too-quick` — Day-3 d3a `unified_te_2way_keys`
+  tested ONE smoothing × ONE 2-way key, scored +0.1 bp NULL at meta-add,
+  closed the entire TE family. The 3-way (Driver, Race, Year) at smoothing
+  20 was the comp's load-bearing single trick (~+200 bp standalone for
+  any single LGBM). One null does not falsify a family.
+
+- `tag: kitchen-sink-fe-beats-stack-without-fe` — Day-16 evening: single
+  LGBM with Rozen's 65 features (50 engineered + 6 CV target encodings
+  + 9 raw cats) hit Fold-1 OOF 0.95084, matching K=22+Path-B-hier-meta
+  PRIMARY at OOF 0.95090. Single-model FE recovers ~95-100% of stacking
+  lift on this comp.
+
+- `tag: keep-playbook-as-repo-reference` — PI suggestion Day-16 PM: keep
+  top 3-5 public Kaggle notebooks under `external/kernels/` as
+  **reference examples**, not copy-pasted code. Use them to (1) reverse-
+  engineer FE at every plateau, (2) sanity-check our feature factory vs
+  published recipes, (3) build a cross-comp recipe library. Periodic
+  review at end-of-comp wrap-up; promote durable patterns to skill
+  `examples/` or `recipes/`. Seed entry:
+  `s6e5/romanrozen/f1-pit-driver-race-year-encoding-0-95354.ipynb`.
+
+## 2026-05-07 (P1 single-model thesis falsified)
+
+- `tag: target-construction-layer-leakage` (already in skill but
+  re-encountered, this time at the FS_A merge level). Day-16 PM/Day-17
+  v2 `make_features_A` computed `race_avg_pit_lap`, `compound_avg_life`,
+  `dc_avg_stint_life` from `df[df['PitNextLap']==1].groupby(...).mean()`
+  on full train, then merged the same lookup into both train and test.
+  In CV-OOF, val rows had their own labels included in the FS_A
+  aggregates → **OOF inflated by ~500 bp** (0.95128 vs honest holdout
+  0.94637). LB submitted at LB 0.94107 (v1 standalone) and 0.94996
+  (K=2 LR with v2). **FIX:** any label-conditional aggregate must be
+  fold-safe — refit FS_A per CV fold using ti rows only. v3 with
+  fold-safe FS_A: OOF 0.94563 (matches holdout 0.94637).
+
+- `tag: 2-level-stacking-with-meta-derivative` (already in skill;
+  re-encountered). K=2 LR(PRIMARY, candidate) where PRIMARY is itself
+  a hier-meta over K=22: K=2 OOF lift +30.79 bp → LB regress −63 bp
+  vs PRIMARY. The PRIMARY-as-base pattern is leaky regardless of how
+  clean the candidate is; Path-B amp does NOT fire on meta-derivative
+  inputs.
+
+- `tag: cv-te-stacking-base-leakage` — when a base uses CV target
+  encoding internally and is then fed to an LR meta with the SAME
+  outer fold split, the base's OOF carries cross-fold TE leakage that
+  the meta over-credits. v1 K=22 LR-meta(K=21 + p1_feA_te): OOF +33 bp
+  → LB regress −126 bp vs PRIMARY. Mitigation: use Path-B hier-meta
+  instead of LR meta for stack-add of TE-bearing bases (Path B is
+  more leakage-robust per d10b GKF probe; 2.3× amplification on
+  GKF vs Strat).
+
+- `tag: transductive-features-need-AV-check` (PI Day-17 lesson). Even
+  using test FEATURE values (not labels) at training time can be
+  unsafe when train/test distributions shift. Frequency encoding,
+  quantile binning, factorize maps, PCA/AE fit on combined train+test
+  can encode subtle distributional structure that differs between
+  train/test or between public/private LB. Rule: before any
+  combined-set FE, run adversarial validation (train_vs_test
+  classifier AUC). If AV-AUC ≈ 0.5 (s6e5: 0.502), combined is safe.
+  If AV-AUC > ~0.55, do NOT use combined-set FE for that lever; fit
+  on train-only. Companion to the strict-no-out-of-fold-labels rule.
+
+- `tag: P1-single-model-thesis-falsified-on-s6e5` — under correct
+  fold-safe OOF discipline, the best single-LGBM with kitchen-sink
+  Rozen-recipe FE (50 engineered + 6 CV TE incl 3-way + 7 fold-safe
+  FS_A merges + 8 historical priors = 93 features, Rozen hparams,
+  5-fold StratKF) achieves OOF 0.94563. Our K=22 + Path-B hier-meta
+  PRIMARY achieves OOF 0.95090 / LB 0.95059. Stacking is +52 bp ahead.
+  P1 thesis ("a single model can match or beat the stack") is
+  CONCLUSIVELY FALSIFIED on this comp. The original PI hypothesis
+  "leader at LB ~0.955 likely uses ONE strong model" — leaders
+  almost certainly blend or stack; Rozen's actual single-LGB OOF
+  0.95241 is likely similarly inflated by FS_A leak in his pipeline.
+
+## 2026-05-16 (branch `claude/read-handover-lA8Nr`)
+
+- `tag: twin-pool-2-meta-collapses-rank-info` — Day-16 H2 built two LR
+  metas over disjoint base subsets (Pool A = 6 GBDT bases; Pool B = 5
+  model-class diverse: 2 FM + 2 rule + DAE) with ρ(metaA, metaB)=0.967
+  (real disagreement). Top-level LR over [metaA, metaB] OOF 0.95010 vs
+  single LR-meta over A∪B (K=11) OOF 0.95028. **Δ = -1.79 bp.** The
+  top-level LR over a 2-feature input collapses the rank info that
+  the K=11 LR-meta with [raw,rank,logit] expand captures across 33
+  dimensions. Reconfirms `lr-meta-rank-lock-strong-anchor` from a
+  different angle: rank-lock can't be broken by adding a meta level
+  to the same set of bases. **Fix:** treat any "build a 2nd meta and
+  blend" candidate as discounted by 50% under `meta_arch_redesign`
+  family — segmentation refinement (Path B) is the only meta-arch
+  axis that has empirically beaten single-LR-meta on this comp.
+
+- `tag: primary-hier-meta-globally-calibrated` — Day-16 H4 (Year=2023
+  ∩ rare-Driver hard-mask post-process) and H7 (per-bin isotonic
+  4 schemes, inner-CV-validated) BOTH NULL. Best mask K=5 lifts +0.004
+  bp ceiling; isotonic schemes regress -2.5 to -9.6 bp. PRIMARY
+  hier-meta with Compound×Stint segmentation has fully absorbed the
+  per-cohort calibration that post-processing recalibration would
+  expose. **Pre-flight rule:** post-process recalibration of PRIMARY
+  is now a confirmed-NULL family (`primary-hier-meta-globally-calibrated`);
+  treat with bp band (-1, 0, 0.5) and P(useful)=0.05.
+
+- `tag: two-stage-stint-needs-richer-stage-2` — Day-16 H10 implemented
+  α5 (per-stint two-stage from d13 axis tree) with stage-1 LGBM
+  regression on E[T_stint] + stage-2 1-D logistic on remaining-laps.
+  Std OOF 0.625 — stage-2 collapsed too much info (just 1 feature). A
+  proper retry would feed stage-2 LGBM with [E[T_stint], laps_so_far,
+  Compound, TyreLife, Position, etc.]. NOT a falsification of the α5
+  axis itself, just of this implementation. Worth re-attempting if
+  later sessions still need new bases.
+
+- `tag: temporal-axis-also-rank-locked-at-K22` — Day-16 H1 GRU
+  sequence model (causal GRU over (Driver, Race) lap windows; the
+  α4 prediction-unit axis from d13 problem-decomposition tree).
+  Trained on Kaggle T4×2 12 epochs × 5-fold ~58 min wall. Std OOF
+  0.93066, **ρ vs PRIMARY 0.919 (most-diverse single base of
+  session)** — confirming the temporal lap-sequence carries
+  meaningfully different signal at the standalone level. **Yet at
+  K=22+1 LR-meta gate Δ = -0.043 bp NULL.** Even the unique virgin
+  prediction-unit axis is fully absorbed by the K=22 LR-meta with
+  [raw, rank, logit] expand. This is the 5th cross-confirmation of
+  `lr-meta-rank-lock-strong-anchor` from a structurally distinct
+  angle (sequence vs per-row classification). **Strategic
+  implication:** standalone-OOF/ρ-band metrics are now empirically
+  insufficient predictors of meta-utility for ANY base-add on
+  this comp; meta-arch redesign (Path B) is the only amp-eligible
+  axis remaining.
+
+- `tag: lr-meta-multi-add-no-better-than-single-add` — Day-16 H9
+  alone +0.631 bp at K=22+1 LR-meta. H9+H2 multi-add (K=22+2): +0.671
+  bp (only +0.04 over H9 alone, despite H2's ρ=0.991 standalone
+  diversity at the meta level). H9+GRU multi-add (K=22+2): +0.629 bp
+  (effectively 0 over H9). Even with structurally diverse candidates
+  (H2 = twin-pool meta, GRU = α4 sequence; ρ to PRIMARY 0.991, 0.919),
+  the LR-meta with [raw,rank,logit] saturates on a SINGLE direction
+  contributed by the marginally-additive base. Multi-add does not
+  unlock additional orthogonal signal on this comp at the K=22 pool
+  size. **Pre-flight rule:** when 2 candidates each PASS K=22+1
+  individually with similar |w| and similar OOF Δ, expect K=22+2
+  multi-add Δ ≈ max(individual Δ), not sum.
+
+- `tag: h9-transductive-pseudo-lifts-LR-meta-but-not-PRIMARY-hier` —
+  Day-16 H9 (LGBM trained on synth_train + half-weighted PRIMARY-
+  pseudo-test 627k rows) std OOF 0.93433, ρ=0.872. K=22+1 LR-meta
+  gate +0.631 bp PASS — small but real positive signal. **But vs
+  PRIMARY hier-meta with Compound×Stint segmentation: Δ -0.30 bp
+  regress.** PRIMARY's hier-meta is +0.93 bp above LR-meta(K=22);
+  the H9 +0.63 gain at LR-meta erases when account for PRIMARY's
+  amp. Empirical confirmation of `path-b-amp-only-fires-on-meta-arch
+  -not-base-add`: even a marginal LR-meta lift doesn't transfer to
+  PRIMARY-grade if the base-add doesn't carry the per-segment
+  routing structure that hier-meta exploits.
+
+## 2026-05-07
+
+- `tag: feature-subset-orig-transfer-passes-where-arch-bag-fails` —
+  d16 Phase 4: 4 variants of orig-trained LGBM on different feature
+  subsets. K=21+1 gates: continuous_only +3.33bp (LARGEST single-base
+  K=21+1 of session, beating inv_laps +1.90 by 1.75×), no_laptime
+  +1.87, no_tyrelife_rp +0.86, categorical_only PASS via meta-stack.
+  Mechanism: orig-LGBM restricted to features the synthesizer left
+  marginal-aligned (TyreLife KS=0.017, Position KS=0.019, Position_Change
+  KS=0.015) generalises to synth far better than full-feature orig
+  (which uses heavily-corrupted LapNumber KS=0.188, Stint KS=0.175,
+  RaceProgress KS=0.186). **Refines** `external-data-arch-bag-redundant-when-shared-training-data`:
+  arch variation IS redundant; FEATURE-SUBSET variation is NOT, because
+  each subset emphasises a different region of the orig DGP. Pre-flight
+  for new orig-data probes: vary FEATURES, not architecture. Phase-1
+  KS-divergence diagnostic literally guided the discovery: the marginal-
+  aligned features the synth preserved are the lever for transfer.
+
+- `tag: density-ratio-routes-or-weights-but-fails-as-feature` — d16
+  Phase 2: r̂(x)=p_synth/p_orig used three ways. As single feature K=21+1
+  NULL (-0.07 bp). As sample weight in mixed-source training (P2.3)
+  K=21+1 +0.78 bp PASS. As cohort router for segment-calibrated orig
+  (P2.4) K=21+1 +1.32 bp PASS. **Lesson**: density ratio carries
+  across-distribution information but it's not pointwise predictive;
+  the productive uses are (a) re-weighting and (b) routing. CRITICAL
+  prerequisite: exclude high-cardinality cats (Driver, Race) from the
+  classifier. v1 with Driver included hit AUC 0.9985 from 856 ghost-
+  Driver tells; r̂(x) saturated at clip ceiling and was useless.
+
+- `tag: rho-alone-insufficient-for-meta-utility` — 4th independent
+  confirmation. d16 Phase 3 GMM single-feat: ρ vs PRIMARY 0.503 (most-
+  diverse single base ever measured, beating d9f FM_A 0.487 and
+  d15_orig_transfer 0.5653) but K=2 gate -0.10 bp NULL. Joins
+  nn_embeddings (ρ=0.918 NULL), year_stint_sparse_lr (ρ=0.844 NULL),
+  stint_progress (ρ=0.252 NULL). The K=21 LR-meta with [raw,rank,logit]
+  expand absorbs high-diversity-low-information bases as convex combos.
+  Already codified in `scripts/probe.py FAMILY_PRIORS`; this just adds
+  a fourth instance.
+
+- `tag: bgmm-default-oversmooths-at-reg-covar-1` — sklearn
+  BayesianGaussianMixture with reg_covar=1.0 (set after v1 crashed at
+  reg_covar=1e-3 with ill-defined empirical covariance) over-smoothed
+  the orig joint. BGMM single-feat AUC 0.55 (near-random) vs GMM 0.76
+  on the same data. ρ(GMM, BGMM) on synth_train = 0.81 — they correlate
+  but BGMM has lost most of the predictive structure. **Fix**: don't
+  use sklearn BGMM as a drop-in for GMM on this joint without a careful
+  reg_covar sweep; or use a proper VI implementation (numpyro / pyro).
+
+- `tag: path-b-on-pool-subset-conflates-cohort-axis-with-pool-size` —
+  d16 Phase 5 ran Path B on a K=14 sub-pool (only 14 of 21 named bases
+  existed under exact filenames). All r̂_q5 / logp_q5 cohort axes
+  regressed -3 to -4 bp vs PRIMARY (which uses K=21). Cannot cleanly
+  attribute the regression to cohort-axis failure vs missing-bases
+  artifact. **Fix**: when probing alternative cohort axes, the pool MUST
+  match PRIMARY exactly — load OOFs by file-glob with matching shapes,
+  not by named list. Re-test Phase 5 cohort-axis on full K=21 to
+  disambiguate.
+
 ## 2026-05-06
+
+- `tag: target-construction-layer-leakage` — when computing a regression
+  target from `y` per-group (e.g., `reverse_cum = total_pits - cumsum`,
+  `inv_laps_until_pit`, `pit_horizon` bucket), the per-group computation
+  must use ONLY rows in the current fold's training set. Using all-train
+  labels per group leaks val-row labels into tr-row targets via the
+  group-level aggregation. Even with strict (X[tr], y[tr]) → predict
+  X[va] LightGBM training, the TARGET ITSELF is contaminated. Confirmed
+  via strict-OOF audit (per-fold target construction with `mask=tr_only`):
+  reverse_cum +4.867 → -0.005 bp (100%); pit_horizon +3.191 → +0.302
+  (90%); inv_laps +1.899 → +0.234 (88%); joint +7.667 → +0.275 (96%).
+  Same failure mode as `tag: path-b-amp-needs-orthogonal-signal-not-meta-
+  derivatives`. **Fix:** for any per-group target derived from y, pass
+  a fold-mask to the target-computation function. For TEST predictions,
+  full-train target + full-train fit is correct. Audit at
+  `audit/2026-05-06-target-reform-leakage-audit.md`. Held candidates
+  built on these targets (path_b_K22_invlaps_*, path_b_K23_dae_invlaps_*,
+  path_b_K25_megapool_*) **must not be submitted**.
+
+- `tag: synthetic-dgp-conditionally-near-independent` — Day-14 PM:
+  d14 DGP-residuals probe (masked-column self-prediction; SAINT/
+  TabNet/VIME class). Trained 4 LGBM regressors to predict
+  LapTime_Delta / Cumulative_Degradation / Position / LapNumber
+  from the rest of the row. **Across all 4 targets, OOF RMSE ≈
+  marginal σ within 3 sig figs** (LapTime_Delta 41.05/41.06;
+  CumDeg 34.94/34.97; Position 3.491/3.491; LapNumber 1.559/1.559).
+  Conditional-given-rest variance ≈ marginal variance — the synthetic
+  NN-DGP added near-independent per-feature noise within rows.
+  Stack outcome: standalone OOF 0.94200 (Δ −88bp vs PRIMARY); K=2
+  min-meta −0.025bp NULL; K=22 add +0.172bp at ρ=0.996 (pred LB
+  −1.3bp under harness band). Family closed.
+  **Lesson**: this is the 5th independent NULL of the same axis
+  (Day-13 G1/G2'/G3, Day-14 H1/Move-D, now d14 DGP-residuals): the
+  K=21 + Path-B-hier-meta has fully absorbed every cross-feature
+  signal extractable from the synthetic DGP within a single row.
+  Per-row feature engineering / self-supervised pretraining cannot
+  break the ceiling — only meta-layer / model-class / external-data
+  innovations can. Joint-explains FM-aug12 saturation, Move D NULL,
+  Day-13/14 alt-axis 4-of-4, and TabPFN's 0.944 ceiling.
+
+- `tag: rho-alone-not-sufficient-for-meta-utility` — measured 13+
+  single-base candidates this session. Three with very low ρ vs
+  PRIMARY (extreme diversity) all NULL at meta gate: nn_embeddings
+  (ρ=0.918, +0.025 bp NULL), year_stint_sparse_lr (ρ=0.844, +0.05 bp),
+  stint_progress alone (ρ=0.252, NULL). The K=21 LR meta with
+  expand([raw,rank,logit]) reproduces high-diversity bases as
+  convex combinations of pool when the test-time-distinct signal
+  is linearly recoverable. **Fix:** when BOTE-ing single-base
+  additions, do NOT credit ρ < 0.95 as predictive of meta lift.
+  Instead require evidence that the candidate's signal is sourced
+  from *outside* the pool's prediction span (e.g., target-derived
+  reformulation like `inv_laps_until_pit`, NOT model-class diversity
+  alone). Codify this in `scripts/probe.py FAMILY_PRIORS` —
+  `nn_or_fe_diversity_alone` family with P=0.10, bp band (0, 0, 1).
+- `tag: marginal-bin-span-not-predictive-lift` — id-order audit found
+  LapNumber_mod_10 marginal target span 566 bp; lap_mod_features
+  LGBM with explicit mod features got K=21+1 +0.002 bp NULL.
+  The 566 bp marginal pattern was fully captured by existing GBDT
+  feature interactions (LapNumber × other features). **Fix:**
+  marginal-bin-span findings are NOT a reliable EV proxy for
+  predictive lift; need a "joint-model holdout" check (refit LGBM
+  WITHOUT the candidate feature; measure ΔAUC; if ΔAUC < 0.5 bp
+  the candidate adds nothing).
+- `tag: target-derived-vs-meta-derived-orthogonality` — empirical
+  separation now established: `d12_lr_meta` (= K=21 LR-meta-OOF)
+  produced +1.348 bp OOF but LB regress -4 bp; `inv_laps_until_pit`
+  (LGBM regression on 1/(1+laps_until_pit), target-derived) produced
+  +1.899 bp OOF. Both have similar ρ (~0.99) and superficially
+  similar OOF lift, but the orthogonal-signal criterion separates
+  them mechanistically. The target-derived candidate has not yet
+  been LB-tested but should NOT be subject to the meta-derivative
+  failure mode. **Pre-flight rule:** before treating any K=K_pool+1
+  candidate as Path-B-amp-eligible, classify the candidate's signal
+  source: (a) target-derived (PASS), (b) feature-engineered from
+  raw inputs (PASS conditional), (c) meta-derivative / convex-combo
+  of existing pool predictions (FAIL — discount Path B amp by 10×).
+- `tag: cpu-contention-multi-probe-batch` — running 7 LightGBM/NN
+  probes simultaneously made each ~4× slower than alone. KD probe
+  reached `max_iter=400` without early-stop on any fold; FE-combo
+  was killed after fold 0 took 62 min. **Fix:** Cap to 3 concurrent
+  CPU-heavy probes max in future batches. Schedule cheap probes
+  (<30 s each) ahead of slow ones to free CPU for the slow batch.
+
+- `tag: path-b-amp-only-fires-on-meta-arch-not-base-add` — Day-15
+  d15b_path_b_K22_dae_only_tau20000 SUBMITTED at LB 0.95059 (+1.0bp
+  NEW PRIMARY) on +0.715bp OOF — realised amp 1.4×, well below Path B
+  amp 6-11.6× central. Cross-confirmed by parallel main-branch agent
+  same day: K=22 + orig_transfer base-add LB 0.95049 (TIE at +1.127bp
+  OOF). The amp pattern (d13 Compound 6.7×, Compound×Stint 8×, Stint
+  11.6×) is conditional on the LIFT being a meta-architecture redesign
+  (e.g. segmentation refinement Stint→Compound×Stint), NOT on
+  K_pool→K_pool+1 base additions even when the new base is genuinely
+  orthogonal-class (DAE ρ_test 0.9477 standalone, Jahrer Porto-Seguro
+  precedent). Base-additions get standard ρ-band treatment per
+  probe.py predicted_lb_delta_bp, with a small positive deviation from
+  the diverse new-class signal. Refines `path-b-amp-needs-orthogonal-
+  signal-not-meta-derivatives` (which excluded meta-derivatives from amp
+  eligibility): even a true orthogonal base-add does not fire amp.
+  Lesson: Day-16 priority should be META-ARCH REDESIGN candidates
+  (non-Gaussian shrinkage prior on hier-meta, Yao/Vehtari covariance-
+  modelled BMA, alternative segmentation cross like Year×Compound or
+  Compound×TyreLife_q5), not more orthogonal base-add candidates.
+  Pre-flight rule: classify candidate as `meta_arch_redesign` (amp-
+  eligible) or `pool_addition` (ρ-band only); discount EV for the latter
+  by ~3-5× regardless of standalone OOF diversity.
+
+- `tag: kaggle-p100-fallback-reproduced-day15` — 8 days after first
+  encountered (Day-3 RealMLP), pushed Day-15 d15b-dae-lgbm-gpu kernel
+  with `machine_shape: GpuT4x2` per the prior friction lesson; v1 ran
+  on P100 (sm_60) anyway, ERRORed at first GPU op
+  (`cudaErrorNoKernelImageForDevice`). The friction tag was internalised
+  but the FIX was not pre-applied — I should have copy-pasted the
+  torch 2.4 force-reinstall pattern from realmlp_gpu.py into the new
+  kernel BEFORE pushing v1. Cost: one wasted Kaggle queue + ~5 min
+  diagnose + push v2. Skill amendment: when creating any new torch-
+  based GPU kernel, START from `kernels/hazard-nn-smoke-gpu/` boilerplate
+  (force-reinstall already wired in), don't fork from a kernel that
+  doesn't have the fix. Add to do-and-dont.md GPU template list.
+
+- `tag: subagent-friction-4-of-4-recurrence` — Day-15 4-branch parallel
+  probe: ALL FOUR dispatched general-purpose subagents fired the same
+  pre-existing frictions `subagent-monitor-truncation` /
+  `subagent-non-execution`. Subagent A wrote a script and exited;
+  Subagent B ran smoke for 30+ min then exited mid-LGBM; Subagent C
+  ran fold 0 then exited; Subagent D wrote KNN feature script then
+  exited mid-LGBM-fold-0. Main thread had to relaunch Branches A and
+  D and supervise C/B's tail. Lesson: the friction tag is well-known
+  but I keep dispatching general-purpose agents for long-running
+  python jobs. Cost: 2× wall (subagents wasted ~30-60 min each before
+  main-thread takeover). **Permanent fix: do NOT dispatch
+  general-purpose subagents for `python script.py >log` jobs that
+  exceed ~5 min wall.** Spawn the python directly from the main thread
+  via Bash run_in_background=True. Document in skill.
 
 - `tag: path-b-amp-needs-orthogonal-signal-not-meta-derivatives` —
   Path B family-conditional amplification (prior precedents: Stint
@@ -27,6 +387,49 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   `meta_arch_redesign`). Add a `two_level_stacking` family in
   `scripts/probe.py FAMILY_PRIORS` with P(useful)≈0.10 and
   bp band (0, 0, 1) so BOTE catches this in the future.
+
+- `tag: external-data-arch-bag-redundant-when-shared-training-data` —
+  branch `decode-synthetic-data-uoPIn` 2026-05-06: trained 4 model
+  classes (LGBM-default, CB, XGB, LGBM-tuned) on the same
+  aadigupta1601 original 99k rows. Inter-arch ρ on synth test 0.94-0.99
+  (high overlap); ρ vs PRIMARY single-row 0.57-0.64. Hier-meta K=23
+  adding CB Δ +0.005bp NULL; K=24 adding XGB Δ +0.33bp but flips 293
+  > R7 200-cap. **Root cause**: same training data → architectures
+  share most of the underlying DGP signal; LR-meta absorbs
+  architectures redundantly. **Fix**: vary training-data subset
+  (e.g. mixed-source with weights) or target-engineering (e.g.
+  laps-until-pit regression instead of next-lap classification),
+  not just architecture. Add a `bag_same_training_data` discount
+  in `scripts/probe.py` FAMILY_PRIORS (-50% on per-arch increments
+  beyond the first).
+
+- `tag: meta-arch-required-for-orthogonal-base-eval` —
+  branch `decode-synthetic-data-uoPIn` 2026-05-06: submitted K=22
+  LR-meta + d15_orig_transfer → LB 0.95039 (-10 bp regress vs PRIMARY
+  hier-meta 0.95049). The OOF lift +0.778 bp under LR-meta(K=22) was
+  REAL but landed below PRIMARY's hier-meta architecture floor.
+  **Root cause**: pre-submit BOTE quoted "+0.778 bp" but didn't
+  specify which meta architecture would be used to evaluate; LR-meta
+  vs hier-meta = ~14 bp delta on this comp, dominating any +0.5-1 bp
+  base-add gain. The follow-up hier-meta(K=22) probe lifted +1.127 bp
+  OOF and landed LB 0.95049 TIE, confirming the mechanism but
+  validating the meta-arch confound. **Fix**: any new-base BOTE must
+  specify both `family` AND `eval_meta_arch` (LR or hier-meta-Cmpd-Stint).
+  Add `eval_meta_arch` to `scripts/probe.py bote()` signature.
+
+- `tag: lb-quantization-floor-defeats-decoded-data` —
+  branch `decode-synthetic-data-uoPIn` 2026-05-06: d15_orig_transfer
+  hier-meta(K=22) lifted +1.127 bp OOF at ρ=0.998 vs PRIMARY → LB tie
+  (5-decimal display 0.95049 == 0.95049). At ρ ≥ 0.998 vs the on-LB
+  reference, even +1 bp OOF lifts land within Kaggle's ~5 bp public-LB
+  resolution. **Root cause**: synth public LB is row-iid (U3 confirmed)
+  with 188k test × 20% public split = 37k scoring rows; AUC resolution
+  ≈ 1/(N_pos × N_neg)^0.5 ≈ 5e-5 floor. Decoded-data signals on this
+  comp are real but bounded by public-LB granularity. **Fix**: don't
+  consume LB submit slots on candidates predicting <2 bp at ρ ≥ 0.998
+  — they're calibration probes, not lift candidates. Update Rule 12
+  to "spend slots on predicted ≥3 bp candidates only". For sub-2-bp
+  candidates, hold as HEDGE/R5 final-window pool.
 
 - `tag: jargon-drift-without-glossary` — branch
   `claude/knowledge-base-setup-LIxXm`: PI read CLAUDE.md for the

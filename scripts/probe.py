@@ -76,6 +76,33 @@ FAMILY_PRIORS = {
     # doesn't transfer (1-of-1 falsified 2026-05-06: Path B over K=22
     # +0.99 bp OOF → -4 bp LB; tag `path-b-amp-needs-orthogonal-signal`).
     "two_level_stacking_meta_as_base": (0.10, (-2.0, 0.0, 1.0)),
+    # Day-15 4-branch additions. DAE: Jahrer Porto-Seguro winner recipe
+    # (unsupervised swap-noise autoencoder + LGBM-on-latent). ET: ExtraTrees
+    # as cheap diversity slot (NVIDIA Grandmaster Playbook). KNN: within-
+    # segment density features feed Path-B routers directly.
+    "dae_unsupervised":      (0.25, (1.0,  3.0,  7.0)),
+    "extra_trees_ensemble":  (0.35, (2.0,  6.0, 12.0)),
+    "knn_distance_features": (0.10, (0.0,  0.8,  3.0)),
+    # Day-16 falsified families.
+    # twin_pool_meta: friction `twin-pool-2-meta-collapses-rank-info` —
+    # 2-meta hierarchy loses rank info vs single LR-meta over union pool.
+    "twin_pool_meta":        (0.05, (-2.0, 0.0,  1.0)),
+    # primary_hier_calibration_postprocess: H4 Y=2023 mask + H7 isotonic
+    # 4 schemes all NULL/regress; PRIMARY hier-meta is globally calibrated.
+    "primary_hier_calibration_postprocess": (0.05, (-1.0, 0.0, 0.5)),
+    # sequence_temporal_model: α4 axis (GRU/Tx over (Driver,Race) lap
+    # sequences). UNTESTED standalone; provisional band based on
+    # new-model-class precedent (FM-class +3 bp first land).
+    "sequence_temporal_model": (0.20, (0.0, 2.0, 8.0)),
+    # transductive_pseudo_full_test: ζ6 axis. d5 confidence-extreme NULL;
+    # full-test soft-label is a different mechanism — provisional.
+    "transductive_pseudo_full_test": (0.15, (0.0, 1.0, 3.0)),
+    # adversarial_sample_weight: ε axis. AV-AUC=0.502 globally but local
+    # weights might re-route GBDT splits — provisional.
+    "adversarial_sample_weight": (0.10, (-1.0, 0.5, 2.0)),
+    # deepgbm_leaf_encoding: ε4 — 2-stage LGBM-on-leaf-categoricals.
+    # Untested on this comp; provisional.
+    "deepgbm_leaf_encoding": (0.15, (0.0, 1.0, 3.0)),
     "process_or_infrastructure": (1.00, (0.0,  0.0,  0.0)),  # not bp; utility
 }
 

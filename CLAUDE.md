@@ -97,6 +97,66 @@ ff-merge before reading state below.
     PI corollary: the calendar/budget belongs to PI; agents do
     not propose timelines or "today/tomorrow" framings — execute
     until PI says stop.
+20. **Single-model-first / kitchen-sink FE before stacking.** Before
+    adding a 2nd base or LR-meta, build the kitchen-sink feature
+    factory (≥30 engineered features + CV target encoding on every
+    high-card combo, **including 3-way**) and a SINGLE model first.
+    That OOF is the floor; stacking adds on top, it does NOT replace
+    it. Origin: s6e5 Day-16 PI question after we ran 16 days of
+    stack-mechanism work without ever asking what's the best single
+    model. Single LGBM with Rozen's recipe matched our K=22+Path-B
+    PRIMARY OOF on Fold-1 alone.
+21. **Family falsification requires ≥3 variants.** A mechanism
+    family (TE, FM, lag, target-reform, pseudo, calibration) is
+    only "dead" after ≥3 distinct configs of the key hyperparameter
+    (smoothing, polynomial order, field count, key cardinality,
+    regularisation). Single-variant nulls update the prior on that
+    VARIANT, not on the family. Origin: s6e5 d3a closed TE family
+    on Day-3 single 2-way × single smoothing variant; the 3-way
+    (Driver, Race, Year) at smoothing 20 was the comp's +200 bp
+    standalone trick that sat unused for 13 days.
+22. **Public-notebook scan at every plateau.** Triggered on 3
+    consecutive nulls, 5 saturations at same LB, 50% checkpoint, or
+    "redecompose": pull top 5 Kaggle public notebooks for the comp
+    slug (≥10 votes), list their features + OOF AUCs + model classes.
+    Question: which features are NOT in our pool? Build that gap as
+    the next experiment. Strengthens Rule 7 with comp-specific recipe
+    intelligence. Origin: s6e5 Day-16 — Rozen's 0.95354 recipe sat
+    at 19-72 votes the entire comp without us pulling it.
+23. **Framework is scaffolding, not authorship.** The framework
+    (BOTE → gate → submit, 7-step, ISSUES tree) optimises HOW to
+    evaluate. It does NOT generate WHAT to evaluate. Reserve ≥1 slot
+    per 3-day cycle for free-form FE creativity uncoupled from
+    existing pool. Triggered when 3+ days pass without a probe whose
+    source idea is NOT a 1-step variant of an existing experiment.
+    Origin: s6e5 16-day plateau where every probe was a rank-locked
+    stack-add variant; discipline is necessary but not sufficient.
+24. **Fold-safe label-conditional aggregates.** ANY feature derived
+    from labels via groupby aggregation (target encoding, mean of
+    positives per group, target-conditional ratios) MUST be re-fit
+    inside each CV fold using ti rows only. Never include val/holdout
+    labels in the aggregate. For test prediction, either refit on full
+    train + apply, OR 5-fold-average models each with own ti-fitted
+    aggregate. **Diagnostic:** strict 80/20 holdout test (independent
+    seed, FE on 80% only, eval on 20%) detects this in <10 min CPU
+    without burning a slot. If holdout_AUC ≪ OOF_AUC by >10 bp, leak
+    present — debug before submit. Origin: Day-17 P1 v2 — FS_A merges
+    (`compound_avg_life`, `race_avg_pit_lap`, `dc_avg_stint_life`)
+    fit on full train inflated OOF by 491 bp (0.95128 vs honest
+    holdout 0.94637); v1 single LB 0.94107 (−863 bp gap); K=2 LR-meta
+    LB 0.94996 (−63 bp).
+25. **Transductive features need AV check.** Even using test FEATURE
+    values (not labels) at training time can be unsafe if train/test
+    distributions differ. Frequency encoding, quantile binning,
+    factorize maps, PCA/AE fit on combined train+test can encode
+    distributional structure that differs between train/test or
+    public/private LB. Rule: before any combined-set transform, run
+    adversarial validation (train-vs-test classifier AUC). If
+    AV-AUC ≈ 0.5, combined-set FE is safe. If AV-AUC > ~0.55, fit on
+    train only. (s6e5 AV-AUC = 0.502 per U3, so combined-FE was
+    safe here.) Companion to Rule 24 — Rule 24 covers label-derived
+    features; Rule 25 covers feature-value transforms. Origin:
+    PI Day-17 lesson on cross-comp generalisation discipline.
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
@@ -114,12 +174,12 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 14                           # 2026-05-14 / Day-14 morning. **PRIMARY LB 0.95049 (d13e Compound×Stint τ=20000)**, holds since end Day-13. Day-13 closed: 6/9 submits — 2 PRIMARY-advances (Stint τ=100k +7bp, Compound×Stint τ=20k +8bp), 4 TIE/regress; Day-13 PM added 6-shape FM partition saturation + Move C minimal (drop d9c) ✓ + drop-GBDT FALSIFIED; Day-13/14 alt-axis 4-of-4 NULL (G1/G2'/G3/H1); EDA deep-dive H1 FM_aug15 -2bp regress (FM-aug saturated); d14 Path B cohort sweep (Year, Year×Stint, Race) NULL (no variant beats current PRIMARY OOF).
+day: 17                           # 2026-05-07 AM. **PRIMARY UNCHANGED at LB 0.95059 (d15b_path_b_K22_dae_only_tau20000)**. Branch `claude/read-kaggle-handover-rsi2Q` ran P1 single-model thesis end-to-end (Rozen recipe replication). 7 probes / 4 LB submits / **P1 thesis CONCLUSIVELY FALSIFIED**. v1 OOF 0.94970 → LB 0.94107 (−863 bp gap from leaky stint-count cluster). v2 with FS_A merge fix OOF 0.95128 → holdout 0.94637 (FS_A target leak). v3 fold-safe FS_A: OOF **0.94563** (matches holdout, honest). Single-LGBM ceiling on this comp is ~0.946 OOF — 52 bp below PRIMARY OOF 0.95090. Stacking is necessary. Other branch landed `d16_path_b_K22_continuous_only_tau20000` LB 0.95089 (+30 bp; clean Path-B base-add candidate for Day-17+ PRIMARY-replace). 4 cross-comp lessons captured to skill: G16 fold-safe label-conditional aggregates, G17 transductive-features-need-AV-check, 80/20 holdout diagnostic, single-model-first / kitchen-sink FE before stacking. R20-R25 added to local CLAUDE.md.
 lb_best_today: 0.95435            # leader; not refreshed
-our_lb_best: 0.95049              # d13e Compound×Stint τ=20000 NEW PRIMARY; gap to top-5% -2.96bp; +8bp jump from Path B Stint 0.95041; +15bp from d9h/d9i 0.95034
-submissions_used_today: 1         # 1/10 (2026-05-06: K=22 Path B Compound×Stint τ=100k LB 0.95045 — REGRESSED -4 bp; Path B family-conditional amp NOT FIRED for meta-derivative addition; 2-level-stacking-as-base falsified)
-submissions_used_total: 25
-saturation_count: 0               # Path B is structural advance; partition-shape + alt-axis nulls are exploration coverage, not saturations
+our_lb_best: 0.95059              # d15b_path_b_K22_dae_only_tau20000 (unchanged Day-16); gap to top-5% -2.86bp
+submissions_used_today: 4         # Day-17 AM: K22_add_p1_feA_te 0.94933, p1_single_v1 0.94107, K2_PRIM_v2 0.94996, (other branch) d16_continuous_only 0.95089
+submissions_used_total: 32
+saturation_count: 1               # Day-16 +1: K=22 rank-locked across all virgin base-add axes (5th cross-confirmation including α4 sequence)
 mechanism_families_explored:
   - baseline_lgbm_raw_features
   - oof_target_encoding
@@ -191,9 +251,45 @@ mechanism_families_explored:
   - two_level_stacking_meta_as_base # 2026-05-06 -- K=21 + d12_lr_meta (= K=21 LR-meta-OOF itself) +1.348 bp OOF, but Path B Compound×Stint hier-meta on K=22 SUBMITTED LB 0.95045 (-4 bp REGRESS, predicted +5-11 bp via Path B amp). FALSIFIED: Path B amp requires orthogonal pool signal, NOT meta-derivatives whose info is already convex combo of pool. Friction tag `path-b-amp-needs-orthogonal-signal-not-meta-derivatives`. Harness: `two_level_stacking_meta_as_base` family added (P=0.10, bp band -2/0/1).
   - tabpfn_finetune_v25_v26         # Day-14 -- v2.5 @ 50k rows fold-0 0.94439; v2.5 @ 150k rows fold-0 0.94446 (IDENTICAL — flat training loss; fine-tuning not learning); v2.6 OOM P100 at any row count (model weights ≈15.37GB > 16GB). AUC ceiling 0.944 = -64bp vs PRIMARY. ρ=0.960 (diverse) but gap too large for pool. DEAD.
   - fm_new_input_features           # Day-14 Move D -- F1_PitWindow_q5, F2_HazardDecay_q5, F3_CompoundPress_q5, F4_RaceStage. FM_aug16 (16-field): std 0.92741 (+20.1bp vs aug12 0.92540), ρ=0.919, min-meta -0.07bp FAIL. Confirms FM-field-augmentation saturated at 12 fields; new input types add standalone OOF but zero pool increment.
-plateau_days: 3                   # Day-13/14 alt-axis branch: 4-of-4 nulls (G1/G2'/G3/H1). Path B was Day-13 structural win on meta-layer axis; partition-shape Day-13 PM saturated across 6 shapes; d14 cohort sweep extends Path B null.
-gate_status: cleared              # d13e Compound×Stint τ=20000 LB 0.95049 NEW PRIMARY (+8bp Day-13 PM)
-headroom_to_top5pct: 0.00296      # 0.95345 − 0.95049 = 29.6bp (d13e Compound×Stint τ=20000)
+  - masked_column_self_prediction   # Day-14 -- 4 LGBM regressors predict LapTime_Delta/Cumulative_Degradation/Position/LapNumber from rest of row; OOF z-residuals + L1 anomaly as 5 new features for LGBM target model. std 0.94200 (-88bp), ρ=0.9599 (diverse), K=2 min-meta -0.025bp NULL, K=22 add +0.172bp at ρ=0.9958 (pred LB -1.3bp under harness band). Load-bearing diag: across all 4 targets OOF RMSE ≈ marginal σ within 3 sig figs — synthetic NN-DGP added near-independent per-feature noise within rows. 5th NULL on per-row-FE axis; jointly explains FM-aug12 saturation, Move D NULL, Day-13/14 alt-axis 4-of-4, TabPFN 0.944 ceiling. Friction tag `synthetic-dgp-conditionally-near-independent`. Family closed.
+  - kd_distillation_lgbm            # 2026-05-06 -- small LGBM mimicking K=21 LR-meta-OOF logits; std 0.94212; K=21+1 +0.526 bp meta-derivative-class artifact (HELD; LB-regress predicted by meta-derivative pattern).
+  - nn_with_embedding_layers        # 2026-05-06 -- MLP w/ Driver/Race/Compound/Year/Stint embeds; std 0.92362 (-272 bp), ρ=0.918 most-diverse measured but K=21+1 -0.025 bp NULL. Confirms ρ alone insufficient predictor of meta-utility.
+  - lap_mod_features_lgbm           # 2026-05-06 -- LapNumber_mod_{3,5,7,10}+id_mod_{5,7,13,100,1000}; id-audit found LapNumber_mod_10 marginal target span 566 bp; std 0.94076, K=21+1 +0.002 bp NULL. The 566 bp span absorbed by GBDT feature interactions.
+  - pseudo_label_confidence_extreme # 2026-05-06 -- top/bot 5% test by PRIMARY confidence as half-weight pseudo; std 0.94083, K=21+1 +0.019 bp NULL.
+  - within_race_lt_quantile         # 2026-05-06 -- LapTime_Delta within-(Race,Year) q5 as LGBM feat; std 0.94008, K=21+1 +0.20 bp NULL/marginal. The +922 bp single-feat leak signal absorbed.
+  - year_stint_sparse_lr            # 2026-05-06 -- one-hots for Year/Stint/Compound + Driver-hash + Year×Stint and Y×S×C; std 0.88164 (very weak), ρ=0.844 most-diverse, K=21+1 +0.05 bp NULL.
+  - blend_aggregators_K21           # 2026-05-06 -- mean/gmean/rank_mean/trimmed of K=21 standalone OOFs; ALL std OOF -19 to -32 bp vs PRIMARY. RULED OUT: LR meta is doing real work, simple blends never match it.
+  - driver_cluster_path_b_cohort    # 2026-05-06 -- k-means k=4 on per-Driver stats → cluster cohort; Compound×cluster (5×4=20 segs) Path B; -0.4 to -0.9 bp NULL across τ. Cohort axis exhausted.
+  - alpha_calibrated_tau_resweep    # 2026-05-06 / d15 Branch A -- two independent confirmations. main-branch agent: Path B α computed with full-train counts at OOF; τ=20k UNCHANGED (ρ=1.0, Δ -0.02 bp). d15 Branch A re-ran the same hypothesis end-to-end: ρ=1.000000 vs d13e at τ=20000 (literally identical predictions). At segments ≥1000 rows, α=n/(n+τ)≈1 in both regimes; smaller τ values regress (τ=2000 -0.99bp). PRIMARY's τ=20k empirically optimal — calibration is not the binding constraint.
+  - id_order_synth_artifact         # 2026-05-06 -- LapNumber_mod_10 marginal span 566 bp, id_mod_1000 568 bp. Marginal span DOES NOT translate to predictive lift when GBDT has feature interactions.
+  - target_reformulation_invlaps    # 2026-05-06 -- LGBM regression on 1/(1+laps_until_pit), target-derived (NOT meta-derivative). Std OOF 0.94053 (-103 bp), ρ=0.924. K=21+1 +1.899 bp OOF originally — **but STRICT-OOF audit collapsed to +0.234 bp (88% collapse)**. Original win was target-construction-layer-leakage (compute_targets() per-group aggregation used va-row labels). Genuine signal ≤+0.3 bp. Held submission INVALIDATED.
+  - target_reformulation_stintprog  # 2026-05-06 -- LGBM regression on TyreLife/max(stint), std 0.64851, ρ=0.252; same target-construction-layer-leakage pattern; legit signal not measured but expected ≈0.
+  - target_reformulation_pit_horizon # 2026-05-06 -- LGBM regression on 4-class horizon bucket. K=21+1 +3.191 bp originally → strict-OOF +0.302 bp (90% collapse). Same leakage as inv_laps.
+  - target_reformulation_reverse_cum # 2026-05-06 -- LGBM regression on # remaining pits per Driver-Race-Year. K=21+1 +4.867 bp originally (BIGGEST single-add of session) → strict-OOF -0.005 bp (100% collapse). Same leakage. Genuine signal essentially zero. Audit at audit/2026-05-06-target-reform-leakage-audit.md.
+  - target_construction_layer_leakage_audit # 2026-05-06 -- generalised friction `target-construction-layer-leakage`: compute_targets() per (Driver, Race, Year) group using ALL train labels leaks val-row labels into tr-row targets via group-level total_pits + cumsum. LightGBM training is technically (X[tr], target[tr]) but target[tr] sees va-row labels indirectly. Same failure mode as d12_lr_meta. ALL THREE target-reform single-adds tested (reverse_cum, pit_horizon, inv_laps) confirmed inflated 88-100%. Joint K=21+3 strict +0.275 bp (vs +7.667 original, 96% collapse). All K=23/K=25 Path B variants built on these targets are similarly inflated; **DO NOT submit** any of: `path_b_K22_invlaps_*`, `path_b_K23_dae_invlaps_*`, `path_b_K25_megapool_*`.
+  - multi_target_nn_pit_aux_invlaps # 2026-05-06 -- shared-trunk NN with pit_next_lap (BCE) + inv_laps_until_pit (MSE 0.3) heads; std 0.92295, K=21+1 +0.086 bp NULL.
+  - path_b_K22_invlaps_compound_stint # 2026-05-06 -- Path B Compound×Stint hier-meta on K=22 = K=21 + inv_laps_until_pit; OOF 0.95110 (+2.75 bp vs PRIMARY) at τ=20k originally — **BUT subsequently FALSIFIED via strict-OOF audit** (inv_laps was the leaky 22nd base). Held submission INVALIDATED. Path-B-amp on top of leaky-base is leaky too.
+  - path_b_multilevel_4tier        # 2026-05-06 -- 4-tier hier-meta (Compound×Stint×Year / Compound×Stint / Compound / global) on K=22 = K=21+DAE; 5 (τ_0,τ_1,τ_2) configs; ALL NULL (-0.16 to -0.79 bp vs PRIMARY). Multi-level hierarchy with sparse L0 cells doesn't fire Path-B amp. T4a meta-arch redesign hypothesis FALSIFIED.
+  - target_reform_strict_oof_audit  # 2026-05-06 -- strict-OOF re-runs (per-fold target construction using only y[tr]). 3-of-3 candidates produce ≤+0.3 bp K=21+1; joint ≤+0.3 bp; 88-100% of the original "wins" were leakage. Confirms session's target-reformulation thesis was a mirage; PRIMARY remains LB 0.95059 (DAE-only K=22, no target-derivation).
+  - extra_trees_5fold_d15c          # d15 Branch C -- ExtraTreesClassifier(4000, max_features='sqrt') 5-fold; std OOF 0.92967 (underfits row-iid leakage GBDTs eat, as predicted); min-meta +0.059bp at ρ 0.99599 = noise-floor band. R5 HEDGE only.
+  - knn_distance_lgbm_d15d          # d15 Branch D -- per-Compound + per-Driver k=5 NN distances (10 features) + LGBM; std OOF 0.94166; min-meta +0.056bp at ρ 0.99586. C+D K=23 add additive +0.095bp; ρ between C&D raw 0.9325 (diverse) but LR-meta routes both to ρ≈0.996 vs PRIMARY. Rank-lock pattern reasserted. R5 HEDGE only.
+  - dae_swap_noise_lgbm_d15b        # d15 Branch B -- Jahrer Porto-Seguro recipe ported to GPU. DAE 256-512-256 swap-noise frac=0.15, 20 epochs batch=4096 on (train+test 627k); 768d latent (h2+h3 concat); LGBM 5-fold on raw+latent vs latent-only. **`dae_only` std OOF 0.94007, ρ_test 0.9477 (most-diverse since FM_A_53), min-meta +0.793bp at ρ 0.99547.** K=22 Path B Compound×Stint τ=20000 OOF 0.95090 +0.715bp vs d13e, ρ 0.99973, flips 59/53 R7-eligible. **SUBMITTED 2026-05-06 15:38: LB 0.95059 (+1.0bp NEW PRIMARY).** Realised amp 1.4× (above ρ-band baseline +0.22bp, well below Path-B-amp 6-11.6× central). New friction `path-b-amp-only-fires-on-meta-arch-not-base-add`: amp transfers on meta-architecture redesign (segmentation lifts) NOT on K_pool→K_pool+1 base additions, even when new base is orthogonal-class.
+  - d15_orig_transfer               # 2026-05-06 branch decode-synthetic-data-uoPIn -- LGBM trained on aadigupta1601 original (99k rows, source verified) → predicts synth. Std-alone synth AUC 0.85138 (-99bp vs PRIMARY), ρ vs OLD PRIMARY 0.565 (most-diverse single base since d9f FM_A 0.487). At LR-meta(K=22) +0.778bp OOF; LR-meta SUBMITTED LB 0.95039 (-10bp REGRESS, meta-arch confound). Hier-meta(K=22, Compound×Stint τ=20k): +1.127bp OOF, ρ=0.99844, flips 180 (R7 ✓), SUBMITTED LB 0.95049 TIE → HEDGE-tier candidate. Mechanism: synthesizer corrupted joint structure but kept marginals; orig-trained model carries un-corrupted DGP signal orthogonal to GBDT pool.
+  - d15_orig_multi_arch_bag         # 2026-05-06 -- d15_orig_cb (CB) + d15_orig_xgb (XGB) + d15_orig_lgbm_t (tuned LGBM) trained on same original. Inter-arch ρ 0.94-0.99 (high), ρ vs PRIMARY 0.57-0.64. Hier-meta K=23(+cb) Δ +0.005bp NULL; K=24(+cb+xgb) Δ +0.33bp but flips 293>R7-200 cap. Multi-arch on shared training-data is REDUNDANT; vary training-data subset, not architecture. Friction tag `external-data-arch-bag-redundant-when-shared-training-data`.
+  - d15_decode_normalized_tyrelife  # 2026-05-06 -- direct lookup of host-removed Normalized_TyreLife from original (5.5% match rate) + stint-fraction estimate fallback. Formula recovered: NTL = TyreLife / D(Driver,Race,Year,Stint), D ≈ stint length. Standalone OOF 0.94162; min-meta(K=21) Δ -0.008bp NULL (absorbed by TyreLife+RaceProgress+Stint already in pool). Cheap rule-out.
+  - d15_physics_residual            # 2026-05-06 -- Ridge LapTime ~ Driver+Race+Year+Compound+TyreLife (5-fold OOF residual) + per-Race-Compound z-score on Cumulative_Degradation. Std OOF 0.94228, min-meta Δ -0.036bp NULL. Physics already in GBDT pool.
+  - d15_leak_lookup                 # 2026-05-06 -- 16 EB-smoothed lookup features from original (P(PitNextLap | LapTime), univariate/bivariate/trivariate). 97.55% of synth LapTime values exist in original (CTGAN/CopulaGAN signature). Std OOF 0.94203, min-meta(K=21) Δ +0.270bp soft-pass (smaller than orig_transfer). Hier-meta K=22(leak-only) -0.90bp vs orig; K=23(leak+orig) +0.19bp incremental over orig — best OOF on branch 0.95096 but ρ=0.9986 → predicted LB tie, NOT submitted.
+  - d16_year_2023_hard_mask         # Day-16 H4 -- post-process zero-mask on (Year=2023 ∩ rare-Driver). Best K=5 +0.004bp ceiling NULL. PRIMARY hier-meta already routes 2023 rare rows to near-zero (pos rate 0.96%). d13 G4 axis falsified.
+  - d16_conformal_isotonic          # Day-16 H7 -- per-bin isotonic recalibration of PRIMARY OOF, inner-CV-validated, 4 schemes (Compound / Year×Compound / Year×Compound×Stint / RaceProgress_q5×Compound). All schemes regress -2.5 to -9.6 bp. PRIMARY hier-meta is globally well-calibrated. δ2/3 axis NULL.
+  - d16_two_stage_stint_logistic    # Day-16 H10 -- α5 axis (d13 tree). Stage-1 LGBM regression on E[T_stint] + stage-2 1-D logistic on remaining-laps. Std OOF 0.625 NULL — stage-2 too restrictive (1 feature). Methodological miss; α5 axis not falsified.
+  - d16_twin_pool_2_meta_blend      # Day-16 H2 -- ε2 axis. Pool A (6 GBDT) + Pool B (5 model-class diverse) with ρ(metaA,metaB)=0.967 real disagreement. Top-level LR over [metaA, metaB] OOF 0.95010 vs single LR-meta(K=11) 0.95028 -- FALSIFIED Δ -1.79bp. Friction `twin-pool-2-meta-collapses-rank-info`. 2-feature top-level LR collapses 33-dim rank info that K=11 LR captures.
+  - d16_deepgbm_leaf_encoding       # Day-16 ε4/ε4b -- ε4 axis. Stage-1 LGBM leaf-indices → stage-2 (cat-LGBM 627 features KILLED 16min over-engineered; sparse-LR head fold-0 0.92507 weak, sparse-LR ~20min/fold). KILLED both. ε4 axis NULL within tested impl.
+  - d16_av_sample_weight_lgbm       # Day-16 H11 -- ε axis. AV classifier (train vs test) → AV-prob as sample weight in base LGBM. KILLED at 12min on AV stage under contention. EV bounded by AV-AUC=0.502 (no global shift).
+  - d16_transductive_pseudo_full    # Day-16 H9 -- ζ6 axis. LGBM trained on (synth_train + half-weight PRIMARY-pseudo-test) 627k rows. Std OOF 0.93433, ρ=0.872. K=22+1 LR-meta Δ +0.631 bp PASS at LR-meta-K22 baseline; meta gives negative-direction routing weight (raw -0.295, logit -0.222). BUT vs PRIMARY hier-meta Δ -0.30 bp regress -- Path-B-amp doesn't fire on base-add per friction. MARGINAL HEDGE candidate.
+  - d16_gru_sequence_alpha4         # Day-16 H1 -- α4 axis (d13 tree, virgin). Causal GRU 1-layer hidden=96, embeds (Driver 16 + Compound 4 + Race 4 + Year 4) over (Driver,Race) lap windows; Kaggle T4×2, 12 epochs × 5-fold, 58 min wall. Std OOF 0.93066, ρ_test 0.919 (most-diverse single base of session). K=22+1 LR-meta Δ -0.043 bp NULL. **5th cross-confirmation of `lr-meta-rank-lock-strong-anchor`** -- even prediction-unit-distinct sequence model fully absorbed by [raw,rank,logit] LR-meta. New friction `temporal-axis-also-rank-locked-at-K22`.
+plateau_days: 1                   # Day-16 no advance: 4 NULL + 3 KILLED + 1 marginal H9. K=22 + Path-B-hier-meta architecture rank-saturated against EVERY base-add axis (per-row FE / calibration / α4 sequence / α5 two-stage / β rank loss / ε twin-pool / ε4 leaf-encoding / ε AV-weight / ζ6 transductive / η1 mask). Day-17 priority: META-ARCH REDESIGN (HANDOVER T4 -- non-Gaussian shrinkage, nested hierarchy, Yao/Vehtari covariance-BMA, alt segmentation crosses) -- owned by `claude/ml-handover-alignment-xvUN0`. If T4 doesn't land: (a) external second-source data (Ergast/FastF1) never tested; (b) Pirelli scrape (HANDOVER A4); (c) structured pool-replace (drop 5 weakest GBDT clones + add 5 fresh diverse-architecture bases).
+gate_status: cleared              # d15b_path_b_K22_dae_only_tau20000 LB 0.95059 PRIMARY (unchanged Day-16)
+headroom_to_top5pct: 0.00286      # 0.95345 − 0.95059 = 28.6bp (unchanged Day-16; no submits)
 ```
 
 ## Calibration ladder
@@ -267,7 +363,10 @@ headroom_to_top5pct: 0.00296      # 0.95345 − 0.95049 = 29.6bp (d13e Compound�
 | d10b_K15_+FMA+FMB (Strat / GKF-Race) | 0.95052 | 0.92764 | n/a | FM-class lift +0.87bp Strat → **+2.01bp GKF (2.3× amplified)**; FM_B L1 #1 under GKF |
 | d10d_leak_corrected_meta | n/a | 0.92764 | n/a | held; G3 FAIL (rare-class flip 0.001); rebalances FM_B L1=6.96 but smooths away GBDT row-extremes; pred-LB 0.95001 |
 | d13_path_b_stint_tau100000 | 0.95082 | 0.94600 | 0.95041 | demoted by d13e; +7bp LB; 11.6× OOF upside; GKF lift +2.59bp = 2.9× AMPLIFIED vs Strat +0.90bp (leakage-robust per d13d) |
-| **d13e_compound_stint_tau20000** | **0.95083** | n/a | **0.95049** | **NEW PRIMARY**; +8bp LB over Path B Stint; 8× OOF upside (+1.00bp OOF); ρ=0.9958 vs d9f; 24 seg cross |
+| d13e_compound_stint_tau20000 | 0.95083 | n/a | 0.95049 | demoted by d15b_K22; +8bp LB over Path B Stint; 8× OOF upside (+1.00bp OOF); ρ=0.9958 vs d9f; 24 seg cross |
+| d15b_lgbm_dae_full (DAE 768d + raw → LGBM) | 0.94325 | n/a | n/a | min-meta +0.221bp at ρ 0.99537; raw+latent redundant LGBM-extractable |
+| **d15b_lgbm_dae_only (DAE 768d → LGBM)** | **0.94007** | n/a | n/a | std-alone, ρ_test 0.9477 (most-diverse since FM_A_53); min-meta +0.793bp at ρ 0.99547; clean orthogonal axis |
+| **d15b_path_b_K22_dae_only_tau20000** | **0.95090** | n/a | **0.95059** | **NEW PRIMARY** (+1.0bp); K=22 Path B = K=21 + d15b_dae_only; +0.715bp OOF, ρ=0.99973, flips 59/53; realised amp 1.4× (Path-B-amp does NOT fire on base-add) |
 | d13e_compound_stint_tau100000 | 0.95081 | n/a | n/a | held; +0.82bp OOF; ρ=0.9996 vs Stint winner (TIE band); 55/98 flips (under R7 200); HEDGE-eligible if τ=20000 lands |
 | d13b_path_b_stint_tau20000 | **0.95082** | n/a | n/a | held; +0.88bp OOF; ρ=0.996; flip ratio 0.220; tau=100000 superseded by submit |
 | d13_path_b_compound_tau100000 | 0.95076 | n/a | **0.95033** | calibration probe; LB +2bp on +0.30bp OOF (6.7× upside); ρ=0.9990; demoted by Stint variant |
