@@ -2,6 +2,77 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-07 PM (branch `claude/read-handover-62BCt`)
+
+- `tag: recipe-gap-misdiagnosis-when-public-author-FE-not-fully-replicated`
+  — H1 v1/v2/v3 priced the +69 bp standalone gap (yekenot 0.95273 vs
+  our default-config realmlp 0.94582) as hyperparameter+orig only. Three
+  variants ALL NULL because we deployed the published REALMLP_PARAMS pack
+  + orig-merge but skipped the load-bearing FE pipeline (CV TE on 2-way
+  combos inside fold loop, arithmetic ratios, floor-cat, count enc,
+  KBins(200/7)). After H1d full-recipe replication landed standalone OOF
+  0.95257 (matched yekenot pub within 1.6 bp), the diagnosis became:
+  recipe gap = FULL FE pipeline, not just hyperparams. **Fix:** before
+  BOTE on a "replicate published recipe" candidate, READ THE FULL
+  NOTEBOOK SOURCE (cells 6 + 8 + 10 in yekenot's case), not just the
+  hyperparameter pack. Promote to skill `do-and-dont.md`.
+
+- `tag: synthetic-augmented-driver-codes-cap-external-data-coverage`
+  — H2 FastF1 external-join match rate 1.42% (6249/439140) due to
+  60% synthetic D### driver codes in train.csv (only 40% real-TLA
+  drivers joinable to FastF1). DGP-leak AV-AUC matched-vs-unmatched
+  0.96 with 2.13× pit-rate skew on matched subset, but holdout test
+  passed (no predictive leak). **Fix:** before any FastF1/Ergast
+  external-join probe, EDA driver-code distribution; if synthetic
+  augmentation > 30% of rows, the join is bounded by the real-TLA
+  subset and EV is heavily capped. Skip OR build for the real-TLA
+  subset only with explicit cohort routing.
+
+- `tag: synthetic-id-range-disjoint-but-decorrelated-from-target`
+  — H3 ID-shift sweep showed AV-AUC = 1.00 at id_div_N for N ∈
+  {10, 100, 1000, 10000} (train ids 0..439139, test 439140..627304,
+  zero overlap = labeling convention). Sparse-LR base on 4 high-AV
+  divisional features OOF 0.50039 = chance. The s5e12 ID-shift
+  mechanism does NOT transfer when target is i.i.d. across the
+  train/test partition. **Fix:** before pursuing s5e12-style
+  ID-shift work on synthetic-tabular comps, run a 1-line check —
+  `set(train.id) ∩ set(test.id) == ∅` AND `feature-AV-AUC ≈ 0.502`
+  → trivial labeling convention, no exploitable structure.
+
+- `tag: path-b-amp-only-fires-on-meta-arch-not-base-add` (6th cross-
+  confirmation) — Path B Compound×Stint τ-sweep on K=22 with h1d as
+  22nd base (where h1d alone is +23 bp OOF base-add) produced ALL TIE
+  with canonical LR-meta (best τ=100k = +0.09 bp Δ vs global LR).
+  This extends the prior friction (was discovered when base-add OOF
+  was tiny +0.7 bp DAE) to high-OOF base-adds. **Conclusion:** Path B
+  segmentation is not amp-eligible for ANY base-add, regardless of
+  base-add OOF magnitude. Only meta-arch redesign (alt cohort axis,
+  shrinkage prior, multi-tier hierarchy) fires the 6-12× amp.
+
+- `tag: torch-set-num-interop-threads-once-per-process` — H1d v1
+  crashed at fold 2 with `RuntimeError: cannot set number of interop
+  threads after parallel work has started`. **Fix:** call
+  `torch.set_num_threads(N)` and `torch.set_num_interop_threads(M)`
+  ONCE at script init (top of main), wrap in try/except RuntimeError.
+  Already promoted to FE recipe doc anti-patterns.
+
+- `tag: subagent-shell-children-die-on-subagent-exit` — H1 strong-mode
+  python (PID 12312) launched by subagent's bash invocation died at
+  ~17 min when the subagent timed out and SIGTERM cascaded down. No
+  artifacts saved despite folds running. **Fix:** when launching
+  long-running compute from a subagent, prefer `nohup ... &` from main
+  thread (survives subagent termination). Subagent should write the
+  script, exit cleanly, and let the main thread launch the compute.
+
+- `tag: kaggle-data-not-pre-pulled-on-fresh-branch-checkout` — fresh
+  checkout of `claude/read-handover-62BCt` had data/ directory empty
+  (.gitignored), required `bash bootstrap.sh` to pull train.csv +
+  test.csv (~30 sec). Per Day-13 friction `pre-warm hook for review
+  branches`, this should be a SessionStart hook but isn't yet wired.
+  **Fix:** wire SessionStart hook for kaggle-comp project sessions
+  (idempotent: skip if data/train.csv exists). See
+  `~/.claude/skills/session-start-hook` skill.
+
 ## 2026-05-06 PM (branch `claude/read-kaggle-handover-rsi2Q`)
 
 - `tag: recipe-over-judgment` — Day-16 PI question: "we ran 16 days of
