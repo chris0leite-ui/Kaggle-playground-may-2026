@@ -448,3 +448,136 @@ Total: 32/270.
 - v3 single LGBM OOF 0.94563 itself — too low standalone, but ρ=0.953
   diversity. Genuine K=22+v3 stack-add lift only +3.40 bp OOF
   (vs leaky +30.79 bp). Held; probably not worth a slot.
+
+---
+
+## Day-17 PM read-handover-62BCt — TOP-5% AT-THRESHOLD via yekenot recipe (LB 0.95345)
+
+**🎯 NEW PRIMARY: LB 0.95345 (AT TOP-5% THRESHOLD) 🎯**
+`submission_d17_K24_d18pool_h1d.csv` (ref 52420646, scored 2026-05-07
+11:39 UTC). +19.6 bp over d18 PRIMARY 0.95149 = **BIGGEST single-submit
+lift of comp**. Headroom to top-5% closes from −19.6 bp → **0**.
+
+### What worked
+
+Full yekenot RealMLP recipe replication (`scripts/d17_h1d_yekenot_full_recipe.py`):
+- 5-fold StratKF OOF AUC 0.95257 (matches yekenot pub 0.95273 within 1.6 bp)
+- ρ_test vs PRIMARY 0.972 (single base) — first base to break ρ < 0.99
+  in 5+ months
+- All 6 load-bearing FE items: arithmetic ratios, floor-cat, count enc,
+  KBins(200/7), per-fold stratified orig concat, **CV TargetEncoder on
+  (Race,Compound)+(Race,Year) inside fold loop** (load-bearing).
+- `n_ens=4` on 4-core CPU; yekenot's `n_ens=24` on Kaggle GPU is +5 bp
+  ceiling at most.
+
+K=24 d18pool+h1d submission stack:
+- K=21 + d16_orig_continuous_only + p1_single_cb_v3_gpu + d17_h1d_yekenot_full
+- LR-meta (Path B over K=22 with h1d was TIE per 6th cross-confirmation
+  of `path-b-amp-only-fires-on-meta-arch-not-base-add`)
+- OOF 0.95385, ρ_test vs d18 PRIMARY 0.989, predicted LB Δ +15 bp
+- Realised LB Δ +19.6 bp (PI sealed prediction +10 bp; agent +15.11 bp;
+  both conservative)
+
+### Calibration outcomes (audit/decisions.jsonl)
+
+| Probe | PI pred | Agent pred | Actual |
+|---|---:|---:|---:|
+| H1 (initial 3 variants) | 0 bp | +27 bp | NULL across 3 variants — recipe-gap misdiagnosis |
+| H2 FastF1 | +5 bp | +3.6 bp | ~0 bp (1.4% match rate cap from synth D### codes) |
+| H3 ID-shift | 0 bp | +0.6 bp | 0 bp (PI win — id_div_N AV is labeling convention only) |
+| H1d full-recipe (final) | +10 bp | +15.11 bp | **+19.6 bp** (both beat) |
+
+### What didn't work (this branch)
+
+- H1 v1/v2/v3 (yekenot-hyperparams + orig-merge alone): all NULL.
+  Misdiagnosed +69 bp standalone gap as hyperparameter+orig only;
+  actual gap is the FULL FE pipeline.
+- H2 FastF1: 1.4% match rate due to 60% synthetic D### driver codes
+  + sandbox 403 on livetiming.formula1.com.
+- H3 ID-shift: train ids 0..439139 / test 439140..627304 = labeling
+  convention with zero overlap; sparse-LR base on id-div features =
+  chance level.
+- C7 K=24 LR-meta (without h1d): predicted LB Δ −0.69 bp (TIE/regress).
+
+### Files
+
+- `scripts/d17_h1d_yekenot_full_recipe.py` — verified replication
+- `scripts/artifacts/oof_d17_h1d_yekenot_full_strat.npy` + test
+- `scripts/artifacts/oof_d17_K24_d18pool_h1d_strat.npy` + test
+  (the SUBMITTED stack)
+- `submissions/submission_d17_K24_d18pool_h1d.csv`
+- `external/kernels/ps-s6-e5-realmlp-pytabkit/VALIDATED.md`
+- `.claude/skills/kaggle-comp/examples/fe-recipe-yekenot-realmlp-kitchen-sink.md`
+- `audit/2026-05-07-d17-strategy-critique.md`
+- `audit/2026-05-07-d17-h1-verdict.md`
+- `audit/2026-05-07-d17-h2-fastf1-external.md`
+- `audit/2026-05-07-d17-h3-id-shift.md`
+- `audit/2026-05-07-d17-phase-a-composition-gate.md`
+
+### Submissions used (Day-17, all UTC days combined)
+
+7/10 today (this branch +1; 6 prior including 3 sibling submits).
+Total: 35/270.
+
+### Next-session priorities
+
+1. **PI submission discussion**: do we need to submit anything else
+   today? K=24 LR-meta variants with Path B Compound×Stint segmentation
+   are unlikely to lift (6th confirmation of meta-arch friction).
+2. **Tier-2 follow-ups for the yekenot recipe**:
+   - n_ens=8 or 12 variant of h1d (~1-2 h CPU); +2-5 bp standalone OOF
+     ceiling. EV +1-3 bp LB.
+   - Apply CV-TE / engineered-cat FE pipeline to a second base
+     architecture (CatBoost or LGBM on the same yekenot FE set).
+     Could yield a structurally different base.
+3. **PRIMARY-replace candidates pending sibling integration**: we have
+   not yet tested K=25+ unions with sibling-branch new bases (d18
+   already includes d16 + p1cb; if siblings produce d19+ candidates,
+   re-stack).
+
+---
+
+## Day-17 PM read-handover-62BCt — d17 Phase-A composition gate
+
+**0 submits this session.** Bootstrapped repo (deps + Kaggle data),
+claimed ISSUES leaf 7f, re-ran inherited `scripts/d17_phase_a_compose.py`
+to completion (sibling branch had bailed mid-run after C1-C5 OOFs were
+written but before summary JSON / C6 / C7).
+
+**Result.** Best K=24 LR-meta combo C7 (cont_only + no_laptime +
+no_tyrerp) OOF **0.95129**, +5.50 bp over the script's printed PRIMARY
+column — but that column was the OLD `oof_PRIMARY_K22_strat.npy` (d15b
+DAE LB 0.95059, OOF 0.95074), not the actual current d16 cont_only
+Path B PRIMARY (LB 0.95089, OOF 0.951208). Vs the actual current
+PRIMARY, **C7 is +0.81 bp OOF at ρ_test 0.99506 → predicted LB Δ −0.69
+bp (TIE/regress). All other Cn combos REGRESS −0.09 to −1.45 bp OOF.**
+
+| Combo | K | OOF | Δ vs d16 PRIM (bp) | ρ_test | pred LB Δ |
+|---|---:|---:|---:|---:|---:|
+| C1 cont | 22 | 0.95106 | −1.45 | 0.99581 | −2.95 |
+| C2 cont+nolaptime | 23 | 0.95120 | −0.09 | 0.99557 | −1.59 |
+| C3 cont+notyrerp | 23 | 0.95122 | +0.11 | 0.99517 | −1.39 |
+| C4 cont+catonly | 23 | 0.95115 | −0.54 | 0.99515 | −2.04 |
+| C5 cont+invlaps_strict | 23 | 0.95107 | −1.42 | 0.97555 | −6.42 |
+| C6 cont+nolaptime+invlaps | 24 | 0.95122 | +0.09 | 0.97714 | −4.91 |
+| **C7 cont+nolaptime+notyrerp** | **24** | **0.95129** | **+0.81** | 0.99506 | **−0.69** |
+
+**Mechanism.** Path-B Compound×Stint τ=20k segmentation on K=22 cont_only
+adds +0.15 bp OOF over canonical LR-meta on the *same* pool. Stacking 3
+more orig-LGBM bases via LR-meta does not close that gap. **5th
+cross-confirmation of `path-b-amp-only-fires-on-meta-arch-not-base-add`.**
+Strict-OOF inv_laps adds essentially nothing on top of cont_only (C5 vs
+C1 = +0.04 bp); refines `target-construction-layer-leakage` finding —
+even audit-cleaned strict-OOF inv_laps is not differentiated enough.
+
+**Next step (NOT RUN — awaiting PI sealed prediction).** Path B
+Compound×Stint τ=20k over the C7 K=24 pool. Cost ~15 min CPU. Family
+`meta_arch_redesign` (p=0.30, (1, 4, 8) bp). Q6: log-loss / row-AUC =
+True. Per Rule 26(a) PI commits LB Δ prediction first.
+
+**Files**:
+- `audit/2026-05-07-d17-phase-a-composition-gate.md` — full audit
+- `scripts/artifacts/d17_phase_a_summary.json` — per-combo |w| + ρ
+- `scripts/artifacts/oof_d17_C{1..7}_*_strat.npy` + `test_*` (C6/C7
+  produced this run)
+- `data/{train,test,sample_submission}.csv` re-hydrated via `bootstrap.sh`

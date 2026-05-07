@@ -178,6 +178,74 @@ prediction signal. 5 phases × 19 probes. CPU-only. 0 submits. Audit at
   New friction `path-b-on-pool-subset-conflates-cohort-axis-with-pool-size`.
   Re-test on full K=21 pool TODO.
   `[owner: autoencoder-synthetic-data-pEMB6 | status: null]`
+- **7f.** d17 Phase-A composition gate: K=23/K=24 stack-add of d16
+  Phase-4 winners (continuous_only / no_laptime / no_tyrelife_rp /
+  categorical_only) ± cross-branch strict inv_laps. Inherited mid-run
+  (C1-C5 OOFs on disk via 1f442e8, summary JSON missing, C6/C7 unrun).
+  Re-run `scripts/d17_phase_a_compose.py` to obtain canonical
+  Δ vs K=21 / Δ vs PRIMARY / ρ for all 7 combos and pick a
+  PRIMARY-advance candidate or fall back to PRIMARY-hold.
+  `[owner: read-handover-62BCt | status: done]` Result: all C1-C7 LR-meta
+  combos TIE/regress vs current d16 PRIMARY; C7 (K=24) +0.81 bp OOF /
+  ρ_test 0.99506 / pred LB Δ −0.69 bp. 5th cross-confirmation of
+  `path-b-amp-only-fires-on-meta-arch-not-base-add`. Audit at
+  `audit/2026-05-07-d17-phase-a-composition-gate.md`.
+
+## 9. Day-17 PM strategy-critic top-3 hypotheses (Rule 14 + Rule 7)
+
+PI directive 2026-05-07: "small probes don't matter. Revisit
+problem-solving loop. Find focus." Strategy-critic-loop diagnosis: the
+gap is RECIPE not POOL — our `realmlp` slot is a default-config single-
+fold smoke test (OOF 0.94582) vs yekenot's published recipe (~0.95273).
+Top 3 hypotheses launched in parallel. Audit at
+`audit/2026-05-07-d17-strategy-critique.md`.
+
+- **9a.** H1 — Yekenot RealMLP recipe replication (`new_model_class`).
+  Cost 30-90 min CPU. PI-pred 0 bp; agent expected +27 bp.
+  `[owner: read-handover-62BCt | status: null]` Result: 3 variants tested,
+  all NULL at K=22 meta. V1 fast (n_ens=2) OOF 0.94344 / ADD +0.43 bp /
+  SWAP −0.44 bp. V2 strong (n_ens=3) OOF 0.94516 / ADD +0.66 bp / SWAP
+  +0.03 bp. V3 strong+orig fold 1-2 = -34/-38 bp regression vs V2 (killed).
+  +69 bp standalone gap is partial-recipe gap; full pipeline (TE on
+  (Race,Compound)+(Race,Year) inside fold + arithmetic ratios +
+  floor-cat + count enc + KBins(200/7) + n_ens=24) NOT replicated.
+  Promoted to leaf 9d. Audit `audit/2026-05-07-d17-h1-verdict.md`.
+
+- **9d.** Full yekenot RealMLP recipe replication. Includes: arithmetic
+  ratios; floor-based numeric→cat; count encoding; KBins(200/7);
+  per-fold stratified orig concat; CV target encoding on (Race,Compound)
+  + (Race,Year) inside fold loop. `[owner: read-handover-62BCt | status:
+  done-CONFIRMED-WIN]` Result: standalone 5-fold OOF 0.95257 (matched
+  yekenot pub 0.95273 within 1.6 bp at n_ens=4). K=22 ADD OOF 0.95355
+  (+28 bp K=21 baseline, ρ_test 0.987). K=24 d18pool+h1d (LR-meta over
+  K=21 + d16_orig_cont + p1cb + h1d) OOF 0.95385 → **SUBMITTED LB 0.95345
+  (ref 52420646)** = AT top-5% threshold; +19.6 bp single-submit lift
+  over d18 PRIMARY 0.95149 (BIGGEST submit lift of comp). Path B sweep
+  on K=22+h1d all TIE LR-meta (6th cross-confirmation of
+  `path-b-amp-only-fires-on-meta-arch-not-base-add`). Yekenot notebook
+  flagged VALIDATED at external/kernels/ps-s6-e5-realmlp-pytabkit/
+  VALIDATED.md; FE recipe doc at .claude/skills/kaggle-comp/examples/
+  fe-recipe-yekenot-realmlp-kitchen-sink.md.
+- **9b.** H2 — FastF1 / Ergast external join (DriverAheadPit +
+  TrackStatus + CumulativeTimeStint per Frontiers AI 2025 Bi-LSTM).
+  Cost 60-180 min CPU + network. PI-pred +5 bp; agent expected +3.6 bp.
+  `[owner: read-handover-62BCt | status: null]` Result (~22 min): standalone
+  OOF 0.94800, holdout 0.94823 (no leakage gap +0.23bp), K=22-add Δ +0.43 bp
+  at ρ 0.9956 (rank-locked). **Match rate 1.42% only** — dataset is
+  60% synthetic D### drivers + 40% real-TLA; FastF1 only joinable on real-TLA
+  subset, AND sandbox network blocks livetiming.formula1.com (only 30/94
+  races pulled). DGP-leak AV check: matched-vs-unmatched AV-AUC 0.96, pit
+  rate skew 2.13×, but holdout test passes so no leakage at the meta level.
+  Audit `audit/2026-05-07-d17-h2-fastf1-external.md`. New friction
+  `synthetic-augmented-driver-codes-cap-external-data-coverage`.
+- **9c.** H3 — ID-shift / row-position structural probe (s5e12 2nd-place
+  precedent). AV-AUC at id_mod_N + sparse-LR base. Cost 20-40 min CPU.
+  PI-pred 0 bp; agent expected +0.6 bp. `[owner: read-handover-62BCt | status: null]`
+  Result (245s): id_div_N AV-AUC ≈ 1.0 (train ids 0..439139, test 439140..627304,
+  zero overlap = labeling convention NOT distribution shift). Sparse-LR base on
+  4 high-AV id-div features OOF 0.50039 (chance). PI prediction 0 bp confirmed.
+  Audit `audit/2026-05-07-d17-h3-id-shift.md`. New friction-tag candidate
+  `synthetic-id-range-disjoint-but-decorrelated-from-target`.
 
 ## 8. Virgin axes complement to HANDOVER T1–T4 (Day-16 RESOLVED)
 
