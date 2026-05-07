@@ -448,3 +448,50 @@ Total: 32/270.
 - v3 single LGBM OOF 0.94563 itself — too low standalone, but ρ=0.953
   diversity. Genuine K=22+v3 stack-add lift only +3.40 bp OOF
   (vs leaky +30.79 bp). Held; probably not worth a slot.
+
+---
+
+## Day-17 PM read-handover-62BCt — d17 Phase-A composition gate
+
+**0 submits this session.** Bootstrapped repo (deps + Kaggle data),
+claimed ISSUES leaf 7f, re-ran inherited `scripts/d17_phase_a_compose.py`
+to completion (sibling branch had bailed mid-run after C1-C5 OOFs were
+written but before summary JSON / C6 / C7).
+
+**Result.** Best K=24 LR-meta combo C7 (cont_only + no_laptime +
+no_tyrerp) OOF **0.95129**, +5.50 bp over the script's printed PRIMARY
+column — but that column was the OLD `oof_PRIMARY_K22_strat.npy` (d15b
+DAE LB 0.95059, OOF 0.95074), not the actual current d16 cont_only
+Path B PRIMARY (LB 0.95089, OOF 0.951208). Vs the actual current
+PRIMARY, **C7 is +0.81 bp OOF at ρ_test 0.99506 → predicted LB Δ −0.69
+bp (TIE/regress). All other Cn combos REGRESS −0.09 to −1.45 bp OOF.**
+
+| Combo | K | OOF | Δ vs d16 PRIM (bp) | ρ_test | pred LB Δ |
+|---|---:|---:|---:|---:|---:|
+| C1 cont | 22 | 0.95106 | −1.45 | 0.99581 | −2.95 |
+| C2 cont+nolaptime | 23 | 0.95120 | −0.09 | 0.99557 | −1.59 |
+| C3 cont+notyrerp | 23 | 0.95122 | +0.11 | 0.99517 | −1.39 |
+| C4 cont+catonly | 23 | 0.95115 | −0.54 | 0.99515 | −2.04 |
+| C5 cont+invlaps_strict | 23 | 0.95107 | −1.42 | 0.97555 | −6.42 |
+| C6 cont+nolaptime+invlaps | 24 | 0.95122 | +0.09 | 0.97714 | −4.91 |
+| **C7 cont+nolaptime+notyrerp** | **24** | **0.95129** | **+0.81** | 0.99506 | **−0.69** |
+
+**Mechanism.** Path-B Compound×Stint τ=20k segmentation on K=22 cont_only
+adds +0.15 bp OOF over canonical LR-meta on the *same* pool. Stacking 3
+more orig-LGBM bases via LR-meta does not close that gap. **5th
+cross-confirmation of `path-b-amp-only-fires-on-meta-arch-not-base-add`.**
+Strict-OOF inv_laps adds essentially nothing on top of cont_only (C5 vs
+C1 = +0.04 bp); refines `target-construction-layer-leakage` finding —
+even audit-cleaned strict-OOF inv_laps is not differentiated enough.
+
+**Next step (NOT RUN — awaiting PI sealed prediction).** Path B
+Compound×Stint τ=20k over the C7 K=24 pool. Cost ~15 min CPU. Family
+`meta_arch_redesign` (p=0.30, (1, 4, 8) bp). Q6: log-loss / row-AUC =
+True. Per Rule 26(a) PI commits LB Δ prediction first.
+
+**Files**:
+- `audit/2026-05-07-d17-phase-a-composition-gate.md` — full audit
+- `scripts/artifacts/d17_phase_a_summary.json` — per-combo |w| + ρ
+- `scripts/artifacts/oof_d17_C{1..7}_*_strat.npy` + `test_*` (C6/C7
+  produced this run)
+- `data/{train,test,sample_submission}.csv` re-hydrated via `bootstrap.sh`
