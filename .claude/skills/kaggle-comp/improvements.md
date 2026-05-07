@@ -53,6 +53,24 @@ OOF +490 bp (0.95128 vs holdout 0.94637); v1 single LB 0.94107
 holdout test (independent seed, FE state on 80% only, eval on 20%)
 detects this in <10 min CPU without burning a slot.
 
+### [ ] guardrails.md G18 — strict-fold-safe variant before treating group-aggregate OOF as honest
+
+`tag: cross-row-aggregates-survive-strict-fold-safe-audit`. Even when
+a group-aggregate FE uses a FEATURE column (not the label) as its
+input, run a strict per-fold variant before treating standalone OOF
+lift as honest. Pattern: for each CV fold, compute the aggregate from
+tr_fold rows only (or tr_fold + test for the combined-frame variant);
+merge into both tr and val rows. Compare strict-OOF to full-train OOF.
+Day-17 leakage (label-derived) collapsed 88-100% under the
+counterpart strict audit. Feature-derived cross-row aggregates may
+collapse less or not at all — but the audit is the only honest way
+to find out. **Origin:** s6e5 2026-05-07 PM — probe 4 field-state
+aggregates over (Race, Year, LapNumber) full-train OOF +15.58 bp
+standalone; strict per-fold OOF +13.73 bp; collapse 12% — fold-safe
+real, distinct from Day-17 leakage family. **Diagnostic cost:**
+~5 min CPU re-run after the full-train probe. PI sealed prediction
+flagged the audit as the necessary defensive step.
+
 ### [ ] guardrails.md G17 — transductive features need AV check
 
 `tag: transductive-features-need-AV-check`. Any FE that fits on

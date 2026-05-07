@@ -624,3 +624,104 @@ True. Per Rule 26(a) PI commits LB Δ prediction first.
 - `scripts/artifacts/oof_d17_C{1..7}_*_strat.npy` + `test_*` (C6/C7
   produced this run)
 - `data/{train,test,sample_submission}.csv` re-hydrated via `bootstrap.sh`
+
+---
+
+## Day-17 PM review-handover-solutions-oE78b — 5-probe diagnostic pass, 1 structural find, 0 submits
+
+**Result: 0 LB submits, 0 LB Δ.** PI sealed prediction = 0 bp for every
+probe (Rule 26a); 5/5 vindicated at LB level (no submission).
+PRIMARY remains **`d17_path_b_K23_v4_h1d_tau100000` LB 0.95354**.
+
+### What ran
+
+PI prompt: "What's hiding in plain sight?" Two rounds:
+
+**Round 1 — 3 probes** (`52b00f2`):
+- `probe_ntl_single_rule.py` (5 min): 5 NTL reconstructions + 13
+  thresholded rules. Best AUC 0.687 < raw TyreLife alone 0.699.
+  Host's brief.md "trivial" refers to unmasked original column.
+- `probe_target_structure.py` (30 min EDA): P(target=1 | lap_from_
+  observed_stint_end) decays 0.272 → 0.061 over 10 laps; 81% of
+  multi-pos stints have last pos at observed-last-lap; 65% contiguous.
+  Target is decay-from-end, not shifted PitStop, no deterministic rule.
+- `probe_combined_lead_lag.py` (30 min): single-feat L1 +29 bp combined
+  vs train-only on `lead_LapNumber_diff`. LGBM-level F4-F5 = -0.36 bp.
+  Combined-frame premium evaporates at GBDT.
+
+**Round 2 — probe 4 + leakage audit + K=24 gate** (`22ffbc0`,
+`c548fda`, `1ca661a`, `e28db35`):
+- `probe_field_state.py` (12 min): cross-row aggregates over
+  (Race,Year,LapNumber) and (R,Y,L,Compound) from train+test combined.
+  Standalone single-LGBM raw 14 + ~30 fs feats: full-train OOF
+  0.94230 (+15.58 bp). Top single-feat **`fs_cum_pits` AUC 0.7972 —
+  highest single-feat OOF on comp** (raw TyreLife alone 0.6989).
+- PI flag: "isn't this leaky like Day-17 FS_A merge?"
+- `probe_field_state_strict.py` (7 min): per-fold strict re-run.
+  F3-strict OOF 0.94211 (+13.73 bp), F4-strict tr-only 0.94208
+  (+13.35 bp). 12% collapse vs Day-17 88-100%. **Audit cleared.**
+- K=24 stack-add gate: K=23 LR-meta (v4+h1d) OOF 0.95414, K=24
+  (+ field-state) OOF 0.95414, marginal **-0.015 bp NULL**.
+  field-state |w|=0.0807 vs v4 0.55 / h1d 0.48. **6th cross-
+  confirmation of `lr-meta-rank-lock-strong-anchor`**.
+
+### Calibration outcomes
+
+| Probe | PI sealed | Agent BOTE | Realised LB | Realised OOF |
+|---|---:|---:|---:|---:|
+| probe_ntl_single_rule | 0 bp | n/a | 0 (no submit) | best 0.687 (≤ raw) |
+| probe_target_structure | 0 bp | n/a (EDA) | 0 (no submit) | n/a |
+| probe_combined_lead_lag | 0 bp | +0.025 bp | 0 (no submit) | +2.18 bp |
+| probe_field_state | 0 bp | +0.025 bp | 0 (no submit) | +13.73 bp strict |
+| probe_field_state K=24 gate | 0 bp | n/a | 0 (no submit) | -0.015 bp marginal |
+
+PI 5/5 vindicated at LB. Family prior `single_base_fe_addition` was
+mis-priced for cross-row aggregates (30× under at standalone OOF level)
+but correctly predicted 0 bp at K=24 stack transfer.
+
+### Friction tags introduced
+
+- `cross-row-aggregates-fire-where-own-row-sequence-doesnt`
+- `cross-row-aggregates-survive-strict-fold-safe-audit` (PROMOTED to
+  improvements.md G18)
+- `field-state-mechanism-fires-on-train-only-too-no-combined-premium`
+- `family-prior-single-base-fe-addition-mis-calibrated-for-cross-row`
+- `lr-meta-rank-lock-strong-anchor` (6th cross-confirm)
+- `host-quote-trivial-refers-to-original-not-reconstructible`
+- `pitnextlap-target-cluster-decay-not-shift`
+- `combined-frame-leadlag-premium-evaporates-at-gbdt`
+
+### Next-session first-action candidates
+
+1. **CB-v4 + field-state retrain on Kaggle GPU** (~35 min). Add ~24
+   field-state features INTO the yekenot recipe; retrain CB; predict
+   v4-fs standalone OOF lift +1 to +5 bp over current v4 OOF 0.95200.
+   If lifts ≥+3 bp, replace v4 in K=23 and re-gate. Bypasses rank-lock
+   by changing the strong anchor itself.
+2. h1d + field-state retrain (RealMLP n_ens=4 with fs feats added).
+3. **External Pirelli/FastF1 hard-join** (HANDOVER A4) — only
+   single-mechanism path to top-5% (51 bp gap to 0.95405 boundary).
+4. K=25 full-merge (+d16 cont_only, +d18 chain_decomp) Path-B held
+   +1.3 bp OOF — within noise but cheap to re-submit.
+
+### Files
+- `audit/2026-05-07-handover-review-3-probes.md` — Round 1 audit
+- `audit/2026-05-07-probe4-field-state-aggregates.md` — Round 2 audit
+  including strict fold-safe + K=24 gate
+- `audit/2026-05-07-postmortem-review-handover-solutions-oE78b.md`
+- `scripts/probe_ntl_single_rule.py`
+- `scripts/probe_target_structure.py`
+- `scripts/probe_combined_lead_lag.py`
+- `scripts/probe_field_state.py`
+- `scripts/probe_field_state_strict.py`
+- `scripts/probe_field_state_lgbm_artifact.py`
+- `scripts/artifacts/probe_*` JSONs + `oof_field_state_lgbm_strat.npy`
+  + `test_field_state_lgbm_strat.npy`
+- `.claude/skills/kaggle-comp/improvements.md` G18 (PI ratified)
+
+### Submissions used (Day-17, all UTC days combined)
+0 this branch. Day-17 total: 7/10 (unchanged).
+
+### Branch state
+Top of `52b00f2 → ca40a76 → 22ffbc0 → 0241693 → c548fda → 1ca661a → e28db35`.
+Ready for ff-merge to `main` after PI sign-off.
