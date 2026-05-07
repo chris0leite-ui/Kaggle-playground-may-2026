@@ -158,6 +158,55 @@ This is the find of the day. PI's leakage skepticism was correct to
 demand the audit — and the audit cleared it. The structural axis
 (cross-row aggregates over OTHER rows' PitStop column) is real.
 
+## K=24 stack-add gate (post-strict-audit)
+
+After PI flagged + strict audit cleared, ran the actual transfer test:
+field-state-LGBM as 24th base on top of v4 + h1d.
+
+```
+python scripts/probe_min_meta.py --candidates p1_single_cb_v4_gpu \
+    d17_h1d_yekenot_full field_state_lgbm
+```
+
+| Pool | OOF | Δ vs K=21 |
+|---|---:|---:|
+| K=21 LR-meta baseline | 0.95073 | — |
+| **K=23 = K=21 + v4 + h1d** | **0.95414** | +34.083 bp |
+| **K=24 = K=23 + field-state** | **0.95414** | +34.068 bp |
+| **Marginal of field-state** | — | **-0.015 bp** (NULL/regress) |
+
+Per-cand |w|: v4 = 0.5365 / h1d = 0.4779 / **field-state = 0.0807**.
+LR-meta downweighted field-state to 7-8% of v4's weight. Classic
+`lr-meta-rank-lock-strong-anchor` — 6th cross-confirmation.
+
+**The +13.35 bp standalone-LGBM lift fully evaporates at K-meta layer
+when stacked on v4 + h1d.** Same pattern as DAE (ρ=0.95, K=22+1 +0.79
+bp), GRU α4 (ρ=0.92, K=22+1 -0.04 bp), KNN-LGBM (ρ=0.93, K=22+1 +0.06
+bp), and others.
+
+**Mechanism (post-hoc).** Field-state aggregates are genuinely
+ρ-decoupled at the FEATURE level (GBDT can't reconstruct
+n_drivers_pitting from a single row). But at the OOF prediction
+level, v4's yekenot recipe encodes Race × Compound × LapNumber + KBins
+(RaceProgress, 200) + KBins(LapTime, 7) interactions, and h1d's CV TE
+on (Race, Compound) + (Race, Year) inside the fold loop captures
+most of the per-(Race, Year, LapNumber) field-state signal indirectly.
+The 24th base's predictions correlate too tightly with v4 + h1d's joint
+output for LR-meta to find rank space.
+
+**Decision: DO NOT SUBMIT.** Submitting K=24 LR-meta would predict
+LB ≈ 0.95354 ± 1 bp (TIE/regress per `path-b-amp-only-fires-on-meta-
+arch-not-base-add` 6th confirmation). Submission slot wasted.
+
+**Right next move (NOT this slot):** integrate field-state INTO v4 by
+retraining CB-v4-fs on Kaggle GPU (~35 min). Adds ~24 field-state
+features to the yekenot recipe. Bypasses rank-lock by changing the
+strong anchor itself (raise v4 ceiling from OOF 0.95200), not stacking
+on top. Predicted v4 standalone OOF lift: +1 to +5 bp (v4 already
+extracts most of the signal indirectly; field-state-as-direct-input may
+add residual marginal). If v4-fs > v4 by ≥+3 bp standalone, replace v4
+in K=23 stack and re-gate.
+
 ## Friction tags introduced
 
 - `cross-row-aggregates-fire-where-own-row-sequence-doesnt` — Probe 1

@@ -23,6 +23,23 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   are NOT. **Fix:** before declaring own-row FE saturated, run a
   cross-row aggregate probe over (Race, Year, LapNumber) groups.
 
+- `tag: lr-meta-rank-lock-strong-anchor` (6th cross-confirmation)
+  — Field-state-LGBM stack-add at K=24 (K=21 + v4 + h1d + field-state)
+  vs K=23 baseline (K=21 + v4 + h1d): Δ = -0.015 bp NULL. Per-cand
+  |w|: v4 0.5365 / h1d 0.4779 / field-state 0.0807. Standalone +13.35
+  bp lift evaporates despite ρ-decoupled features (cross-row aggregates
+  GBDT can't reconstruct from single rows). Mechanism: v4's yekenot
+  recipe (Race×Compound×LapNumber + KBins(RaceProgress,200)) + h1d's
+  CV TE on those keys absorb the per-(Race,Year,LapNumber) field-state
+  signal indirectly via interactions; the 24th base's predictions
+  correlate too tightly with v4+h1d joint output for LR rank space.
+  **Generalises to:** even ρ-decoupled-AT-FEATURE-LEVEL bases get
+  rank-locked at meta IF the strong anchor (v4+h1d) ALREADY encodes
+  the same (Race × Compound × LapNumber) interaction structure.
+  **Fix-by-design:** integrate orthogonal-feature signals INTO the
+  strong anchor by retraining (CB-v4-fs), not as a separate stacked
+  base. Bypasses rank-lock by changing the anchor, not stacking on top.
+
 - `tag: cross-row-aggregates-survive-strict-fold-safe-audit`
   — PI flagged probe 4 against Day-17 `target-construction-layer-
   leakage`. Day-17 pattern: `df[df.PitNextLap==1].groupby(...).mean()`
