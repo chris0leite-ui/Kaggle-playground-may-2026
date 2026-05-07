@@ -581,3 +581,137 @@ True. Per Rule 26(a) PI commits LB Δ prediction first.
 - `scripts/artifacts/oof_d17_C{1..7}_*_strat.npy` + `test_*` (C6/C7
   produced this run)
 - `data/{train,test,sample_submission}.csv` re-hydrated via `bootstrap.sh`
+
+---
+
+## Day-18 PM ensemble-logistic-regression-research-MbLKu (LR-diagnostic expedition)
+
+**0 LB submits this session.** Research-loop session (PI-directed L2:
+"learn, don't chase bp"). 10 LR-diagnostic experiments across 3 arcs;
+3 audit notes; 1 skill module promoted; 5 new friction tags.
+
+### Origin
+
+PI request: study Chris Deotte's 2nd-place s6e4 writeup ("Claude Code
+and Codex — GPU LogReg"); explore "ensemble of logistic regressions"
+direction. Pulled 4 s6e4 writeups via `kaggle competition_list_topic_messages`
+(2nd cdeotte / 1st OvR / 4th Optimistix / 12th retro-rank30). Ran
+Conn & McLean 7-step problem-solving twice (first under bp criterion,
+then re-cast under PI's L2 "learn" criterion).
+
+### What we ran
+
+| Arc | Scripts | Question answered |
+|---|---|---|
+| A | E1 SVD, E2 calibration, E4 per-segment, E8 grid | pool/meta diagnostics |
+| B | E5 bootstrap-coef, E6 residual-interactions, E9 forward-select | DGP archaeology |
+| C | A2 vanilla+rich Bagged-LR + gate, A4 per-Compound + gate | new-base injection (cross-confirmed null) |
+
+### Three load-bearing findings
+
+1. **Pool eff_rank ≈ 3 of 24** (E1 entropy + E9 forward-select cross-
+   confirmed). K=10 = K=24 in OOF AUC. **14 of 24 bases are dead
+   weight.** `cb_slow-wide-bag` is exactly the first negative-marginal
+   pick — predicted independently by E1 redundancy (ρ=0.9963 with
+   cb_year-cat) and E2 miscalibration (slope 1.95).
+
+2. **Stint is the dominant interaction hub** (E6). 9 of 10 top
+   cell-residual pairs include Stint. PRIMARY's per-cell residuals
+   on those pairs are < 1% — the GBDT pool fully saturates the
+   (Stint × *) DGP information. Adding 9 Stint-cross interactions
+   to a global LR lifts +123 bp standalone (validated empirically in
+   A2 vanilla → rich).
+
+3. **Representation-only diversity is meta-null on a saturated info
+   space** (A2 + A4 cross-confirmation). A2_rich had the LOWEST ρ to
+   PRIMARY of any base ever produced (0.71); A4 had ρ=0.75. Both
+   gave Δ ≤ +0.04 bp on K=10. **Refines `rho-alone-insufficient-for-
+   meta-utility` from 4 → 6 cross-confirmations.** Lift on s6e5
+   requires NEW INFORMATION (external data, ruled out by PI) OR
+   NEW META-ARCHITECTURE (Path-B redesign).
+
+### Durable deliverables (carry across comps)
+
+- **`.claude/skills/kaggle-comp/lr-diagnostics.md`** — skill module
+  doc; entry routes from SKILL.md reading-order table.
+- **`.claude/skills/kaggle-comp/templates/scripts/lr_diag/`** — 10
+  Python scripts + README, ready to drop into next comp's `scripts/`
+  with TARGET / K_BASES / cat-cols swap.
+- **`audit/2026-05-07-lr-diagnostics-arc{A,B,C}.md`** — three audits,
+  each ≤146 lines, full diagnostic results + interpretation.
+- **5 new friction tags** in `audit/friction.md` (top of file).
+- **3 new entries** in CLAUDE.md `mechanism_families_explored`.
+
+### NEXT-SESSION PRIORITY (explicit recommendation)
+
+**The s6e5 LR-family search is empirically exhausted** — 6 cross-
+confirmations of `rho-alone-insufficient-for-meta-utility`, plus
+quantitative Arc-C nulls. Two paths remain:
+
+**T1 (HIGH EV — only in-pool path with demonstrated lift mechanism):
+Meta-architecture redesign on K=10**
+
+The only mechanism class that has historically broken K=22+ saturation
+is Path-B amplification (6-11.6× on d13 Compound, d13 Stint, d13e).
+Three concrete candidates, each Path-B-like:
+
+- **Non-Gaussian shrinkage.** Replace Path-B's Gaussian-τ prior with
+  Beta-Binomial or Student-t. Same axis as d13e Compound×Stint.
+- **Yao/Vehtari covariance-modelled BMA.** LKJ prior on inter-base
+  Σ + GP prior on segment index. The Bayesian-rigorous "Path B done
+  correctly". 4h CPU local or 30 min Kaggle GPU PyMC-JAX.
+- **Alternative segmentation crosses on K=10.** Year × Compound
+  (20 cells), Compound × TyreLife_q5 (25 cells), Driver-cluster ×
+  Stint (20 cells). All over K=10 (NOT K=24 — drop dead weights
+  first).
+
+EV per Rule 19 family priors: meta-arch redesign p=0.30,
+(1, 4, 8) bp. Cost: 1-3 days each. Q6 metric-aligned: yes.
+Operate on K=10 stack, not K=24.
+
+**T2 (FOUNDATIONAL — settle the K=10 simplification):
+Build a K=10 PRIMARY artifact**
+
+Pure pool-surgery candidate. Same OOF AUC as K=24 production; less
+overfit risk on private LB. Cost: 10 min CPU. **Predicted LB:** within
+±2 bp of d18 PRIMARY 0.95345. Do NOT submit until PI sign-off (Rule 1).
+If the LB matches, we've simplified at no cost. If LB drops, we've
+learned that K=24 carried genuine private-LB signal we missed.
+
+**T3 (PARKED, requires PI scope decision):
+External data**
+
+Pirelli historical pit-window scrape (ISSUES leaf 4a; never run).
+Aggregate-prior pattern, NOT row-join. Tier-2 EV per Day-8 research.
+Only path to bring genuinely NEW information into the pool.
+
+### Recommended sequence
+
+1. **First action**: T2 build K=10 artifact (10 min); freezes the
+   pool-surgery finding into a usable artifact.
+2. **Then**: T1 candidate #3 (alternative segmentation crosses — 3
+   variants × 30 min CPU = 90 min). Cheapest of the three meta-arch
+   candidates; immediately tells us whether Path-B amp persists on
+   K=10 (it should; the saturation is in INFO space, not pool size).
+3. If T1#3 lands → T1#1 non-Gaussian shrinkage (1 day CPU).
+4. If T1#1 also lands → T1#2 Yao/Vehtari BMA (Kaggle GPU).
+5. If all three NULL: T3 Pirelli scrape (PI scope sign-off needed).
+
+**Per Rule 26(a):** PI commits sealed LB Δ prediction before agent
+runs BOTE for any T1/T2/T3 candidate.
+
+### Files added this session
+
+- `audit/2026-05-07-chris-deotte-lr-stacker-research.md` (research note)
+- `audit/2026-05-07-lr-diagnostics-arc{A,B,C}.md` (3 result audits)
+- `scripts/lr_diag_e{1,2,4,5,6,8,9}_*.py` (7 diagnostic scripts)
+- `scripts/lr_diag_a{2_bagged_lr,2_gate,4_per_segment}.py` (3 injection scripts)
+- `.claude/skills/kaggle-comp/lr-diagnostics.md` (skill module)
+- `.claude/skills/kaggle-comp/templates/scripts/lr_diag/` (10 scripts + README)
+- `scripts/artifacts/lr_diag_e{1,2,4,5,6,8,9}_*.json`
+- `scripts/artifacts/{oof,test}_a2_{vanilla,rich}_strat.npy`
+- `scripts/artifacts/{oof,test}_a4_per_compound_strat.npy`
+
+### Submissions used
+
+0/10 today. Total: 35/270.

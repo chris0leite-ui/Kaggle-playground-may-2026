@@ -2,6 +2,54 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-07 PM (branch `claude/ensemble-logistic-regression-research-MbLKu`)
+
+- `tag: representation-only-diversity-meta-null-on-saturated-info-space`
+  — A2 Bagged-LR (rich, with E6 Stint-cross interactions, ρ vs PRIMARY
+  = 0.71, lowest of any base ever produced) and A4 per-Compound LR
+  specialists (ρ = 0.75) BOTH gave Δ ≤ +0.04 bp on K=10. Cross-confirmed
+  via two structurally distinct LR-population constructions. Refines
+  prior `rho-alone-insufficient-for-meta-utility` from 4 → 6
+  cross-confirmations. **Fix:** when GBDT pool's per-cell residuals on
+  top E6 interactions are < 1%, no LR/FM/NN representation-only base
+  on the same features will lift the meta. Lift requires NEW
+  INFORMATION (external data) or NEW META-ARCHITECTURE (Path-B).
+
+- `tag: pool-eff-rank-far-below-nominal-on-saturated-gbdt-pool`
+  — E1 SVD on K=24 logit matrix: entropy eff_rank 2.88, top-5 σ
+  explain 91.2% variance, stable rank 1.28. E9 forward-selection
+  confirmed empirically: K=10 = K=24 in OOF AUC. 14 of 24 bases are
+  dead weight; 11 never picked, 3 picked at Δ ≤ 0 bp. cb_slow-wide-bag
+  is the FIRST negative-delta pick — predicted independently by E1
+  (most redundant ρ=0.9963 with cb_year-cat) and E2 (most miscalibrated,
+  slope 1.95). **Fix:** drop bases unpicked by E9 forward-select before
+  running new K_pool+1 probes; reduces private-LB overfitting risk.
+
+- `tag: s6e4-3-axes-recipe-does-not-transfer-binary-auc`
+  — E8 grid: full-input variants Δ ∈ [−0.03, +0.08] bp, ρ ≥ 0.9996.
+  Logits-only uniformly −0.9 bp worse. The 12th-place s6e4 "three axes
+  must all be true" recipe (logits / class_weight / multinomial) applies
+  to multinomial balanced-accuracy, NOT to binary AUC. Class_weight × C
+  × penalty are rank-no-op for binary AUC LR-meta. **Fix:** before
+  adopting cross-comp recipe, check whether origin metric matches
+  target metric (Q6 already in CLAUDE.md Rule 16).
+
+- `tag: cell-residual-magnitude-necessary-not-sufficient-for-lr-signal`
+  — A2_rich: of 9 E6-flagged Stint-cross interactions (high cell-
+  residual magnitude), 7 landed cleanly (SNR > 5, sign-flip = 0) but 2
+  didn't — Stint × LapNumber (collinear with Stint × TyreLife) and
+  LapTime × LapTime_Delta (huge std=2.95 across folds). **Fix:** filter
+  E6's residual rank by bootstrap SNR + sign-flip stability before
+  engineering features.
+
+- `tag: lr-diagnostic-suite-promoted-to-skill-2026-05-07`
+  — 10-script battery (`lr_diag_e{1,2,4,5,6,8,9}_*.py` +
+  `lr_diag_a{2,4}_*.py`) + 3 audits + skill doc
+  (`.claude/skills/kaggle-comp/lr-diagnostics.md`) +
+  `templates/scripts/lr_diag/`. Drop-in for any tabular comp's Day-1.
+  Cost: <2h CPU answers pool-redundancy + interaction-hub +
+  saturation-mechanism. Validated empirically on s6e5 across 3 arcs.
+
 ## 2026-05-07 PM (branch `claude/read-handover-62BCt`)
 
 - `tag: recipe-gap-misdiagnosis-when-public-author-FE-not-fully-replicated`

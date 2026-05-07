@@ -108,6 +108,7 @@ If CLAUDE.md is > 50k tokens, archive it before doing anything else.
 | [strategy-critic.md](strategy-critic.md) | Strategy-critic-loop (Rule 14) — 5-question template |
 | [self-improvement.md](self-improvement.md) | Friction tracking + skill-evolution workflow |
 | [do-and-dont.md](do-and-dont.md) | One-page concise checklist |
+| [lr-diagnostics.md](lr-diagnostics.md) | LR-diagnostic suite — Day-1 pool/DGP/meta archaeology in <2h CPU (built from s6e5; reusable) |
 | [examples/](examples/) | Walked examples from the reference comp |
 
 ## Problem-solving framework
