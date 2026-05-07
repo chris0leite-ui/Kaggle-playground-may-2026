@@ -48,10 +48,14 @@ WALL_BUDGET_S = 5 * 3600  # Kaggle 9h; bag stops if >5h elapsed
 WORK = Path("/kaggle/working")
 WORK.mkdir(parents=True, exist_ok=True)
 
-# Toggleable extras (set in main() based on env or constants here)
-WITH_ORIG_DATA = False   # irrigation synthetic-DGP trick
-N_SEEDS = 3              # 1, 2, or 3
-MAX_ROUNDS = 8000
+# 5-fold full single-seed run. Smoke (chrisleitescha/p1-single-cb-v3-gpu-
+# smoke v1) confirmed fold-1 AUC=0.95093 / iter=1965 / wall=308s on
+# full 351k ti rows. 5-fold projected wall ~26 min — under Rule 2's
+# 1h cap. 3-seed bag (~77 min) deferred to a follow-up version after
+# we see honest 5-fold OOF.
+WITH_ORIG_DATA = False
+N_SEEDS = 1
+MAX_ROUNDS = 2500  # smoke ES'd at 1965 with od_wait=200; 2500 plenty
 
 
 # === FE chain (verbatim from scripts/p1_features.py) ===
