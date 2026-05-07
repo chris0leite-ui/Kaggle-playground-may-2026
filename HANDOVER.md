@@ -6,193 +6,217 @@
 
 ---
 
-## Where we are
+## Where we are (Day-16 PM, 2026-05-06 evening)
 
-- **PRIMARY** = `d16_path_b_K22_continuous_only_tau20000` LB **0.95089** (Day-16 PM advance, 2026-05-07).
-  - K=22 = K=21 + d16_orig_continuous_only (orig-LGBM on 7 marginal-aligned features).
-  - +3.0 bp over previous PRIMARY (d15b_dae 0.95059); top-5% gap −25.6 bp.
-- _Previous PRIMARY (historical):_ `d13e_compound_stint_tau20000` LB **0.95049** (Day-13 PM advance).
-- **TOP SUBMISSION CANDIDATE (HELD):** `path_b_K22_invlaps_tau20000.csv`
-  - OOF **0.95110** (+2.75 bp); largest non-meta-derivative single-add OOF advance ever.
-  - **Target-derived** signal (LGBM regression on `1/(1+laps_until_pit)`); orthogonal-signal criterion satisfied.
-  - ρ vs PRIMARY 0.99753; flips 57/96 (ratio 0.594).
-  - Path B family amp prior (8-11.6×) → predicted LB band **+1.25 to +32 bp**.
-- **HEDGE candidates held:** `path_b_K22_invlaps_tau100000.csv` (asymmetric flips 45/189),
-  `path_b_K22_d12meta_tau100000.csv` (LB 0.95045 R7-eligible),
-  `d12_lr_meta` (+1.348 bp OOF meta-derivative).
-- **Gap to top-5%** (0.95345): −29.6 bp from PRIMARY. Bull projection on the held
-  τ=20k candidate (11.6× amp) → 0.95370 (top-1% range).
-- **Submissions used total:** 25/270; 1 LB submission today.
+- **PRIMARY** = `d16_path_b_K22_continuous_only_tau20000` LB **0.95089**
+  (Day-17 advance via `claude/autoencoder-synthetic-data-pEMB6`, scored 2026-05-07).
+  K=22 = K=21 + `d16_orig_continuous_only` (orig-LGBM on 7 features the
+  synthesizer left marginal-aligned per Phase-1 KS-divergence diagnostic).
+  Mechanism: selective-feature-restriction transfer; not target-derived.
+- _Previous PRIMARY:_ `d15b_path_b_K22_dae_only_tau20000` LB **0.95059**
+  (Day-15 PM via DAE swap-noise → LGBM-on-latent). Both DAE-class and
+  selective-feature-restriction-transfer signals are legitimate (no
+  target-label leakage).
+- **Gap to top-5%** (0.95345): −25.6 bp.
+- **Top of LB ~0.955** (PI observation, end of session): leaders likely
+  use FEW or a SINGLE model with a structural mechanism we haven't found
+  yet. Stacking-with-target-derived-bases was chasing inflated OOF
+  (see leakage section below).
+- **Submissions used total:** 28/270.
+- **Branches active recently:**
+  - `claude/read-handover-lA8Nr` — Day-16 virgin-axes, 11 probes,
+    4 NULL / 1 falsified / 3 KILLED / 2 parked / 1 marginal (no advance).
+  - `claude/ml-handover-alignment-xvUN0` — harness + target-reformulation
+    thesis **falsified via strict-OOF audit**.
+  - `claude/autoencoder-synthetic-data-pEMB6` — d16 cont_only PRIMARY
+    advance (LB 0.95089, +3.0 bp) + d17 Phase 0/A in flight.
 
-## Read order on session start (skip default; this is the synthesis)
+## 🔴 CRITICAL — held candidates INVALIDATED
+
+End-of-day strict-OOF audit on this branch **collapsed all
+target-reformulation single-add results 88-100%**:
+
+| candidate | original Δ at K=21+1 | strict-OOF Δ | collapse |
+|---|---:|---:|---:|
+| reverse_cum | +4.867 bp | −0.005 bp | 100% |
+| pit_horizon | +3.191 bp | +0.302 bp | 90% |
+| inv_laps_until_pit | +1.899 bp | +0.234 bp | 88% |
+| Joint K=21+3 | +7.667 bp | +0.275 bp | 96% |
+
+**Bug:** `compute_targets()` in `scripts/probe_target_reform.py` and
+`_v2.py` aggregates per (Driver, Race, Year) group using ALL train
+labels — leaking val-row labels into tr-row regression targets via
+`total_pits` + `cumsum`. New friction tag
+`target-construction-layer-leakage`. Same family as
+`d12_lr_meta` 2-level stacking (LB regress on +1.348 bp inflated OOF).
+
+**Held candidates DO NOT submit:**
+- `path_b_K22_invlaps_tau{5k,20k,100k}.csv` — 88% leaky
+- `path_b_K23_dae_invlaps_tau{5k,20k,100k}.csv` — partially leaky (inv_laps component)
+- `path_b_K25_megapool_tau{5k,20k,100k}.csv` — 96% leakage mirage
+- `path_b_multilevel_τ_*.csv` — 5 configs NULL anyway
+
+**Held candidates safe (no target-leakage):**
+- `d15b_path_b_K22_dae_only_tau{20k,100k}.csv` (PRIMARY + close-second)
+- `path_b_K22_d12meta_tau100000.csv` (LB 0.95045, R7-eligible HEDGE)
+- `d15c` (ExtraTrees), `d15d` (LGBM-on-KNN) — R5 HEDGE only
+
+Audit: `audit/2026-05-06-target-reform-leakage-audit.md`.
+
+## Read order on session start
 
 1. `CLAUDE.md` — state block + Rules 1-19 (Rule 19 = experimentation harness)
-2. `scripts/probe.py` — entry point. `bote()` for BOTE, `gate()` for uniform gate report
-3. `scripts/probe_min_meta.py` — K=K_pool+N stack-add gate
-4. `audit/2026-05-06-d14-dgp-residuals.md` — masked-column self-pred NULL + load-bearing DGP diagnostic (joint-explains all per-row-FE NULLs)
-5. `audit/2026-05-06-synthetic-data-batch.md` — 7-probe batch (today's session-1 NULLs)
-6. `audit/2026-05-06-do-all-4-probes.md` — TE-audit CLEAN, α-resweep NULL, sparse-LR/lt-q5 NULL
-7. `audit/2026-05-06-blend-and-rho-probes.md` — K=21 blends ruled out + ρ inventory
-8. `audit/2026-05-06-path-b-K22-d12meta.md` — meta-derivative LB-failure record
-9. `audit/2026-05-06-alpha-asymmetry-verification.md` — α verification, harness intro
-10. `audit/friction.md` — 5 new tags from this session at top
-11. `scripts/pre_submit_diff.py` — MANDATORY before submit
+2. `audit/2026-05-06-target-reform-leakage-audit.md` — **load-bearing** —
+   strict-OOF audit collapse table
+3. `audit/2026-05-16-d16-virgin-axes-results.md` — Day-16 virgin-axes
+   (11 probes, all NULL / falsified / parked)
+4. `audit/friction.md` — top tags `target-construction-layer-leakage`,
+   `path-b-amp-only-fires-on-meta-arch-not-base-add`,
+   `path-b-amp-needs-orthogonal-signal-not-meta-derivatives`,
+   `lr-meta-rank-lock-strong-anchor`
+5. `scripts/probe.py` — `bote()` + `gate()` harness (Rule 19)
+6. `scripts/probe_min_meta.py` — K=21+N stack-add gate
+7. `scripts/probe_target_reform_strict_oof.py` — strict-OOF audit pattern
+8. `scripts/pre_submit_diff.py` — MANDATORY before submit
 
-**Harness usage cheatsheet (Rule 19):**
-```bash
-python scripts/probe.py bote NAME --family X --cost_min N \
-    [--std_oof_lift_bp Y] [--prob_useful U]
-python scripts/probe.py gate NAME --oof PATH --test PATH
-python scripts/probe_min_meta.py --candidates NAME1 NAME2 ...
-```
+## Day-15 PM (read-handover-LgbQ4): NEW PRIMARY LB 0.95059 via DAE
 
-## Today's progress (2026-05-06, both sessions)
+Submission `d15b_path_b_K22_dae_only_tau20000` (52394353 COMPLETE
+2026-05-06 15:38) — DAE 768d latent → LGBM-on-latent → K=22 + Path B
+Compound×Stint τ=20k. Realised LB amp **1.4×** on +0.715 bp OOF —
+load-bearing for the new friction tag
+`path-b-amp-only-fires-on-meta-arch-not-base-add`.
 
-**Per-row feature-engineering family CLOSED.** Across both sessions today,
-13+ single-base candidates tested at K=21+1 meta gate. All NULL when not
-target-derived: NN-with-embeddings (ρ=0.918 most-diverse, NULL), Year×Stint
-sparse-LR (ρ=0.844, NULL), within-Race LapTime_Δ q5, lap-mod/id-mod features
-(566 bp marginal pattern absorbed), confidence-extreme pseudo-cascade,
-multi-target NN with shared trunk, blend aggregators (mean/gmean/rank/trimmed).
-**The 5th independent NULL** — `d14_dgp_residuals` (masked-column self-prediction)
-— produced a load-bearing diagnostic: across all 4 self-pred targets, OOF RMSE
-≈ marginal σ within 3 sig figs. **The synthetic NN-DGP is conditionally
-near-independent within rows.** Per-row FE / SSL pretraining cannot break
-the K=21 + Path-B ceiling — joint-explains FM-aug12 saturation, Move D NULL,
-Day-13/14 alt-axis 4-of-4, TabPFN's 0.944 ceiling.
+DAE artifacts re-usable for any future K_pool+N probe (no need to
+retrain): `oof_d15b_lgbm_dae_{full,only}_strat.npy` + test variants.
 
-**The breakthrough.** `inv_laps_until_pit` = LGBM regression on
-`1/(1+laps_until_pit)` (computed from PitNextLap labels per Driver-Race-Year
-group). K=21+1 OOF +1.899 bp (largest non-meta-derivative single-add measured).
-**Path B Compound×Stint over K=22+inv_laps τ=20k → OOF 0.95110** (+2.75 bp
-vs PRIMARY). Pre-submit-diff PASS (ρ=0.99753; 53% rows shifted >1e-3).
-**HELD pending submission decision.** Mechanistic distinction from
-d12_lr_meta failure (LB −4 bp): inv_laps is target-derived (orthogonal),
-not convex-combo of pool predictions.
+## Day-16 (read-handover-lA8Nr): virgin-axes complement, all NULL
 
-**Day-14 also confirmed:** TabPFN v2.5/v2.6 DEAD (AUC ceiling 0.944);
-FM-field-augmentation saturated at 12 fields (Move D / aug16 -0.07 bp NULL).
+11 probes covering α/β/δ/ε/ζ/η axes from the d13 problem decomposition
+tree. Highlights:
+- **α4 GRU sequence on (Driver, Race) lap windows**: std OOF 0.93066,
+  ρ=0.919 (most-diverse base of session). K=22+1 LR-meta Δ=−0.043 bp NULL.
+  **5th cross-confirmation of `lr-meta-rank-lock-strong-anchor`.**
+- **ε2 twin parallel-pool 2-meta blend**: ρ(metaA, metaB)=0.967 real
+  disagreement; top-level LR vs single LR-meta(K=11): FALSIFIED Δ=−1.79 bp.
+  Friction `twin-pool-2-meta-collapses-rank-info`.
+- **δ2/3 conformal isotonic 4 schemes**: All regress −2.5 to −9.6 bp NULL.
+  Friction `primary-hier-meta-globally-calibrated`.
+- **ζ6 transductive pseudo (full-test soft labels)**: marginal +0.63 bp
+  at LR-meta-K22 but −0.30 vs PRIMARY hier. R5 HEDGE only.
+- 2 parked, 3 killed (DeepGBM ε4 over-engineered, etc.)
 
-**Harness installed:** `scripts/probe.py` (bote + gate), `probe_min_meta.py`,
-`probe_path_b_K22_invlaps.py`, `probe_target_reform.py` etc. CLAUDE.md
-Rule 19 codifies the workflow.
+Full audit: `audit/2026-05-16-d16-virgin-axes-results.md`.
+
+## This branch (ml-handover-alignment-xvUN0): harness + target-reform leakage
+
+**Three significant deliverables:**
+1. **Harness installed** (`scripts/probe.py`, `probe_min_meta.py`,
+   18+ probe scripts). CLAUDE.md Rule 19 codifies BOTE-first / gate-after.
+2. **Target reformulation thesis FALSIFIED via strict-OOF audit** (above).
+3. **4-tier multi-level Path B (T4a)**: 5 (τ_0, τ_1, τ_2) configs all NULL.
+   Simple multi-tier-shrinkage variant doesn't fire Path-B amp.
+
+**Per-row feature engineering family CLOSED** (5 NULLs jointly explained
+by `tag: synthetic-dgp-conditionally-near-independent`).
 
 ## Falsified or dead — do NOT retry
 
-See `ISSUES.md ## Falsified or dead` (full list, 20+ entries). Highlights:
-- Per-row feature-engineering of any kind (5 NULLs jointly explained by `tag: synthetic-dgp-conditionally-near-independent`).
-- Meta-derivative-as-base 2-level stacking (d12_lr_meta LB −4 bp confirmed; KD same family).
-- TabPFN fine-tuning v2.5 / v2.6.
-- FM-field-augmentation beyond 12 fields (Move D aug16, d14 H1 aug15).
-- Drop-GBDT pool refactor (d13c −2.5 to −2.6 bp Strat).
-- α-calibrated τ-resweep (τ=20k empirically optimal).
-- TE fold-leak audit (d2a/d3a CLEAN).
-- ρ-alone diversity heuristic (NULL across 3 probes today).
+See `ISSUES.md ## Falsified or dead` (full list). Highlights:
+- **target_reformulation_invlaps / pit_horizon / reverse_cum / stintprog**
+  — all leaky; strict-OOF audit 88-100% collapse
+- **path_b_K22_invlaps_*, path_b_K23_dae_invlaps_*, path_b_K25_megapool_***
+  — all built on leaky targets
+- **multi_level_path_b_4tier** — 5 configs NULL
+- **Day-16 virgin-axes** — 11 of 11 NULL/falsified/killed
+- TabPFN v2.5/v2.6, FM-aug16+, drop-GBDT pool refactor, simple K=21
+  blends, α-calibrated τ-resweep, multi-target NN, masked-column
+  self-prediction (DGP-residual)
 
 ## Next-session first-action — RANKED by EV/cost
 
-**Daily slot status (2026-05-06):** 10/10 used. Submission queue resumes
-2026-05-07 with `path_b_K22_invlaps_tau20000.csv` as primary candidate.
+### A1 — SINGLE-MODEL HYPOTHESIS TEST (PI-directed for next session)
 
-### A1 — SUBMISSION (queued for next day, PI-approved)
+PI hypothesis: leader at LB ~0.955 likely uses ONE strong model with
+a structural mechanism we missed. Our 25-base stacking chases inflated
+OOF that doesn't transfer.
 
-`submission_path_b_K22_invlaps_tau20000.csv`. Re-checked vs new PRIMARY
-(d15b_path_b_K22_dae_only LB 0.95059): OOF 0.95110 (+2.03 bp), ρ=0.99733
-(PASS gate), flips 77/121 ratio 0.636. Per `path-b-amp-only-fires-on-meta-
-arch-not-base-add` realised amp 1.4× → predicted LB ~+2.85 bp → ~0.95088.
+**Procedure:** train ONE LightGBM (or CatBoost) with a wide feature
+set including raw + strict-OOF target reformulations as FEATURES (not
+separate bases). Measure standalone OOF AUC. If it beats ~0.945
+(baseline+) significantly → "single model" path alive. If standalone
+is unchanged → the +50 bp gap requires a structural insight we
+haven't found.
 
-### Day-15+ experiment menu (build on wins + try similar)
+Inputs available:
+- Raw features (11 numeric + 3 cat)
+- `oof_target_reform_{reverse_cum,pit_horizon,inv_laps}_strict_strat.npy`
+  (strict-OOF, leak-free per `probe_target_reform_strict_oof.py`)
+- DAE 768d latent (`oof_d15b_lgbm_dae_only_strat.npy`)
 
-Three orthogonal-base mechanism classes are now empirically alive (each
-realises ~1.4× LB amp, NOT Path-B 6-11.6×):
-1. **Manifold learning** — Jahrer DAE swap-noise → LGBM-on-latent (LB +1bp)
-2. **Target reformulation** — `inv_laps_until_pit` (held; +2.03 bp OOF)
-3. **External data** — `orig_transfer` LGBM on aadigupta (regressed -1bp)
+Cost: ~10-30 min for one wide-feature LightGBM 5-fold + standalone AUC.
 
-**Tier 1 — COMBINE the orthogonal bases (highest EV/cost; probes ready)**
+### A2 — Pirelli external data scrape (ISSUES leaf 4a; untouched)
 
-- **T1a. K=23 = K=21 + DAE_only + inv_laps** under Path B Compound×Stint
-  τ ∈ {5k, 20k, 100k}. ~10 min CPU. Both OOF/test artifacts on disk
-  (`oof_d15b_lgbm_dae_only_strat.npy`, `oof_inv_laps_until_pit_strat.npy`).
-  EV: P=0.40, expected +0.6 bp LB. **EXECUTE FIRST.**
-- **T1b. K=24 = K=21 + DAE + inv_laps + orig_transfer** Path B sweep.
-  Risk: orig_transfer regressed alone, may dilute. ~10 min CPU.
-  EV: P=0.30, expected +0.3 bp LB.
+Aggregate-prior pattern (per (Compound, Race, Year) historical),
+NOT row-join (d2 row-join failed at 5.6% match rate). Tier-2 EV per
+Day-8 research. EV +0.5 to +3 bp.
 
-**Tier 2 — More target reformulations** (`probe_target_reform.py` scaffold)
+### A3 — Examine raw data structure for missed leak
 
-- T2a. `pit_horizon_multiclass` (4-class softmax: this / 1-2 / 3-5 / >5)
-- T2b. `next_pit_lap_number` (regression on absolute lap number)
-- T2c. `stint_index_within_race` (regression on completed-stints count)
-- T2d. `reverse_cumcount_pits` (# remaining pits per Driver-Race-Year)
+`id_mod_1000` 568 bp marginal span absorbed by GBDT interactions when
+added as feature. Question: is there a **non-feature** structure (row
+order, group ordering) that encodes pit_next_lap directly?
 
-Each ~5 min CPU; 4 probes = 20 min. EV per: P=0.20, +0.3 bp LB expected.
+### A4 — Web search top-finisher Playground writeups
 
-**Tier 3 — DAE variants**
+Pattern-match leader's "single model at 0.955" against published
+synthetic-tabular Playground writeups.
 
-- T3a. Mask-noise DAE (zero-out instead of swap-noise) — ~15 min
-- T3b. Stacked-2-layer DAE (deeper encoder, larger latent) — ~30 min
-- T3c. CatBoost-on-DAE-latent (different downstream model class) — ~15 min
-- T3d. DAE on K=21 OOFs themselves (autoencode pool predictions) — ~10 min
+### Meta-arch redesign (still alive at structural level)
 
-**Tier 4 — META-ARCH redesign (the friction's amp-eligible priority)**
+Untested in T4a's simple multi-tier:
+- Non-Gaussian shrinkage prior (Beta-Binomial / Student-t)
+- Yao/Vehtari covariance-Σ BMA (LKJ + GP prior)
+- Alternative segmentation cross (Year×Compound, Compound×TyreLife_q5,
+  Driver-cluster × Stint)
 
-Per `path-b-amp-only-fires-on-meta-arch-not-base-add`, meta-arch redesign
-is the ONLY axis where Path-B's 6-11.6× amp can fire. Highest tail EV.
+### Research-loop trigger (Rule 7)
 
-- T4a. Non-Gaussian shrinkage (Student-t / Beta-Binomial prior on segment LRs) — ~30 min
-- T4b. Multi-level hierarchy (Stint within Compound within Year nested) — ~30 min
-- T4c. Multi-cohort meta-blend (LR over multiple Path B OOFs as joint inputs) — ~30 min
-- T4d. Yao/Vehtari covariance-modelled BMA — ~45 min (research first)
-
-### A2b — Re-test d15_orig_transfer against the NEW K=22 pool (~30 min CPU)
-
-`branch claude/decode-synthetic-data-uoPIn` confirmed `aadigupta1601` is
-the synth's source dataset and built `d15_orig_transfer` (LGBM trained on
-the original, predicts synth). Standalone synth-AUC 0.85138, ρ=0.565 vs
-OLD PRIMARY (most-diverse single base since d9f FM_A 0.487). At hier-meta(K=22,
-Compound×Stint, τ=20k) = K=21 + d15_orig_transfer: OOF +1.127 bp,
-ρ=0.99844, flips 180 (R7 ✓), submitted LB 0.95049 TIE with OLD PRIMARY.
-Branch pushed full artifacts. NEW PRIMARY (d15b_dae) brings K=22 inv_laps
-to a different baseline — re-test orig_transfer against `K=22 = K=21
-+ inv_laps_until_pit` (NEW baseline) to see if the two orthogonal
-mechanism families stack. Audit: `audit/2026-05-06-d15-decode-synthesizer.md`.
-
-### A3 — Pool composition: STRUCTURED replace, not naive drop
-
-d13c falsified naive drop. Structured swap (drop 2 leak-eaters AND add 2
-target-derived bases) untested. ~30 min CPU. EV +1 to +5 bp.
-
-### A4 — External data revisit (Pirelli scrape)
-
-ISSUES leaf 4a still open. Pirelli pit-window per (Compound, Race) historical.
-Aggregate-prior (not row-join) integration pattern. EV +0.5 to +3 bp.
-
-### Research-loop trigger (Rule 7) IF A1 misses on LB
-
-If A1 LB ≤ PRIMARY (no advance): pause submits, redecompose ISSUES,
-web-search top finisher writeups for synthetic-tabular Playground.
+If A1 + A2 + A3 all NULL: pause submits, re-decompose ISSUES.md (3+
+plateau-days now confirmed; per-row FE family closed; target-reform
+family closed via leakage-audit; meta-arch redesign still untouched
+at proper Bayesian level).
 
 ## Operating rules (load-bearing)
 
-1. Pre-submit-diff before EVERY submit; ρ < 0.999 mandatory.
-2. **Per-row feature engineering is dead** (`synthetic-dgp-conditionally-near-independent`). Don't propose new ones.
-3. **ρ alone NOT sufficient for meta-utility** (3 NULLs at low ρ today triangulate this).
-4. **Target-derived single-bases pass orthogonality**; meta-derivatives FAIL Path B amp.
-5. Strat-only Day-3+ (R1) for primary OOF; public LB row-iid per U3.
-6. Cap ≤3 concurrent CPU-heavy probes; schedule cheap probes first.
+1. **Pre-submit-diff before EVERY submit**; ρ < 0.999 mandatory.
+2. **Strict-OOF audit any per-group y-derived target before submission**
+   (`tag: target-construction-layer-leakage`).
+3. **Per-row feature engineering is dead**
+   (`tag: synthetic-dgp-conditionally-near-independent`).
+4. **ρ alone NOT sufficient for meta-utility** (5 cross-confirmations).
+5. **Path B amp does NOT fire on base-adds** (1.4× realised, not 6-11.6×;
+   `tag: path-b-amp-only-fires-on-meta-arch-not-base-add`).
+6. **Path B amp REQUIRES orthogonal signal** (meta-derivatives FAIL;
+   `tag: path-b-amp-needs-orthogonal-signal-not-meta-derivatives`).
+7. Strat-only Day-3+ (R1) for primary OOF; public LB row-iid per U3.
+8. Cap ≤3 concurrent CPU-heavy probes; schedule cheap probes first.
 
 ## Pointers (audit notes added today)
 
+- `audit/2026-05-06-target-reform-leakage-audit.md` — **load-bearing**
+- `audit/2026-05-16-d16-virgin-axes-results.md` — Day-16 11-probe NULL audit
 - `audit/2026-05-06-alpha-asymmetry-verification.md` — α verification + harness intro
 - `audit/2026-05-06-blend-and-rho-probes.md` — K=21 blends ruled out + ρ inventory
 - `audit/2026-05-06-path-b-K22-d12meta.md` — meta-derivative LB-failure record
 - `audit/2026-05-06-do-all-4-probes.md` — TE-audit / α-resweep / sparse-LR / lt-q5
-- `audit/2026-05-06-synthetic-data-batch.md` — 7-probe batch
+- `audit/2026-05-06-synthetic-data-batch.md` — 7-probe synth-data batch
 - `audit/2026-05-06-d14-dgp-residuals.md` — masked-column self-pred NULL + DGP diagnostic (load-bearing)
-- `scripts/probe.py` / `probe_min_meta.py` — harness
-- `scripts/probe_path_b_K22_invlaps.py` — THE breakthrough probe
-- `scripts/probe_target_reform.py` — target reformulation scaffold (extensible)
+- `audit/2026-05-15-d15-4branch-results.md` — 4-branch + B-GPU + DAE submit audit
+- `scripts/probe.py` + `probe_min_meta.py` + `probe_target_reform_strict_oof.py` — harness
+- `scripts/probe_path_b_K22_invlaps.py` — INVALIDATED (`target-construction-layer-leakage`)
+- `scripts/probe_target_reform.py` — INVALIDATED (`target-construction-layer-leakage`)
 - `scripts/d14_dgp_residuals.py` — DGP-residual probe
 
 ---

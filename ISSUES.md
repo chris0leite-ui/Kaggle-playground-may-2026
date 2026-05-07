@@ -156,10 +156,75 @@ prediction signal. 5 phases × 19 probes. CPU-only. 0 submits. Audit at
   Re-test on full K=21 pool TODO.
   `[owner: autoencoder-synthetic-data-pEMB6 | status: null]`
 
+## 8. Virgin axes complement to HANDOVER T1–T4 (Day-16 RESOLVED)
+
+Day-15 PM Conn–McLean re-entry. T1–T4 (combine-bases / target-reform /
+DAE-variants / meta-arch redesign) is owned by other branches; this leaf
+covered the orthogonal axes from the d13 problem decomposition tree
+(α/β/δ/ε/ζ/η). Day-16 executed all 9 candidates. **All 9 NULL,
+falsified, parked, or killed.** Full audit
+`audit/2026-05-16-d16-virgin-axes-results.md`.
+
+- **7a.** α4 GRU sequence on (Driver, Race) lap windows. Std OOF
+  0.93066, ρ=0.919 (most-diverse base of session). K=22+1 LR-meta
+  Δ=-0.043 bp NULL. **5th cross-confirmation of `lr-meta-rank-lock-strong-anchor`.**
+  Friction `temporal-axis-also-rank-locked-at-K22`.
+  `[owner: read-handover-lA8Nr | status: null]`
+- **7b.** ε2 twin parallel-pool 2-meta blend. ρ(metaA, metaB)=0.967
+  real disagreement; top-level LR vs single LR-meta(K=11):
+  **FALSIFIED Δ -1.79 bp.** Friction `twin-pool-2-meta-collapses-rank-info`.
+  `[owner: read-handover-lA8Nr | status: null]`
+- **7c.** ε3 K=5 pool on aadigupta1601 original. **PARKED**:
+  reconsidered redundant per `external-data-arch-bag-redundant-when-shared-training-data`.
+  `[owner: read-handover-lA8Nr | status: parked]`
+- **7d.** η1 Year=2023 ∩ rare-Driver hard-mask. Best K=5 +0.004 bp
+  ceiling NULL. PRIMARY routes 2023 rare rows to near-zero already.
+  Friction `primary-hier-meta-globally-calibrated`.
+  `[owner: read-handover-lA8Nr | status: null]`
+- **7e.** β3 ROC-Star / rank_xendcg. **PARKED** (LightGBM rank
+  objectives ill-fit — LambdaRank already failed -86 bp; ROC-Star
+  needs custom PyTorch impl, GPU was occupied with H1 GRU).
+  `[owner: read-handover-lA8Nr | status: parked]`
+- **7f.** δ2/3 conformal isotonic 4 schemes (inner-CV-validated).
+  All schemes regress -2.5 to -9.6 bp NULL. PRIMARY hier-meta
+  globally well-calibrated. Friction `primary-hier-meta-globally-calibrated`.
+  `[owner: read-handover-lA8Nr | status: null]`
+- **7g.** α5 two-stage stint (logistic stage-2). Std OOF 0.625 NULL —
+  stage-2 1-D logistic too restrictive. Methodological miss; α5 axis
+  not falsified. Friction `two-stage-stint-needs-richer-stage-2`.
+  `[owner: read-handover-lA8Nr | status: null]`
+- **7h.** ζ3 decoded-data KNN nearest-orig PitStop label. **PARKED**
+  (reconsidered redundant w/ orig_transfer).
+  `[owner: read-handover-lA8Nr | status: parked]`
+- **7i.** ε4 DeepGBM. cat-LGBM stage-2 KILLED 16 min over-engineered
+  (627 cats × num_leaves=255). Lean variant ε4b (sparse-LR head,
+  9300-dim) fold-0 AUC 0.92507 weak; KILLED ~20 min/fold.
+  `[owner: read-handover-lA8Nr | status: null]`
+
+**Bonus probes added during execution:**
+- **7j.** ζ6 transductive full-test pseudo (lean LGBM, 500 boost / 31
+  leaves, half-weight pseudo on all test rows). Std OOF 0.93433,
+  ρ=0.872. K=22+1 LR-meta Δ +0.631 bp PASS at LR-meta-K22; **Δ -0.30
+  bp regress vs PRIMARY hier-meta** (Path-B-amp doesn't fire on
+  base-add). Marginal HEDGE candidate. Friction
+  `h9-transductive-pseudo-lifts-LR-meta-but-not-PRIMARY-hier`.
+  `[owner: read-handover-lA8Nr | status: marginal]`
+- **7k.** Multi-add gates K=22+2: H9+H2 +0.671 / H9+GRU +0.629 bp ≈
+  H9 alone (+0.631). Friction `lr-meta-multi-add-no-better-than-single-add`.
+  `[owner: read-handover-lA8Nr | status: null]`
+
 ---
 
 ## Falsified or dead (do not re-claim)
 
+- Day-16 leaf 7 — all virgin axes from d13 problem-decomposition tree
+  (α/β/δ/ε/ζ/η) are rank-locked at K=22 + Path-B-hier-meta. 4 NULL
+  (H4 mask, H7 isotonic, H10 stint logistic, H1 GRU sequence at
+  ρ=0.919 most-diverse), 1 falsified (H2 twin-pool -1.79 bp), 3
+  parked (orig pool, ROC-Star, KNN-orig), 2 killed (ε4 cat-LGBM,
+  ε4b lean), 1 marginal (H9 transductive +0.63 LR-meta but -0.30
+  vs PRIMARY hier). Multi-add gates ≈ single-add. Full audit
+  `audit/2026-05-16-d16-virgin-axes-results.md`.
 - Time-to-event LGBM variants (d12 T1.2 4-of-4 dead).
 - Year-segmented specialist + AV-reweight (d12 falsified; AV-AUC 0.502).
 - LambdaRank meta (d12 -86bp).
