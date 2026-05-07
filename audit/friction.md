@@ -431,6 +431,54 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   to "spend slots on predicted ≥3 bp candidates only". For sub-2-bp
   candidates, hold as HEDGE/R5 final-window pool.
 
+- `tag: jargon-drift-without-glossary` — branch
+  `claude/knowledge-base-setup-LIxXm`: PI read CLAUDE.md for the
+  first time and did not know what BOTE stood for despite it being
+  load-bearing in Rule 19. ~25 acronyms (G1-G4, ρ, OOF, GKF, FM,
+  K=N, τ, R5, R7, P10, etc.) appear in CLAUDE.md without inline
+  expansion. Cause: agents accreted shared markdown vocabulary
+  faster than PI could review; no rule mandates expand-on-first-use
+  or maintains a glossary. Breaks PI's ability to audit agent
+  output. **Fix:** when introducing a new acronym in CLAUDE.md /
+  audits / skill files, expand on first use OR add to a glossary
+  cross-linked from CLAUDE.md. See
+  `knowledge-base/friction/2026-05-06-jargon-drift.md`.
+
+- `tag: friction-vs-improvements-role-ambiguity` — branch
+  `claude/knowledge-base-setup-LIxXm`: cross-comp store
+  `.claude/skills/kaggle-comp/improvements.md` has 1 pending /
+  0 applied entries while `audit/friction.md` is 580 lines and
+  actively used. Cause: criteria header on improvements.md
+  ("appears in 2+ comps, costs > 1 LB slot, or required human
+  nag") is not operationalised in any workflow; promotion-eligible
+  items default to friction.md by laziness. **Fix:** postmortem
+  skill (shipped today, `.claude/skills/postmortem/`) runs at
+  WRAPUP step 4b and drafts promotion candidates per its step 3
+  criteria; PI ratifies before commit. Promotion now session-cadence,
+  not end-of-comp. See
+  `knowledge-base/friction/2026-05-06-friction-vs-improvements.md`.
+
+- `tag: framework-credit-vs-pi-override-conflation` — branch
+  `claude/knowledge-base-setup-LIxXm`: hypothesis-board entries
+  (e.g. TabPFN-DEAD) read as if framework rules killed candidates
+  cleanly when actually PI override + Rule 2 was the operative
+  mechanism. Cause: audit/hypothesis entries don't distinguish
+  rule-driven kills from PI-driven kills. Risk: at scale the
+  framework will *appear* to be working autonomously when it isn't.
+  **Fix:** consider `pi_override: yes/no` field on per-probe audit
+  files. PI deferred actioning; flagged as
+  `knowledge-base/flags/2026-05-06.md` F-1 standing flag.
+
+- `tag: bote-skipped-under-no-rule-yet` — Day-14 morning: TabPFN
+  fine-tune ran fold-0 smoke at 08:11 UTC; BOTE harness was created
+  at 09:57 UTC the same day. So the TabPFN kill was Rule 2
+  (smoke / 1-fold time-probe) + PI's "test first" override, not
+  BOTE — BOTE didn't exist yet. **Lesson:** when crediting a rule
+  for a kill, check git log to confirm the rule existed at probe
+  time. Implemented in `scripts/probe.py` decision-time JSONL log
+  (shipped today): each BOTE call now stamps `framework_sha` so
+  retrospective rule-attribution becomes trivially auditable.
+
 ## 2026-05-13/14
 
 - `tag: single-base-fe-additions-noise-wall` — Day-13/14 alternative-axis

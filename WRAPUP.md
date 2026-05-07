@@ -57,6 +57,13 @@ Cap ≤150 lines. This is a checklist agents follow verbatim.
    One entry per distinct friction event today. Reuse existing tags
    when possible.
 
+4b. **Run the postmortem skill.** Follow
+    `.claude/skills/postmortem/SKILL.md` steps 1–6: identify what
+    went wrong, draft promotion candidates from today's friction
+    entries, ask PI for additions, ask PI to ratify promotions,
+    write `audit/YYYY-MM-DD-postmortem*.md`, stage outputs.
+    Blocks on PI replies; do not bypass.
+
 5. **File-size guard.** If `CLAUDE.md` > 50k tokens or `HANDOVER.md`
    > 150 lines, archive the oldest sections to
    `audit/archive-YYYY-MM-DD-<topic>.md` BEFORE step 6 and update
