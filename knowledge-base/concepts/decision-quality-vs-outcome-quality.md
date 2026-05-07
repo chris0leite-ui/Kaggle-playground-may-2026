@@ -118,18 +118,26 @@ For the decision-quality framing to function as a trust mechanism:
    (40 lines, 1 pending, 0 applied). Periodically prompts agents
    to discuss + update rules. PI accepts the loose loop and does
    not want to over-engineer it.
-   *Proposal on the table*: a **post-session postmortem skill** that
-   would capture decisions + framework state automatically. Scope
-   pending [F1.7.1.1](../questions/2026-05-06-grilling-round-7.md#f171).
+   *PI committed (2026-05-06)*: **per-session postmortem**, run when
+   PI types "postmortem" / "do the postmortem." Implemented as a
+   `SKILL.md` (Claude recommendation) so it auto-discovers each
+   session. Open: replace-vs-augment Rule 17 wrap-up, and whether
+   the postmortem also handles friction→improvements promotion
+   ([F1.7.2](../questions/2026-05-06-grilling-round-9.md#f172)).
 4. **Cross-comp persistence** — rules survive comp boundaries.
    *Verified empirically*: cross-comp store exists but is essentially
    unpopulated (0 applied entries). See [flag F-3](../flags/2026-05-06.md#f-3).
-   The loop runs single-comp-only today. Cause hypothesised but not
-   confirmed ([F1.8.1](../questions/2026-05-06-grilling-round-7.md#f181)).
+   *PI committed (2026-05-06)*: **session-cadence promotion** — not
+   waiting for end-of-comp. Within-comp promotion allowed when
+   "improvement is very clear." Two-file structure retained.
+   Trigger + criteria for "clear" pending in
+   [F1.8.2.1](../questions/2026-05-06-grilling-round-9.md#f1821).
 
 If any of these is missing, the framing degrades back to
-outcome-quality with extra prose. Today: 2 are committed-but-unbuilt,
-1 is loose-but-running, 1 is broken.
+outcome-quality with extra prose. Today: 1 & 2 are committed
+(skill-based per-session capture, with framework SHA stamping), 3
+is gaining a postmortem trigger, 4 has a cadence (session-level)
+but trigger / criteria still open.
 
 ## Adjacent concepts
 

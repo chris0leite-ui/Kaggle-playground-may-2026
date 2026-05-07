@@ -32,8 +32,21 @@ files exist with implicit different scopes, neither populating
 correctly. Picking one rule unblocks the cross-comp loop and lets
 flag F-3 close.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** **Loose / session-cadence promotion.**
+> *"Competition takes a lot of time, so I will not wait for more
+> competitions to do the improvements. It's rather on the session
+> time scale that after a couple of sessions, I would do the
+> improvements. Or if the improvement is very clear, it would be
+> after one session even."*
+>
+> So:
+> - Promotion criterion ≠ "2+ comps." Within-comp promotion allowed.
+> - Cadence: per-session or multi-session, governed by clarity.
+> - Two-file structure retained (no collapse to tag-in-place).
+>
+> Friction entry [updated](../friction/2026-05-06-friction-vs-improvements.md).
+> Drilled in [F1.8.2.1](./2026-05-06-grilling-round-9.md#f1821) on
+> who triggers and what counts as "clear."
 
 ---
 
@@ -58,8 +71,21 @@ design starts.
 If this is too design-y for understand-mode, say so and I'll park
 both questions.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** PI does not want a skill in the
+> heavyweight sense — wants a workflow document the agent reads
+> when PI types "postmortem" / "do the postmortem." Asked Claude
+> for a recommendation on skill-vs-doc.
+>
+> **Claude recommendation**: implement as a skill (just a
+> `SKILL.md` under `.claude/skills/postmortem/`) — same file content
+> as a plain doc but auto-discovered every session via the
+> available-skills system reminder. Cold-start friction in
+> ephemeral containers ([operational-environment](../concepts/operational-environment.md))
+> tips the choice. Replace-vs-augment Rule 17 wrap-up: not directly
+> answered; PI's session-cadence postmortem suggests **augment**
+> (postmortem hooks alongside wrap-up). Confirmation pending in
+> [F1.7.2](./2026-05-06-grilling-round-9.md#f172) on whether the
+> postmortem should also do friction→improvements promotion.
 
 ---
 

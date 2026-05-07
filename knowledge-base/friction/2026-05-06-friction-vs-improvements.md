@@ -43,6 +43,20 @@ PI to choose, in [F1.8.2](../questions/2026-05-06-grilling-round-8.md#f182):
 - Tag-in-place: collapse to one file with a `[promotion-candidate]`
   tag — no boundary problem.
 
+## PI's resolution direction (2026-05-06)
+
+**Loose / session-cadence**, two-file structure retained.
+
+- Comp duration is too long to wait for end-of-comp distillation.
+- Promotion considered after each session, or after a couple of
+  sessions, governed by *clarity* of the improvement.
+- "Tag-in-place" not chosen; PI keeps friction.md and improvements.md
+  as separate files.
+
+Open: who triggers the promotion (PI / agent / postmortem skill),
+and what defines "clear" — drilled in
+[F1.8.2.1](../questions/2026-05-06-grilling-round-9.md#f1821).
+
 ## Adjacent
 
 - [Flag F-3](../flags/2026-05-06.md#f-3) — empirical evidence
