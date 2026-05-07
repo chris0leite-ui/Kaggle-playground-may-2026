@@ -65,7 +65,7 @@ def main():
         ("p1_single_cb_v4_gpu",         "v4 CB yekenot (main +24bp K=21+1)"),
         ("d17_h1d_yekenot_full",        "h1d RealMLP yekenot (main load-bearing)"),
     ]
-    # Our DGP-class bases (best subset from K=21+7 audit)
+    # Our DGP-class bases + held HEDGE candidates from prior sessions
     dgp_class = [
         ("d16_orig_continuous_only",    "d16 cont_only"),
         ("d18_chain_decomp",            "d18 chain v1"),
@@ -75,6 +75,13 @@ def main():
         ("d18_h_mode_lookup",           "H mode-lookup"),
         ("d18_i_mode_collapse",         "I mode-collapse"),
         ("d18_j_cond_vector",           "J cond-vector"),
+        ("d15b_lgbm_dae_only",          "DAE-only (most-diverse base of session)"),
+        ("d15b_lgbm_dae_full",          "DAE-full (raw+latent)"),
+        ("d15_orig_transfer",           "orig-transfer full-feature LGBM"),
+        ("d15_leak_lookup",             "EB leak_lookup univariate+bivariate"),
+        ("d18b_chain_decomp",           "d18b chain v2 (causal+q10)"),
+        ("p1_single_lgbm_v3_feA_te",    "p1 v3 fold-safe Rozen-style LGBM"),
+        ("d18_e2_preimage_knn",         "E2 preimage kNN"),
     ]
     # Verify all artifacts exist
     for n, _ in mainline + dgp_class:
