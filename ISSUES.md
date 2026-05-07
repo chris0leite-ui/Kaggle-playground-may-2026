@@ -206,7 +206,15 @@ Top 3 hypotheses launched in parallel. Audit at
 - **9b.** H2 — FastF1 / Ergast external join (DriverAheadPit +
   TrackStatus + CumulativeTimeStint per Frontiers AI 2025 Bi-LSTM).
   Cost 60-180 min CPU + network. PI-pred +5 bp; agent expected +3.6 bp.
-  `[owner: read-handover-62BCt | status: wip]`
+  `[owner: read-handover-62BCt | status: null]` Result (~22 min): standalone
+  OOF 0.94800, holdout 0.94823 (no leakage gap +0.23bp), K=22-add Δ +0.43 bp
+  at ρ 0.9956 (rank-locked). **Match rate 1.42% only** — dataset is
+  60% synthetic D### drivers + 40% real-TLA; FastF1 only joinable on real-TLA
+  subset, AND sandbox network blocks livetiming.formula1.com (only 30/94
+  races pulled). DGP-leak AV check: matched-vs-unmatched AV-AUC 0.96, pit
+  rate skew 2.13×, but holdout test passes so no leakage at the meta level.
+  Audit `audit/2026-05-07-d17-h2-fastf1-external.md`. New friction
+  `synthetic-augmented-driver-codes-cap-external-data-coverage`.
 - **9c.** H3 — ID-shift / row-position structural probe (s5e12 2nd-place
   precedent). AV-AUC at id_mod_N + sparse-LR base. Cost 20-40 min CPU.
   PI-pred 0 bp; agent expected +0.6 bp. `[owner: read-handover-62BCt | status: null]`

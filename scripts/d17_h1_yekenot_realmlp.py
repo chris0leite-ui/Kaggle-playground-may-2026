@@ -54,6 +54,10 @@ N_FOLDS = 5
 # CPU speed mode params (per task brief). May be downgraded if too slow.
 CPU_FAST = dict(n_ens=2, n_epochs=4, batch_size=512)
 CPU_FAST_FALLBACK = dict(n_ens=1, n_epochs=3, batch_size=512)
+# Stronger configs (closer to yekenot's published) — only viable since
+# fold-0 timing showed ~37s for n_ens=1 n_epochs=2 batch=512.
+CPU_STRONG = dict(n_ens=3, n_epochs=6, batch_size=256)
+CPU_STRONGER = dict(n_ens=4, n_epochs=6, batch_size=256)
 
 YEKENOT_PARAMS_BASE = dict(
     random_state=SEED,
@@ -179,7 +183,10 @@ def fit_realmlp(X_tr, y_tr, X_va, params, n_threads=2):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", choices=["fast", "fallback"], default="fast")
+    ap.add_argument("--mode", choices=["fast", "fallback", "strong", "stronger"], default="fast")
+    ap.add_argument("--out-suffix", default="",
+                    help="Append to output artifact name "
+                         "(e.g. --out-suffix _strong → oof_d17_h1_yekenot_realmlp_strong_strat.npy)")
     ap.add_argument("--folds", type=int, default=5,
                     help="Number of folds to run (1..5). For wall-time tuning.")
     ap.add_argument("--skip-holdout", action="store_true")
@@ -187,7 +194,14 @@ def main():
                     help="Soft wall-time cap; abort start of new fold if exceeded.")
     args = ap.parse_args()
 
-    cpu_params = CPU_FAST if args.mode == "fast" else CPU_FAST_FALLBACK
+    if args.mode == "fast":
+        cpu_params = CPU_FAST
+    elif args.mode == "fallback":
+        cpu_params = CPU_FAST_FALLBACK
+    elif args.mode == "strong":
+        cpu_params = CPU_STRONG
+    elif args.mode == "stronger":
+        cpu_params = CPU_STRONGER
     print(f"=== D17 H1 yekenot RealMLP ({args.mode}) ===")
     print(f"  CPU params: {cpu_params}")
     print(f"  folds: {args.folds}  budget: {args.time_budget_min:.0f} min")
@@ -269,8 +283,9 @@ def main():
     # Save outputs (2-col format)
     oof2 = np.column_stack([1 - oof, oof]).astype(np.float32)
     test2 = np.column_stack([1 - test_pred, test_pred]).astype(np.float32)
-    np.save(ART / "oof_d17_h1_yekenot_realmlp_strat.npy", oof2)
-    np.save(ART / "test_d17_h1_yekenot_realmlp_strat.npy", test2)
+    suf = args.out_suffix
+    np.save(ART / f"oof_d17_h1_yekenot_realmlp{suf}_strat.npy", oof2)
+    np.save(ART / f"test_d17_h1_yekenot_realmlp{suf}_strat.npy", test2)
 
     res = dict(
         mode=args.mode,
@@ -285,7 +300,7 @@ def main():
         delta_vs_yekenot_pub_bp=(oof_auc - 0.95273) * 1e4,
         total_wall_s=time.time() - t0,
     )
-    Path(ART / "d17_h1_yekenot_realmlp_results.json").write_text(json.dumps(res, indent=2))
+    Path(ART / f"d17_h1_yekenot_realmlp{suf}_results.json").write_text(json.dumps(res, indent=2))
     print(f"  saved oof+test+results")
 
     # ===== 80/20 holdout (Rule 24 / Rule 25) =====
@@ -319,7 +334,7 @@ def main():
             res["holdout_auc"] = holdout_auc
             res["holdout_minus_oof_bp"] = -gap_bp
             res["holdout_wall_s"] = time.time() - t_h
-            Path(ART / "d17_h1_yekenot_realmlp_results.json").write_text(json.dumps(res, indent=2))
+            Path(ART / f"d17_h1_yekenot_realmlp{suf}_results.json").write_text(json.dumps(res, indent=2))
 
     print(f"\nFINAL total wall: {(time.time()-t0)/60:.1f} min")
     return True
