@@ -31,7 +31,9 @@ when PRIMARY changes, update the constants below or pass explicit paths.
 from __future__ import annotations
 
 import argparse
+import datetime as _dt
 import json
+import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -42,9 +44,13 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 
 ART = Path("scripts/artifacts")
-BOTE_LOG = Path("audit/bote_log.jsonl")  # PI/agent prediction calibration
 TARGET = "PitNextLap"
 SEED, N_FOLDS = 42, 5
+
+# ---- Decision-time log (append-only JSONL) --------------------------
+# Per knowledge-base/concepts/decision-time-logging.md. Every BOTE call
+# appends one row, locking predictions + framework SHA at decision-time.
+DECISIONS_LOG = Path("audit/decisions.jsonl")
 
 # ---- PRIMARY defaults (update when PRIMARY changes) -----------------
 PRIMARY_OOF = ART / "oof_d13e_compound_stint_tau20000_strat.npy"
@@ -77,8 +83,84 @@ FAMILY_PRIORS = {
     "dae_unsupervised":      (0.25, (1.0,  3.0,  7.0)),
     "extra_trees_ensemble":  (0.35, (2.0,  6.0, 12.0)),
     "knn_distance_features": (0.10, (0.0,  0.8,  3.0)),
+    # Day-16 falsified families.
+    # twin_pool_meta: friction `twin-pool-2-meta-collapses-rank-info` —
+    # 2-meta hierarchy loses rank info vs single LR-meta over union pool.
+    "twin_pool_meta":        (0.05, (-2.0, 0.0,  1.0)),
+    # primary_hier_calibration_postprocess: H4 Y=2023 mask + H7 isotonic
+    # 4 schemes all NULL/regress; PRIMARY hier-meta is globally calibrated.
+    "primary_hier_calibration_postprocess": (0.05, (-1.0, 0.0, 0.5)),
+    # sequence_temporal_model: α4 axis (GRU/Tx over (Driver,Race) lap
+    # sequences). UNTESTED standalone; provisional band based on
+    # new-model-class precedent (FM-class +3 bp first land).
+    "sequence_temporal_model": (0.20, (0.0, 2.0, 8.0)),
+    # transductive_pseudo_full_test: ζ6 axis. d5 confidence-extreme NULL;
+    # full-test soft-label is a different mechanism — provisional.
+    "transductive_pseudo_full_test": (0.15, (0.0, 1.0, 3.0)),
+    # adversarial_sample_weight: ε axis. AV-AUC=0.502 globally but local
+    # weights might re-route GBDT splits — provisional.
+    "adversarial_sample_weight": (0.10, (-1.0, 0.5, 2.0)),
+    # deepgbm_leaf_encoding: ε4 — 2-stage LGBM-on-leaf-categoricals.
+    # Untested on this comp; provisional.
+    "deepgbm_leaf_encoding": (0.15, (0.0, 1.0, 3.0)),
     "process_or_infrastructure": (1.00, (0.0,  0.0,  0.0)),  # not bp; utility
 }
+
+# ---- Decision-log helpers -------------------------------------------
+def _git(*args: str) -> str:
+    """Run a git query, return stripped stdout, or 'unknown' on failure."""
+    try:
+        return subprocess.check_output(
+            ["git", *args], text=True, stderr=subprocess.DEVNULL
+        ).strip()
+    except Exception:
+        return "unknown"
+
+
+def _append_decision_record(res: dict, note: str) -> None:
+    """Append a JSONL row capturing the BOTE decision at decision-time.
+
+    Schema (one event per line):
+      ts, tool, decision_id, family, verdict, prob_useful,
+      predicted_lift_bp_band [pess, med, opt], expected_lb_bp,
+      cost_min_estimate, cost_efficiency_bp_per_min,
+      metric_aligned, metric_check_note, pi_predicted_lb_bp,
+      framework_sha, agent_branch, note.
+
+    metric_aligned / pi_predicted_lb_bp added 2026-05-06 per Rule 26
+    (PI interaction protocol). They extend the substrate from
+    knowledge-base/concepts/decision-time-logging.md with the
+    sealed-prediction calibration loop: PI commits a number BEFORE
+    seeing the agent's expected_lb_bp, agent records both, and
+    `probe.py calibration` later emits per-name PI-vs-agent error.
+
+    See knowledge-base/concepts/decision-time-logging.md for rationale.
+    """
+    record = {
+        "ts": _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds"),
+        "tool": "probe.py bote v1",
+        "kind": "decision",
+        "decision_id": res["name"],
+        "family": res["family"],
+        "verdict": res["verdict"],
+        "prob_useful": res["prob_useful"],
+        "predicted_lift_bp_band": [
+            res["bp_pessimistic"], res["bp_median"], res["bp_optimistic"]
+        ],
+        "expected_lb_bp": res["expected_lb_bp"],
+        "cost_min_estimate": res["cost_min"],
+        "cost_efficiency_bp_per_min": res["cost_efficiency_bp_per_min"],
+        "metric_aligned": res.get("metric_aligned"),
+        "metric_check_note": res.get("metric_check_note", ""),
+        "pi_predicted_lb_bp": res.get("pi_predicted_lb_bp"),
+        "framework_sha": _git("rev-parse", "HEAD"),
+        "agent_branch": _git("rev-parse", "--abbrev-ref", "HEAD"),
+        "note": note,
+    }
+    DECISIONS_LOG.parent.mkdir(parents=True, exist_ok=True)
+    with DECISIONS_LOG.open("a") as f:
+        f.write(json.dumps(record) + "\n")
+
 
 # ---- ρ → predicted-LB-delta band ------------------------------------
 def predicted_lb_delta_bp(d_oof_bp: float, rho: float) -> float:
@@ -105,7 +187,6 @@ def bote(name: str,
          metric_aligned: bool | None = None,
          metric_check_note: str = "",
          pi_predicted_lb_bp: float | None = None,
-         log_path: Path | str | None = BOTE_LOG,
          note: str = "") -> dict:
     """Back-of-envelope EV calc. Run BEFORE any compute on a candidate.
 
@@ -128,9 +209,8 @@ def bote(name: str,
       metric_check_note: free-text on why metric_aligned is True/False.
       pi_predicted_lb_bp: PI's own LB-delta prediction in bp, recorded
         next to the agent/family prior so we can calibrate PI vs agent
-        across submits. Optional but encouraged (see audit doc tip 1).
-      log_path: append the BOTE record as JSONL to this path for later
-        calibration analysis. Pass None to disable.
+        across submits. Sealed-prediction order per Rule 26(a): PI
+        commits a number BEFORE agent reveals expected_lb_bp.
       note: free-text rationale to print.
     """
     if family not in FAMILY_PRIORS:
@@ -202,17 +282,8 @@ def bote(name: str,
         print(f"  ⚠ {metric_warning}")
     print(f"  verdict: {verdict}")
 
-    if log_path is not None:
-        try:
-            from datetime import datetime, timezone
-            rec = dict(res)
-            rec["ts"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
-            rec["note"] = note
-            Path(log_path).parent.mkdir(parents=True, exist_ok=True)
-            with open(log_path, "a") as f:
-                f.write(json.dumps(rec) + "\n")
-        except Exception as e:
-            print(f"  [bote_log append failed: {e}]")
+    _append_decision_record(res, note)
+    print(f"  logged: {DECISIONS_LOG}")
     return res
 
 
@@ -410,52 +481,58 @@ def _cli_bote(args):
         metric_aligned=ma,
         metric_check_note=args.metric_check_note or "",
         pi_predicted_lb_bp=args.pi_predicted_lb_bp,
-        log_path=None if args.no_log else BOTE_LOG,
         note=args.note or "",
     )
 
 
 def _cli_record(args):
-    """Append a submitted-LB outcome to BOTE_LOG so calibration can be
-    computed later. Indexed by candidate name; multiple outcomes per
+    """Append a submitted-LB outcome to DECISIONS_LOG so calibration can
+    be computed later. Indexed by candidate name; multiple outcomes per
     candidate are allowed (e.g. retried after K_pool changed)."""
-    from datetime import datetime, timezone
     rec = dict(
         kind="outcome",
         name=args.name,
+        decision_id=args.name,
         actual_lb_bp=float(args.actual_lb_bp),
-        ts=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        ts=_dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds"),
+        framework_sha=_git("rev-parse", "HEAD"),
+        agent_branch=_git("rev-parse", "--abbrev-ref", "HEAD"),
         note=args.note or "",
     )
-    BOTE_LOG.parent.mkdir(parents=True, exist_ok=True)
-    with open(BOTE_LOG, "a") as f:
+    DECISIONS_LOG.parent.mkdir(parents=True, exist_ok=True)
+    with open(DECISIONS_LOG, "a") as f:
         f.write(json.dumps(rec) + "\n")
     print(f"recorded outcome for {args.name!r}: actual LB Δ {args.actual_lb_bp:+.2f}bp"
-          f"  →  {BOTE_LOG}")
+          f"  →  {DECISIONS_LOG}")
 
 
 def _cli_calibration(args):
-    """Pair predictions to outcomes in BOTE_LOG and emit per-family
-    PI-vs-agent-vs-actual error. Last-prediction-before-each-outcome wins."""
-    if not BOTE_LOG.exists():
-        raise SystemExit(f"no log at {BOTE_LOG}")
+    """Pair decision records to outcomes in DECISIONS_LOG and emit per-
+    family PI-vs-agent-vs-actual error. Last-prediction-before-each-
+    outcome wins."""
+    if not DECISIONS_LOG.exists():
+        raise SystemExit(f"no log at {DECISIONS_LOG}")
     preds: dict[str, dict] = {}
     rows: list[dict] = []
-    with open(BOTE_LOG) as f:
+    with open(DECISIONS_LOG) as f:
         for line in f:
             rec = json.loads(line)
-            if rec.get("kind") == "outcome":
-                p = preds.get(rec["name"])
+            kind = rec.get("kind", "decision")
+            name = rec.get("decision_id") or rec.get("name")
+            if not name:
+                continue
+            if kind == "outcome":
+                p = preds.get(name)
                 if p is None:
                     continue
                 rows.append(dict(
-                    name=rec["name"], family=p.get("family", "?"),
+                    name=name, family=p.get("family", "?"),
                     actual=rec["actual_lb_bp"],
                     agent=p.get("expected_lb_bp"),
                     pi=p.get("pi_predicted_lb_bp"),
                 ))
             else:
-                preds[rec["name"]] = rec
+                preds[name] = rec
     if not rows:
         print("no paired predictions/outcomes yet")
         return
@@ -510,10 +587,8 @@ def main():
     b.add_argument("--metric-check-note", type=str, default=None,
                    help="Free-text on why metric_aligned is True/False.")
     b.add_argument("--pi-predicted-lb-bp", type=float, default=None,
-                   help="PI's own LB-delta prediction (bp), tracked next "
-                        "to the agent's expected_lb_bp for calibration.")
-    b.add_argument("--no-log", action="store_true",
-                   help="Skip appending to audit/bote_log.jsonl.")
+                   help="PI's own LB-delta prediction (bp), sealed BEFORE "
+                        "agent reveals expected_lb_bp (Rule 26a).")
     b.add_argument("--note", type=str, default=None)
     b.set_defaults(func=_cli_bote)
 
@@ -537,7 +612,7 @@ def main():
     r.set_defaults(func=_cli_record)
 
     c = sub.add_parser("calibration",
-                       help="pair predictions to outcomes in audit/bote_log.jsonl")
+                       help="pair predictions to outcomes in audit/decisions.jsonl")
     c.set_defaults(func=_cli_calibration)
 
     args = ap.parse_args()

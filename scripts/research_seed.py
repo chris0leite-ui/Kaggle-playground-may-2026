@@ -3,8 +3,13 @@
 Embeds MLE-STAR's web-retrieval lever (Google Research blog 2025; arXiv
 2506.15692) into our loop. MLE-STAR's +47bp over AIDE on MLE-bench-Lite
 came mostly from grounding the seed solution in prior-comp recipes
-fetched from the web. We do this on plateau (Rule 7); this script makes
-it cheap to do at FAMILY KICKOFF too.
+fetched from the web.
+
+Tool support for Rule 22 (public-notebook scan at every plateau) and
+Rule 7 (research-loop on plateau): both call for ≥5 prior-comp /
+GM-blog citations before declaring a ceiling or opening a new family.
+This script generates the structured stub the agent fills via
+WebSearch.
 
 Usage:
     python scripts/research_seed.py FAMILY_NAME [--note ...]

@@ -57,19 +57,24 @@ Cap ≤150 lines. This is a checklist agents follow verbatim.
    One entry per distinct friction event today. Reuse existing tags
    when possible.
 
+4b. **Run the postmortem skill.** Follow
+    `.claude/skills/postmortem/SKILL.md` steps 1–6: identify what
+    went wrong, draft promotion candidates from today's friction
+    entries, ask PI for additions, ask PI to ratify promotions,
+    write `audit/YYYY-MM-DD-postmortem*.md`, stage outputs.
+    Blocks on PI replies; do not bypass.
+
 5. **File-size guard.** If `CLAUDE.md` > 50k tokens or `HANDOVER.md`
    > 150 lines, archive the oldest sections to
    `audit/archive-YYYY-MM-DD-<topic>.md` BEFORE step 6 and update
    pointers. Never silently truncate.
 
-5b. **Override-rate report (Rule 20e).** Before commit, run
-    `python scripts/probe.py calibration` and report to PI:
-    - This session: agent recommended N candidates, PI overrode M.
-    - Rolling 7-day override rate (count outcomes in `bote_log.jsonl`
-      whose `verdict` differed from PI's actual go/no-go).
-    - If 0/M overrides for 2 consecutive wrap-ups, flag stamp risk
-      in HANDOVER.md `## Where we are`. The friction tag for this is
-      `tag: pi-stamp-risk`.
+5b. **Calibration snapshot (Rule 26).** Before commit, run
+    `python scripts/probe.py calibration` and append the table to
+    today's postmortem (step 4b). Used by postmortem step 2 to count
+    PI overrides. If 0/M overrides for 2 consecutive postmortems,
+    postmortem flags stamp risk in HANDOVER.md `## Where we are`
+    (friction tag `pi-stamp-risk`).
 
 6. **Commit.** Use HEREDOC, structured message:
    ```
