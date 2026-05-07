@@ -176,7 +176,7 @@ our_lb_best: 0.95059              # d15b_path_b_K22_dae_only_tau20000 NEW PRIMAR
 submissions_used_today: 4         # 2026-05-06: (1) main d12_lr_meta τ=100k LB 0.95045 -4bp REGRESS; (2) main d15b_path_b_K22_dae_only_tau20000 LB 0.95059 +1bp NEW PRIMARY; (3) decode K=22 LR-meta + d15_orig_transfer LB 0.95039 -10bp REGRESS (meta-arch confound); (4) decode K=22 hier-meta + d15_orig_transfer LB 0.95049 TIE (HEDGE-eligible)
 submissions_used_total: 28
 saturation_count: 0               # base-add wall confirmed at +0-1bp band but DAE-class candidate was structural-positive; meta-arch redesign axis is the next Path-B-amp-eligible move
-mechanism_families_explored:
+mechanism_families_explored:  # Q1 reference. Detail in audit/. Compressed 2026-05-06.
   - baseline_lgbm_raw_features
   - oof_target_encoding
   - xgb_native_categorical
@@ -184,92 +184,76 @@ mechanism_families_explored:
   - relative_state_fe
   - lr_meta_stacker_3view
   - dirichlet_random_search
-  - hgbc_label_encoded_driver       # E3 -- BEST single-model pre-CB
+  - hgbc_label_encoded_driver       # E3 — BEST single-model pre-CB
   - row_subsample_catboost          # E1
-  - l1_meta_sweep                   # E2 -- null
-  - realmlp_cpu_singlefold          # E4 -- not pursued
-  - lr_meta_stacker_expanded        # M5b -- LB 0.94891
-  - reformulation_lgbm              # M5c -- A/B horizon-shift, laps-until-pit
-  - hgbc_beta_variants              # M5d -- f1 deep + f2 shallow, LB 0.94963
-  - catboost_year_in_cat_cols       # cb_year-cat -- +60bp Strat over base
-  - catboost_lossguide_grow_policy  # cb_lossguide -- BEST CB on GroupKF
-  - catboost_gpu_multi_seed_bag     # cb_slow-wide-bag -- BEST CB on Strat
-  - corr_pool_prune                 # M5g (ρ≥0.97) -- TOO aggressive
-  - l1coef_pool_prune               # M5h -- only prune that preserves OOF
-  - unified_te_2way_keys            # d3a -- +2.2bp Strat std-alone, +0.1bp stacked (null)
-  - sequence_fe_race_driver         # d3b -- +18bp Strat std-alone, +0.2bp stacked (null)
-  - tier_break_l1_prune             # M5h2 v1 -- drop a_horizon, K=12, LB 0.94991 (tied; gap unchanged)
-  - catboost_yetirank_pairwise      # d4 -- 0.90508 std, ρ=0.666 vs M5q (most diverse), TIE_EXPECTED
-  - gaussian_naive_bayes_mixed      # d4 -- 0.87984 std, ρ=0.853 vs M5q, TIE_EXPECTED stack
-  - gbdt_meta_lr_alternative        # d4 slot 2 -- LGBM/HGBC meta over M5q pool; LB 0.95001 (-4bp)
-  - recursive_gbdt_m5q_feature      # d5 path-c -- 0.94994 std (+92bp); K=15 stacks NULL (3rd rank-lock)
-  - gbdt_meta_k15_recursive         # d5 -- LGBM/HGBC meta over K=15 NULL (-1bp vs d4 K=14)
-  - tabnet_smoke_default_config     # d5 -- 0.93532 fold0, FAIL gate; under-trained, parked
-  - pseudo_label_e3_mvp             # d5 path-b phase1 -- +4.1bp e3, ρ=0.996 PASS both gates
-  - pseudo_label_5_base_phase2      # d5 path-b phase2 -- 5 fast bases all lift +2-19bp
-  - partial_pseudo_m5q_k14          # d5 -- 6 pseudo + 8 orig; OOF 0.95082 (+2.54bp); ρ=0.99836 REAL_DELTA
-  - aux_feature_gbdt_meta           # d6 F5 -- +0.12bp over no-aux LGBM; FALSIFIED
-  - 2base_recursive_blend           # d6 B -- 4 variants; tie or regress; FALSIFIED
-  - rule_residual_l1_base           # d6 C/F1.1 -- residual GBDT on rule_proba; min-meta PASS
-  - multi_rule_residual_k18         # d6 F1.2 -- 4 rules; LB 0.95026 (+2.1bp PRIMARY)
-  - simple_math_rule_residual_pool  # d9 -- 9 closed-form / Bayesian rule_residuals; ALL FAIL min-meta vs PRIMARY
-  - hash_lr_3way_baseline           # d9 R14 -- sparse-LR 3-way interactions; std 0.794, ρ=0.444 most-diverse
-  - hash_lr_strength_ladder         # d9b R14 L0-L5 -- L2/L3/L4 PASS at +0.01bp; L4 K=20 swap LB 0.95025 TIE
-  - factorization_machine_cpu       # d9c FM -- std 0.921, ρ=0.899, min-meta +0.18bp PASS; K=20 swap LB 0.95029 (+3bp)
-  - hash_lr_3way_strength_ladder    # d9b R14 L0-L5 -- L2/L3/L4 PASS; K=20 swap+L4 LB 0.95025 TIE
-  - factorization_machine_partition # d9f FM_A driver-dynamics + FM_B race-context -- K=21 swap LB 0.95031 (+2bp NEW PRIMARY)
-  - factorization_machine_aug12     # d9h unified 12-field FM + K=22 add LB 0.95034 (+3bp tied PRIMARY, 300× upside)
-  - factorization_machine_aug2way   # d9i FM_A_aug + FM_B_aug 2-way partition K=21 swap LB 0.95034 (+3bp tied)
-  - factorization_machine_aug15     # d13 EDA H1 -- 12 d9h fields + CRT(Compound×TL_q5×RP_q5) + Cdpl(cumdeg/lap q5) + Ldz(LapTime_Delta race-z q5); std OOF 0.92711 (strongest FM ever, +1.7bp vs aug12), ρ=0.909 (most diverse), K=23 add LB 0.95032 (-2bp regress); FM-FIELD-AUGMENTATION LEVER SATURATED at 12 fields
-  - empirical_bayes_hierarchical_meta # d13 Path B -- per-segment LR meta over K=21 PRIMARY pool with τ-shrinkage to global. Compound (5 seg) τ=100k LB 0.95033 (+2bp, 6.7× upside); Stint (5 seg) τ=100k LB 0.95041 (+7bp, 11.6× upside; mechanism leakage-robust per d13d GKF probe 2.9× amplified); **Compound×Stint (24 seg) τ=20k LB 0.95049 NEW PRIMARY (+8bp, 8× upside)**; Year (4 seg)/Race (26 seg)/Year×Compound/Year×Stint UNTESTED
-  - groupkf_stack_rebuild_audit     # d10b/c -- FM-class lift +2.01bp under Race-only GKF vs +0.87bp Strat (2.3× AMPLIFIED); FM_B is #1 L1 component under GKF; PRIMARY private-LB robust
-  - leak_corrected_lr_meta          # d10d -- refit LR on GKF OOFs; G3 fail (flip ratio 0.001); FM dominance over-credits, smooths GBDT row-extremes; held
-  - empirical_bayes_hier_lr_meta    # d13 Stint τ=100000 -- LB 0.95041 NEW PRIMARY (+7bp; 11.6× OOF upside); GKF lift +2.59bp 2.9× AMPLIFIED per d13d probe -- mechanism leakage-robust, private-LB-likely-real
-  - t12_censored_regression         # d12 -- LGBM weighted-regression on log(laps_until_pit); std 0.544, FAIL min-meta
-  - t12_ratio_target                # d12 -- LGBM regression on pits/stints + heuristic; std 0.674, FAIL min-meta
-  - t12_stintlevel_survival         # d12 -- stint-level LGBM duration → row hazard; std 0.601, FAIL min-meta
-  - year_segmented_specialist       # d12 -- M_active/M_2023 split FALSIFIED; AV-AUC 0.502 (no shift); 2023 is EASIEST segment
-  - adversarial_validation_reweight # d12 -- e3+adv-weight FALSIFIED -4.92bp min-meta; train/test i.i.d.
-  - lambdarank_race_meta            # d12 -- LambdaMART Race-grouped REGRESSED -86bp; LR-meta-stays-best
-  - aucpairwise_xgb_base            # d12 -- XGB rank:pairwise smoke -451bp fold-0; FAIL gate
-  - single_bag_e3_5seed             # d12 -- standalone bag -19bp OOF; K=21 complexity JUSTIFIED (not OOF-noise)
-  - groupkf_full_pool_meta          # d12 -- KEY FINDING: rank-lock partial dissolves; ρ(Strat-vs-GKF meta)=0.9914
-  - fm_partition_5_3_d13a           # d13a -- FM_A_53 (D,C,S,T,Cd) + FM_B_53 (R,Y,Rp); Strat S3 K=24 +0.20bp pred ρ 0.99976; LB 0.95032 TIE; GKF Δ -41.6/-2.9bp BOTH leakage-robust
-  - fm_partition_4_4_ct_axis_d13d   # d13d V2 -- FM_A_CT (C,T,Cd,Ld) + FM_B_DR (D,R,S,Y); K=25 add REGRESS -0.05bp; wheel-physics axis redundant w/ d9f+d13a
-  - fm_partition_6_6_alt_d13d       # d13d V3 -- FM_A_DH + FM_B_RT (T moved to B, Nx/Pv to A); K=25 add +0.03bp noise-floor; partition-shape SATURATED across 6 shapes
-  - gkf_full_22_stack_d13b          # d13b -- 4-FM (d9c+d9f A/B+d13a A_53/B_53) GKF stack +3.20bp; SWAP_21 (drop d9c) -0.01bp = REDUNDANT; Move C minimal validated under GKF
-  - move_c_strat_pool_refactor      # d13c -- T1 drop_d9c K=23 = T0 K=24 (no regress) ✓; T2/T3 drop GBDT leak-eaters -2.5/-2.6bp Strat FALSIFIED — leak-eaters carry public-LB row-iid signal
-  - within_stint_lgbm_fe            # d13 G1 -- 6 γ-pack feat (laps_into_stint etc); std 0.94194, ρ 0.965, min-meta -0.38bp NULL
-  - cross_driver_intra_race_lgbm_fe # d13 G2' -- 9 γ4 feat (block_tyrelife_std +0.29 row-corr); std 0.94250, ρ 0.957, min-meta +0.03bp NULL
-  - stintgrouped_lambdamart         # d13 G3 -- pairwise loss; smoke fold-0 0.74585, killed (63% all-zero stints from probe Q1)
-  - fm_aug13_3way_concat_field      # d14 H1 -- CTRq Compound×TL_q5×RP_q5 (114/125 levels); std 0.92639 (+9.9bp vs aug12), ρ **0.917** (most diverse), min-meta -0.13bp NULL
-  - path_b_cohort_sweep_d14         # d14 -- Year(4)/Year×Stint(24)/Race(26) × τ∈{5k,20k,100k}; 9 variants, NONE beats current PRIMARY (Compound×Stint τ=20k) on OOF; best Year×Stint τ=20k OOF 0.95080 (-0.30bp). Cohort lever Compound axis dominates Year axis (2023 flat-rate generator defeats per-Year specialization).
-  - two_level_stacking_meta_as_base # 2026-05-06 -- K=21 + d12_lr_meta (= K=21 LR-meta-OOF itself) +1.348 bp OOF, but Path B Compound×Stint hier-meta on K=22 SUBMITTED LB 0.95045 (-4 bp REGRESS, predicted +5-11 bp via Path B amp). FALSIFIED: Path B amp requires orthogonal pool signal, NOT meta-derivatives whose info is already convex combo of pool. Friction tag `path-b-amp-needs-orthogonal-signal-not-meta-derivatives`. Harness: `two_level_stacking_meta_as_base` family added (P=0.10, bp band -2/0/1).
-  - tabpfn_finetune_v25_v26         # Day-14 -- v2.5 @ 50k rows fold-0 0.94439; v2.5 @ 150k rows fold-0 0.94446 (IDENTICAL — flat training loss; fine-tuning not learning); v2.6 OOM P100 at any row count (model weights ≈15.37GB > 16GB). AUC ceiling 0.944 = -64bp vs PRIMARY. ρ=0.960 (diverse) but gap too large for pool. DEAD.
-  - fm_new_input_features           # Day-14 Move D -- F1_PitWindow_q5, F2_HazardDecay_q5, F3_CompoundPress_q5, F4_RaceStage. FM_aug16 (16-field): std 0.92741 (+20.1bp vs aug12 0.92540), ρ=0.919, min-meta -0.07bp FAIL. Confirms FM-field-augmentation saturated at 12 fields; new input types add standalone OOF but zero pool increment.
-  - masked_column_self_prediction   # Day-14 -- 4 LGBM regressors predict LapTime_Delta/Cumulative_Degradation/Position/LapNumber from rest of row; OOF z-residuals + L1 anomaly as 5 new features for LGBM target model. std 0.94200 (-88bp), ρ=0.9599 (diverse), K=2 min-meta -0.025bp NULL, K=22 add +0.172bp at ρ=0.9958 (pred LB -1.3bp under harness band). Load-bearing diag: across all 4 targets OOF RMSE ≈ marginal σ within 3 sig figs — synthetic NN-DGP added near-independent per-feature noise within rows. 5th NULL on per-row-FE axis; jointly explains FM-aug12 saturation, Move D NULL, Day-13/14 alt-axis 4-of-4, TabPFN 0.944 ceiling. Friction tag `synthetic-dgp-conditionally-near-independent`. Family closed.
-  - kd_distillation_lgbm            # 2026-05-06 -- small LGBM mimicking K=21 LR-meta-OOF logits; std 0.94212; K=21+1 +0.526 bp meta-derivative-class artifact (HELD; LB-regress predicted by meta-derivative pattern).
-  - nn_with_embedding_layers        # 2026-05-06 -- MLP w/ Driver/Race/Compound/Year/Stint embeds; std 0.92362 (-272 bp), ρ=0.918 most-diverse measured but K=21+1 -0.025 bp NULL. Confirms ρ alone insufficient predictor of meta-utility.
-  - lap_mod_features_lgbm           # 2026-05-06 -- LapNumber_mod_{3,5,7,10}+id_mod_{5,7,13,100,1000}; id-audit found LapNumber_mod_10 marginal target span 566 bp; std 0.94076, K=21+1 +0.002 bp NULL. The 566 bp span absorbed by GBDT feature interactions.
-  - pseudo_label_confidence_extreme # 2026-05-06 -- top/bot 5% test by PRIMARY confidence as half-weight pseudo; std 0.94083, K=21+1 +0.019 bp NULL.
-  - within_race_lt_quantile         # 2026-05-06 -- LapTime_Delta within-(Race,Year) q5 as LGBM feat; std 0.94008, K=21+1 +0.20 bp NULL/marginal. The +922 bp single-feat leak signal absorbed.
-  - year_stint_sparse_lr            # 2026-05-06 -- one-hots for Year/Stint/Compound + Driver-hash + Year×Stint and Y×S×C; std 0.88164 (very weak), ρ=0.844 most-diverse, K=21+1 +0.05 bp NULL.
-  - blend_aggregators_K21           # 2026-05-06 -- mean/gmean/rank_mean/trimmed of K=21 standalone OOFs; ALL std OOF -19 to -32 bp vs PRIMARY. RULED OUT: LR meta is doing real work, simple blends never match it.
-  - driver_cluster_path_b_cohort    # 2026-05-06 -- k-means k=4 on per-Driver stats → cluster cohort; Compound×cluster (5×4=20 segs) Path B; -0.4 to -0.9 bp NULL across τ. Cohort axis exhausted.
-  - alpha_calibrated_tau_resweep    # 2026-05-06 / d15 Branch A -- two independent confirmations. main-branch agent: Path B α computed with full-train counts at OOF; τ=20k UNCHANGED (ρ=1.0, Δ -0.02 bp). d15 Branch A re-ran the same hypothesis end-to-end: ρ=1.000000 vs d13e at τ=20000 (literally identical predictions). At segments ≥1000 rows, α=n/(n+τ)≈1 in both regimes; smaller τ values regress (τ=2000 -0.99bp). PRIMARY's τ=20k empirically optimal — calibration is not the binding constraint.
-  - id_order_synth_artifact         # 2026-05-06 -- LapNumber_mod_10 marginal span 566 bp, id_mod_1000 568 bp. Marginal span DOES NOT translate to predictive lift when GBDT has feature interactions.
-  - target_reformulation_invlaps    # 2026-05-06 -- LGBM regression on 1/(1+laps_until_pit), target-derived (NOT meta-derivative). Std OOF 0.94053 (-103 bp), ρ=0.924. K=21+1 +1.899 bp OOF. **POSITIVE single-add finding** (largest non-meta-derivative single-add lift ever measured). HELD candidate.
-  - target_reformulation_stintprog  # 2026-05-06 -- LGBM regression on TyreLife/max(stint), std 0.64851, ρ=0.252 (most-diverse single base ever); K=21+1 alone NULL.
-  - multi_target_nn_pit_aux_invlaps # 2026-05-06 -- shared-trunk NN with pit_next_lap (BCE) + inv_laps (MSE 0.3) heads; std 0.92295, K=21+1 +0.086 bp NULL.
-  - path_b_K22_invlaps_compound_stint # 2026-05-06 -- Path B Compound×Stint hier-meta on K=22 = K=21 + inv_laps_until_pit; OOF 0.95110 (+2.75 bp vs PRIMARY) at τ=20k, ρ=0.99753. **LARGEST OOF ADVANCE OF SESSION**, target-derived. Held pending submission decision.
-  - extra_trees_5fold_d15c          # d15 Branch C -- ExtraTreesClassifier(4000, max_features='sqrt') 5-fold; std OOF 0.92967 (underfits row-iid leakage GBDTs eat, as predicted); min-meta +0.059bp at ρ 0.99599 = noise-floor band. R5 HEDGE only.
-  - knn_distance_lgbm_d15d          # d15 Branch D -- per-Compound + per-Driver k=5 NN distances (10 features) + LGBM; std OOF 0.94166; min-meta +0.056bp at ρ 0.99586. C+D K=23 add additive +0.095bp; ρ between C&D raw 0.9325 (diverse) but LR-meta routes both to ρ≈0.996 vs PRIMARY. Rank-lock pattern reasserted. R5 HEDGE only.
-  - dae_swap_noise_lgbm_d15b        # d15 Branch B -- Jahrer Porto-Seguro recipe ported to GPU. DAE 256-512-256 swap-noise frac=0.15, 20 epochs batch=4096 on (train+test 627k); 768d latent (h2+h3 concat); LGBM 5-fold on raw+latent vs latent-only. **`dae_only` std OOF 0.94007, ρ_test 0.9477 (most-diverse since FM_A_53), min-meta +0.793bp at ρ 0.99547.** K=22 Path B Compound×Stint τ=20000 OOF 0.95090 +0.715bp vs d13e, ρ 0.99973, flips 59/53 R7-eligible. **SUBMITTED 2026-05-06 15:38: LB 0.95059 (+1.0bp NEW PRIMARY).** Realised amp 1.4× (above ρ-band baseline +0.22bp, well below Path-B-amp 6-11.6× central). New friction `path-b-amp-only-fires-on-meta-arch-not-base-add`: amp transfers on meta-architecture redesign (segmentation lifts) NOT on K_pool→K_pool+1 base additions, even when new base is orthogonal-class.
-  - d15_orig_transfer               # 2026-05-06 branch decode-synthetic-data-uoPIn -- LGBM trained on aadigupta1601 original (99k rows, source verified) → predicts synth. Std-alone synth AUC 0.85138 (-99bp vs PRIMARY), ρ vs OLD PRIMARY 0.565 (most-diverse single base since d9f FM_A 0.487). At LR-meta(K=22) +0.778bp OOF; LR-meta SUBMITTED LB 0.95039 (-10bp REGRESS, meta-arch confound). Hier-meta(K=22, Compound×Stint τ=20k): +1.127bp OOF, ρ=0.99844, flips 180 (R7 ✓), SUBMITTED LB 0.95049 TIE → HEDGE-tier candidate. Mechanism: synthesizer corrupted joint structure but kept marginals; orig-trained model carries un-corrupted DGP signal orthogonal to GBDT pool.
-  - d15_orig_multi_arch_bag         # 2026-05-06 -- d15_orig_cb (CB) + d15_orig_xgb (XGB) + d15_orig_lgbm_t (tuned LGBM) trained on same original. Inter-arch ρ 0.94-0.99 (high), ρ vs PRIMARY 0.57-0.64. Hier-meta K=23(+cb) Δ +0.005bp NULL; K=24(+cb+xgb) Δ +0.33bp but flips 293>R7-200 cap. Multi-arch on shared training-data is REDUNDANT; vary training-data subset, not architecture. Friction tag `external-data-arch-bag-redundant-when-shared-training-data`.
-  - d15_decode_normalized_tyrelife  # 2026-05-06 -- direct lookup of host-removed Normalized_TyreLife from original (5.5% match rate) + stint-fraction estimate fallback. Formula recovered: NTL = TyreLife / D(Driver,Race,Year,Stint), D ≈ stint length. Standalone OOF 0.94162; min-meta(K=21) Δ -0.008bp NULL (absorbed by TyreLife+RaceProgress+Stint already in pool). Cheap rule-out.
-  - d15_physics_residual            # 2026-05-06 -- Ridge LapTime ~ Driver+Race+Year+Compound+TyreLife (5-fold OOF residual) + per-Race-Compound z-score on Cumulative_Degradation. Std OOF 0.94228, min-meta Δ -0.036bp NULL. Physics already in GBDT pool.
-  - d15_leak_lookup                 # 2026-05-06 -- 16 EB-smoothed lookup features from original (P(PitNextLap | LapTime), univariate/bivariate/trivariate). 97.55% of synth LapTime values exist in original (CTGAN/CopulaGAN signature). Std OOF 0.94203, min-meta(K=21) Δ +0.270bp soft-pass (smaller than orig_transfer). Hier-meta K=22(leak-only) -0.90bp vs orig; K=23(leak+orig) +0.19bp incremental over orig — best OOF on branch 0.95096 but ρ=0.9986 → predicted LB tie, NOT submitted.
+  - l1_meta_sweep                   # E2 — null
+  - realmlp_cpu_singlefold          # E4 — not pursued
+  - lr_meta_stacker_expanded        # M5b LB 0.94891
+  - reformulation_lgbm              # M5c A/B horizon-shift, laps-until-pit
+  - hgbc_beta_variants              # M5d LB 0.94963
+  - catboost_year-cat / lossguide / slow-wide-bag  # 3 CB winners
+  - corr_pool_prune / l1coef_pool_prune  # M5g/M5h prune; only L1coef preserves OOF
+  - unified_te_2way_keys            # d3a +2.2bp Strat std, +0.1bp stacked NULL
+  - sequence_fe_race_driver         # d3b +18bp Strat, +0.2bp stacked NULL
+  - tier_break_l1_prune             # M5h2 v1 LB 0.94991 TIE
+  - catboost_yetirank_pairwise / gaussian_naive_bayes_mixed  # d4 std weak; stack TIE
+  - gbdt_meta_lr_alternative        # d4 slot 2 LB 0.95001 (-4bp)
+  - recursive_gbdt_m5q_feature      # d5 +92bp std, K=15 stacks NULL
+  - gbdt_meta_k15_recursive         # d5 NULL
+  - tabnet_smoke_default_config     # d5 FAIL gate, parked
+  - pseudo_label_e3_mvp / 5_base_phase2 / partial_pseudo_m5q_k14  # d5 PASS; K=14 LB regress
+  - aux_feature_gbdt_meta           # d6 F5 falsified
+  - 2base_recursive_blend           # d6 B falsified
+  - rule_residual_l1_base / multi_rule_residual_k18  # d6 F1.1/F1.2; K=18 LB 0.95026 (+2.1bp)
+  - simple_math_rule_residual_pool  # d9 9 closed-form; ALL FAIL min-meta
+  - hash_lr_3way_baseline / strength_ladder  # d9/d9b L4 K=20 swap LB 0.95025 TIE
+  - factorization_machine_cpu       # d9c FM std 0.92069, ρ 0.899; K=20 swap LB 0.95029
+  - factorization_machine_partition # d9f K=21 swap LB 0.95031 (+2bp; FM_A ρ 0.487 most-diverse)
+  - factorization_machine_aug12     # d9h K=22 add LB 0.95034 (+3bp; 300× upside)
+  - factorization_machine_aug2way   # d9i K=21 swap LB 0.95034 (+3bp; OOF predicted regression)
+  - factorization_machine_aug15     # d13 H1 std 0.92711 strongest FM ever; K=23 add -2bp REGRESS
+  - empirical_bayes_hierarchical_meta  # d13 Path B; Compound×Stint τ=20k LB 0.95049 (+8bp 8× upside)
+  - groupkf_stack_rebuild_audit     # d10b/c FM-class +2.01bp GKF vs +0.87bp Strat (2.3× AMP)
+  - leak_corrected_lr_meta          # d10d G3 fail flip 0.001; held
+  - empirical_bayes_hier_lr_meta    # d13 Stint τ=100k LB 0.95041 (+7bp; 11.6× upside; GKF 2.9× AMP)
+  - t12_censored_regression / ratio_target / stintlevel_survival  # d12 4-of-4 FAIL min-meta
+  - year_segmented_specialist       # d12 falsified; AV-AUC 0.502 (i.i.d.); 2023 EASIEST
+  - adversarial_validation_reweight # d12 -4.92bp min-meta; train/test i.i.d.
+  - lambdarank_race_meta            # d12 -86bp REGRESSED (Q6 origin)
+  - aucpairwise_xgb_base            # d12 -451bp fold-0 (Q6 origin)
+  - single_bag_e3_5seed             # d12 -19bp every segment; K=21 complexity JUSTIFIED
+  - groupkf_full_pool_meta          # d12 KEY: ρ(Strat-vs-GKF meta)=0.9914; rank-lock partial dissolves
+  - fm_partition_5_3_d13a / 4_4_ct_axis / 6_6_alt  # d13a/d13d K=23-25 noise-floor; partition SATURATED
+  - gkf_full_22_stack_d13b          # d13b SWAP_21 redundant; Move C minimal validated under GKF
+  - move_c_strat_pool_refactor      # d13c T2/T3 -2.5/-2.6bp Strat FALSIFIED — leak-eaters carry signal
+  - within_stint_lgbm_fe / cross_driver_intra_race_lgbm_fe  # d13 G1/G2' min-meta NULL
+  - stintgrouped_lambdamart         # d13 G3 killed (63% all-zero stints)
+  - fm_aug13_3way_concat_field      # d14 H1 ρ 0.917 most-diverse; min-meta -0.13bp NULL
+  - path_b_cohort_sweep_d14         # d14 Year/YxStint/Race × τ; 9 variants ALL <PRIMARY OOF
+  - two_level_stacking_meta_as_base # K=22 path B LB 0.95045 -4bp REGRESS (meta-derivative class FALSIFIED)
+  - tabpfn_finetune_v25_v26         # Day-14 DEAD; AUC ceiling 0.944; v2.6 OOM P100
+  - fm_new_input_features           # Day-14 Move D aug16 std +20bp; min-meta -0.07bp FAIL
+  - masked_column_self_prediction   # Day-14 5th per-row-FE NULL; DGP near-independent (load-bearing diag)
+  - kd_distillation_lgbm            # 2026-05-06 +0.526bp meta-derivative-class artifact (HELD)
+  - nn_with_embedding_layers        # 2026-05-06 ρ=0.918 most-diverse; K=21+1 -0.025 NULL (ρ-alone falsified)
+  - lap_mod_features_lgbm           # 2026-05-06 +0.002 NULL; 566bp marginal absorbed by GBDT interactions
+  - pseudo_label_confidence_extreme # 2026-05-06 +0.019 NULL
+  - within_race_lt_quantile         # 2026-05-06 +0.20 NULL/marginal
+  - year_stint_sparse_lr            # 2026-05-06 ρ=0.844; +0.05 NULL
+  - blend_aggregators_K21           # 2026-05-06 mean/gmean/rank/trimmed -19 to -32bp; LR meta does real work
+  - driver_cluster_path_b_cohort    # 2026-05-06 -0.4 to -0.9bp NULL across τ; cohort axis exhausted
+  - alpha_calibrated_tau_resweep    # 2026-05-06 / d15A ρ=1.0 vs d13e; τ=20k empirically optimal
+  - id_order_synth_artifact         # 2026-05-06 marginal span ≠ predictive lift (rule of thumb)
+  - target_reformulation_invlaps    # 2026-05-06 K=21+1 +1.899bp OOF; largest non-meta-derivative single-add (HELD)
+  - target_reformulation_stintprog  # 2026-05-06 ρ=0.252 most-diverse single base ever; K=21+1 NULL
+  - multi_target_nn_pit_aux_invlaps # 2026-05-06 +0.086bp NULL
+  - path_b_K22_invlaps_compound_stint  # 2026-05-06 OOF 0.95110 (+2.75bp); HELD pending submit
+  - extra_trees_5fold_d15c          # d15C +0.059bp at ρ 0.99599 noise-floor; R5 HEDGE only
+  - knn_distance_lgbm_d15d          # d15D +0.056bp; ρ between C/D 0.9325 raw but LR routes to ρ=0.996; HEDGE only
+  - dae_swap_noise_lgbm_d15b        # d15B Jahrer DAE GPU; LB 0.95059 NEW PRIMARY (+1bp; amp 1.4× — friction `path-b-amp-only-fires-on-meta-arch-not-base-add`)
+  - d15_orig_transfer               # 2026-05-06 LGBM on aadigupta orig; hier-meta K=22 LB 0.95049 TIE; HEDGE-tier
+  - d15_orig_multi_arch_bag         # 2026-05-06 multi-arch on shared training-data REDUNDANT (friction tag)
+  - d15_decode_normalized_tyrelife / physics_residual / leak_lookup  # 2026-05-06 3 lookup probes; cheap rule-outs
 plateau_days: 0                   # Day-15 PM PRIMARY-advance to LB 0.95059 (DAE-class new-base +1bp); plateau reset. Per-row-FE family closed (5 prior NULLs); base-add wall confirmed empirically. Day-16 priority: meta-arch-redesign axis.
 gate_status: cleared              # d15b_path_b_K22_dae_only_tau20000 LB 0.95059 NEW PRIMARY (+1bp Day-15 PM)
 headroom_to_top5pct: 0.00286      # 0.95345 − 0.95059 = 28.6bp (d15b_path_b_K22_dae_only_tau20000)
@@ -277,289 +261,96 @@ headroom_to_top5pct: 0.00286      # 0.95345 − 0.95059 = 28.6bp (d15b_path_b_K2
 
 ## Calibration ladder
 
+Pre-Day-13 rows archived → `audit/archive-2026-05-06-claude-md-compression.md`.
+Active anchors below; cite these for 6-Q questions 3-5 ("predict ρ band /
+OOF / closest precedent").
+
 | Mechanism | Strat OOF | GroupKF OOF | LB | Notes |
 |---|---:|---:|---:|---|
 | baseline_two_anchor | 0.94075 | 0.92059 | 0.94113 | LB-proxy ✓ gap +3.8bp |
-| m3_catboost | 0.94612 | 0.91645 | n/a | depth=6, default CTR; Race-overfit |
-| m4_relstate | 0.94244 | 0.92195 | n/a | only B1 lifting both anchors |
-| e3_hgbc | 0.94876 | 0.92785 | 0.94870 | BEST single pre-CB; gap −0.6bp |
-| e5_optuna_lgbm | 0.94736 | 0.92585 | n/a | LGBM Optuna 30 trials |
-| f1_hgbc_deep / f2_hgbc_shallow | 0.94870 / 0.94861 | 0.92739 / 0.92711 | n/a | β E3 clones (~99% corr) |
-| **cb_year-cat** | **0.94679** | **0.91992** | n/a | Year ∈ CAT_COLS; +60bp/+34bp vs M3 |
-| **cb_lossguide** | **0.94697** | **0.92377** | n/a | Lossguide; BEST CB GroupKF (+31.8bp) |
-| **cb_slow-wide-bag** | **0.94790** | **0.92322** | n/a | GPU 3-seed bag; BEST CB Strat (+71.5bp) |
-| m5b_lr_meta_expanded | 0.94926 | 0.92871 | 0.94891 | gap −3.5bp (anchor) |
-| m5d_lr_meta_expanded | 0.95023 | 0.92994 | 0.94963 | D2 PRIMARY; gap −6.0bp (widened) |
-| m5e (CB-only 13-base) | 0.95027 | 0.93084 | n/a | held; M5c + 3 CB winners |
-| **m5f (combined 15-base)** | **0.95042** | **0.93105** | n/a | held; M5d + M5e new bases |
-| m5g (corr ρ≥0.97 prune) | 0.94961 | 0.92915 | n/a | TOO aggressive; 5/15 surv |
-| **m5h (L1coef top-13)** | **0.95043** | **0.93087** | **0.94991** | **CURRENT PRIMARY**; gap −5.2bp; drop m3+m4 dead weight |
-| d3a_te_unified | 0.93692 | 0.91284 | n/a | +2.2bp Strat vs d2a; std-alone redundant w/ d2a |
-| m5i (M5h+d3a, 14) | 0.95043 | 0.93096 | n/a | d3a L1=0.079 last; tie M5h Strat |
-| m5j (d3a swaps d2a, 13) | 0.95044 | 0.93092 | n/a | d3a L1=1.065 (3rd); +0.1bp Strat tie |
-| d3b_seqfe | 0.94254 | 0.92136 | n/a | +18bp Strat over baseline; FAIL gate by 35bp |
-| m5k (M5h+d3a+d3b, 15) | 0.95045 | 0.93102 | n/a | d3b L1=0.316 (mid-tier); +0.2bp Strat tie |
-| m5h2_v1 (drop a_horizon, 12) | 0.95044 | n/a | **0.94991** | **TIED M5h LB**; gap-vs-pool-size hypothesis falsified for 13→12 |
-| m5j (d3a swaps d2a, 13) | 0.95044 | n/a | **0.94991** | **TIED M5h LB**; TE-key swap is LB-neutral (quantization-limit) |
-| m5p (minimal+LR-FE+EBM, 6) | 0.94839 | n/a | **0.94754** | -237bp; orthogonal-mech thesis FAILED |
-| m5n_3b (minimal-basis, 4) | 0.94808 | n/a | **0.94700** | -291bp; minimal-basis thesis FAILED — clones earn slot |
-| **m5q (M5h + RealMLP, 14)** | **0.95057** | n/a | **0.95005** | **PRIMARY**; +14bp LB; +1.4bp OOF → 10× LB amplification |
-| d4_cb_yetirank | 0.90508 | n/a | n/a | std weak; ρ=0.666 vs M5q (most-diverse base); +0.0bp stack TIE |
-| d4_nb (mixed Gaussian + TE) | 0.87984 | n/a | n/a | std weak; ρ=0.853 vs M5q; +0.24bp stack TIE |
-| m5x (M5q + yetirank, K=15) | 0.95057 | n/a | n/a | held; ρ=0.99966 vs M5q TIE_EXPECTED |
-| m5z (M5q + yetirank + nb, K=16) | 0.95060 | n/a | n/a | held; ρ=0.99957 vs M5q TIE_EXPECTED |
-| m5_meta_lgbm_shallow (LGBM d=3) | 0.95048 | n/a | **0.95001** | **slot 2**; -4bp LB; meta-switch bounded; ρ=0.995→4bp |
-| m5_meta_lgbm_medium (LGBM d=5) | 0.95047 | n/a | n/a | held; ρ=0.99436 vs M5q; OOF -1bp |
-| m5_meta_hgbc | 0.95042 | n/a | n/a | held; ρ=0.99490 vs M5q; OOF -1.5bp |
-| d5_recursive_m5q (HGBC + M5q feat) | 0.94994 | n/a | n/a | std-alone +92bp baseline; ρ=0.99159 vs M5q |
-| d5_M5_K15a (M5q + recursive, LR) | 0.95056 | n/a | n/a | NULL (-0.06bp); rec L1=0.84 but ρ=0.99991 TIE_EXPECTED |
-| d5_meta_k15_lgbm_shallow (GBDT meta) | 0.95038 | n/a | n/a | NULL (-1.0bp vs d4 K=14); GBDT-meta ceiling fixed |
-| **d5_partial_pseudo_m5q (K=14)** | **0.95082** | n/a | **0.94963** | **slot-1 −4.2bp LB**; gap WIDENED −5.2→−12bp; pseudo over-amp falsified |
-| d6_aux_meta_with_aux | 0.95049 | n/a | n/a | F5 falsified; +0.12bp over no-aux; held |
-| d6_2base_v1_lr_expand | 0.95055 | n/a | n/a | Move B falsified; ρ=0.99996 (tie); held |
-| d6_rule_residual (standalone) | 0.94593 | n/a | n/a | Δe3 −28bp; ρ vs M5q test 0.92887 (most diverse since RealMLP) |
-| d6_k15_rule_residual | 0.95062 | n/a | n/a | held; +0.51bp; ρ=0.99971; superseded by K=18 |
-| d6_rule_compound_stint (std) | 0.94604 | n/a | n/a | F1.2 R2; min-meta +0.30bp PASS |
-| d6_rule_driver_compound (std) | 0.94457 | n/a | n/a | F1.2 R3; ρ=0.89144 (most diverse); min-meta +0.45bp PASS |
-| d6_rule_year_race (std) | 0.94586 | n/a | n/a | F1.2 R4; min-meta +0.37bp PASS |
-| **d6_k18_multi_rule** | **0.95065** | n/a | **0.95026** | **PRIMARY**; +2.1bp LB; gap −3.9bp (NARROWED from −5.2); 1.3bp upside on +0.8bp prediction |
-| d9_R5_weibull_compound | 0.94600 | n/a | n/a | d9 -- ρ vs PRIMARY 0.943; min-meta -0.09bp FAIL |
-| d9_R6_next_compound | 0.94443 | n/a | n/a | d9 -- ρ 0.908 (P5 1-step lookup); min-meta -0.12bp FAIL |
-| d9_R7_prev_compound | 0.94481 | n/a | n/a | d9 -- ρ 0.914; min-meta -0.10bp FAIL |
-| d9_R10_driver_eb | 0.94463 | n/a | n/a | d9 -- ρ 0.912 Beta-Binom; min-meta -0.10bp FAIL |
-| d9_R14_hash_lr_3way (L0) | 0.79377 | n/a | n/a | d9 -- ρ=0.444 most diverse; min-meta -0.02bp FAIL by hair |
-| d9b_R14_L2 (binned numerics) | 0.91449 | n/a | n/a | d9b -- ρ 0.874; min-meta +0.01bp PASS; sweet spot |
-| d9b_R14_L3 (+ Compound × num) | 0.91626 | n/a | n/a | d9b -- ρ 0.875; min-meta +0.01bp PASS; best ladder rung |
-| d9b_R14_L4 (+ Driver × num) | 0.91369 | n/a | n/a | d9b -- ρ 0.869; min-meta +0.01bp PASS; K=20 swap chosen |
-| d9b_k20_swap_l4 | 0.95067 | n/a | **0.95025** | d9b SUBMITTED -- pred +0.19bp, actual −0.01bp TIE (LB quantization) |
-| **d9c_FM (Factorization Machine)** | **0.92069** | n/a | n/a | **d9c -- ρ 0.899, min-meta +0.18bp PASS, 18× R14 lift; new model class** |
-| d9c_Sd_K20_swap_FM | 0.95070 | n/a | 0.95029 | hedge; +3bp LB (5.7× upside on +0.53bp pred); demoted by d9f |
-| d9f_FM_A_driver_dynamics | 0.82505 | n/a | n/a | d9f -- D/C/S/T_q5; ρ vs PRIMARY 0.487 (most-diverse since R14) |
-| d9f_FM_B_race_context | 0.88438 | n/a | n/a | d9f -- R/Y/Rp_q5/P_q5; ρ 0.861; min-meta +0.04bp PASS |
-| d9f_K21_swap_partA_partB | 0.95073 | n/a | 0.95031 | demoted by d9h/d9i; was PRIMARY |
-| d9h_FM_aug12 (12-field unified) | 0.92540 | n/a | n/a | strongest single FM ever (+4.7bp std OOF over d9c FM); ρ=0.917 vs d9f |
-| **d9h_K22_add_aug12** | **0.95073** | n/a | **0.95034** | **NEW PRIMARY (TIED)**; +3bp LB (300× upside on +0.01bp pred) |
-| d9i_FM_A_aug (D/C/S/T/Cd/Ld) | 0.88123 | n/a | n/a | aug FM_A; ρ vs d9f PRIMARY 0.720 |
-| d9i_FM_B_aug (R/Y/Rp/P/Nx/Pv) | 0.88561 | n/a | n/a | aug FM_B; ρ 0.863 |
-| **d9i_S1_K21_swap_aug2way** | **0.95071** | n/a | **0.95034** | **NEW PRIMARY (TIED)**; +3bp LB; OOF predicted -0.19bp (regression!), actual +3bp lift; OOF direction-flipped |
-| d10b_K13_baseline (Strat / GKF-Race) | 0.95043 | 0.92744 | n/a | 13 GBDT/baseline; gap −229.92bp (leakage signature) |
-| d10b_K15_+FMA+FMB (Strat / GKF-Race) | 0.95052 | 0.92764 | n/a | FM-class lift +0.87bp Strat → **+2.01bp GKF (2.3× amplified)**; FM_B L1 #1 under GKF |
-| d10d_leak_corrected_meta | n/a | 0.92764 | n/a | held; G3 FAIL (rare-class flip 0.001); rebalances FM_B L1=6.96 but smooths away GBDT row-extremes; pred-LB 0.95001 |
-| d13_path_b_stint_tau100000 | 0.95082 | 0.94600 | 0.95041 | demoted by d13e; +7bp LB; 11.6× OOF upside; GKF lift +2.59bp = 2.9× AMPLIFIED vs Strat +0.90bp (leakage-robust per d13d) |
-| d13e_compound_stint_tau20000 | 0.95083 | n/a | 0.95049 | demoted by d15b_K22; +8bp LB over Path B Stint; 8× OOF upside (+1.00bp OOF); ρ=0.9958 vs d9f; 24 seg cross |
-| d15b_lgbm_dae_full (DAE 768d + raw → LGBM) | 0.94325 | n/a | n/a | min-meta +0.221bp at ρ 0.99537; raw+latent redundant LGBM-extractable |
-| **d15b_lgbm_dae_only (DAE 768d → LGBM)** | **0.94007** | n/a | n/a | std-alone, ρ_test 0.9477 (most-diverse since FM_A_53); min-meta +0.793bp at ρ 0.99547; clean orthogonal axis |
-| **d15b_path_b_K22_dae_only_tau20000** | **0.95090** | n/a | **0.95059** | **NEW PRIMARY** (+1.0bp); K=22 Path B = K=21 + d15b_dae_only; +0.715bp OOF, ρ=0.99973, flips 59/53; realised amp 1.4× (Path-B-amp does NOT fire on base-add) |
-| d13e_compound_stint_tau100000 | 0.95081 | n/a | n/a | held; +0.82bp OOF; ρ=0.9996 vs Stint winner (TIE band); 55/98 flips (under R7 200); HEDGE-eligible if τ=20000 lands |
-| d13b_path_b_stint_tau20000 | **0.95082** | n/a | n/a | held; +0.88bp OOF; ρ=0.996; flip ratio 0.220; tau=100000 superseded by submit |
-| d13_path_b_compound_tau100000 | 0.95076 | n/a | **0.95033** | calibration probe; LB +2bp on +0.30bp OOF (6.7× upside); ρ=0.9990; demoted by Stint variant |
-| d13_g1_within_stint (LGBM, +6 γ FE) | 0.94194 | n/a | n/a | NULL; ρ=0.9651 vs PRIMARY (0.95073 anchor); min-meta -0.38bp; LGBM-class feature add dead |
-| d13_g2_cross_driver (LGBM, +9 γ4 FE) | 0.94250 | n/a | n/a | NULL; ρ=0.9572; min-meta +0.03bp; cross-driver intra-race signal already in pool |
-| d14_h1_fm_aug13_3way (FM, +CTRq) | **0.92639** | n/a | n/a | NULL vs Path B PRIMARY; ρ=**0.9169** (most diverse single base); min-meta -0.13bp; +9.9bp standalone over d9h_aug12 but no incremental signal at meta |
-| d14_fm_aug16 (FM, 12+4 Move-F) | **0.92741** | n/a | n/a | NULL; +20.1bp standalone vs aug12; ρ=0.919 diverse; min-meta **-0.07bp FAIL**; FM-field-augmentation SATURATED at 12 fields (new input types F1-F4 confirm) |
-| d14_tabpfn_v25_150k (fold-0 only) | 0.94446 | n/a | n/a | DEAD; identical to 50k-row result 0.94439; flat training loss; fine-tuning ceiling ≈0.944 at any row count; v2.6 OOM P100; -64bp vs PRIMARY |
-| d12_groupkf_meta (K=21 GKF) | 0.95069 / **GKF 0.94776** | n/a | n/a | **Day-12 STRUCTURAL FINDING**: ρ(Strat-vs-GKF meta-test)=0.9914 — rank-lock partial dissolves; FM ΔAUC −9bp vs GBDT −200 to −343bp |
-| d12_groupkf_meta_no_realmlp K=20 | 0.95056 / **GKF 0.94577** | n/a | n/a | clean K=20 (no realmlp Strat anchor); ρ vs Strat-meta 0.9856; GroupKF-meta candidate HEDGE for R5 |
-| d12 single bags (e3 5seed / cb 3seed) | 0.94876 / 0.94790 | n/a | n/a | calibration probe -- regress -19/-28bp every segment vs PRIMARY; K=21 complexity JUSTIFIED, NOT OOF-noise overfit |
+| **m5q (M5h + RealMLP, K=14)** | 0.95057 | n/a | 0.95005 | OLD PRIMARY (Day-3); +14bp LB; +1.4bp OOF → 10× amp |
+| **d6_k18_multi_rule** | 0.95065 | n/a | 0.95026 | OLD PRIMARY (Day-7); +2.1bp LB |
+| **d9c_FM** | 0.92069 | n/a | n/a | ρ 0.899; min-meta +0.18bp PASS; first FM-class anchor |
+| d9c_Sd_K20_swap_FM | 0.95070 | n/a | 0.95029 | +3bp LB (5.7× upside); FM-class amp first-fired |
+| **d9f_FM_A_driver_dynamics** | 0.82505 | n/a | n/a | ρ vs PRIMARY 0.487 (most-diverse since R14) |
+| d9f_K21_swap_partA_partB | 0.95073 | n/a | 0.95031 | +2bp LB (6.25× upside) |
+| **d9h_K22_add_aug12** | 0.95073 | n/a | 0.95034 | +3bp LB; 300× upside on +0.01bp pred (TIE→LB-lift) |
+| **d9i_S1_K21_swap_aug2way** | 0.95071 | n/a | 0.95034 | +3bp LB; OOF predicted -0.19bp REGRESSION; LB amplified positive |
+| d10b_K13_baseline | 0.95043 | 0.92744 | n/a | gap −229.92bp (leakage signature) |
+| d10b_K15_+FMA+FMB | 0.95052 | 0.92764 | n/a | FM-class +0.87bp Strat → +2.01bp GKF (2.3× AMP) |
+| d10d_leak_corrected_meta | n/a | 0.92764 | n/a | G3 FAIL (flip 0.001); held; pred-LB 0.95001 |
+| d13_path_b_compound_tau100000 | 0.95076 | n/a | 0.95033 | +2bp LB on +0.30bp OOF (6.7× upside; first hier-meta) |
+| d13_path_b_stint_tau100000 | 0.95082 | 0.94600 | 0.95041 | +7bp LB (11.6× upside); GKF +2.59bp = 2.9× AMPLIFIED |
+| **d13e_compound_stint_tau20000** | 0.95083 | n/a | 0.95049 | +8bp LB over Stint; 8× upside; 24-seg cross; OLD PRIMARY |
+| d13e_compound_stint_tau100000 | 0.95081 | n/a | n/a | held; +0.82bp OOF; HEDGE-eligible |
+| d13b_path_b_stint_tau20000 | 0.95082 | n/a | n/a | held; +0.88bp OOF |
+| d13_g1_within_stint / g2_cross_driver | 0.94194 / 0.94250 | n/a | n/a | LGBM-class FE NULL at min-meta |
+| d14_h1_fm_aug13_3way | 0.92639 | n/a | n/a | ρ=0.9169 most-diverse; min-meta -0.13bp NULL |
+| d14_fm_aug16 (Move D) | 0.92741 | n/a | n/a | +20.1bp std vs aug12; min-meta -0.07bp FAIL (FM-aug saturated 12 fields) |
+| d14_tabpfn_v25_150k | 0.94446 | n/a | n/a | DEAD; ceiling 0.944; v2.6 OOM P100 |
+| **d15b_lgbm_dae_only (DAE 768d → LGBM)** | 0.94007 | n/a | n/a | ρ_test 0.9477 (most-diverse since FM_A); min-meta +0.793bp |
+| **d15b_path_b_K22_dae_only_tau20000** | 0.95090 | n/a | **0.95059** | **CURRENT PRIMARY**; +1.0bp; flips 59/53; realised amp 1.4× (NOT 8×) |
+| d15c_extra_trees / d15d_knn_lgbm | 0.92967 / 0.94166 | n/a | n/a | min-meta +0.05-0.06bp; rank-lock at ρ≈0.996; R5 HEDGE only |
 
-## Hypothesis board (Day 12 evening)
+## Hypothesis board (Day-15 PM)
+
+Day-9→Day-12 DONE history archived → `audit/archive-2026-05-06-claude-md-compression.md`.
 
 ```
-- DONE: d9 simple-math rule_residual cohort — 9 of 10 FALSIFIED at
-        min-meta vs PRIMARY (-0.09 to -0.12bp band regardless of
-        lookup key / smoothing). 5th confirmation of P10: rule_residual
-        family is saturated within PRIMARY's 4-rule cohort.
-- DONE: d9 R14 hash_lr_3way — std 0.794 but ρ=0.444 (most-diverse
-        single base since RealMLP). Min-meta -0.02bp FAIL by a hair;
-        new model-class signal flagged.
-- DONE: d9b R14 strength ladder L0-L5 — L2/L3/L4 PASS at +0.01bp;
-        L1 (+Race/Year) and L5 (kitchen sink) FAIL. Sweet spot is
-        adding 5-quintile bins of TyreLife/RaceProgress/Position to
-        the LR. K=20 swap+L4 SUBMITTED at LB 0.95025 (TIE -0.01bp;
-        pred +0.19bp; quantization-bounded).
-- DONE: d9c Factorization Machine — std OOF 0.92069, ρ=0.899,
-        min-meta +0.18bp PASS (18× R14_L3's lift). FM auto-learns
-        cross-feature interactions in low-rank space; replaces R14
-        ladder entirely. Sd K=20 swap with FM (no R14): pred LB
-        +0.53bp, ρ=0.99973. ABOVE +0.5bp slot threshold.
-- DONE: d9c Sd K=20 swap + FM SUBMITTED at 18:56 UTC. **LB 0.95029,
-        +3bp lift, NEW PRIMARY.** 5.7× upside on +0.53bp prediction.
-        Gap narrowed -3.9 → -2.6bp. FM is the first genuinely new
-        model class to land LB lift since RealMLP joined M5q (Day-3).
-- DONE: d9d FM hparam sweep + 3-seed bag — FLAT. k=8 is sweet spot;
-        bagging HURTS K=20 stack (smooths predictions toward shared
-        bias, removes routing diversity LR meta consumes).
-- DONE: d9e FFM (field-aware FM) — STRICTLY WORSE than FM. 4× more
-        params overfits 351k train rows; 8 fields too few for FFM's
-        per-field-pair specialization to add value.
-- DONE: d9f multi-FM with disjoint feature partitions —
-        FM_A driver-dynamics (D/C/S/T_q5) + FM_B race-context
-        (R/Y/Rp_q5/P_q5). ρ FM_A vs FM_B = 0.406 (≈ orthogonal).
-        K=21 swap (drop d9c FM, add FM_A + FM_B): OOF 0.95073
-        (+0.29bp), ρ=0.99965. d9c FM demoted out of L1 top-15 in
-        K=22 add — partition replaces unified FM cleanly.
-- DONE: d9f K=21 swap SUBMITTED at 20:25 UTC. **LB 0.95031, +2bp lift,
-        NEW PRIMARY.** 6.25× upside on +0.32bp prediction (mirrors
-        d9c's 5.7× pattern — FM-class LB amplification is real).
-        Gap narrowed -2.6 → -2.4bp.
-- DONE: d9g 3-way multi-FM (3+2+3 partition) — REGRESSED at all 3
-        stack configs (-0.46bp K=22 swap; -0.09bp K=24 add). Per-FM
-        too weak; LR meta demotes them. d9f 2-way is partition
-        sweet-spot.
-- DONE: d9h FM_aug12 unified 12-feat — std OOF 0.92540 (strongest
-        single FM ever, +4.7bp over d9c). K=22 add OOF +0.01bp (TIE
-        expected). **SUBMITTED 21:19 UTC: LB 0.95034, +3bp lift,
-        NEW PRIMARY (300× upside on OOF prediction).** Calibration
-        win — challenged "OOF tie → LB tie" assumption.
-- DONE: d9i augmented 2-way (D/C/S/T/Cd/Ld + R/Y/Rp/P/Nx/Pv) — std
-        FM_A_aug 0.881 (+5.6bp), FM_B_aug 0.886. K=21 swap predicted
-        OOF -0.19bp REGRESSION. **SUBMITTED 21:20 UTC: LB 0.95034,
-        +3bp lift (TIED with d9h)**. OOF *predicted regression* but
-        LB *amplified positive* — 16× direction-flip plus magnitude.
-- INSIGHT: FM-class OOF on Strat-fold underestimates LB lift due to
-        StratifiedKFold's 80% within-group leakage (P6) inflating
-        GBDT-pool OOF. Three consecutive FM-class submits (d9c +3bp,
-        d9f +2bp, d9h +3bp, d9i +3bp) confirm. **OOF Δ is a LOWER
-        BOUND on LB Δ for FM-class candidates at ρ ≈ 0.9997.**
-- DONE: d10 GroupKF audit — under strict (Race,Driver,Year,Stint)
-        GKF, FM bases drop only 2.5–54bp vs GBDTs dropping 209–247bp
-        under Race-only GKF. FM bases are leakage-robust at the
-        standalone level.
-- DONE: d10b/c GroupKF stack rebuild — built K=13/K=15 stacks under
-        BOTH Strat and Race-only GKF (apples-to-apples). FM-class
-        lift: **+0.87bp Strat → +2.01bp GKF (2.3× AMPLIFIED)**.
-        L1 inversion: under Strat FMs are mid-pack (FM_B L1=0.138,
-        rank 13/15); under GKF FM_B is **#1 dominant** (L1=6.96,
-        2× the next base). When LR meta can't piggyback on within-
-        group leakage from GBDTs, it routes hard through FM. PRIMARY
-        d9f K=21 swap (LB 0.95031) is private-LB robust.
-- DONE: d10d leak-corrected LR meta (refit LR on GKF OOFs, apply to
-        GKF test preds). G3 rare-class flip ratio 0.001 (1751 rows
-        drop out of top-1%, 2 added). FM_B L1=6.96 dominates as
-        designed but smooths away GBDT row-specific extremes that
-        ARE genuine (i.i.d. test → those rows really do pit). HELD,
-        pred-LB 0.95001. Insight: GKF OOFs cannot see test-row-
-        specific signals, so they over-credit FM. Bayesian
-        hierarchical stacker (Path B) is the correct synthesis.
-- DONE: d13/d13b Path B empirical-Bayes hierarchical LR meta.
-        Per-segment partial-pooled LR with shrinkage τ. Sweep:
-        Compound (5 seg) τ=100000 → +0.30bp OOF, ρ=0.9990 PASS;
-        **Stint (5/6 seg) τ=100000 → +0.86bp OOF, ρ=0.9984**, flip
-        ratio 0.211 FAIL G3 (but 4-5× better balanced than d10d).
-        Compound×Stint segmentation killed at fold 2; Year×Compound
-        not run. Stint variants held for R5 final-window OOF-best.
-- DONE: d13c Path B Compound τ=100000 SUBMITTED at 05:31 UTC.
-        **LB 0.95033, +2bp lift over d9f K=21 swap PRIMARY** (-1bp
-        from d9h/d9i tied PRIMARY at 0.95034). 6.7× LB upside on
-        +0.30bp OOF prediction — FM-class amplification pattern
-        TRANSFERS to hier-meta architecture.
-- DONE: d13 Path B Stint τ=100000 SUBMITTED at 05:34 UTC.
-        **LB 0.95041, +7bp lift over d9h/d9i tied PRIMARY → NEW
-        PRIMARY**. 11.6× LB upside on +0.86bp OOF prediction.
-- DONE: d13d GroupKF probe of hier-meta. K=20 GKF pool (no realmlp).
-        Global LR meta GKF OOF 0.94574; Stint hier τ=100000 GKF OOF
-        **0.94600 (+2.59bp)**. Strat lift +0.90bp → GKF lift +2.59bp
-        = **2.9× AMPLIFIED** (stronger than FM-class 2.3× in d10b/c).
-        Hier-meta mechanism is leakage-robust. **Public-LB +7bp lift
-        is mechanism-driven, not sample variance.** Revised private-LB
-        estimate: median +4 to +6bp over HEDGE (conservative +2bp,
-        bull +7bp). Three independent leak-blocking probes agree.
-- LATER: External-data Pirelli pit-window scrape (Tier-2 highest
-        absolute EV), EmbMLP CPU (different model class), hazard NN
-        (GPU; d9 hazard_nn_stack regressed 315bp — implementation
-        matters; main-branch agent's leakfree hazard NN at OOF 0.92013
-        confirmed DEAD).
-- DONE Day-12: 6 wider-step options run as parallel subagents
-        overnight. 5 FALSIFIED. **Option 1 produced load-bearing
-        finding.**
-- DONE: Option 1 GroupKF full rebuild — K=21 LR-meta on GroupKFold
-        OOFs produces test predictions with ρ=0.9914 vs Strat-meta
-        (K=20 clean: 0.9856). **Rank-lock partially dissolves under
-        leakage-blocked OOF.** Per-base ΔAUC: GBDT bases drop −200 to
-        −343bp under GKF; FM/rule/sparse-LR drop −9 to −43bp. **FM is
-        23–37× more leakage-robust than every GBDT.** L1 ranking
-        shifts: cb_slow-wide-bag −17 ranks, e5_optuna_lgbm −13; FM
-        +15 (#20→#5). The Strat-OOF "all-bases-tie" is GBDTs eating
-        shared fold-mate signal; FM/rules generalize.
-- DONE: Option 9 single-bag probe — falsifies "OOF-noise overfit"
-        thesis. Single 5-seed/3-seed bags regress -19 to -28bp every
-        Year/Stint/Compound segment vs PRIMARY. K=21 stack complexity
-        is JUSTIFIED — it routes between leakage-eaters and
-        leakage-robust bases.
-- DONE: Option 3 T1.2 multi-formulation 3-of-3 (censored / ratio /
-        survival LGBMs) — ALL FAIL min-meta. Standalone OOF 0.54-0.67
-        confirms time-to-event LGBMs are GBDT-class (leakage-eaters
-        category). 4-of-4 T1.2 cohort dead-listed.
-- DONE: Option 4 Year-specialist + AV-reweight — BOTH FAIL min-meta
-        -4.5 to -5.0bp. Two crisp findings: (a) AV-classifier AUC =
-        0.502 (train/test i.i.d.; no shift to exploit, refutes
-        external-info-as-lever thesis), (b) Year=2023 is the EASIEST
-        segment for the pool (AUC 0.94602, highest of any Year);
-        cohort splitting strips cross-Year regularization (specialist
-        2023-AUC -105bp). P3's "-45bp 2023 lift" interpretation
-        INVERTED.
-- DONE: Option 5 LambdaRank meta — REGRESSES -86bp under Race
-        grouping; AUC-pairwise XGB base smoke -451bp fold-0. LR-meta
-        on [raw, rank, logit] is metric-aligned for global AUC when
-        bases are well-calibrated; pairwise-rank objectives offer no
-        lift here. Dead-list.
-- DONE: Option 2 TabPFN-2.5 fine-tuned — Kaggle GPU kernel ready at
-        `kernels/d12-tabpfn-finetune-gpu/`. CPU smoke blocked on
-        license. T4×2 wall 5-7h. EV +5-15bp std-alone, +1-3bp stack
-        median, tail +3-9bp. **Only live "10bp shot" remaining.**
+- INSIGHT (Day-15 PM): friction `path-b-amp-only-fires-on-meta-arch-not-base-add`.
+  Realised LB amp 1.4× on +0.715bp OOF base-add (DAE→K=22) — well below
+  Path-B-amp 6-11.6× on meta-arch redesigns (d13 Compound 6.7×, d13e 8×,
+  d13 Stint 11.6×). Refines Day-12 prior `path-b-amp-needs-orthogonal-
+  signal-not-meta-derivatives`: even genuinely orthogonal base-add
+  (DAE ρ=0.9477 standalone) does NOT fire amp; only meta-arch redesign
+  does. Day-16 priority is meta-arch redesign axis.
 - INSIGHT (Day-12 unifying frame): K=21 stack works because LR-meta
-        routes between two base populations — leakage-eating GBDTs
-        (high Strat AUC, real LB AUC much lower) and leakage-robust
-        FM/rules (Strat AUC ≈ GroupKF AUC). Public LB is row-iid (U3)
-        so PRIMARY survives, but the diversification we need is
-        WITHIN the leakage-robust population. **Pivot:** more FM-class
-        bases (5/3 multi-FM, 4/4 multi-FM, DeepFM-lite, regularised
-        FFM re-attempt). Replace 3 most-leakage-eating GBDTs.
-- NEXT (Day-13+): (a) push TabPFN kernel to Kaggle (PI-approved);
-        (b) build 5/3 + 4/4 multi-FM partitions (cheap CPU); (c)
-        DeepFM-lite (FM + 2-layer MLP head); (d) GroupKF-meta as R5
-        final-3-day HEDGE candidate (don't submit as PRIMARY — public
-        is row-iid).
+  routes between leakage-eating GBDTs (high Strat AUC, real LB AUC much
+  lower) and leakage-robust FM/rules (Strat AUC ≈ GKF AUC). Public LB
+  row-iid (U3) so PRIMARY survives. Diversification needed is WITHIN
+  the leakage-robust population.
+- HELD: `path_b_K22_invlaps_tau20000` (branch ml-handover-alignment-
+  xvUN0). OOF 0.95110 (+2.75bp); target-derived (NOT meta-derivative);
+  ρ=0.99753; flips 57/96. Predicted LB +1-32bp depending on Path-B amp
+  realised. Submission decision pending PI.
+- LATER:
+  (a) Meta-arch redesign — non-Gaussian shrinkage prior (Beta-Binomial /
+      Student-t); Yao/Vehtari covariance-modelled BMA; alternative seg
+      crosses (Year×Compound, Compound×TyreLife_q5, Driver_clustered×Stint).
+      Highest tail EV; only Path-B-amp-eligible axis per friction tag.
+  (b) External-data Pirelli pit-window scrape (Tier-2; ISSUES.md leaf 4a).
+  (c) Tier-2 target reformulations (pit_horizon_multiclass; reverse
+      cumcount of pits; stint_index_within_race) — `probe_target_reform.py`.
+  (d) Pool-composition surgery — STRUCTURED replace (drop 2 leak-eaters
+      AND add 2 target-derived). d13c falsified naive drop.
+  (e) GroupKF-meta as R5 HEDGE (don't submit as PRIMARY; public is row-iid).
+- TabPFN v2.5/v2.6 — DEAD (Day-14; AUC ceiling 0.944; v2.6 OOM P100).
+- DAE base — LANDED (LB 0.95059 +1bp NEW PRIMARY). DAE variants in
+  Tier 3 (mask-noise / stacked-2-layer / CatBoost-on-latent / DAE-on-OOFs).
+- HEDGE ladder accumulating: d13e τ=100k, d15c ExtraTrees, d15d KNN-LGBM,
+  d15c+d15d K=23, path_b_K22_invlaps τ=100k.
 ```
 
 ## Pointers
+
+Pre-Day-12 pointers archived → `audit/archive-2026-05-06-claude-md-compression.md`.
 
 - `HANDOVER.md` — next-session brief (Rule 15).
 - `WRAPUP.md` — wrap-up + prepare-handover procedure (Rule 17).
 - `ISSUES.md` — live problem decomposition / claim board (Rule 18).
 - `comp-context.md` — settled-once facts.
-- `audit/2026-05-04-strategy-critique.md` — Rule 14 origin.
-- `audit/2026-05-04-catboost-research.md` — CatBoost lever map.
-- `audit/2026-05-04-m5h-l1coef-prune.md` — Day-3 submit candidate.
-- `audit/2026-05-04-d3a-te-unified.md` — Step 1 result + M5i/M5j.
-- `audit/2026-05-04-d3b-seqfe.md` — Step 2 result + M5k.
-- `audit/2026-05-05-d4-yetirank-nb-results.md` — Day-4 base-add probes.
-- `audit/2026-05-05-d4-gbdt-meta-breakthrough.md` — Day-4 slot-2 envelope.
-- `audit/2026-05-05-nn-stack-priorities.md` — bigger-move ordering.
-- `audit/2026-05-07-d6-critic-loop.md` — Rule 14 audit; 5 untried mechanisms.
-- `audit/2026-05-07-d6-f5-aux-meta-result.md` — F5 falsified.
-- `audit/2026-05-07-d6-move-b-2base-recursive.md` — Move B falsified.
-- `audit/2026-05-07-d6-move-c-rule-residual.md` — F1.1 single rule.
-- `audit/2026-05-07-d6-f1-2-multi-rule.md` — F1.2 K=18 LB-landed +2.1bp.
-- `audit/2026-05-09-d9-math-heuristics.md` — d9 10-approach cohort, all min-meta FAIL vs PRIMARY.
-- `audit/2026-05-09-d9b-r14-ladder.md` — d9b R14 ladder L0-L5; K=20 swap+L4 SUBMITTED LB 0.95025 TIE.
-- `audit/2026-05-09-d9c-fm.md` — d9c FM passes min-meta +0.18bp; Sd K=20 swap+FM LB 0.95029 (+3bp).
-- `audit/2026-05-10-d9d-fm-sweep-bag.md` — FM hparam sweep + bag NULL; bag HURTS stack.
-- `audit/2026-05-10-d9e-ffm.md` — FFM strictly worse than FM (overfit + redundant).
-- `audit/2026-05-10-d9f-multi-fm.md` — multi-FM partition K=21 swap LB 0.95031 (+2bp prior PRIMARY).
-- `audit/2026-05-10-d9g-3way-multi-fm.md` — 3-way partition REGRESSED.
-- `audit/2026-05-12-d12-master-synthesis.md` — Day-12 6-option overnight synthesis.
-- `audit/2026-05-12-d12-groupkf-rebuild.md` — Option 1 STRUCTURAL FINDING.
-- `audit/2026-05-12-d12-tabpfn-finetune-prep.md` — Option 2 Kaggle GPU kernel ready.
-- `audit/2026-05-12-d12-t12-multi-formulation.md` — Option 3 T1.2 3-of-3 falsified.
-- `audit/2026-05-12-d12-year-specialist-advweight.md` — Option 4 falsified; AV-AUC 0.502.
-- `audit/2026-05-12-d12-lambdarank-meta.md` — Option 5 -86bp regression.
-- `audit/2026-05-12-d12-monolithic-bag-probe.md` — Option 9 K=21 complexity justified.
-- `audit/2026-05-10-d9h-fm-augmented.md` — FM_aug12 standalone strongest; K=22 add LB 0.95034 (+3bp NEW PRIMARY tied).
-- `audit/2026-05-10-d9i-augmented-2way.md` — aug 2-way K=21 swap LB 0.95034 (+3bp NEW PRIMARY tied; OOF was -0.19bp regression).
-- `audit/2026-05-10-d10-groupkf-audit-fm-real.md` — strict GKF FM bases drop 2.5–54bp vs GBDTs −210bp.
-- `audit/2026-05-10-d10b-groupkf-stack-rebuild.md` — FM-class lift +2.01bp GKF vs +0.87bp Strat (2.3× AMPLIFIED); FM_B is #1 L1 under GKF.
-- `audit/2026-05-10-d10d-leak-corrected-meta.md` — leak-corrected LR meta gate-FAILs (G3 flip ratio 0.001) but informative; Bayesian hierarchical is correct synthesis.
-- `audit/2026-05-13-d13-path-b-hier-meta.md` — Path B empirical-Bayes; Stint τ=100000 +0.86bp OOF, ρ=0.998, G3 0.211 FAIL; R5 candidate held.
-- `audit/2026-05-13-d13d-path-b-gkf-probe.md` — Path B GKF probe; Stint hier-meta lift +0.90bp Strat → +2.59bp GKF (2.9× AMPLIFIED) — mechanism leakage-robust.
-- `audit/friction.md` — friction one-liners.
+- `audit/friction.md` — friction one-liners (read top of file each session).
+- `audit/2026-05-06-agentic-kaggle-research.md` — agentic-loop research synthesis + tips for PI.
+- `audit/2026-05-12-d12-master-synthesis.md` — Day-12 6-option overnight synthesis (4 falsified, 1 structural finding).
+- `audit/2026-05-12-d12-groupkf-rebuild.md` — Option 1 STRUCTURAL FINDING (rank-lock dissolution under GKF).
+- `audit/2026-05-13-d13-path-b-hier-meta.md` — Path B empirical-Bayes Stint τ=100k +0.86bp OOF; held.
+- `audit/2026-05-13-d13d-path-b-gkf-probe.md` — Path B GKF; Stint lift +0.90bp Strat → +2.59bp GKF (2.9× AMP).
+- `audit/2026-05-15-d15-4branch-results.md` — Day-15 PM 4-branch deep-dive + DAE + new PRIMARY 0.95059.
+- `audit/2026-05-06-d14-dgp-residuals.md` — masked-column self-pred NULL + DGP near-independent diagnostic.
+- `audit/2026-05-06-d15-decode-synthesizer.md` — orig_transfer K=22 hier-meta LB 0.95049 TIE (HEDGE-tier).
+- `scripts/hypothesis_view.py` — graph view of mechanism_families_explored
+  grouped by axis; `--axis target_reform` / `--status alive` filters; `--json
+  data/hypothesis_graph.json` for JSON dump (gitignored, regenerable).
+- `scripts/dispatch_branches.py` — parallel-branch dispatcher; reads ISSUES.md,
+  emits 6-Q-templated brief for N picks (Rule 18 / 19e).
+- `scripts/probe.py` / `probe_min_meta.py` / `research_seed.py` — harness (Rule 19).
