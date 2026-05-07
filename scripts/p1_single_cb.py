@@ -98,31 +98,50 @@ def detect_gpu() -> bool:
         return False
 
 
-def cb_params(use_gpu: bool, max_iters: int, seed: int) -> dict:
-    """Maximum-effort CatBoost recipe per audit/2026-05-04-catboost-
-    research.md untried-lever ranking. Single source of truth; the
-    seed-bag loop varies only random_seed."""
+def cb_params(use_gpu: bool, max_iters: int, seed: int, depth: int = 10) -> dict:
+    """Research-backed CatBoost recipe (single source of truth).
+
+    Synthesis of:
+      - audit/2026-05-04-catboost-research.md lever map
+      - audit/2026-05-04-irrigation-water-postmortem.md (LEARNINGS.md)
+      - CatBoost official param-tuning docs (catboost.ai/docs/.../parameter-tuning)
+      - Garkavenko, "Categorical features parameters in CatBoost"
+
+    Notable research-driven choices:
+      - DON'T set `simple_ctr` / `combinations_ctr` — defaults
+        (Borders+Counter, Uniform target borders) are documented best
+        for BINARY classification. "Useless to increase TargetBorderCount
+        for binary class" (Garkavenko).
+      - DON'T set `max_ctr_complexity=6` — 6.4× model size for marginal
+        lift (Garkavenko). Stick with default 4.
+      - Bernoulli + subsample=0.8 (irrigation-water proven; works
+        identically on CPU/GPU, no `mvs_reg` GPU-strip dance).
+      - rsm=0.8 column subsampling — never tested on s6e5; irrigation
+        included this in their 0.98150 PRIMARY recipe.
+      - min_data_in_leaf=20 — bigger than irrigation's 2 (s6e5 has 351k
+        train rows; min_data_in_leaf=2 too aggressive at this scale).
+      - border_count=254 on GPU per docs ("set 254 for GPU if best
+        possible quality is required").
+      - depth=10 default per zeta fold-0 0.94992 proof + docs 6-10 range.
+    """
     p = dict(
-        # objective
         loss_function="Logloss",
         eval_metric="AUC",
-        # slow + wide
+        # slow + wide (M3 hit iter-cap on 4/5 folds at 800 iters)
         iterations=max_iters,
         learning_rate=0.03,
-        depth=10,
+        depth=depth,
         l2_leaf_reg=8.0,
-        # CTR
-        max_ctr_complexity=6,
-        simple_ctr=[
-            "Borders:CtrBorderCount=15:TargetBorderType=Median",
-            "Counter:CtrBorderCount=15",
-            "BinarizedTargetMeanValue:CtrBorderCount=15",
-        ],
+        # categorical handling — CatBoost defaults handle Borders+Counter
+        # correctly for binary class. Just set OHE threshold high enough
+        # to one-hot Compound(5) + Year(4) + Stint(<=5).
         one_hot_max_size=10,
-        # bootstrap
-        bootstrap_type="MVS",
-        subsample=0.7,
-        mvs_reg=0.1,
+        # row + column subsampling (Bernoulli is GPU/CPU symmetric)
+        bootstrap_type="Bernoulli",
+        subsample=0.8,
+        rsm=0.8,
+        # leaf regularization
+        min_data_in_leaf=20,
         # ES
         od_type="Iter",
         od_wait=200,
@@ -134,16 +153,11 @@ def cb_params(use_gpu: bool, max_iters: int, seed: int) -> dict:
     if use_gpu:
         p["task_type"] = "GPU"
         p["devices"] = "0:1"
-        # GPU build doesn't support BinarizedTargetMeanValue or mvs_reg
-        # as of catboost 1.2.x — strip them for the GPU path.
-        p["simple_ctr"] = [
-            "Borders:CtrBorderCount=15:TargetBorderType=Median",
-            "Counter:CtrBorderCount=15",
-        ]
-        p.pop("mvs_reg", None)
+        p["border_count"] = 254  # docs: "set 254 for GPU max quality"
     else:
         p["task_type"] = "CPU"
         p["thread_count"] = -1
+        # CPU default border_count=128 is fine.
     return p
 
 
@@ -231,6 +245,11 @@ def main():
     ap.add_argument("--smoke", action="store_true",
                     help="1 fold + 50k row subsample for sanity check")
     ap.add_argument("--force-cpu", action="store_true")
+    ap.add_argument("--depth", type=int, default=10,
+                    help="CB depth (docs recommend 6-10; zeta proved 10 on s6e5)")
+    ap.add_argument("--with-orig-data", action="store_true",
+                    help="Append aadigupta1601 original rows to train with "
+                         "row weight 0.5 (irrigation-water synthetic-DGP trick)")
     args = ap.parse_args()
 
     use_gpu = (not args.force_cpu) and detect_gpu()
@@ -335,16 +354,81 @@ def main():
             X[num_cols] = X[num_cols].fillna(0).astype(np.float32)
         cat_idx = [feats.index(c) for c in cat_cols]
 
+        # 5b. Optionally append aadigupta1601 original rows with weight
+        # 0.5 (irrigation-water synthetic-DGP trick: train sees both
+        # the host's synthesizer output AND the underlying real DGP).
+        # 97.55% of synth LapTime values exist in original (d15 KS-div
+        # diagnostic) — the synth corrupted joint structure but kept
+        # marginals, so original rows give CB clean per-row signal.
+        train_ti_y = train_ti[TARGET].astype(int).values
+        ti_weights = np.ones(len(X_tr), dtype=np.float32)
+        if args.with_orig_data:
+            orig_path = Path("external/aadigupta_orig/f1_strategy_dataset_v4.csv")
+            if orig_path.exists():
+                orig_raw = pd.read_csv(orig_path)
+                # drop columns synth doesn't have to keep schema aligned
+                drop_extra = [c for c in
+                              ("Normalized_TyreLife", "Position_Change")
+                              if c in orig_raw.columns]
+                orig_raw = orig_raw.drop(columns=drop_extra)
+                # synth has 'id' col, orig doesn't — synthesize ids past
+                # max(train_id) so they don't collide with real ids
+                next_id = int(train["id"].max()) + 1
+                orig_raw["id"] = np.arange(next_id, next_id + len(orig_raw))
+                # full FE chain using ti-fitted state + fold's fs_a
+                orig_S, _ = make_features_static(orig_raw, fit=False, state=state)
+                orig_FS = apply_fs_a(orig_S, fs_a)
+                # CV TE: use full-ti stats (same as va/test branch)
+                if not args.no_te:
+                    for cols, smooth, te_name in TE_CONFIGS:
+                        if not all(c in orig_FS.columns for c in cols):
+                            continue
+                        kfn = _key_fn(cols)
+                        gm = float(y_ti.mean())
+                        k_ti = kfn(train_ti)
+                        stats = (pd.DataFrame({"key": k_ti.values,
+                                               "target": y_ti.values})
+                                 .groupby("key")["target"].agg(["sum", "count"]))
+                        stats["enc"] = ((stats["sum"] + smooth * gm)
+                                        / (stats["count"] + smooth))
+                        m = stats["enc"].to_dict()
+                        orig_FS[te_name] = kfn(orig_FS).map(m).fillna(gm).values
+                # base-OOF / KNN extras: orig rows don't have these — fill
+                # with marginal mean (CB will treat as constant; doesn't help
+                # but doesn't hurt). Skip if no extras requested.
+                if extras_train is not None:
+                    for c in extras_train.columns:
+                        orig_FS[c] = float(extras_train[c].mean())
+                X_orig = orig_FS.reindex(columns=feats, fill_value=0).copy()
+                for c in cat_cols:
+                    X_orig[c] = X_orig[c].astype("int32")
+                num_cols_local = [c for c in feats if c not in cat_cols]
+                X_orig[num_cols_local] = (X_orig[num_cols_local].fillna(0)
+                                          .astype(np.float32))
+                y_orig = orig_FS[TARGET].astype(int).values
+                X_tr = pd.concat([X_tr, X_orig], ignore_index=True)
+                train_ti_y = np.concatenate([train_ti_y, y_orig])
+                ti_weights = np.concatenate([
+                    ti_weights,
+                    np.full(len(X_orig), 0.5, dtype=np.float32),
+                ])
+                print(f"    + appended {len(X_orig)} orig rows "
+                      f"(weight=0.5; pos rate {y_orig.mean():.4f})")
+            else:
+                print(f"    !! --with-orig-data set but {orig_path} missing; skip")
+
         # 6. CatBoost (n_seeds bag)
         oof_va_seed = np.zeros(len(vi), dtype=np.float64)
         test_seed = np.zeros(len(test_S), dtype=np.float64)
         seed_iters = []
         for s in seeds:
-            params = cb_params(use_gpu, args.max_rounds, s)
+            params = cb_params(use_gpu, args.max_rounds, s, depth=args.depth)
             m = cb.CatBoostClassifier(**params)
-            m.fit(X_tr, train_ti[TARGET].astype(int),
-                  eval_set=(X_va, train_va[TARGET].astype(int)),
-                  cat_features=cat_idx, use_best_model=True)
+            fit_kw = dict(eval_set=(X_va, train_va[TARGET].astype(int)),
+                          cat_features=cat_idx, use_best_model=True)
+            if args.with_orig_data:
+                fit_kw["sample_weight"] = ti_weights
+            m.fit(X_tr, train_ti_y, **fit_kw)
             oof_va_seed += m.predict_proba(X_va)[:, 1] / len(seeds)
             test_seed += m.predict_proba(X_te)[:, 1] / len(seeds)
             seed_iters.append(int(m.tree_count_))
