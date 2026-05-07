@@ -68,3 +68,6 @@ external/pavloivanin_baseline/
 external/weather_woodshole/
 # external/kernels/ (notebook sources) ARE checked in — small + load-bearing reference
 kernels/d18-f1-replay-forensics-gpu/output/
+scripts/artifacts/.*_announced
+scripts/artifacts/d18_seq_done.flag
+scripts/artifacts/d18_gate_hij_done.flag
