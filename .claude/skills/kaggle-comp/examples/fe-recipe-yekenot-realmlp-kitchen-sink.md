@@ -201,9 +201,20 @@ The FE pipeline (items 1-6) is far more load-bearing than n_ens. Plan
   external telemetry on Driver key. The FE pipeline + orig-merge bypass
   the 1.4% match-rate cap H2 hit.
 
-## Calibration outcome (s6e5)
+## Calibration outcome (s6e5) — VALIDATED
 
 - PI sealed prediction full-recipe LB Δ: **+10 bp**
 - Agent BOTE full-recipe LB Δ: **+5 to +8 bp**
-- Verified single-fold standalone: **+91 bp** vs default-config (0.95366
-  vs 0.94454). 5-fold OOF + meta-add result pending at note write time.
+- **Verified 5-fold StratKF OOF AUC: 0.95257** (vs yekenot pub 0.95273,
+  gap −1.6 bp = within fold variance; vs default-config realmlp
+  baseline 0.94582 = **+675 bp standalone**).
+- Per-fold AUCs: 0.95366, 0.95153, 0.95232, 0.95189, 0.95375.
+- **K=22 ADD (canonical LR-meta) OOF 0.95355** = +28.16 bp vs K=21
+  baseline (0.95073), +23.4 bp vs current d16 PRIMARY OOF (0.951208).
+- ρ_test vs d16 PRIMARY: **0.97180** (single base) / **0.98728** (K=22
+  stack) — first base to break the 5-month ρ < 0.99 plateau.
+- Predicted LB at K=22 ADD via probe.py band: **+18.4 bp** over
+  PRIMARY 0.95089 → projected **0.95273** (gap to top-5% closes from
+  −25.6 bp to −7.2 bp).
+- Yekenot's notebook is now flagged as VALIDATED at
+  `external/kernels/ps-s6-e5-realmlp-pytabkit/VALIDATED.md`.
