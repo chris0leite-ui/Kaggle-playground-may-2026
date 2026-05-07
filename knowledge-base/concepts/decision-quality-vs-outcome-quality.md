@@ -99,20 +99,37 @@ bad decision →
 This converts *"we don't want to make the same mistake again"* from
 a slogan into the framework's actual update mechanism.
 
-## Operational requirements (load-bearing)
+## Operational requirements (load-bearing) — status as of 2026-05-06
 
 For the decision-quality framing to function as a trust mechanism:
 
-1. **Decision-time logging** — schema, not prose. Open: F1.6.1.
-2. **Framework versioning** — which rule was active when. Currently
-   inferable from git log only.
+1. **Decision-time logging** — schema, not prose.
+   *PI committed*: "really really need to lock the decision-time
+   capture." No infrastructure yet. Pending postmortem-skill design
+   ([F1.7.1.1](../questions/2026-05-06-grilling-round-7.md#f171)).
+2. **Framework versioning** — which rule was active when.
+   *PI committed*: "lock our decisions together with the status of
+   the framework at the time that we took the decision." Currently
+   inferable only from git log.
 3. **Deliberate rule extraction** — explicit post-mortem step, not
-   accidental. Open: F1.7.1.
+   accidental.
+   *Current state*: PI manually adds to `audit/friction.md` (580
+   lines, active) and `.claude/skills/kaggle-comp/improvements.md`
+   (40 lines, 1 pending, 0 applied). Periodically prompts agents
+   to discuss + update rules. PI accepts the loose loop and does
+   not want to over-engineer it.
+   *Proposal on the table*: a **post-session postmortem skill** that
+   would capture decisions + framework state automatically. Scope
+   pending [F1.7.1.1](../questions/2026-05-06-grilling-round-7.md#f171).
 4. **Cross-comp persistence** — rules survive comp boundaries.
-   Open: F1.8.
+   *Verified empirically*: cross-comp store exists but is essentially
+   unpopulated (0 applied entries). See [flag F-3](../flags/2026-05-06.md#f-3).
+   The loop runs single-comp-only today. Cause hypothesised but not
+   confirmed ([F1.8.1](../questions/2026-05-06-grilling-round-7.md#f181)).
 
 If any of these is missing, the framing degrades back to
-outcome-quality with extra prose.
+outcome-quality with extra prose. Today: 2 are committed-but-unbuilt,
+1 is loose-but-running, 1 is broken.
 
 ## Adjacent concepts
 

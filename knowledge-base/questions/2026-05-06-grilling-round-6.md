@@ -39,8 +39,14 @@ Concrete check (PI to do or delegate, ≤5 min):
 infrastructure required to make F1.4's calibration actually work.
 Without it the rest is performative.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** Strong commitment: *"really really need
+> to lock the decision-time capture. We need a framework to lock our
+> decisions together with the status of the framework at the time
+> that we took the decision."*
+>
+> Concrete proposal: a **post-session postmortem skill** that captures
+> decisions + system state at the close of each session. Scope
+> pending in [F1.7.1.1](./2026-05-06-grilling-round-7.md#f171).
 
 ---
 
@@ -66,8 +72,17 @@ occur. That's a slow growth function. Deliberate extraction makes
 the growth rate proportional to the failure rate — which is what the
 decision-quality framing implicitly assumes.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** **Loose but running.** PI manually
+> appends to `audit/friction.md` and the cross-comp `improvements.md`,
+> then periodically asks agents to read both, discuss, and update
+> rules. *"Might keep working like that to see if frictions appear
+> and not to over-optimize."* So: human-triggered batch, not a
+> per-audit step. Accepts the imperfection.
+>
+> Forward-looking: PI proposed a **post-session postmortem skill**
+> that would automate decision + framework-state capture, partially
+> formalising the loop without over-engineering it. Scope pending in
+> [F1.7.1.1](./2026-05-06-grilling-round-7.md#f171).
 
 ---
 
@@ -92,8 +107,18 @@ resets. PI's day-job framing (transferable research loop) implies
 the same risk: if patterns observed in Kaggle don't get formalised
 into the day-job toolkit, the transfer is performative too.
 
-> PI answer:
-> _to fill_
+> **PI answer (implied; verified by Claude 2026-05-06).** PI did not
+> directly answer; mentioned in passing that they add to "frictions
+> file and improvements file." Verification (via filesystem):
+>
+> - `.claude/skills/kaggle-comp/improvements.md` exists, total ~40
+>   lines: **1 pending entry, 0 applied entries.**
+> - `audit/friction.md` is 580 lines, actively maintained.
+>
+> → **Cross-comp loop is broken / aspirational.** Per-comp friction
+> work is happening; promotion to the cross-comp store is not.
+> Filed as [flag F-3](../flags/2026-05-06.md#f-3). Drilled in
+> [F1.8.1](./2026-05-06-grilling-round-7.md#f181) on cause.
 
 ---
 
