@@ -231,11 +231,11 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 17                           # 2026-05-07 AM. **PRIMARY UNCHANGED at LB 0.95059 (d15b_path_b_K22_dae_only_tau20000)**. Branch `claude/read-kaggle-handover-rsi2Q` ran P1 single-model thesis end-to-end (Rozen recipe replication). 7 probes / 4 LB submits / **P1 thesis CONCLUSIVELY FALSIFIED**. v1 OOF 0.94970 → LB 0.94107 (−863 bp gap from leaky stint-count cluster). v2 with FS_A merge fix OOF 0.95128 → holdout 0.94637 (FS_A target leak). v3 fold-safe FS_A: OOF **0.94563** (matches holdout, honest). Single-LGBM ceiling on this comp is ~0.946 OOF — 52 bp below PRIMARY OOF 0.95090. Stacking is necessary. Other branch landed `d16_path_b_K22_continuous_only_tau20000` LB 0.95089 (+30 bp; clean Path-B base-add candidate for Day-17+ PRIMARY-replace). 4 cross-comp lessons captured to skill: G16 fold-safe label-conditional aggregates, G17 transductive-features-need-AV-check, 80/20 holdout diagnostic, single-model-first / kitchen-sink FE before stacking. R20-R25 added to local CLAUDE.md.
+day: 17                           # 2026-05-07 PM. **PRIMARY = `d17_K24_d18pool_h1d` LB 0.95345 (AT top-5% threshold)**. Branch `claude/read-handover-62BCt` ran strategy-critic-loop (Rule 14 + Rule 7 research-loop) on plateau, then full yekenot RealMLP recipe replication. h1d single-base 5-fold OOF 0.95257 (MATCHED yekenot pub 0.95273 within 1.6bp); K=24 LR-meta(K=21+d16_orig+p1cb+h1d) OOF 0.95385 → LB 0.95345 = +19.6bp over d18 PRIMARY 0.95149 (BIGGEST single-submit lift of comp). Load-bearing detail: CV TargetEncoder on (Race,Compound)+(Race,Year) inside fold loop + 5 other FE items (arithmetic ratios, floor-cat, count enc, KBins(200/7), per-fold orig concat). H2 FastF1 NULL (1.4% match rate from 60% synth D### codes); H3 ID-shift NULL (id_div_N AV=1 is labeling convention only). Sibling branches landed d17_p1cb LB 0.95143 + d18_K23 LB 0.95149 today. Yekenot's notebook flagged VALIDATED at external/kernels/ps-s6-e5-realmlp-pytabkit/; FE recipe doc at .claude/skills/kaggle-comp/examples/fe-recipe-yekenot-realmlp-kitchen-sink.md.
 lb_best_today: 0.95435            # leader; not refreshed
-our_lb_best: 0.95059              # d15b_path_b_K22_dae_only_tau20000 (unchanged Day-16); gap to top-5% -2.86bp
-submissions_used_today: 4         # Day-17 AM: K22_add_p1_feA_te 0.94933, p1_single_v1 0.94107, K2_PRIM_v2 0.94996, (other branch) d16_continuous_only 0.95089
-submissions_used_total: 32
+our_lb_best: 0.95345              # d17_K24_d18pool_h1d (NEW PRIMARY 2026-05-07 PM); AT top-5% threshold (+0.0bp gap)
+submissions_used_today: 7         # Day-17: K22_add_p1_feA_te 0.94933, p1_single_v1 0.94107, K2_PRIM_v2 0.94996, d16_continuous_only 0.95089 (sibling), d17_p1cb 0.95143 (sibling), d18_K23_d16_d18 0.95149 (sibling), d17_K24_d18pool_h1d 0.95345 (this branch)
+submissions_used_total: 35
 saturation_count: 1               # Day-16 +1: K=22 rank-locked across all virgin base-add axes (5th cross-confirmation including α4 sequence)
 mechanism_families_explored:  # Q1 reference. Detail in audit/. Compressed 2026-05-06.
   - baseline_lgbm_raw_features
@@ -332,7 +332,7 @@ mechanism_families_explored:  # Q1 reference. Detail in audit/. Compressed 2026-
   - p1_single_lgbm_kitchen_sink    # Day-17 P1 thesis FALSIFIED; v1 LB 0.94107 leaky; v3 fold-safe OOF 0.94563 honest; single-LGBM ceiling ~0.946 = -52bp from PRIMARY OOF (origin Rule R20/R24/R25)
 plateau_days: 1                   # Day-16 no advance: 4 NULL + 3 KILLED + 1 marginal H9. K=22 + Path-B-hier-meta architecture rank-saturated against EVERY base-add axis (per-row FE / calibration / α4 sequence / α5 two-stage / β rank loss / ε twin-pool / ε4 leaf-encoding / ε AV-weight / ζ6 transductive / η1 mask). Day-17 priority: META-ARCH REDESIGN (HANDOVER T4 — non-Gaussian shrinkage, nested hierarchy, Yao/Vehtari covariance-BMA, alt segmentation crosses). If T4 doesn't land: external second-source data (Ergast/FastF1) never tested; Pirelli scrape; structured pool-replace (drop 5 weakest GBDT clones + add 5 fresh diverse-architecture bases).
 gate_status: cleared              # d15b_path_b_K22_dae_only_tau20000 LB 0.95059 PRIMARY; d16_path_b_K22_continuous_only_tau20000 LB 0.95089 +3bp candidate-PRIMARY (Day-16, leakage-clean per Rule 24 audit)
-headroom_to_top5pct: 0.00256      # 0.95345 − 0.95089 = 25.6bp on d16 candidate-PRIMARY (vs 28.6bp on d15b PRIMARY)
+headroom_to_top5pct: 0.00000      # 0.95345 − 0.95345 = 0bp on d17_K24_d18pool_h1d PRIMARY (AT threshold; reach to LB 0.95435 leader = -9.0bp)
 ```
 
 ## Calibration ladder

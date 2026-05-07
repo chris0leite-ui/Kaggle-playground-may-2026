@@ -211,16 +211,21 @@ Top 3 hypotheses launched in parallel. Audit at
   floor-cat + count enc + KBins(200/7) + n_ens=24) NOT replicated.
   Promoted to leaf 9d. Audit `audit/2026-05-07-d17-h1-verdict.md`.
 
-- **9d.** Full yekenot RealMLP recipe replication (Tier-2; promoted from
-  9a partial null). Includes: arithmetic ratios (LapNumber/RaceProgress,
-  TyreLife/LapNumber); floor-based numeric→cat on all numerics + ratios;
-  count encoding on each cat; KBins(200) on RaceProgress + KBins(7) on
-  LapTime; per-fold stratified orig concat; CV target encoding on
-  (Race,Compound) + (Race,Year) combos inside fold loop; n_ens=24.
-  Cost 2-4 h engineering + 30-90 min runtime. EV +5-15 bp standalone OOF
-  (closing the +69 bp recipe gap), unknown meta-add transfer at ρ
-  unknown until ran. Defer to focused dispatch with PI directive.
-  `[owner: unclaimed | status: open]`
+- **9d.** Full yekenot RealMLP recipe replication. Includes: arithmetic
+  ratios; floor-based numeric→cat; count encoding; KBins(200/7);
+  per-fold stratified orig concat; CV target encoding on (Race,Compound)
+  + (Race,Year) inside fold loop. `[owner: read-handover-62BCt | status:
+  done-CONFIRMED-WIN]` Result: standalone 5-fold OOF 0.95257 (matched
+  yekenot pub 0.95273 within 1.6 bp at n_ens=4). K=22 ADD OOF 0.95355
+  (+28 bp K=21 baseline, ρ_test 0.987). K=24 d18pool+h1d (LR-meta over
+  K=21 + d16_orig_cont + p1cb + h1d) OOF 0.95385 → **SUBMITTED LB 0.95345
+  (ref 52420646)** = AT top-5% threshold; +19.6 bp single-submit lift
+  over d18 PRIMARY 0.95149 (BIGGEST submit lift of comp). Path B sweep
+  on K=22+h1d all TIE LR-meta (6th cross-confirmation of
+  `path-b-amp-only-fires-on-meta-arch-not-base-add`). Yekenot notebook
+  flagged VALIDATED at external/kernels/ps-s6-e5-realmlp-pytabkit/
+  VALIDATED.md; FE recipe doc at .claude/skills/kaggle-comp/examples/
+  fe-recipe-yekenot-realmlp-kitchen-sink.md.
 - **9b.** H2 — FastF1 / Ergast external join (DriverAheadPit +
   TrackStatus + CumulativeTimeStint per Frontiers AI 2025 Bi-LSTM).
   Cost 60-180 min CPU + network. PI-pred +5 bp; agent expected +3.6 bp.

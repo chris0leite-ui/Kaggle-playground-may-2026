@@ -451,6 +451,92 @@ Total: 32/270.
 
 ---
 
+## Day-17 PM read-handover-62BCt — TOP-5% AT-THRESHOLD via yekenot recipe (LB 0.95345)
+
+**🎯 NEW PRIMARY: LB 0.95345 (AT TOP-5% THRESHOLD) 🎯**
+`submission_d17_K24_d18pool_h1d.csv` (ref 52420646, scored 2026-05-07
+11:39 UTC). +19.6 bp over d18 PRIMARY 0.95149 = **BIGGEST single-submit
+lift of comp**. Headroom to top-5% closes from −19.6 bp → **0**.
+
+### What worked
+
+Full yekenot RealMLP recipe replication (`scripts/d17_h1d_yekenot_full_recipe.py`):
+- 5-fold StratKF OOF AUC 0.95257 (matches yekenot pub 0.95273 within 1.6 bp)
+- ρ_test vs PRIMARY 0.972 (single base) — first base to break ρ < 0.99
+  in 5+ months
+- All 6 load-bearing FE items: arithmetic ratios, floor-cat, count enc,
+  KBins(200/7), per-fold stratified orig concat, **CV TargetEncoder on
+  (Race,Compound)+(Race,Year) inside fold loop** (load-bearing).
+- `n_ens=4` on 4-core CPU; yekenot's `n_ens=24` on Kaggle GPU is +5 bp
+  ceiling at most.
+
+K=24 d18pool+h1d submission stack:
+- K=21 + d16_orig_continuous_only + p1_single_cb_v3_gpu + d17_h1d_yekenot_full
+- LR-meta (Path B over K=22 with h1d was TIE per 6th cross-confirmation
+  of `path-b-amp-only-fires-on-meta-arch-not-base-add`)
+- OOF 0.95385, ρ_test vs d18 PRIMARY 0.989, predicted LB Δ +15 bp
+- Realised LB Δ +19.6 bp (PI sealed prediction +10 bp; agent +15.11 bp;
+  both conservative)
+
+### Calibration outcomes (audit/decisions.jsonl)
+
+| Probe | PI pred | Agent pred | Actual |
+|---|---:|---:|---:|
+| H1 (initial 3 variants) | 0 bp | +27 bp | NULL across 3 variants — recipe-gap misdiagnosis |
+| H2 FastF1 | +5 bp | +3.6 bp | ~0 bp (1.4% match rate cap from synth D### codes) |
+| H3 ID-shift | 0 bp | +0.6 bp | 0 bp (PI win — id_div_N AV is labeling convention only) |
+| H1d full-recipe (final) | +10 bp | +15.11 bp | **+19.6 bp** (both beat) |
+
+### What didn't work (this branch)
+
+- H1 v1/v2/v3 (yekenot-hyperparams + orig-merge alone): all NULL.
+  Misdiagnosed +69 bp standalone gap as hyperparameter+orig only;
+  actual gap is the FULL FE pipeline.
+- H2 FastF1: 1.4% match rate due to 60% synthetic D### driver codes
+  + sandbox 403 on livetiming.formula1.com.
+- H3 ID-shift: train ids 0..439139 / test 439140..627304 = labeling
+  convention with zero overlap; sparse-LR base on id-div features =
+  chance level.
+- C7 K=24 LR-meta (without h1d): predicted LB Δ −0.69 bp (TIE/regress).
+
+### Files
+
+- `scripts/d17_h1d_yekenot_full_recipe.py` — verified replication
+- `scripts/artifacts/oof_d17_h1d_yekenot_full_strat.npy` + test
+- `scripts/artifacts/oof_d17_K24_d18pool_h1d_strat.npy` + test
+  (the SUBMITTED stack)
+- `submissions/submission_d17_K24_d18pool_h1d.csv`
+- `external/kernels/ps-s6-e5-realmlp-pytabkit/VALIDATED.md`
+- `.claude/skills/kaggle-comp/examples/fe-recipe-yekenot-realmlp-kitchen-sink.md`
+- `audit/2026-05-07-d17-strategy-critique.md`
+- `audit/2026-05-07-d17-h1-verdict.md`
+- `audit/2026-05-07-d17-h2-fastf1-external.md`
+- `audit/2026-05-07-d17-h3-id-shift.md`
+- `audit/2026-05-07-d17-phase-a-composition-gate.md`
+
+### Submissions used (Day-17, all UTC days combined)
+
+7/10 today (this branch +1; 6 prior including 3 sibling submits).
+Total: 35/270.
+
+### Next-session priorities
+
+1. **PI submission discussion**: do we need to submit anything else
+   today? K=24 LR-meta variants with Path B Compound×Stint segmentation
+   are unlikely to lift (6th confirmation of meta-arch friction).
+2. **Tier-2 follow-ups for the yekenot recipe**:
+   - n_ens=8 or 12 variant of h1d (~1-2 h CPU); +2-5 bp standalone OOF
+     ceiling. EV +1-3 bp LB.
+   - Apply CV-TE / engineered-cat FE pipeline to a second base
+     architecture (CatBoost or LGBM on the same yekenot FE set).
+     Could yield a structurally different base.
+3. **PRIMARY-replace candidates pending sibling integration**: we have
+   not yet tested K=25+ unions with sibling-branch new bases (d18
+   already includes d16 + p1cb; if siblings produce d19+ candidates,
+   re-stack).
+
+---
+
 ## Day-17 PM read-handover-62BCt — d17 Phase-A composition gate
 
 **0 submits this session.** Bootstrapped repo (deps + Kaggle data),
