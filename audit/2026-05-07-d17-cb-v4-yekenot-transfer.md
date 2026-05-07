@@ -128,9 +128,45 @@ to closing the full gap; both untested on this comp.
 - `yekenot-floor-count-kbins-fires-on-gbdt-too` (NEW; counter-evidence
   to research-branch audit's caveat that items 2-4 are NN-specific)
 - `path-b-amp-only-fires-on-meta-arch-not-base-add` (re-confirmed at
-  K=22 +0.39 bp and K=23 +0.12 bp over flat LR-meta)
+  K=22 +0.39 bp, K=23 +0.12 bp, K=25 +0.34 bp over flat LR-meta)
 - `cb-rsm-restricted-to-pairwise-loss-on-gpu` (Catboost GPU error
   fixed in v3; CPU keeps rsm=0.8)
+- `gbdt-class-redundant-on-shared-FE` (NEW; XGB on identical v4 FE is
+  ρ=0.984 standalone vs CB-v4 and adds only +0.02 bp at K=24
+  LR-meta on top of v4+h1d. New stack-add must come from a different
+  FE or different model class — NN, FM, etc.)
+- `pool-saturation-v4h1d-absorbs-d16d18` (NEW; K=25 = K=21+v4+h1d+
+  d16+d18 OOF 0.95428 is only +1.3 bp over K=23 v4+h1d OOF 0.95415.
+  Adding d16 + d18 to a pool that already has v4 yields diminishing
+  returns; v4 absorbs most of the orthogonal DGP signal d16/d18
+  carry.)
+
+## End-of-session ladder
+
+| Stack | OOF | LB |
+|---|---:|---:|
+| LGBM v3 honest (Day-17 AM ceiling) | 0.94563 | (not submitted; v1/v2 leaky) |
+| CB v3 standalone | 0.94993 | n/a |
+| CB v4 standalone | 0.95200 | n/a (held; predicted ~0.946-0.948) |
+| XGB v4 standalone | 0.95135 | n/a |
+| h1d RealMLP standalone | 0.95257 | n/a |
+| K=22 v3 Path-B τ=20k | 0.95200 | **0.95143** |
+| K=22 v4 Path-B τ=20k | 0.95319 | held |
+| K=23 v4+h1d Path-B τ=100k | 0.95415 | **0.95354 (PRIMARY, rank #98 of 893)** |
+| K=24 v4+h1d+xgb LR-meta | 0.95417 | not submitted (redundant) |
+| K=25 full-merge Path-B τ=100k | 0.95428 | held (+1.3 bp OOF; within noise) |
+| Research K=24 d18pool h1d | 0.95385 | 0.95345 |
+| Top-5% boundary | — | 0.95405 (gap −51 bp from PRIMARY) |
+| Leader (MILANFX) | — | 0.95476 (gap −122 bp) |
+
+## Wrap-up status (2026-05-07 PM end-of-session)
+
+- **CB axis closed**. v3→v4 transfer + K=22/K=23 stack-merges
+  completed. Diminishing returns at K=24/K=25 — new lifts now require
+  different FE pool or different model class.
+- **PRIMARY: LB 0.95354** (`d17_path_b_K23_v4_h1d_tau100000`).
+- Branch `claude/optimize-model-performance-rruC2` ready for
+  ff-merge to `main` after PI confirmation.
 
 End — d17 PM session. Wall ~5h total compute (20 min v3 5-fold + 35
 min v4 5-fold + 16 min holdouts + ~12 min Path-B sweeps + research
