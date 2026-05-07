@@ -1,129 +1,121 @@
-# P1 single-model results — Day-16 PM (final)
+# P1 single-model thesis — final results (Day-17 AM)
 
 Branch: `claude/read-kaggle-handover-rsi2Q`. Plan doc:
 `audit/2026-05-06-p1-single-model-plan.md`. ISSUES leaf: 8a.
 
 ## TL;DR
 
-**P1 thesis (PI hypothesis "single model can close the gap")**: PARTIALLY
-CONFIRMED. A single LGBM with Rozen-recipe kitchen-sink FE + CV target
-encoding alone is **−12 bp below PRIMARY** (OOF 0.94970 vs 0.95090). BUT
-its diversity (ρ=0.947 vs PRIMARY) makes it the **single most valuable
-base-add of the entire competition**: when added as 22nd base to K=21
-LR-meta, OOF lifts **+33.09 bp** to 0.95404. Gate vs PRIMARY: **Δ +31.37
-bp, predicted LB +26 bp → ~0.95323** (within reach of top-5% 0.95345).
+**P1 thesis CONCLUSIVELY FALSIFIED on s6e5.** Under strict OOF
+discipline (fold-safe label-conditional aggregates, fold-safe CV TE),
+the best single-LGBM with kitchen-sink Rozen-style FE achieves
+**OOF 0.94563**. Our K=22 + Path-B hier-meta PRIMARY (LB 0.95059) is
++52 bp ahead in honest terms. Stacking is necessary for our LB.
 
-Submission ready: `submissions/submission_K22_add_p1_feA_te.csv`.
-Awaiting PI sign-off.
+**4 LB submits this branch** (+ 1 from another branch):
 
-## Phase 1 — replicate Rozen single LGBM
+| Submission | OOF | LB | Gap | Status |
+|---|---:|---:|---:|---|
+| K22_add_p1 LR-meta v1 | 0.95404 | 0.94933 | −471 bp | leaky |
+| p1_single v1 | 0.94970 | **0.94107** | **−863 bp** | catastrophic |
+| K2 LR(PRIMARY, v2) | 0.95398 | 0.94996 | −402 bp | 2-level + leaky |
+| (other branch) d16_continuous_only | 0.95121 | **0.95089** | −3 bp | clean Path-B |
+| **PRIMARY** (unchanged) | 0.95090 | **0.95059** | −3 bp | clean |
 
-Recipe ported from `external/kernels/romanrozen/f1-pit-driver-race-year-encoding-0-95354.ipynb`:
-- `make_features_A`: 50 engineered cols (tyre/compound algebra,
-  race-progress, lag/rolling within (Driver,Race,Year), within-stint,
-  3 combo categoricals).
-- `cv_target_encode`: 6 high-card combos with smoothing 15-30
-  (incl. Driver×Race×Year — the load-bearing single trick of the comp).
-- LGBM hparams (Rozen): lr=0.025, num_leaves=255, min_child_samples=25,
-  ff=0.65, λ1=1.2, λ2=2.5, max_depth=10, path_smooth=0.1, n_est=6000.
+PRIMARY remains best validated. d16_continuous_only from another
+branch is the +30 bp candidate via clean Path-B amplification.
 
-| Variant | Std OOF | ρ vs PRIMARY | Δ OOF vs PRIMARY |
-|---|---:|---:|---:|
-| (e3_hgbc — best prior single) | 0.94876 | — | −21.4 bp |
-| feA_te (our recipe, no orig) | **0.94970** | 0.947466 | −12.0 bp |
-| feA_te_orig (with aadigupta concat) | 0.94968 | 0.945984 | −12.2 bp |
-| Reference: Rozen single LGB (T4 GPU) | 0.95241 | n/a | +15 bp |
-| Reference: PRIMARY K=22 + Path-B | 0.95090 | 1.0 | 0 |
+## Phases run
 
-ρ(feA_te, feA_te_orig) = 0.991 OOF / 0.995 TEST → near-duplicates;
-orig-concat adds zero standalone signal. Synth Driver codes (D109 etc.)
-overlap with orig real codes (HAM, BOT, ...) only 31/887, so orig rows
-cold-key on (Driver×Race×Year) TE features.
+### Phase 1 — v1 (leaky stint-count cluster)
+- `make_features_A` v1: 50 engineered features + 6 CV TE; included
+  `stint_size_far`, `stint_pct`, count-based `pit_imminent`/`pit_in_5`
+  (per-split-count `groupby.cumcount()` / `transform('count')`).
+- OOF 0.94970, K=22 LR-meta-add OOF 0.95404 (+33 bp).
+- Submitted: K22_add LB **0.94933**, single LB **0.94107**.
+- Diagnosis: train/test feature distribution shift via per-split
+  counts (same physical stint, train sees count=7, test sees count=3).
 
-## Phase 2 — stack-add gate
+### Phase 2 — v2 (FS_A leak)
+- Removed leaky stint-count cluster; added Rozen FS_A merge aggregates
+  (`race_avg_pit_lap`, `compound_avg_life`, etc.) + 1950-2022 priors.
+- OOF 0.95128 (+158 bp vs v1, +38 bp over PRIMARY OOF — too good).
+- Submitted: K=2 LR(PRIMARY, v2) LB **0.94996** (−63 bp vs PRIMARY).
+- Diagnosis (via 80/20 holdout test, no slot burned):
+  holdout AUC 0.94637 vs OOF 0.95128 = **−491 bp gap**. FS_A
+  aggregates fit on full train (with PitNextLap labels) leaked val
+  labels into val features.
 
-`scripts/probe_min_meta.py` K=21 + N candidates with [raw, rank, logit]
-expand:
+### Phase 3 — v3 (fold-safe FS_A)
+- Refactored: `make_features_static` (label-independent only) +
+  `fit_fs_a` (per-fold, ti rows only) + `apply_fs_a` (merge +
+  derivatives). 5-fold CV with ti-only FS_A and inner-CV TE per fold.
+- **OOF 0.94563** (fold-std 0.00049, total wall 4 min — vs v2's 31
+  min because LGBM early-stops at 450-715 iters instead of 5400-6000).
+- Per-fold: 0.94654 / 0.94582 / 0.94544 / 0.94522 / 0.94525.
+- Holdout AUC 0.94637 (with full-80% FS_A) — matches v3 OOF tightly,
+  **confirming fold-safety**.
 
-| Pool | OOF | Δ vs K=21 baseline |
-|---|---:|---:|
-| K=21 baseline | 0.95073 | 0 |
-| K=22 = K=21 + p1_feA_te | **0.95404** | **+33.09 bp** |
+## Gate v3 vs PRIMARY
 
-Gate vs PRIMARY (`scripts/p1_post.py K22_add_p1_feA_te`):
-- standalone OOF: 0.95404 (Δ +31.37 bp)
-- ρ vs PRIMARY: 0.986534
-- predicted LB band: +26.37 bp → LB ~**0.95323**
-- G3 flips: +→− 605, −→+ 435 (R7-eligible, >200)
-- K=2 LR-meta(PRIMARY, K22_add) OOF: 0.95404 (saturated; +K22_add ≡ blend)
-- DECISION: ✅ pursue submit (PI sign-off).
-
-Pre-submit-diff vs PRIMARY (`scripts/pre_submit_diff.py`):
-- 188098 / 188165 rows differ > 1e-6 (99.96%)
-- 128767 (68.4%) differ > 1e-3
-- max abs 0.384, mean 0.022, Spearman 0.985 ≤ 0.999 → DIFFERS
-
-## ρ inventory (PRIMARY vs external submissions, for context)
-
-| Pair | ρ |
+| Metric | Value |
 |---|---:|
-| PRIMARY (LB 0.95059) vs makimakiai_v8_solo | 0.96952 |
-| PRIMARY vs makimakiai_blend (LB **0.95372**) | 0.98146 |
-| PRIMARY vs gkanamoto tabM | 0.97860 |
-| PRIMARY vs pavlo baseline (0.942) | 0.95470 |
-| makimakiai_v8 vs makimakiai_blend | 0.98649 |
+| Standalone OOF | 0.94563 |
+| Δ OOF vs PRIMARY | −52.69 bp |
+| ρ vs PRIMARY (TEST) | 0.953 (very diverse) |
+| predicted LB band | LB ~0.94482 |
+| G3 flips: +→− | 1415 |
+| G3 flips: −→+ | 64 |
+| K=2 LR-meta(PRIMARY, v3) OOF | 0.95124 (Δ +3.40 bp) |
 
-The +313 bp gap between PRIMARY (0.95059) and makimakiai_blend (0.95372)
-at ρ=0.981 is mechanistically consistent with a single-model FE recipe
-(~+150 bp standalone) plus blending with public-LB ensemble sources.
+**Genuine incremental value of v3 as 23rd base** = +3.40 bp at
+ρ=0.953. Compare with v2's leaky +30.79 bp — the leak amplification
+was 90% of the apparent K=2 lift. Not worth a slot for confident
+LB submit.
 
-## Why was Rozen 0.95241 standalone unreproduced (only 0.94970)?
+## Lessons captured
 
-Rozen's notebook reports 118 tree features; our `make_features_A` has 50.
-Possible gaps:
-- Additional rolling windows (we have 3,5,7,10,15)
-- Position-related interactions
-- Race × Year × Compound 3-way TE (we have it; smoothing 15)
-- Multi-seed LGBM bag (Rozen runs single seed, we match)
-- GPU `device='gpu'` numerics differ slightly from CPU
-- Rozen trains on FOLD train + ALL orig (we test this in feA_te_orig — null)
+Skill file `improvements.md`:
+- G13 single-model-first / kitchen-sink FE before stacking
+- G14 family falsification needs ≥3 variants
+- G15 framework is scaffolding, not authorship
+- **G16 fold-safe label-conditional aggregates** (NEW, Day-17)
+- **G17 transductive features need AV check** (NEW, Day-17 PI lesson)
+- pre-baseline gate items 8-11 (public-notebook scan, TE inventory,
+  physics features, single-model OOF target)
+- 80/20 holdout diagnostic mandatory before new-FE-family LB submit
 
-The standalone gap (~+27 bp Rozen vs ours) is interesting but **not
-load-bearing for the submission**: K22_add_p1_feA_te already gives
-+31 bp OOF lift even at our 0.94970 standalone.
+Local `CLAUDE.md` R20-R23 updated.
 
-## Why we missed this earlier (root cause)
-
-Lessons committed to skill `improvements.md` (6 entries) and local
-CLAUDE.md (R20-R23):
-- R20 single-model-first / kitchen-sink FE before stacking
-- R21 family falsification requires ≥3 variants
-- R22 public-notebook scan at every plateau
-- R23 framework is scaffolding, not authorship
-
-See `audit/friction.md` 2026-05-06 PM section for friction tags.
-
-## Submission decision (awaiting PI)
-
-Submit candidate: `submissions/submission_K22_add_p1_feA_te.csv`
-- Predicted LB ~0.95323 (band [+21, +33] bp at ρ=0.987)
-- Top-5% threshold 0.95345 (within reach if upper band)
-- Submit budget: 0/10 used today
-
-If LB transfers cleanly: jumps from current PRIMARY (LB 0.95059) to
-0.953+ in a single submit, closing 90%+ of the gap to top-5% in one
-shot. PI sign-off needed per Rule 1.
+`audit/friction.md` 2026-05-07 section: 4 new tags
+- `target-construction-layer-leakage` (re-encountered at FS_A level)
+- `2-level-stacking-with-meta-derivative` (re-encountered)
+- `cv-te-stacking-base-leakage` (LR-meta over-credits CV-TE bases)
+- `transductive-features-need-AV-check` (PI Day-17)
+- `P1-single-model-thesis-falsified-on-s6e5`
 
 ## Files
 
-- `scripts/p1_features.py` — feature factory + CV TE
-- `scripts/p1_single_lgbm.py` — 4-variant trainer
-- `scripts/p1_single_cb.py` — single CatBoost (not run; deferred)
-- `scripts/p1_gate_all.py`, `scripts/p1_post.py` — gate harnesses
-- `scripts/artifacts/oof_p1_single_lgbm_feA_te_strat.npy` (+test)
-- `scripts/artifacts/oof_p1_single_lgbm_feA_te_orig_strat.npy` (+test)
-- `scripts/artifacts/oof_K22_add_p1_feA_te_strat.npy` (+test)
-- `submissions/submission_K22_add_p1_feA_te.csv` (✅ pre-submit-diff)
-- `submissions/submission_p1_single_lgbm_feA_te.csv` (HEDGE; predicted LB regression)
-- `submissions/submission_p1_single_lgbm_feA_te_orig.csv` (near-dup of feA_te)
-- `external/kernels/{romanrozen,...}/` — 8 reference notebooks
+- `scripts/p1_features.py` v3 — `make_features_static` +
+  `fit_fs_a` + `apply_fs_a`; legacy `make_features_A` kept and flagged.
+- `scripts/p1_single_lgbm_v3.py` — fold-safe trainer.
+- `scripts/p1_holdout.py` — 80/20 honest holdout diagnostic.
+- `scripts/p1_post.py`, `scripts/p1_gate_all.py` — gate harnesses.
+- `scripts/artifacts/oof_p1_single_lgbm_v3_feA_te_strat.npy` (+test).
+- `scripts/artifacts/p1_holdout_results.json` — holdout AUC 0.94637.
+- `submissions/submission_K22_add_p1_feA_te.csv` — leaky v1 stack-add (LB 0.94933).
+- `submissions/submission_p1_single_lgbm_feA_te.csv` — leaky v1 single (LB 0.94107).
+- `submissions/submission_K2_PRIM_v2.csv` — leaky 2-level K=2 (LB 0.94996).
+- `submissions/submission_p1_single_lgbm_v3_feA_te.csv` — fold-safe v3 (NOT submitted; predicted LB regression).
+- `external/kernels/{romanrozen,...}/` — 8 reference notebooks.
+- `external/{aadigupta_orig,f1_official_1950_2022,weather_woodshole}/` — external datasets.
+
+## What's still open
+
+- **d16_continuous_only_tau20000** (other branch, LB 0.95089) — clean
+  +30 bp candidate via Path-B hier-meta on a fold-safe base. Future
+  PRIMARY-replacement candidate.
+- **Single-model HOLDOUT calibration as standard probe** — every
+  new FE family should run the 80/20 holdout test before LB submit.
+- **Rozen 0.95241 standalone may be similarly inflated** by FS_A leak
+  in his pipeline. The blend LB 0.95354 is dominated by his external
+  blend partners (5-source ensemble), not the single-LGB component.

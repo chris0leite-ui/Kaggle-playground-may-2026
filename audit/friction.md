@@ -41,6 +41,59 @@ One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.
   `examples/` or `recipes/`. Seed entry:
   `s6e5/romanrozen/f1-pit-driver-race-year-encoding-0-95354.ipynb`.
 
+## 2026-05-07 (P1 single-model thesis falsified)
+
+- `tag: target-construction-layer-leakage` (already in skill but
+  re-encountered, this time at the FS_A merge level). Day-16 PM/Day-17
+  v2 `make_features_A` computed `race_avg_pit_lap`, `compound_avg_life`,
+  `dc_avg_stint_life` from `df[df['PitNextLap']==1].groupby(...).mean()`
+  on full train, then merged the same lookup into both train and test.
+  In CV-OOF, val rows had their own labels included in the FS_A
+  aggregates → **OOF inflated by ~500 bp** (0.95128 vs honest holdout
+  0.94637). LB submitted at LB 0.94107 (v1 standalone) and 0.94996
+  (K=2 LR with v2). **FIX:** any label-conditional aggregate must be
+  fold-safe — refit FS_A per CV fold using ti rows only. v3 with
+  fold-safe FS_A: OOF 0.94563 (matches holdout 0.94637).
+
+- `tag: 2-level-stacking-with-meta-derivative` (already in skill;
+  re-encountered). K=2 LR(PRIMARY, candidate) where PRIMARY is itself
+  a hier-meta over K=22: K=2 OOF lift +30.79 bp → LB regress −63 bp
+  vs PRIMARY. The PRIMARY-as-base pattern is leaky regardless of how
+  clean the candidate is; Path-B amp does NOT fire on meta-derivative
+  inputs.
+
+- `tag: cv-te-stacking-base-leakage` — when a base uses CV target
+  encoding internally and is then fed to an LR meta with the SAME
+  outer fold split, the base's OOF carries cross-fold TE leakage that
+  the meta over-credits. v1 K=22 LR-meta(K=21 + p1_feA_te): OOF +33 bp
+  → LB regress −126 bp vs PRIMARY. Mitigation: use Path-B hier-meta
+  instead of LR meta for stack-add of TE-bearing bases (Path B is
+  more leakage-robust per d10b GKF probe; 2.3× amplification on
+  GKF vs Strat).
+
+- `tag: transductive-features-need-AV-check` (PI Day-17 lesson). Even
+  using test FEATURE values (not labels) at training time can be
+  unsafe when train/test distributions shift. Frequency encoding,
+  quantile binning, factorize maps, PCA/AE fit on combined train+test
+  can encode subtle distributional structure that differs between
+  train/test or between public/private LB. Rule: before any
+  combined-set FE, run adversarial validation (train_vs_test
+  classifier AUC). If AV-AUC ≈ 0.5 (s6e5: 0.502), combined is safe.
+  If AV-AUC > ~0.55, do NOT use combined-set FE for that lever; fit
+  on train-only. Companion to the strict-no-out-of-fold-labels rule.
+
+- `tag: P1-single-model-thesis-falsified-on-s6e5` — under correct
+  fold-safe OOF discipline, the best single-LGBM with kitchen-sink
+  Rozen-recipe FE (50 engineered + 6 CV TE incl 3-way + 7 fold-safe
+  FS_A merges + 8 historical priors = 93 features, Rozen hparams,
+  5-fold StratKF) achieves OOF 0.94563. Our K=22 + Path-B hier-meta
+  PRIMARY achieves OOF 0.95090 / LB 0.95059. Stacking is +52 bp ahead.
+  P1 thesis ("a single model can match or beat the stack") is
+  CONCLUSIVELY FALSIFIED on this comp. The original PI hypothesis
+  "leader at LB ~0.955 likely uses ONE strong model" — leaders
+  almost certainly blend or stack; Rozen's actual single-LGB OOF
+  0.95241 is likely similarly inflated by FS_A leak in his pipeline.
+
 ## 2026-05-16 (branch `claude/read-handover-lA8Nr`)
 
 - `tag: twin-pool-2-meta-collapses-rank-info` — Day-16 H2 built two LR
