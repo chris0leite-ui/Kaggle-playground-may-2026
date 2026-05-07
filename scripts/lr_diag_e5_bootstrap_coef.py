@@ -140,7 +140,9 @@ def main():
           f"{X.shape[1] - len(num_cols)} categorical/interaction")
 
     out = {"feature_count": X.shape[1], "n_boot": 50, "regimes": {}}
-    for regime in ["l2", "l2_balanced", "l1"]:
+    # l1 saga dropped (>>1 min/fit at C=0.1; E8 already settled L1 is
+    # rank-no-op; l2 + l2_balanced sufficient for signal-vs-noise)
+    for regime in ["l2", "l2_balanced"]:
         print(f"\n=== regime: {regime} ===")
         coefs, aucs = run_regime(X, y, regime, n_boot=50)
         rows = summarize(coefs, names)
@@ -155,7 +157,7 @@ def main():
 
     # Console synthesis: top SNR features per regime (real signal),
     # high-flip features (noise), and L1 sparsity
-    for regime in ["l2", "l2_balanced", "l1"]:
+    for regime in ["l2", "l2_balanced"]:
         rows = out["regimes"][regime]["rows"]
         rows_sorted = sorted(rows, key=lambda r: -r["snr"])
         print(f"\n=== {regime}: AUC OOB = "
