@@ -42,8 +42,17 @@ criteria + agent-drafted promotions, the loop self-runs and PI
 audits. With pure judgement + manual trigger, the loop is fully
 PI-bottlenecked. Both are valid; just need to know which you want.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06, implicit in F1.7.2 spec).** **Hybrid**:
+> agent (postmortem skill) drafts promotion candidates at session-end,
+> PI ratifies before any commit to `improvements.md`. *"suggest to me
+> what could be promoted as rules and ask me if there's anything else
+> I would like to add."*
+>
+> Criteria operationalised in
+> [`.claude/skills/postmortem/SKILL.md`](../../.claude/skills/postmortem/SKILL.md)
+> step 3 (any one of: generalisable rule named, ≥1 LB slot or ≥1h
+> compute waste cost, required PI override, or repeated pattern this
+> comp). PI judgement is final.
 
 ---
 
@@ -69,8 +78,19 @@ skill is one thing (decision capture) or two (decision capture +
 loop closure). One-thing is simpler and ships faster; two-thing is
 more valuable per session.
 
-> PI answer:
-> _to fill_
+> **PI answer (2026-05-06).** **Yes** — postmortem owns the
+> promotion step. *"suggest to me what could be promoted as rules
+> and ask me if there's anything else I would like to add."*
+>
+> Postmortem augments WRAPUP (does not replace). Built as
+> [`.claude/skills/postmortem/SKILL.md`](../../.claude/skills/postmortem/SKILL.md)
+> + WRAPUP.md step 4b. Auto-discovered by the available-skills system
+> reminder — verified working in this session.
+>
+> **Open**: decision-time mid-session capture (F1.6.1's *"lock
+> decisions together with framework state at the time"*) is **not**
+> handled by this skill. Postmortem is retrospective only. Drilled
+> in [F1.6.2](./2026-05-06-grilling-round-10.md#f162).
 
 ---
 
