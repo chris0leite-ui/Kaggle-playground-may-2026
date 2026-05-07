@@ -255,6 +255,23 @@ LR closes 87% of the GBDT-vs-`lr_raw` gap with mega. The remaining
   conditional FE is mandatory; per-fold FS_A and TE.
 - `transductive-features-need-AV-check` (Rule 25) — combined-set
   KBins/OHE/hash require AV-AUC ≈ 0.5 to be leak-free.
+- `random-subspace-LR-reduces-eff-rank` — bagging LR over random feature
+  subsets *destroys* diversity. 10 bags of 30%-subset on s6e5 mega gave
+  bag eff_rank 1.67 (vs 2.19 for 20 hand-designed FE variants). **Skip
+  this; do not budget time for it.**
+- `per-segment-LR-on-DGP-partition-finds-new-signal` — *highest-EV LR
+  diversity move on s6e5*. Per-(Compound × Year) mega LR gave +60.8 bp
+  over global mega (0.92776 → 0.93385). Pattern: 2023-cohort cells lift
+  most (+725 to +1081 bp), small cells regress. Mechanism: pooled-coef
+  LR can't represent cohort-conditional DGP shifts.
+- `mega-oof-as-gbdt-feature-causes-overfit` — adding the mega LR's
+  fold-safe OOF as a single feature to a fresh LGBM on raw caused
+  −36.7 bp regression. Mega is meta-level useful, not feature-level.
+- `gbdt-meta-not-better-than-lr-meta-on-saturated-pool` — non-linear
+  meta does NOT unlock the residual-after-PRIMARY directions. On s6e5
+  K=24+mega: LR-meta 0.95387, LightGBM-meta 0.95378 (Δ −0.89 bp).
+  Rank-lock is structural to the OOF correlation pattern, not solver-
+  specific.
 
 ## Diagnostic on the LR-bank's effective rank
 
