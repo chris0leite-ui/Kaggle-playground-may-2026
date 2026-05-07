@@ -64,8 +64,14 @@ If you want this v1.5 right now, pick one. If you want to live with
 the gap until you've used the postmortem v1 a few times and seen
 where it's actually painful, say so — that's a defensible choice.
 
-> PI answer:
-> _to fill_
+> **PI follow-up (2026-05-06).** *"How would we best implement
+> decision-time logging?"* — solution-mode opened.
+>
+> **Claude recommendation**: substrate (b) — extend
+> `scripts/probe.py bote` to append a JSONL record to
+> `audit/decisions.jsonl` on every call. ~30 lines in probe.py. Full
+> design + schema + rationale: [`concepts/decision-time-logging.md`](../concepts/decision-time-logging.md).
+> Pending PI ratification before implementation.
 
 ---
 
