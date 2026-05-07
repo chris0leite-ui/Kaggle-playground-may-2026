@@ -202,7 +202,25 @@ Top 3 hypotheses launched in parallel. Audit at
 
 - **9a.** H1 — Yekenot RealMLP recipe replication (`new_model_class`).
   Cost 30-90 min CPU. PI-pred 0 bp; agent expected +27 bp.
-  `[owner: read-handover-62BCt | status: wip]`
+  `[owner: read-handover-62BCt | status: null]` Result: 3 variants tested,
+  all NULL at K=22 meta. V1 fast (n_ens=2) OOF 0.94344 / ADD +0.43 bp /
+  SWAP −0.44 bp. V2 strong (n_ens=3) OOF 0.94516 / ADD +0.66 bp / SWAP
+  +0.03 bp. V3 strong+orig fold 1-2 = -34/-38 bp regression vs V2 (killed).
+  +69 bp standalone gap is partial-recipe gap; full pipeline (TE on
+  (Race,Compound)+(Race,Year) inside fold + arithmetic ratios +
+  floor-cat + count enc + KBins(200/7) + n_ens=24) NOT replicated.
+  Promoted to leaf 9d. Audit `audit/2026-05-07-d17-h1-verdict.md`.
+
+- **9d.** Full yekenot RealMLP recipe replication (Tier-2; promoted from
+  9a partial null). Includes: arithmetic ratios (LapNumber/RaceProgress,
+  TyreLife/LapNumber); floor-based numeric→cat on all numerics + ratios;
+  count encoding on each cat; KBins(200) on RaceProgress + KBins(7) on
+  LapTime; per-fold stratified orig concat; CV target encoding on
+  (Race,Compound) + (Race,Year) combos inside fold loop; n_ens=24.
+  Cost 2-4 h engineering + 30-90 min runtime. EV +5-15 bp standalone OOF
+  (closing the +69 bp recipe gap), unknown meta-add transfer at ρ
+  unknown until ran. Defer to focused dispatch with PI directive.
+  `[owner: unclaimed | status: open]`
 - **9b.** H2 — FastF1 / Ergast external join (DriverAheadPit +
   TrackStatus + CumulativeTimeStint per Frontiers AI 2025 Bi-LSTM).
   Cost 60-180 min CPU + network. PI-pred +5 bp; agent expected +3.6 bp.
