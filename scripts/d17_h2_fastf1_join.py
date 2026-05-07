@@ -58,6 +58,15 @@ def load_session_safe(year: int, race: str):
     try:
         s = fastf1.get_session(year, race, "R")
         s.load(laps=True, telemetry=False, weather=False, messages=False)
+        # Validate that laps actually loaded — when livetiming API
+        # returns 403, FastF1 logs warnings but the laps DataFrame is
+        # empty / accessing it raises DataNotLoadedError.
+        try:
+            n = len(s.laps)
+            if n == 0:
+                return None
+        except Exception:
+            return None
         return s
     except Exception as e:
         print(f"  [skip] {year} {race}: {e}")
