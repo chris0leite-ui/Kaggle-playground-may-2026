@@ -195,7 +195,7 @@ def main():
     print(f"  full-train wall: {time.time()-t_full:.1f}s")
 
     # Evaluate vs current PRIMARY (d16 cont_only K=23 Path-B)
-    primary_test = np.load(ART / "test_d16_path_b_K23_continuous_only_tau20000_strat.npy"
+    primary_test = np.load(ART / "test_d16_path_b_K22_continuous_only_tau20000_strat.npy"
                           )[:, 1].astype(np.float64)
     rare_thr = float(np.quantile(primary_test, 0.99))
     primary_pos = primary_test >= rare_thr
