@@ -122,46 +122,6 @@ Audit: `audit/2026-05-06-target-reform-leakage-audit.md`.
 7. `scripts/probe_target_reform_strict_oof.py` — strict-OOF audit pattern
 8. `scripts/pre_submit_diff.py` — MANDATORY before submit
 
-## Day-15 PM (read-handover-LgbQ4): NEW PRIMARY LB 0.95059 via DAE
-
-Submission `d15b_path_b_K22_dae_only_tau20000` (52394353 COMPLETE
-2026-05-06 15:38) — DAE 768d latent → LGBM-on-latent → K=22 + Path B
-Compound×Stint τ=20k. Realised LB amp **1.4×** on +0.715 bp OOF —
-load-bearing for the new friction tag
-`path-b-amp-only-fires-on-meta-arch-not-base-add`.
-
-DAE artifacts re-usable for any future K_pool+N probe (no need to
-retrain): `oof_d15b_lgbm_dae_{full,only}_strat.npy` + test variants.
-
-## Day-16 (read-handover-lA8Nr): virgin-axes complement, all NULL
-
-11 probes covering α/β/δ/ε/ζ/η axes from the d13 problem decomposition
-tree. Highlights:
-- **α4 GRU sequence on (Driver, Race) lap windows**: std OOF 0.93066,
-  ρ=0.919 (most-diverse base of session). K=22+1 LR-meta Δ=−0.043 bp NULL.
-  **5th cross-confirmation of `lr-meta-rank-lock-strong-anchor`.**
-- **ε2 twin parallel-pool 2-meta blend**: ρ(metaA, metaB)=0.967 real
-  disagreement; top-level LR vs single LR-meta(K=11): FALSIFIED Δ=−1.79 bp.
-  Friction `twin-pool-2-meta-collapses-rank-info`.
-- **δ2/3 conformal isotonic 4 schemes**: All regress −2.5 to −9.6 bp NULL.
-  Friction `primary-hier-meta-globally-calibrated`.
-- **ζ6 transductive pseudo (full-test soft labels)**: marginal +0.63 bp
-  at LR-meta-K22 but −0.30 vs PRIMARY hier. R5 HEDGE only.
-- 2 parked, 3 killed (DeepGBM ε4 over-engineered, etc.)
-
-Full audit: `audit/2026-05-16-d16-virgin-axes-results.md`.
-
-## This branch (ml-handover-alignment-xvUN0): harness + target-reform leakage
-
-**Three significant deliverables:**
-1. **Harness installed** (`scripts/probe.py`, `probe_min_meta.py`,
-   18+ probe scripts). CLAUDE.md Rule 19 codifies BOTE-first / gate-after.
-2. **Target reformulation thesis FALSIFIED via strict-OOF audit** (above).
-3. **4-tier multi-level Path B (T4a)**: 5 (τ_0, τ_1, τ_2) configs all NULL.
-   Simple multi-tier-shrinkage variant doesn't fire Path-B amp.
-
-**Per-row feature engineering family CLOSED** (5 NULLs jointly explained
-by `tag: synthetic-dgp-conditionally-near-independent`).
 
 ## Falsified or dead — do NOT retry
 
@@ -176,60 +136,6 @@ See `ISSUES.md ## Falsified or dead` (full list). Highlights:
   blends, α-calibrated τ-resweep, multi-target NN, masked-column
   self-prediction (DGP-residual)
 
-## Next-session first-action — RANKED by EV/cost
-
-### A1 — SINGLE-MODEL HYPOTHESIS TEST (PI-directed for next session)
-
-PI hypothesis: leader at LB ~0.955 likely uses ONE strong model with
-a structural mechanism we missed. Our 25-base stacking chases inflated
-OOF that doesn't transfer.
-
-**Procedure:** train ONE LightGBM (or CatBoost) with a wide feature
-set including raw + strict-OOF target reformulations as FEATURES (not
-separate bases). Measure standalone OOF AUC. If it beats ~0.945
-(baseline+) significantly → "single model" path alive. If standalone
-is unchanged → the +50 bp gap requires a structural insight we
-haven't found.
-
-Inputs available:
-- Raw features (11 numeric + 3 cat)
-- `oof_target_reform_{reverse_cum,pit_horizon,inv_laps}_strict_strat.npy`
-  (strict-OOF, leak-free per `probe_target_reform_strict_oof.py`)
-- DAE 768d latent (`oof_d15b_lgbm_dae_only_strat.npy`)
-
-Cost: ~10-30 min for one wide-feature LightGBM 5-fold + standalone AUC.
-
-### A2 — Pirelli external data scrape (ISSUES leaf 4a; untouched)
-
-Aggregate-prior pattern (per (Compound, Race, Year) historical),
-NOT row-join (d2 row-join failed at 5.6% match rate). Tier-2 EV per
-Day-8 research. EV +0.5 to +3 bp.
-
-### A3 — Examine raw data structure for missed leak
-
-`id_mod_1000` 568 bp marginal span absorbed by GBDT interactions when
-added as feature. Question: is there a **non-feature** structure (row
-order, group ordering) that encodes pit_next_lap directly?
-
-### A4 — Web search top-finisher Playground writeups
-
-Pattern-match leader's "single model at 0.955" against published
-synthetic-tabular Playground writeups.
-
-### Meta-arch redesign (still alive at structural level)
-
-Untested in T4a's simple multi-tier:
-- Non-Gaussian shrinkage prior (Beta-Binomial / Student-t)
-- Yao/Vehtari covariance-Σ BMA (LKJ + GP prior)
-- Alternative segmentation cross (Year×Compound, Compound×TyreLife_q5,
-  Driver-cluster × Stint)
-
-### Research-loop trigger (Rule 7)
-
-If A1 + A2 + A3 all NULL: pause submits, re-decompose ISSUES.md (3+
-plateau-days now confirmed; per-row FE family closed; target-reform
-family closed via leakage-audit; meta-arch redesign still untouched
-at proper Bayesian level).
 
 ## Operating rules (load-bearing)
 
@@ -246,142 +152,96 @@ at proper Bayesian level).
 7. Strat-only Day-3+ (R1) for primary OOF; public LB row-iid per U3.
 8. Cap ≤3 concurrent CPU-heavy probes; schedule cheap probes first.
 
-## Pointers (audit notes added today)
 
-- `audit/2026-05-06-target-reform-leakage-audit.md` — **load-bearing**
-- `audit/2026-05-16-d16-virgin-axes-results.md` — Day-16 11-probe NULL audit
-- `audit/2026-05-06-alpha-asymmetry-verification.md` — α verification + harness intro
-- `audit/2026-05-06-blend-and-rho-probes.md` — K=21 blends ruled out + ρ inventory
-- `audit/2026-05-06-path-b-K22-d12meta.md` — meta-derivative LB-failure record
-- `audit/2026-05-06-do-all-4-probes.md` — TE-audit / α-resweep / sparse-LR / lt-q5
-- `audit/2026-05-06-synthetic-data-batch.md` — 7-probe synth-data batch
-- `audit/2026-05-06-d14-dgp-residuals.md` — masked-column self-pred NULL + DGP diagnostic (load-bearing)
-- `audit/2026-05-15-d15-4branch-results.md` — 4-branch + B-GPU + DAE submit audit
-- `scripts/probe.py` + `probe_min_meta.py` + `probe_target_reform_strict_oof.py` — harness
-- `scripts/probe_path_b_K22_invlaps.py` — INVALIDATED (`target-construction-layer-leakage`)
-- `scripts/probe_target_reform.py` — INVALIDATED (`target-construction-layer-leakage`)
-- `scripts/d14_dgp_residuals.py` — DGP-residual probe
 
 ---
 
-## Day-15 PM read-handover-LgbQ4 (deep-dive 4-branch + GPU revival + submit)
+## Archived per-branch PM detail (Day-15/16/17)
 
-**Result: NEW PRIMARY LB 0.95059** (+1.0bp over d13e 0.95049). Submission `d15b_path_b_K22_dae_only_tau20000` (52394353 COMPLETE 2026-05-06 15:38). Gap to top-5%: 28.6bp. Day-15 used 1/9 slots; total 26/270.
+Per Rule 5 file-size guard (HANDOVER cap ≤ 150 lines), the detailed
+per-branch PM sections from Day-15/16/17 have been moved to:
+`audit/archive-2026-05-07-handover-day15-17-pm-sections.md`
 
-**Branches run** (4-parallel + GPU revival):
-- **A** `d15a_alpha_tau_resweep` (`code_fix_calibration`) — **FALSIFIED**. ρ=1.000000 vs d13e at τ=20000; α-fix is no-op (segments ≥1000 rows have α≈1 in both regimes). PI's "code-quality fix" intuition wrong on this lever.
-- **B-CPU** `d15b_dae_smoke` — KILLED, DAE-on-CPU non-feasible (smoke 30 min on 70k×782 incomplete).
-- **B-GPU v1** `d15b-dae-lgbm-gpu` — ERROR (P100 sm_60 fallback, friction `kaggle-p100-fallback-reproduced-day15`).
-- **B-GPU v2** torch 2.4 force-reinstall fix — **SUCCESS**. DAE 256-512-256 swap-noise frac=0.15 on (train+test 627k) 20 epochs batch=4096; 768-d latent (h2+h3 concat). LGBM-on-latent-only std OOF 0.94007, ρ_test 0.9477 (most-diverse since FM_A_53). Min-meta +0.793bp at ρ 0.99547. K=22 Path B Compound×Stint τ=20000 OOF 0.95090 (+0.715bp), ρ=0.99973, flips 59/53 R7-eligible. Submit landed +1.0bp LB.
-- **C** `d15c_extra_trees` (4000 trees max_features=sqrt) — borderline. std OOF 0.92967, min-meta +0.059bp at ρ 0.99599. **R5 HEDGE only.**
-- **D** `d15d_lgbm_knn` (k=5 NN per-Compound + per-Driver, 10 features) — borderline. std OOF 0.94166, min-meta +0.056bp at ρ 0.99586. C+D K=23 add additive +0.095bp; ρ between C/D raw 0.9325 but LR-meta routes both to ρ≈0.996. **R5 HEDGE only.**
+Load-bearing summaries remain in `## Where we are` and `## 🔴 CRITICAL`
+above. Read the archive only for archaeology / detailed reproductions.
 
-**Load-bearing finding**: friction `path-b-amp-only-fires-on-meta-arch-not-base-add`. Realised LB amp 1.4× on +0.715bp OOF base-add — well below Path-B-amp 6-11.6× on meta-arch redesigns (d13 Compound 6.7×, d13e 8×, d13 Stint 11.6×). Refines the prior `path-b-amp-needs-orthogonal-signal-not-meta-derivatives`: even genuinely orthogonal base-add (DAE ρ 0.9477 standalone) does NOT fire amp; only meta-arch redesign (segmentation refinement) does. Cross-confirmed by main-branch agent same day: K=22 + orig_transfer hier-meta τ=20k LB 0.95049 (TIE +1.127bp OOF).
+## Day-18 PM ensemble-logistic-regression-research-MbLKu (LR-diagnostic + meta-arch test)
 
-**Cross-branch awareness** (do NOT touch — note only):
-- `claude/ml-handover-alignment-xvUN0` has unsubmitted candidate `path_b_K22_invlaps τ=20k` OOF 0.95110 (+2.75bp), claimed largest-of-session. Untested at LB; under my new friction tag would predict ~+4bp LB at 1.4× realised amp.
-- Multiple branches also active: knowledge-base-setup-LIxXm, eda-deep-dive-qFByN, etc. Scribe will consolidate next morning.
+**0 LB submits this session.** Research-loop session per PI L2
+("learn, don't chase bp"). 12 experiments across 3 arcs + 2 Tier-1
+meta-arch tests. PRIMARY unchanged: `d17_K24_d18pool_h1d` LB 0.95345.
 
-**Artifacts persisted (all committed for later use)**:
-- `scripts/d15a_alpha_tau_resweep.py` + 7 OOF/test pairs at τ ∈ {2000,5000,10000,20000,50000,100000,200000}
-- `scripts/d15b_dae_{smoke,encoder,lgbm_on_dae}.py` (CPU killed) + `kernels/d15b-dae-gpu/` (v2 working, 1.4GB latents .gitignored)
-- `scripts/d15b_path_b_K22_dae_only.py` + 3 τ-sweep OOF/test pairs
-- `oof_d15b_lgbm_dae_{full,only}_strat.npy` + `test_*` (re-usable in any K_pool+1 probe)
-- `scripts/d15c_extra_trees.py` + `oof_d15c_extra_trees_strat.npy` + test
-- `scripts/d15d_{knn_features,lgbm_on_knn}.py` + `d15d_knn_X_{train,test}.npy` (KNN distance feature matrices) + LGBM OOF/test
-- `submissions/submission_d15b_path_b_K22_dae_only_tau20000.csv`
-- 6 `probe_min_meta__d15*.json` gate reports
-- `scripts/probe.py` extended with 3 new families (`dae_unsupervised`, `extra_trees_ensemble`, `knn_distance_features`)
+### Three load-bearing findings
 
-**Next steps (Day-16 priority)**:
-1. **PI decision needed**: do we submit `claude/ml-handover-alignment-xvUN0`'s K=22+inv_laps τ=20k? +2.75bp OOF projects ~+4bp LB at 1.4× realised amp = LB ~0.95093. Stronger candidate than today's d15b. Slot cost 1/9.
-2. **Day-16 axis pivot**: meta-architecture redesign (amp-eligible per friction `path-b-amp-only-fires-on-meta-arch-not-base-add`). Concrete candidates:
-   - **Non-Gaussian shrinkage** on Path B (Beta-Binomial / Student-t). Replaces Gaussian-τ; same amp axis as d13e Compound×Stint (8×).
-   - **Yao/Vehtari covariance-modelled BMA** (LKJ prior on inter-base Σ, GP prior on segment index). Proper "Path B done correctly". 4h CPU or 30 min Kaggle GPU PyMC-JAX.
-   - **Alternative segmentation cross**: Year×Compound (4×5=20 seg), Compound×TyreLife_q5 (5×5=25 seg), Driver_clustered×Stint (4 driver clusters × 5 = 20 seg).
-3. **DAE pool composition**: `d15b_lgbm_dae_full` had similar lift profile to base-add (no amp). Both d15b artifacts useful for any future K_pool+N probe — no need to retrain.
-4. **R5 HEDGE ladder accumulating**: d15b_path_b_K22_dae_only_tau{20000,100000} (PRIMARY + close-second), d15c (ExtraTrees), d15d (LGBM-on-KNN), d15c+d15d K=23.
-5. **Skill amendment** (already in friction): start any new torch GPU kernel from `kernels/hazard-nn-smoke-gpu/` boilerplate (sm_60 force-reinstall pre-wired). Don't dispatch general-purpose subagents for python jobs >5 min wall.
+1. **Pool eff_rank ≈ 3 of 24** (E1 entropy + E9 forward-select cross-
+   confirmed). K=10 = K=24 in OOF AUC. **14 of 24 bases dead weight.**
+   `cb_slow-wide-bag` first negative-marginal pick; predicted by E1
+   redundancy and E2 miscalibration independently.
+2. **Stint is the dominant interaction hub** (E6). 9 of 10 top
+   cell-residual pairs include Stint. PRIMARY's per-cell residuals
+   on those pairs <1% — GBDT pool fully saturates the (Stint × *)
+   DGP information. Adding the 9 Stint-cross interactions to LR
+   lifts +123 bp standalone (A2 vanilla → rich).
+3. **Representation-only diversity is meta-null on a saturated info
+   space** (A2 + A4 cross-confirmed). A2_rich ρ=0.71 (lowest base ever),
+   A4 ρ=0.75 — both Δ ≤ +0.04 bp on K=10. **6 cross-confirmations of
+   `rho-alone-insufficient-for-meta-utility`.**
 
-**Pointers added today**:
-- `audit/2026-05-15-d15-4branch-results.md` — full 4-branch + B-GPU + K=22 Path B + submit-result audit
-- `scripts/d15{a,b,c,d}_*.py` — branch implementations
-- `kernels/d15b-dae-gpu/` — Kaggle GPU kernel (v2 with sm_60 fix)
-- `submissions/submission_d15b_path_b_K22_dae_only_tau20000.csv` — submitted artifact
+### Tier-1 tests executed
 
----
+- **T2 K=10 PRIMARY artifact built**. OOF 0.95381, ρ_test 0.99913 vs
+  d18 K=24. Δ = −0.4 bp (within sub-bp noise). No-cost simplification
+  candidate; not LB-submitted (PI hold).
+- **T1#3 Path-B 3 alt segmentations × 3 τ on K=10**. ALL 9 within
+  sub-bp of K=10 baseline; best S3 Driver_freq_q4 × Stint τ=20k +0.27
+  bp. **Path-B amp does NOT fire on K=10.** Refines friction:
+  `path-b-amp-requires-large-redundant-pool-not-saturated-pool` —
+  Path-B was a redundancy-re-allocation mechanism, not a
+  new-information mechanism.
 
-## Day-16 PM autoencoder-synthetic-data-pEMB6 (overnight gauge-p-synth sweep)
+### Durable deliverables (carry across comps)
 
-**🎯 NEW PRIMARY: LB 0.95089 🎯** (`submission_d16_path_b_K22_continuous_only_tau20000.csv`,
-ref 52410696, scored 2026-05-07). +3.0 bp over previous PRIMARY 0.95059.
-Top-5% gap closes −28.6 bp → −25.6 bp (leader 0.95345). Realised amp ~1.0×
-on +3.10 bp OOF advance.
+- **`.claude/skills/kaggle-comp/lr-diagnostics.md`** — skill entry
+- **`.claude/skills/kaggle-comp/templates/scripts/lr_diag/`** — 10
+  Python scripts + README, drop-in for any tabular comp's Day-1
+- 3 audits `audit/2026-05-07-lr-diagnostics-arc{A,B,C}.md`
+- 5 friction tags + 4 mechanism-family entries codified
 
-**Headline.** **`d16_path_b_K22_continuous_only_tau20000` OOF 0.95121** =
-HIGHEST OOF EVER (+3.10bp vs prior PRIMARY OOF 0.95090). Standalone base
-`d16_orig_continuous_only` K=21+1 +3.331bp = LARGEST single-base K=21+1 of
-session (beats inv_laps +1.90 by 1.75×).
+### NEXT-SESSION PRIORITY (post-execution view)
 
-**Mechanism.** Selective feature-restriction transfer. Orig-trained LGBM on
-the 7 features the synthesizer left marginal-aligned (TyreLife KS=0.017,
-Position 0.019, LapTime 0.056, LapTime_Delta 0.179, Cumulative_Degradation
-0.071, RaceProgress 0.186, LapNumber 0.188). Phase-1 KS-divergence diagnostic
-*literally* guided the choice. ρ vs PRIMARY 0.9946 — most-diverse positive
-single base since d15_orig_transfer (0.5653).
+In-pool research empirically exhausted. Three honest options ranked:
 
-**Sweep done overnight** (5 phases × 19 probes; CPU-only; 0 submits per
-Rule 1; 12h wall):
-  - **Phase 1 ✅** SDV overall 0.803; class-conditional structure SHARPER
-    in synth than orig (synth Stint y0-vs-y1 KS 0.43 vs orig 0.24).
-  - **Phase 2 v2 ✅** Density ratio r̂(x) (Driver/Race excluded after v1
-    AUC 0.9985 from ghost-Driver tells). r̂ as feature NULL; as sample
-    weight +0.78bp; as cohort router +1.32bp. New friction
-    `density-ratio-routes-or-weights-but-fails-as-feature`.
-  - **Phase 3 ✅** GMM 16-comp single-feat: ρ=0.503 (most-diverse single
-    base ever) but K=2 NULL — 4th confirmation of `rho-alone-insufficient-for-meta-utility`.
-    BGMM at reg_covar=1.0 oversmoothed (AUC 0.55 near-random) — new friction
-    `bgmm-default-oversmooths-at-reg-covar-1`.
-  - **Phase 4 v2 ✅ KEY WIN** Orig-transfer feature-subset variants. All
-    4 PASS K=21+1; continuous_only +3.33, no_laptime +1.87, no_tyrelife_rp
-    +0.86, dr_split +1.32. New friction
-    `feature-subset-orig-transfer-passes-where-arch-bag-fails`.
-  - **Phase 5 null+caveat** All 6 ran r̂_q5/logp_q5 cohort axes regress
-    -3 to -4bp. CAVEAT: ran on K=14 sub-pool (only 14/21 named bases
-    matched filenames). New friction
-    `path-b-on-pool-subset-conflates-cohort-axis-with-pool-size`.
-  - **Phase 6 ✅** K=21+1 individual gates + K=21+7 panel (+5.94bp;
-    continuous_only |w|=1.48 dominates) + K=22 Path B Compound×Stint
-    sweep with continuous_only as 22nd base.
+1. **T3 Pirelli external data scrape** (only path with new-information
+   mechanism). PI scope sign-off: NOT a public CSV; a structured
+   external scrape of historical pit-window aggregates per
+   (Compound, Race, Year). Aggregate-prior join, not row-join.
+   ISSUES leaf 4a; untouched. Tier-2 EV +0.5 to +3 bp per Day-8
+   research.
+2. **Wrap s6e5** — top-5% achieved (LB 0.95345 = 0.0 bp gap). Durable
+   wins shipped (skill suite + 9 codified findings). Reserve compute
+   for next Featured comp Day-1.
+3. **T1#1 non-Gaussian shrinkage** (4-8 h CPU). Predicted null at high
+   confidence per saturated-info argument; same Path-B mechanism that
+   already failed in T1#3. Run only if PI wants completeness on
+   meta-arch family.
 
-**Submission result**:
-  - τ=20k variant SUBMITTED 2026-05-07 (PI authorized; 468 flips override).
-    OOF 0.95121 → **LB 0.95089** (+3.0 bp over previous PRIMARY).
-  - τ=100k variant HELD as HEDGE-eligible candidate (R5 final-window probe).
+**Recommendation: option 1 (T3) or 2 (wrap).** Option 3 is low-EV
+discipline-only.
 
-**Cross-branch awareness**: claude/ml-handover-alignment-xvUN0 has held
-candidate `path_b_K22_invlaps τ=20k` OOF 0.95110. d16's continuous_only
-variant lifts another +1.10bp OOF over inv_laps and is mechanistically
-distinct (selective feature-restriction transfer vs target reformulation).
-Independent mechanism families — should consider K=23 stack-add of both
-in next session.
+### Files added this session
 
-**Pointers added today**:
-- `audit/2026-05-07-overnight-gauge-p-synth.md` — full overnight sweep audit (synthesis section finalized)
-- `audit/friction.md` — 5 new friction tags from this branch
-- `ISSUES.md` § 7 — umbrella `gauge-p-synth-overnight` with 5 sub-leaves (4 done, 1 null)
-- `scripts/d16_gauge_phase{1,2_v2,3_likelihood,3b_bgmm_fix,4_v2,5_pathb,6_wrapup}.py`
-- `scripts/d16_path_b_K22_continuous_only.py` — submission candidate generator
-- `submissions/submission_d16_path_b_K22_continuous_only_tau20000.csv` — submission CSV (NOT submitted; Rule 1)
-- 16+ d16 OOF/test pairs in `scripts/artifacts/oof_d16_*` and `test_d16_*`
-- `scripts/artifacts/d16_phase{1..5}_summary.json` + `d16_overnight_consolidated.json`
+- `audit/2026-05-07-chris-deotte-lr-stacker-research.md` (research note)
+- `audit/2026-05-07-lr-diagnostics-arc{A,B,C}.md` (3 arc audits)
+- `audit/2026-05-07-postmortem-lr-diagnostic-expedition.md`
+- `audit/archive-2026-05-07-handover-day15-17-pm-sections.md` (file-cap)
+- `scripts/lr_diag_e{1,2,4,5,6,8,9}_*.py` + `lr_diag_a{2,4}_*.py`
+- `scripts/t2_k10_primary.py` + `t1_3_segmentation_crosses.py`
+- `.claude/skills/kaggle-comp/{lr-diagnostics.md,templates/scripts/lr_diag/}`
+- 12 JSON results + 6 OOF/test artifact pairs in `scripts/artifacts/`
 
-**Next-session priorities (handover):**
-1. **PI submission decision**: τ=100k (HEDGE-safe) vs τ=20k (PI sign-off); predicted LB +4-5bp lift.
-2. **K=23 stack-add**: K=21 + d16_orig_continuous_only + path_b_K22_invlaps (cross-branch). Both PASS independently; orthogonal mechanisms; predict additive ~+4-5bp K=23 OOF.
-3. **Phase-5 re-test on full K=21**: cleanly disambiguate cohort-axis failure from missing-bases artifact.
-4. **Tune continuous_only LGBM**: feature subset is fixed; tune n_leaves, min_data, subsample on orig.
-5. **Multi-arch on continuous_only feature subset**: CatBoost / XGB with same 7 features (different from d15_orig_multi_arch which varied arch on full features).
+### Submissions used
+
+0/10 today. Total: 35/270.
 
 ---
 
