@@ -448,3 +448,153 @@ Total: 32/270.
 - v3 single LGBM OOF 0.94563 itself — too low standalone, but ρ=0.953
   diversity. Genuine K=22+v3 stack-add lift only +3.40 bp OOF
   (vs leaky +30.79 bp). Held; probably not worth a slot.
+
+---
+
+## Day-18 PM reverse-engineer-data-generation-Hu8EK
+
+**🎯 NEW PRIMARY: LB 0.95368** (`d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000`,
+ref 52432732, scored 2026-05-07). +1.4 bp over previous PRIMARY 0.95354
+(main's `d17_path_b_K23_v4_h1d_tau100000`). Top-5% gap closes
+−5.1 → **−3.7 bp** (boundary 0.95405). Leader (MILANFX) gap −10.8 bp.
+
+### What ran (DGP-reverse-engineering arc)
+
+14 probes across 3 tiers + combined-with-main:
+
+**Tier-1 CTGAN-aware (after F1 confirmed CTGAN-class)**
+| Probe | Mechanism | K=21+1 Δ |
+|---|---|---:|
+| **d18 v1 chain (causal+gauss)** | per-step orig log-likelihood | **+7.37** ⭐ |
+| F5 class-cond GMM Bayes-factor | 2 GMMs on 7 KS-low feats per class | +3.56 |
+| J cond-vector tuple lookup | EB(P×C×S×R×Y).y_mean | +2.30 |
+| F2 constraint violations | 10 physical constraints | +1.56 |
+| d18b v2 chain (q10) | binned multiclass | +1.43 (5× weaker) |
+| H mode-id × (C×S) lookup | EB on G's mode-ids | +0.97 |
+| I mode-collapse bias-factor | synth_freq[m]/orig_freq[m] | +0.80 |
+| G mode-id (CTGAN latent) | BGMM(10) per KS-low feat | +0.53 |
+| E5/K1/K2/K3 cohort-axis | mode-id × Compound, etc. | NULL/regress |
+| F1 GPU replay forensics | arch ID via SDV replay | NULL as base |
+
+**F1 verdict**: host = **CTGAN-class GAN** (lowest mean KS 0.134 to CTGAN
+replay; non-GAN→GAN P(replay-like) jump 0.06→0.13). All 4 disc AUCs
+≥0.988 — host has custom signature.
+
+**Combined-with-main**: pulled `oof_p1_single_cb_v4_gpu` + `oof_d17_h1d_yekenot_full`
+artifacts via `git checkout origin/main -- ...`. Solo K=23+v4+h1d+1 marginals
+(815s wall, 12 candidates):
+- d16 +0.79 ⭐, E2 +0.42, d18 +0.33, F2 +0.25, F5 +0.21, J +0.18
+- DAE +0.16 (wildcard fizzled — RealMLP h1d absorbs the unsupervised
+  manifold), d18b +0.08, p1 v3 +0.08, orig-transfer +0.07, leak/DAE-full ≤0
+
+**K=25/26/27 Path-B sweep** (Compound × Stint, τ ∈ {5k, 20k, 100k}):
+- K=25 (v4+h1d+d16+E2): τ=100k OOF 0.95427 (+1.2 bp)
+- K=26 (+d18): τ=100k OOF 0.95430 (+1.5 bp)
+- **K=27 (+F2)**: **τ=100k OOF 0.95432** (+1.7 bp) ⭐ submitted
+- Path-B amp ~1.0× across all K (friction reconfirmed)
+
+**K=27 submitted** (Pre-submit-diff vs main PRIMARY: ρ=0.999023 borderline,
+top-1% flips 129/154 R7-OK). Predicted band 0-2 bp; **realised +1.4 bp**
+(dead-center). Calibration: 2-of-2 submissions in band this session.
+
+### Falsified or dead this session
+
+- E5 chain_LL_q5 cohort axis (Path-B regress)
+- K1/K2/K3 mode-id Path-B cohort variants (all NULL vs Compound × Stint)
+- F1 per-architecture disc features as bases (-0.11 bp; arch-bias is
+  orthogonal to PitNextLap target)
+- DAE wildcard solo on K=23 v4+h1d (+0.16 bp; absorbed)
+- G/H/I CTGAN mode-id features on K=23 v4+h1d (≤+0.07 bp; absorbed by
+  CatBoost CTR on combo-cats)
+
+### Friction tags introduced this session
+
+- `pool-saturation-v4h1d-absorbs-dgp-class` (generalises main's
+  `pool-saturation-v4h1d-absorbs-d16d18` to all DGP-class incl
+  CTGAN-aware mode-ids)
+- `dae-wildcard-absorbed-by-mainline`
+- `sequential-axis-untouched` (the biggest remaining DGP blind spot)
+- `f1-replay-disc-features-orthogonal-to-target`
+- `parallel-lgbm-3way-contention-oom` (process)
+- `combined-pool-marginal-1bp-ceiling`
+
+### Next-session first-action — RANKED queue (NEW probes after this round)
+
+The DGP arc characterised the synthesizer end-to-end (architecture +
+mode structure + class-conditional generator + within-row independence).
+Five untouched mechanism axes remain — see ISSUES.md leaves 7g-7k:
+
+**A1 (7g) ⭐ — Sequence-level DGP fingerprinting**: HMM on per-Year
+Compound transition matrices + AR(1) on within-stint TyreLife;
+per-(Driver, Race, Year) sequence log-likelihood under orig's transition
+model. Synth groups with low LL = GAN-artifact strategies. Run-length
+distributions per group. **Untested mechanism layer**: every probe so
+far treats rows i.i.d., but the dataset is sequential (within-group
+F1 strategies). v4+h1d sees rows i.i.d. internally → any sequence
+signal is structurally orthogonal. Cost 2-3 h CPU. Predicted +1-3 bp
+K=21+1; learning value high regardless of LB.
+
+**A2 (7h) — Cross-feature joint mode-id**: G probed univariate mode-id;
+the *tuple* `(mode_TL, mode_LT, mode_RP, mode_CD, mode_LD, mode_LN, mode_Pos)`
+is the GAN's discrete latent VECTOR. Frequency-table comparison orig vs
+synth + per-row log-frequency + cluster-id (k-prototypes) + EB(cluster).y_mean.
+Cost 30 min CPU.
+
+**A3 (7i) — Membership inference / exact-row copy detection**: 97.55%
+literal LapTime overlap suggests some synth rows are near-exact orig
+copies. Per synth row, min-distance to orig over all 16 columns. Below
+ε threshold, predicted P(y=1) = orig's actual y (leak-free; uses orig
+labels for orig rows). Cost 1 h CPU.
+
+**A4 (7j) — CTGAN replay with explicit cond-vector spec**: F1's CTGAN
+used default conditioning. Re-train with `cond_columns=[PitStop, Compound,
+Stint, Year]` and stratified per-cond sampling. If host had this design,
+KS to host_synth should drop sharply. Cost 3 h Kaggle GPU.
+
+**A5 (7k) — Per-Year DGP heterogeneity / specialists**: d12 said 2023 =
+flat 0.96% pit rate (vs 19% global). Per-Year KS divergence + per-Year
+v4-recipe specialist test under K=27 pool. Cost 30 min CPU.
+
+### Ranked path to top-5% (3.7 bp gap)
+
+1. **A1 sequence-level fingerprinting** — HIGH learning value; new
+   mechanism axis; predicted +1-3 bp marginal.
+2. **External data: FastF1 lap-by-lap pit-call hard-join** (mainline
+   Item 5) or **Pirelli pit-window scrape** (Item 6) — Tier-2 EV +10
+   to +30 bp; only single-mechanism path that could close the full gap.
+   Cost 1-2 days each.
+3. **Yao/Vehtari covariance-modelled BMA** (T4b) — proper Path-B done
+   with LKJ prior on inter-base Σ + GP prior on segment index. Untested;
+   amp axis untested at K=27. Cost ~30 min Kaggle GPU.
+4. **A2 / A3 / A5** — modest +0.5-1.5 bp each but interpretable
+   diagnostics.
+
+### Files added this session
+
+- `scripts/d18_chain_decomp.py` (E1 v1)
+- `scripts/d18b_chain_variants.py` (v2/v3)
+- `scripts/d18_path_b.py` (K=22/23/25/26/27/28 Path-B variants)
+- `scripts/d18_e2_preimage_knn.py`, `d18_e4_class_cond_chain.py`,
+  `d18_e5_pathb_chain_cohort.py`, `d18_f2_constraint.py`,
+  `d18_f5_class_cond_gmm.py`, `d18_f6_kl_ceiling.py`
+- `scripts/d18_g_mode_id_ctgan.py`, `d18_h_mode_lookup.py`,
+  `d18_i_mode_collapse.py`, `d18_j_cond_vector_lookup.py`,
+  `d18_k_pathb_mode_cohort.py`
+- `scripts/d18_combined_with_main.py` (greedy K=23 v4+h1d+N synth)
+- `scripts/d18_combined_solo.py` (faster solo marginals)
+- `scripts/d18_f1_synth.py` (ρ-matrix synthesis)
+- `kernels/d18-f1-replay-forensics-gpu/` (replay forensics, COMPLETED)
+
+### Audits
+
+- `audit/2026-05-07-d18-chain-decomp.md` — d18 v1 (+7.37 bp single-base)
+- `audit/2026-05-07-d18-dgp-decomp-batch.md` — E1-E5 batch synthesis
+- `audit/2026-05-07-d18-ideaboard.md` — locked queue (still relevant)
+- `audit/2026-05-07-d18-tier1-ctgan-batch.md` — G/H/I/J/K + F2/F5 synthesis
+- `audit/2026-05-07-d18-postmortem.md` — Day-18 PM postmortem
+
+### Submitted CSVs
+
+- `submission_d18_path_b_K23_d16_d18_tau20000.csv` — LB 0.95149 (Day-17 PM)
+- `submission_d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000.csv` — **LB 0.95368** ⭐
+

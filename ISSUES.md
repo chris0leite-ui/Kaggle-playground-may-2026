@@ -183,12 +183,46 @@ prediction signal. 5 phases × 19 probes. CPU-only. 0 submits. Audit at
   Stint → LapNumber → TyreLife → Position → LapTime,Delta,CumDeg →
   RaceProgress, Position_Change. One small LGBM per step on orig
   modelling P(X_k | X_{<k}). For each synth row compute per-step
-  log-likelihood + per-step residual z-score → ~24 features. Stack
-  as a candidate base (LGBM head on the 24 features + raw 14 features)
-  AND keep diagnostic CSV (per-row corruption profile reusable for
-  future probes). Mechanism: synthesizer's joint corruption shows up
-  as which step's likelihood drops; diagnostic for E2/E3/E4.
-  `[owner: reverse-engineer-data-generation-Hu8EK | status: wip]`
+  log-likelihood + per-step residual z-score → ~24 features.
+  `[owner: reverse-engineer-data-generation-Hu8EK | status: done]`
+  Result: d18 v1 K=21+1 +7.365 bp (largest single-base of session).
+  Combined with d16+d18+E2+F2 + main's v4+h1d → K=27 Path-B τ=100k
+  LB 0.95368 (NEW PRIMARY +1.4 bp over 0.95354).
+- **7g.** Sequence-level DGP fingerprinting (NEW; biggest remaining
+  blind spot). HMM on per-Year Compound transition matrices + AR(1)
+  on within-stint TyreLife; per-(Driver,Race,Year)-group sequence
+  log-likelihood under orig's transition model. Synth groups with
+  low LL = GAN-artifact strategies. Run-length stats per group
+  (regulation-bounded stint lengths). Untested mechanism layer; v4
+  treats rows i.i.d. internally so any sequence-coherence signal is
+  orthogonal. Predicted +1-3 bp K=21+1; learning value high regardless.
+  Cost ~2-3 h CPU.
+  `[owner: unclaimed | status: open]`
+- **7h.** Cross-feature joint mode-id (extends G). The mode-tuple
+  `(mode_TL, mode_LT, mode_RP, mode_CD, mode_LD, mode_LN, mode_Pos)`
+  is the GAN's discrete latent VECTOR. Frequency-table comparison
+  orig vs synth; per-row log-frequency in orig; cluster mode-tuples
+  (k-prototypes) → cluster-id is a mid-level latent + orig empirical
+  P(y=1) per cluster. Cost ~30 min CPU.
+  `[owner: unclaimed | status: open]`
+- **7i.** Membership inference + exact-row copy detection. The
+  97.55% literal LapTime overlap suggests many synth rows are
+  near-exact orig copies. Per synth row, find min-distance to orig
+  over all 16 columns; below ε threshold, set predicted P(y=1) =
+  orig's actual y for that row (leak-free, uses orig's labels for
+  orig's rows). Cost ~1 h CPU.
+  `[owner: unclaimed | status: open]`
+- **7j.** Class-conditional CTGAN replay refinement. F1's CTGAN used
+  default conditioning. Re-train with explicit cond_columns =
+  [PitStop, Compound, Stint, Year] and conditional per-stratum
+  sampling. If host had this design, KS to host_synth should drop
+  sharply. Cost ~3 h Kaggle GPU.
+  `[owner: unclaimed | status: open]`
+- **7k.** Per-Year DGP heterogeneity. d12 found 2023 = flat 0.96%
+  pit rate (vs 19% global). Per-Year KS divergence + per-Year
+  v4-recipe specialists test under K=27 pool (untested in current
+  session). Cost ~30 min CPU.
+  `[owner: unclaimed | status: open]`
 
 ## 8. Virgin axes complement to HANDOVER T1–T4 (Day-16 RESOLVED)
 
