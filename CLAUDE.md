@@ -3,11 +3,7 @@
 This file is the rules + pointers index. Detailed state lives in
 `state/`, `HANDOVER.md`, and the references at the bottom of this file.
 
-## Reference branch
-
-Truth lives on `origin/main`. At session start, run
-`git fetch origin && git log --oneline HEAD..origin/main`; if non-empty,
-fast-forward before reading any state file below.
+Truth lives on `origin/main`. Session-start git fetch is Rule 32.
 
 ## Rule 0 — How to communicate with the PI
 
@@ -64,12 +60,10 @@ If you find yourself reaching for an acronym, that's a smell.
     handover" → both sections.
 18. **Issue-tree claim before compute.** Before any probe ≥10 min, claim
     an unclaimed `open` leaf in `ISSUES.md`.
-19. **Experimentation harness.** `scripts/probe.py bote NAME` before
-    spending compute; `scripts/probe.py gate NAME` after artifacts exist;
-    `scripts/probe_min_meta.py` for stack-add gates. Family kickoff seed
-    via `scripts/research_seed.py` for any new mechanism family.
-    Calibration log: `audit/decisions.jsonl`. Rule-out is a valid
-    result; document nulls.
+19. **Experimentation harness.** `scripts/probe.py bote` before compute;
+    `gate` after artifacts; `probe_min_meta.py` for stack-add gates;
+    `research_seed.py` for new families. Calibration log:
+    `audit/decisions.jsonl`. Document nulls too.
 20. **Single-model-first / kitchen-sink FE before stacking.** Build the
     feature factory and a single strong model first; stacking adds, it
     doesn't replace.
@@ -85,10 +79,10 @@ If you find yourself reaching for an acronym, that's a smell.
 25. **Transductive features need adversarial-validation check.** Before
     any combined train+test transform, run AV; if AV-AUC > 0.55, fit on
     train only. (s6e5 AV-AUC = 0.502, so combined is safe.)
-26. **PI interaction protocol.** PI is read+strategy, not keyboard. Two
-    required questions on every BOTE: (i) Q6 metric alignment;
-    (ii) which precedent is PI pricing this against? Once-per-session
-    devil's-advocate ritual on the strongest current recommendation.
+26. **PI interaction protocol.** PI is read+strategy, not keyboard.
+    Every BOTE asks PI: (i) Q6 metric alignment, (ii) which precedent
+    are we pricing this against? Once-per-session devil's-advocate
+    ritual on the strongest current recommendation.
 27. **Pre-submit prediction diff is mandatory.** `scripts/pre_submit_diff.py`
     against the previous submit. If Spearman > 0.999, abort — LB will tie.
 28. **Subagent dispatch limits.** Don't dispatch general-purpose subagents
@@ -109,6 +103,9 @@ If you find yourself reaching for an acronym, that's a smell.
 34. **Experiments use descriptive names in docs.** Letter-number codes
     may stay in artifact filenames and old audits, but new prose says
     what each thing IS. Glossary maps codes ↔ descriptions.
+35. **PI thoughts are append-only.** Transcribe PI voice-dumps to
+    `knowledge-base/thoughts/YYYY-MM-DD-slug.md`. Never overwrite,
+    delete, or archive on cleanup. Folder is permanent.
 
 ## Defaults from prior-comp postmortem
 
@@ -130,6 +127,7 @@ State (mutable, refresh each session):
 - `state/mechanism-ledger.md` — every mechanism family tried, with results.
 
 Process docs (read once / on trigger):
+- `SETUP.md` — onboarding checklist for a new comp (read on day 1 of a fresh repo).
 - `HANDOVER.md` — next-session brief (Rule 15).
 - `WRAPUP.md` — wrap-up + prepare-handover procedure (Rule 17).
 - `ISSUES.md` — live problem decomposition / claim board (Rule 18).
@@ -141,10 +139,12 @@ Process docs (read once / on trigger):
 - `audit/friction-archive.md` — full historical friction (1,450 lines; do
   not read by default).
 
+- `knowledge-base/` — PI second-brain (permanent; Rule 35).
+  Subdirs: `thoughts/` (voice-dumps), `concepts/`, `friction/`, `flags/`, `questions/`.
+
 Other:
-- `.claude/skills/postmortem/SKILL.md` and `.claude/skills/kaggle-comp/lr-diagnostics.md` — skills.
-- `knowledge-base/README.md` — PI second-brain (concepts, thoughts, flags).
-- `scripts/probe.py` (BOTE + gate harness, Rule 19), `probe_min_meta.py`
-  (stack-add gate), `pre_submit_diff.py` (mandatory pre-submit, Rule 27),
-  `research_seed.py` (kickoff stub), `smoke_kaggle_artifacts.py`
-  (Kaggle Dataset migration regression).
+- `.claude/skills/postmortem/SKILL.md`, `.claude/skills/kaggle-comp/{lr-diagnostics,setup}.md`.
+- `knowledge-base/README.md` — second-brain layout reference.
+- `scripts/`: `probe.py` (Rule 19 harness), `probe_min_meta.py`,
+  `pre_submit_diff.py` (Rule 27), `research_seed.py`,
+  `smoke_kaggle_artifacts.py`, `setup_artifact_dataset.sh`.
