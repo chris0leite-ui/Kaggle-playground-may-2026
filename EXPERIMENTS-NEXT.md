@@ -319,6 +319,174 @@ PitStop, `field_pit_rate = transform('mean')` of PitStop,
 plus the simpler `avg/max/min_field_tyre_age` and derived
 `tyre_age_vs_field`, `is_oldest_tyre`.
 
+## Tier A3 — added 2026-05-08 PM (late) from extended FE research
+
+Origin: `audit/2026-05-08-fe-research-extended.md`. Three parallel
+agents covered (i) older TPS / classical binary-AUC writeups (Otto,
+Home Credit, IEEE Fraud, MoA), (ii) sequential-events FE (NFL Big
+Data Bowl 2020-2025, soccer LEM, hazard models), (iii) F1
+practitioner sources (TUMFTM/race-simulation, Heilmeier 2018,
+FastF1, fuel-coefficient literature). Picks below either **refine**
+an A2 entry (with concrete corrections) or open a new mechanism
+class.
+
+### EXP-A3-1 — Rank-sorted multi-neighbour gaps (refines A2-1)
+**Status:** pending  **Cost:** ~18 min CPU.
+**Origin:** NFL Big Data Bowl 2020 1st place "The Zoo" (Singer &
+Gordeev). Pattern: actor-relative kinematics + sort-by-distance for
+permutation invariance. Direct analogue for our 887-driver
+categorical.
+
+Build cumulative race time per `(Driver, Race, Year)`; sort drivers
+by `cum_rt` within each `(Race, Year, LapNumber)`; produce features
+`gap_ahead_1`, `gap_ahead_2`, `gap_behind_1`, `gap_behind_2`,
+`pace_ahead = LapTime - LapTime_of_car_ahead`. Plus the BDB 2023 U
+Toronto **pit-pressure scalar**:
+`pit_pressure = sum_over_rivals[exp(-gap / 5.0) * I(rival_TyreLife < 5)]`
+— captures undercut threat density, not just nearest.
+
+**What we learn if it passes:** rank-sort breaks our 887-Driver
+permutation symmetry in a way count-encoding doesn't. The
+"permutation-invariant pairwise tensor" is the proven 4th-direction
+mechanism in cross-actor-state competitions.
+
+**What we learn if it fails:** even rank-sorted gap features absorb
+at K=4+1; rank-lock extends to permutation-invariant inputs.
+
+### EXP-A3-2 — Per-track learned fuel coefficient (corrects A2-6)
+**Status:** pending  **Cost:** ~6 min CPU + per-fold refit.
+**Origin:** f1metrics blog + The Motorsport Metrics. **The
+0.035 s/lap constant in svanikkolli v12 is mass-confounded.** F1
+cars burn 1.5-1.8 kg/lap; published coefficients are 0.030 s/kg ×
+1.7 kg/lap ≈ **0.051 s/lap** post-2019 and **0.090 s/lap** pre-2014.
+Better still: per-track learned slope.
+
+```python
+# Per fold, per (Race, Year), regress mid-stint clean laps:
+mid_stint = (df['lap_in_stint'] >= 3) & (df['lap_in_stint'] <= df['stint_length'] - 3)
+fits = (df[mid_stint].groupby(['Race', 'Year'])
+          .apply(lambda g: np.polyfit(g['LapNumber'], g['LapTime (s)'], 1)[0]))
+df['track_fuel_coef'] = df.set_index(['Race', 'Year']).index.map(fits.to_dict())
+df['fuel_corrected_deg'] = (df['LapTime (s)']
+    - df.groupby(['Driver','Race','Year'])['LapTime (s)'].transform('first')
+    - df['track_fuel_coef'] * (df['LapNumber'] - df.groupby(['Driver','Race','Year'])['LapNumber'].transform('first')))
+```
+
+**What we learn if it passes:** the fuel-burn signal is a real and
+extractable confound on tyre-degradation features. Then feed the
+residual to all downstream FE.
+
+**What we learn if it fails:** the synth doesn't preserve fuel-burn
+slope structure (or `LapTime` already routes through other
+features).
+
+### EXP-A3-3 — `tirechange_pursuer` + DriverAheadPit lagged window
+**Status:** pending  **Cost:** ~10 min CPU.
+**Origin:** TUMFTM `vse_supervised.py` "Tire-Change head" feature
+list (`tirechange_pursuer` is the canonical defendable-undercut
+state variable in the TUM RL agent); Frontiers AI 2025 features
+`DriverAheadPit` and `DriverBehindPit` lagged 1-3 laps.
+
+Extends svanikkolli v12 §F5 (which uses `car_ahead_pitted_now` and
+`car_behind_pitted_now` at T-0). Adds T-1, T-2, T-3 lags. The TUM
+formulation is specifically position-adjacent (Position±1) on the
+PRIOR lap.
+
+```python
+gap = df.sort_values(['Race','Year','LapNumber','Position'])
+glap = gap.groupby(['Race','Year','LapNumber'])
+for lag in (1, 2, 3):
+    df[f'driver_ahead_pitted_lag{lag}']  = glap['PitStop'].shift(1).groupby(['Driver','Race','Year']).shift(lag).fillna(0)
+    df[f'driver_behind_pitted_lag{lag}'] = glap['PitStop'].shift(-1).groupby(['Driver','Race','Year']).shift(lag).fillna(0)
+df['tirechange_pursuer'] = df['driver_behind_pitted_lag1']
+```
+
+### EXP-A3-4 — Heilmeier compound-conditional log-curve residual
+**Status:** pending  **Cost:** ~8 min CPU + per-fold refit.
+**Origin:** TUMFTM `helper_funcs/calc_tire_degradation.py`. Heilmeier
+2020 found that `t = k0 + k1 · ln(k2 · age + 1)` is the best
+parametric fit per compound. Residual against this fit is "tyre is
+degrading faster/slower than the compound's nominal Heilmeier
+curve."
+
+```python
+from scipy.optimize import curve_fit
+def heilmeier_log(age, k0, k1, k2): return k0 + k1 * np.log(k2 * age + 1)
+fits = {}
+for c in ['SOFT', 'MEDIUM', 'HARD', 'INTERMEDIATE', 'WET']:
+    sub = train_fold[(train_fold['Compound'] == c)]
+    if len(sub) > 100:
+        try: fits[c], _ = curve_fit(heilmeier_log, sub['TyreLife'], sub['Cumulative_Degradation'].abs(), p0=[0, 1, 0.1])
+        except: fits[c] = (0, 1, 0.1)
+df['heilmeier_pred'] = df.apply(lambda r: heilmeier_log(r['TyreLife'], *fits.get(r['Compound'], (0, 1, 0.1))), axis=1)
+df['heilmeier_resid'] = df['Cumulative_Degradation'].abs() - df['heilmeier_pred']
+```
+
+### EXP-A3-5 — Multi-task auxiliary head: BCE + α·Huber(laps_until_pit)
+**Status:** pending  **Cost:** ~25 min CPU.
+**Origin:** soccer LEM Springer 2024; NFL BDB 2025 transformer; GBDT
+custom-objective tradition. **First non-feature pick in the menu.**
+
+Auxiliary regression target: `laps_until_next_pit_in_train`,
+right-censored. Joint loss in a single LightGBM via custom-objective
+or in a small NN. Use the auxiliary head's OOF prediction as a
+*feature* for the binary head if joint-training is hard.
+
+**What we learn if it passes:** target reformulations are still
+leakage traps (Day-17), but a *regression auxiliary head* with the
+right censoring is a different mechanism than the
+classification reframings we killed.
+
+### EXP-A3-6 — KNN-target-mean-of-500 (Home Credit 1st-place feature)
+**Status:** pending  **Cost:** ~20 min CPU.
+**Origin:** Home Credit 1st place ("Home Aloan"); Otto 1st place
+(Titericz/Semenov, per-class KNN distances as 8 features). The
+target-mean of the 500 nearest neighbours by `(LapNumber, TyreLife,
+RaceProgress)` was Home Credit's third-most-important feature.
+
+```python
+from sklearn.neighbors import NearestNeighbors
+KEY = ['LapNumber', 'TyreLife', 'RaceProgress']
+X_tr = train_fold[KEY].fillna(0).values
+nn = NearestNeighbors(n_neighbors=500).fit(X_tr)
+for X_target, name in [(X_tr, 'train'), (X_val, 'val'), (X_test, 'test')]:
+    _, idx = nn.kneighbors(X_target)
+    if name == 'train':
+        # leave-one-out: skip first neighbour (self)
+        idx = idx[:, 1:]
+    df_target['knn500_target_mean'] = train_fold['PitNextLap'].values[idx].mean(axis=1)
+```
+
+### EXP-A3-7 — UID post-hoc smoothing (IEEE-CIS Fraud 1st-place trick)
+**Status:** pending  **Cost:** ~2 min CPU; implemented as a
+post-process after PRIMARY OOF + test predictions exist.
+**Origin:** IEEE-CIS Fraud Detection 1st-place writeup. Synthesise a
+UID by concatenating `(Driver, Race, Year)` (or other tuples); then
+replace each row's prediction with the UID-group mean.
+
+```python
+df['_uid'] = df['Driver'].astype(str) + '_' + df['Race'].astype(str) + '_' + df['Year'].astype(str)
+oof_smoothed  = pd.Series(oof,  index=df.index).groupby(df['_uid']).transform('mean').values
+pred_smoothed = pd.Series(pred, index=test.index).groupby(test['_uid']).transform('mean').values
+```
+
+Test on K=4 PRIMARY current OOF before any new training. Pure
+post-process; cheap to falsify.
+
+### EXP-A3-8 — Quantile + histogram groupby aggregations (Deotte S5E2 trick)
+**Status:** pending  **Cost:** ~15 min CPU.
+**Origin:** TPS-S5E2 1st-place (Deotte, NVIDIA cuDF blog). Beyond
+mean/std/count, build for k ∈ {0.05, 0.10, 0.25, 0.50, 0.75, 0.90,
+0.95}: `groupby(C1)[C2].quantile(k)`. Plus 10-20-bin histogram of
+each `(group, target_col)` pair as a wide block.
+
+For s6e5: `groupby('Driver')['LapTime (s)'].quantile(...)`,
+`groupby('Race')['TyreLife'].quantile(...)`,
+`groupby(['Race','Compound'])['Cumulative_Degradation'].quantile(...)`.
+Captures multi-modal distributions a single mean misses.
+
+Aggressive variant: histogram features per (Driver, Compound).
+
 ### EXP-A2-8 — LightGBM stack-meta on richly-featured matrix
 **Status:** pending
 **Targets:** **scope clarification of EXP-NEW**. The hypothesis-board
