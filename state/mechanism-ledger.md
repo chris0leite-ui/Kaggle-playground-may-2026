@@ -244,3 +244,29 @@ of Rule 24 (fold-safe label-conditional aggregates).
 - **Yao/Vehtari covariance-modulated per-segment stacker** (C1) —
   3 τ all regress vs plain shrinkage; per-segment-stacker family
   closed (9 variants tested over Days 14-19).
+
+## 2026-05-08 PM EXP-NEW Phase 1-5b (research-feature-engineering)
+
+- **A3-7 user-id smoothing on PitNextLap target** — dry-run −124 bp
+  FAIL (target leakage destroys within-group variance). Killed
+  before launching at scale.
+- **A2-2 mandatory compound rule** — only Phase 1 smoke winner
+  (+9.3 bp 50k×1F). Full 5-fold single-LGBM 0.94577 vs 0.94563
+  (+1.4 bp partial absorb). K=4+1 plain LR-meta +0.302 bp (below
+  +0.5 PASS); G3 flip 0.195 asymmetric; TIE_EXPECTED on 4-gate.
+  K=4+1 Path-B C×S τ=100k +0.26 bp; ρ 0.999893; WEAK.
+- **A2-3, A2-4, A2-6, A2-7, A3-1, A3-2** — Phase 1 smoke null /
+  regress at 50k×1F. Six picks closed in one batch; A3-1 RankSorted-
+  Gaps already covers the Frontiers AI 2025 `DriverAheadPit`/Behind
+  peer-effect family.
+- **A2-8 LightGBM stack-meta on K=4** — 43 meta features (P + ranks
+  + logits + 6 pairwise products + 6 abs-diffs + 6 logit-diffs +
+  raw side info). 5-fold OOF 0.95390 vs Path-B PRIMARY 0.95403
+  (Δ −1.30 bp); also below plain LR 0.95399 (−0.96 bp). Fold-std
+  0.00080 elevated. **Friction:** tree stackers overfit interaction
+  noise on small-K pools; convex LR + Path-B partial-pooling
+  regularize better. Closed FAIL.
+- **Bi-LSTM / GRU sequence base** — research scan only. Frontiers
+  AI 2025 Bi-LSTM achieved F1 0.81 with 10-lap windows; deferred to
+  next session (GPU-heavy ~30-60 min Kaggle T4). Cited as the only
+  genuinely untried mechanism after the Rule 7 saturation scan.

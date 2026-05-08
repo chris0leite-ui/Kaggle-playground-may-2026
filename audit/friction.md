@@ -16,6 +16,27 @@ restating it.
 
 ## Week of 2026-05-08
 
+- `research-scan-duplicate-mechanism-claim` (2026-05-08 PM
+  research-feature-engineering-7oCmj): proposed Frontiers AI 2025's
+  `DriverAheadPit`/`DriverBehindPit` peer-effect features as a
+  research-backed untried mechanism, but A3-1 RankSortedGaps already
+  implements both `_ahead_pitted_lag1`/`_behind_pitted_lag1` and the
+  full gap-based peer family — and A3-1 NULLED in Phase 1 smoke.
+  Self-corrected before launching the probe. **Fix:** before
+  proposing any "research-backed untried mechanism," grep the
+  existing FE pick registry (`fe_picks_*.py`) for class-overlap;
+  read the smoke results table to confirm not-yet-tested. Cost of
+  catch was nil (caught in PI question construction); cost of miss
+  would have been ~10 min CPU spent reproducing a known null.
+- `tree-stack-meta-overfits-small-K-pool` (2026-05-08 PM): A2-8
+  LightGBM stack-meta on K=4 with 43 meta features (P + ranks +
+  logits + pairwise products + abs-diffs + logit-diffs + raw side
+  info) lost −1.30 bp vs Path-B PRIMARY and even −0.96 bp vs plain
+  LR-meta. Fold-std 0.00080 (vs typical ~0.00050). Tree depth-4
+  splits absorb interaction noise faster than they extract signal
+  on a 4-base pool. **Lesson:** convex LR + Path-B partial-pooling
+  regularize better than gradient boosting at small K. Add to
+  `audit/friction-archive.md` under axis-class falsifications.
 - `day-counter-drift` (PI-flagged 2026-05-08 PM): prose across
   `state/`, `HANDOVER.md`, `audit/`, `glossary.md` referred to "Day-17
   PM", "Day-18 PM", "Day-19" as if calendar-aligned. They were not.
