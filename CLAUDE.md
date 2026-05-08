@@ -101,15 +101,17 @@ ff-merge before reading state below.
     (e) "Many small things" beats "one big bet": prefer 5×30-min
         probes over 1×3-h NN unless EV/cost-min strongly favors the
         big bet under the harness's BOTE.
-    (f) **Calibration loop (added 2026-05-06).** Every BOTE call
-        accepts `--metric-aligned true/false` (Q6, mandatory) and
-        `--pi-predicted-lb-bp X` (PI's own LB-Δ prediction tracked
-        next to the agent's `expected_lb_bp`). Records append to
-        `audit/decisions.jsonl` (decision-time log; locks framework_sha
-        + agent_branch at decision-time). After a submit lands, run
-        `python scripts/probe.py record-outcome NAME --actual-lb-bp X`
-        to close the loop; `python scripts/probe.py calibration`
-        emits PI vs agent vs actual error per family.
+    (f) **Calibration loop (added 2026-05-06; revised 2026-05-07 PM).**
+        Every BOTE call accepts `--metric-aligned true/false` (Q6,
+        mandatory). The `--pi-predicted-lb-bp X` flag is OPTIONAL
+        as of Day-19 wrap-up (Rule 26a sealed-prediction removed);
+        when omitted, calibration tracks agent expected vs actual
+        only. Records append to `audit/decisions.jsonl` (decision-
+        time log; locks framework_sha + agent_branch at decision-
+        time). After a submit lands, run `python scripts/probe.py
+        record-outcome NAME --actual-lb-bp X` to close the loop;
+        `python scripts/probe.py calibration` emits agent vs actual
+        error per family (PI column shown when set).
     (g) **Family kickoff seed (added 2026-05-06).** When opening a
         NEW mechanism family (one not in `mechanism_families_explored`),
         run `python scripts/research_seed.py FAMILY` to generate a
@@ -182,22 +184,26 @@ ff-merge before reading state below.
     features; Rule 25 covers feature-value transforms. Origin:
     PI Day-17 lesson on cross-comp generalisation discipline.
 
-26. **PI interaction protocol (non-coding PI; added 2026-05-06).**
-    PI is read+strategy, not keyboard. Agent runs all Python; PI
-    ratifies and calibrates. Anti-rubber-stamp rituals:
-    (a) **Sealed-prediction order.** Before agent reveals its BOTE
-        `expected_lb_bp` for any candidate, agent FIRST asks:
-        "what's your LB Δ prediction in bp?" PI commits a number +
-        one-line rationale to chat. THEN agent reveals its number
-        and they go to `audit/decisions.jsonl` together via
-        `--pi-predicted-lb-bp`. Agent revealing first poisons the
-        calibration loop via anchoring.
-    (b) **Three required questions on every BOTE.** Agent asks PI:
-        (i) PI-predicted LB Δ (sealed per (a));
-        (ii) Q6 — does training objective match row-AUC?;
-        (iii) which precedent is PI pricing this against? (cite a
-        calibration-ladder row). Skipping any → agent runs without
-        `--pi-predicted-lb-bp` and flags the omission in chat.
+26. **PI interaction protocol (non-coding PI; added 2026-05-06,
+    revised 2026-05-07 PM).** PI is read+strategy, not keyboard.
+    Agent runs all Python; PI ratifies and calibrates.
+    Anti-rubber-stamp rituals:
+    (a) **REMOVED 2026-05-07 PM (Day-19 wrap-up postmortem).**
+        Sealed-prediction order is no longer required. Agent reveals
+        its BOTE `expected_lb_bp` directly without first asking PI
+        for a sealed number. Calibration loop continues via
+        `audit/decisions.jsonl` (agent expected vs actual);
+        `pi_predicted_lb_bp` field becomes optional and may be
+        omitted. Removal rationale: protocol added cognitive overhead
+        for a non-coding PI without proportional calibration gain;
+        agent BOTE alone is the load-bearing prediction; PI
+        intervenes via direct correction (override-rate per (e))
+        rather than per-probe sealed numbers.
+    (b) **Two required questions on every BOTE** (was three; sealed
+        prediction dropped per (a)). Agent asks PI:
+        (i) Q6 — does training objective match row-AUC?;
+        (ii) which precedent is PI pricing this against? (cite a
+        calibration-ladder row). Q6 unanswered = forced SKIP.
     (c) **Devil's-advocate ritual.** Once per session, agent picks
         its strongest current recommendation and argues *against* it
         in 3 bullets. PI accepts the counter or rebuts it. Surfaces
@@ -214,6 +220,8 @@ ff-merge before reading state below.
         anti-pattern (Sethserver; MLE-bench HITL literature).
     Origin: `knowledge-base/concepts/agentic-kaggle-systems-comparison.md`
     HITL section + non-coding-PI reframe (2026-05-06 chat).
+    Revision origin: Day-19 postmortem PI directive
+    "remove asking for the sealed prediction".
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
