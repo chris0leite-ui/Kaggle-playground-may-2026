@@ -18,8 +18,7 @@ submissions/*
 *.feather
 *.h5
 
-# Override: final Kaggle submission CSVs are committed
-!submissions/submission_*.csv
+# (removed 2026-05-08: submissions migrated to Kaggle Dataset; no longer tracked)
 
 # Artifacts now live in private Kaggle Dataset chrisleitescha/s6e5-artifacts
 # (migration 2026-05-08). Local working copy in scripts/artifacts/ is rebuilt
