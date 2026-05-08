@@ -73,20 +73,17 @@ def main():
     if args.smoke:
         args.max_rounds = min(args.max_rounds, 500)
 
-    fe_pick_fn = None
+    fe_pick_cls = None
     if args.feature_add:
-        # Lazy import to keep --feature-add optional.
-        import importlib.util as _ilu
-        spec = _ilu.spec_from_file_location(
-            "fe_picks_a2a3",
-            str(Path(__file__).parent / "fe_picks_a2a3.py"))
-        mod = _ilu.module_from_spec(spec)
-        spec.loader.exec_module(mod)
-        if args.feature_add not in mod.PICKS:
+        # Lazy import via sys.path to keep --feature-add optional.
+        import sys as _sys
+        _sys.path.insert(0, str(Path(__file__).parent))
+        import fe_picks_a2a3 as _fpa
+        if args.feature_add not in _fpa.PICKS:
             raise SystemExit(f"--feature-add {args.feature_add!r} not in "
                              f"fe_picks_a2a3.PICKS: "
-                             f"{sorted(mod.PICKS.keys())}")
-        fe_pick_fn = mod.PICKS[args.feature_add]
+                             f"{sorted(_fpa.PICKS.keys())}")
+        fe_pick_cls = _fpa.PICKS[args.feature_add]
         print(f"  feature-add: {args.feature_add}")
 
     print(f"=== P1 v3 fold-safe FS_A | name={args.name} | no_te={args.no_te} "
@@ -119,12 +116,11 @@ def main():
     sample_ti = fold_list[0][0]
     sample_fs_a = fit_fs_a(train_S.iloc[sample_ti])
     train_sample = apply_fs_a(train_S, sample_fs_a)
-    if fe_pick_fn is not None:
-        # Run pick once on full frame to discover the new column names; the
-        # actual per-fold call happens inside the CV loop.
-        train_sample, _, pick_cols = fe_pick_fn(
-            train_sample.copy(), test_S.copy(),
-            fold_state={"fold": -1, "sample_only": True})
+    if fe_pick_cls is not None:
+        # Discovery-only pass: instantiate the pick to learn its
+        # new_columns; do not fit on labels here.
+        _discover_pick = fe_pick_cls()
+        pick_cols = list(_discover_pick.new_columns)
     else:
         pick_cols = []
     feats, cat_cols = feature_columns_for_lgbm(train_sample)
@@ -152,17 +148,14 @@ def main():
         test_fold = apply_fs_a(test_S, fs_a)
 
         # 2b. apply FE pick (per-fold, with ti-only label aggregates if any)
-        if fe_pick_fn is not None:
-            # Call pattern: pick fits any label-derived state on train_ti
-            # ONLY (where TARGET is present); applies to all three frames.
-            train_ti, _, _ = fe_pick_fn(
-                train_ti, None, fold_state={"fold": fold, "phase": "fit_train"})
-            train_va, _, _ = fe_pick_fn(
-                train_va, None, fold_state={"fold": fold, "phase": "transform_val",
-                                            "fitted_on": train_ti})
-            test_fold, _, _ = fe_pick_fn(
-                test_fold, None, fold_state={"fold": fold, "phase": "transform_test",
-                                             "fitted_on": train_ti})
+        if fe_pick_cls is not None:
+            # One pick instance per fold: fit on ti rows (label-aware if
+            # the pick has a non-trivial .fit), transform all three frames.
+            pick = fe_pick_cls()
+            pick.fit(train_ti)
+            train_ti = pick.transform(train_ti)
+            train_va = pick.transform(train_va)
+            test_fold = pick.transform(test_fold)
 
         # 3. add CV TE features (ti-only stats, applied to ti/va/test)
         if not args.no_te:
