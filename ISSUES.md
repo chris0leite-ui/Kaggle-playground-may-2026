@@ -364,6 +364,46 @@ falsified, parked, or killed.** Full audit
   H9 alone (+0.631). Friction `lr-meta-multi-add-no-better-than-single-add`.
   `[owner: read-handover-lA8Nr | status: null]`
 
+## 11. Multi-model FE testing campaign (2026-05-08 PM, late)
+
+Origin: PI directive after FE research synthesis. 16 candidate FE
+picks queued in `EXPERIMENTS-NEXT.md` Tier-A2 + Tier-A3 from three
+audit notes (`audit/2026-05-08-fe-research-{survey,code-grounded,
+extended}.md`). Plan at `/root/.claude/plans/now-carefully-plan-how-
+polished-dewdrop.md` (PI-approved). Funnel: Stage 0 BOTE → Stage 1
+LR ceiling probe → Stage 2 LGBM smoke → Stage 3 LGBM 5-fold OOF +
+80/20 holdout audit → Stage 4 K=4+1 stack-add gate. Only the TOP-1
+survivor goes through full multi-model build-out (LR + LGBM + CB +
+RealMLP + HGBC, including Kaggle GPU per PI authorisation 2026-05-
+08). EXP-A2-8 stack-meta architecture probe runs as an independent
+track regardless of FE-add outcomes.
+
+- **11a.** Phase 0 — BOTE pre-flight for ~13 picks. Done.
+  `[owner: research-feature-engineering-7oCmj | status: done]`
+- **11b.** Phase 1-4 — funnel execution. 7 picks tested in smoke;
+  A2-2 (mandatory_compound_rule) only winner @ +9.3 bp smoke,
+  +1.4 bp full 5-fold. Phase 4 K=4+1 plain LR-meta gate: +0.302 bp
+  (below +0.5 PASS); G3 flip 0.195 asymmetric; TIE_EXPECTED.
+  Phase 4b Path-B C×S τ=100k amp test: K=4+A2-2 OOF 0.95405 vs
+  K=4 PRIMARY 0.95403 (Δ +0.26 bp); ρ 0.999893 (TIE_EXPECTED).
+  WEAK verdict; below strict gate. No survivor for Phase 5a.
+  `[owner: research-feature-engineering-7oCmj | status: null]`
+- **11c.** Phase 5a — multi-model build-out for TOP-1 survivor.
+  Skipped: no Stage-4 survivor.
+  `[owner: research-feature-engineering-7oCmj | status: parked]`
+- **11d.** Phase 5b — EXP-A2-8 LightGBM stack-meta. Tested 2026-
+  05-08 PM: 43 meta features (4 P + 4 logits + 4 ranks + 6 pairwise
+  products + 6 abs-diffs + 6 logit-diffs + 8 raw side-info + 5
+  Compound one-hot). 5-fold OOF 0.95390 vs Path-B PRIMARY 0.95403
+  (Δ −1.30 bp); also below plain LR 0.95399 (−0.96 bp). Fold-std
+  0.00080 elevated (range 0.95309–0.95506). Tree stacker overfits
+  interaction noise on K=4 pool; convex LR + Path-B partial-pooling
+  regularize better. FAIL.
+  `[owner: research-feature-engineering-7oCmj | status: null]`
+- **11e.** Phase 6 — submission decision. No surviving lift; no
+  submission. PRIMARY remains K=4 + Path-B C×S τ=100k @ LB 0.95351.
+  `[owner: research-feature-engineering-7oCmj | status: null]`
+
 ---
 
 ## Falsified or dead (do not re-claim)

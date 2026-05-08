@@ -56,15 +56,49 @@ def main():
     ap.add_argument("--max-rounds", type=int, default=6000)
     ap.add_argument("--no-te", action="store_true",
                     help="Drop CV TE features for ablation")
+    ap.add_argument("--smoke", action="store_true",
+                    help="Smoke mode: 1 fold only, 50k row subsample, "
+                         "max-rounds=500. ~3-4 min CPU. Use for FE-add "
+                         "screening before committing to full 5-fold OOF.")
+    ap.add_argument("--smoke-rows", type=int, default=50_000,
+                    help="Row count for smoke subsample (default 50k).")
+    ap.add_argument("--feature-add", default=None,
+                    help="Name of an FE pick to add via "
+                         "scripts/fe_picks_a2a3.py registry (single-pick "
+                         "screening). The pick function is called per-fold "
+                         "after fit_fs_a / apply_fs_a; output columns are "
+                         "appended to the LGBM feature matrix.")
     args = ap.parse_args()
 
-    print(f"=== P1 v3 fold-safe FS_A | name={args.name} | no_te={args.no_te} ===")
+    if args.smoke:
+        args.max_rounds = min(args.max_rounds, 500)
+
+    fe_pick_cls = None
+    if args.feature_add:
+        # Lazy import via sys.path to keep --feature-add optional.
+        import sys as _sys
+        _sys.path.insert(0, str(Path(__file__).parent))
+        import fe_picks_a2a3 as _fpa
+        if args.feature_add not in _fpa.PICKS:
+            raise SystemExit(f"--feature-add {args.feature_add!r} not in "
+                             f"fe_picks_a2a3.PICKS: "
+                             f"{sorted(_fpa.PICKS.keys())}")
+        fe_pick_cls = _fpa.PICKS[args.feature_add]
+        print(f"  feature-add: {args.feature_add}")
+
+    print(f"=== P1 v3 fold-safe FS_A | name={args.name} | no_te={args.no_te} "
+          f"| smoke={args.smoke} | feature_add={args.feature_add} ===")
     t0_total = time.time()
 
     train = pd.read_csv("data/train.csv")
     test = pd.read_csv("data/test.csv")
     sub = pd.read_csv("data/sample_submission.csv")
     print(f"  train {train.shape}  test {test.shape}")
+    if args.smoke and len(train) > args.smoke_rows:
+        rng = np.random.default_rng(SEED)
+        idx = rng.choice(len(train), size=args.smoke_rows, replace=False)
+        train = train.iloc[np.sort(idx)].reset_index(drop=True)
+        print(f"  SMOKE subsample → train {train.shape}")
 
     # --- Static features (label-independent), computed once each ---
     print("  building static features (train + test)...")
@@ -76,13 +110,24 @@ def main():
     # so feats / cat_cols are consistent across the 5 folds.
     skf = StratifiedKFold(N_FOLDS, shuffle=True, random_state=SEED)
     fold_list = list(skf.split(np.zeros(len(y)), y))
+    if args.smoke:
+        fold_list = fold_list[:1]
+        print(f"  SMOKE single-fold mode: {len(fold_list)} fold")
     sample_ti = fold_list[0][0]
     sample_fs_a = fit_fs_a(train_S.iloc[sample_ti])
     train_sample = apply_fs_a(train_S, sample_fs_a)
+    if fe_pick_cls is not None:
+        # Discovery-only pass: instantiate the pick to learn its
+        # new_columns; do not fit on labels here.
+        _discover_pick = fe_pick_cls()
+        pick_cols = list(_discover_pick.new_columns)
+    else:
+        pick_cols = []
     feats, cat_cols = feature_columns_for_lgbm(train_sample)
     if not args.no_te:
         feats = feats + [n for _, _, n in TE_CONFIGS]
-    print(f"  feats: {len(feats)}  cat: {len(cat_cols)}")
+    feats = feats + [c for c in pick_cols if c not in feats]
+    print(f"  feats: {len(feats)}  cat: {len(cat_cols)}  pick_cols: {len(pick_cols)}")
 
     # --- 5-fold loop with per-fold FS_A and per-fold CV TE ---
     n_train, n_test = len(y), len(test_S)
@@ -101,6 +146,16 @@ def main():
         train_ti = apply_fs_a(train_S.iloc[ti].reset_index(drop=True), fs_a)
         train_va = apply_fs_a(train_S.iloc[vi].reset_index(drop=True), fs_a)
         test_fold = apply_fs_a(test_S, fs_a)
+
+        # 2b. apply FE pick (per-fold, with ti-only label aggregates if any)
+        if fe_pick_cls is not None:
+            # One pick instance per fold: fit on ti rows (label-aware if
+            # the pick has a non-trivial .fit), transform all three frames.
+            pick = fe_pick_cls()
+            pick.fit(train_ti)
+            train_ti = pick.transform(train_ti)
+            train_va = pick.transform(train_va)
+            test_fold = pick.transform(test_fold)
 
         # 3. add CV TE features (ti-only stats, applied to ti/va/test)
         if not args.no_te:

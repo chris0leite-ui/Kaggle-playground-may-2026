@@ -61,6 +61,23 @@ parked. For history, read `audit/research/` and the postmortems.
   closes FALSIFIED. The "non-LR meta" clause of A30 is empirically
   refuted. See `scripts/probe_pca_meta.py`,
   `audit/2026-05-08-pca-meta-probe.md`, A30b.
+- **Non-LR meta architecture — prediction-only-input scope
+  FALSIFIED, pairwise-prediction-interaction scope OPEN.** PCA-meta
+  probe 2026-05-08 PM: LightGBM meta is *worse* than LR meta by
+  1-2 bp at every prediction-only input representation tested
+  (PCA top-K for K in 3..27, K=10 / K=27 raw [P, rank, logit]
+  expansion). Lane-4 four-lane probe extended this: K=4 [P, rank,
+  logit] LightGBM meta Δ −1.20 bp; 2-layer MLP meta Δ −7.77 bp;
+  augmented LR with raw row features added Δ −0.04 bp. **The
+  structurally-untested case is: LightGBM meta on K=4 with
+  pairwise products + pairwise abs-diffs of base predictions + raw
+  FE columns + TE columns added** (romanrozen ~54-col stack
+  matrix). Pairwise prediction interactions are not derivable by
+  LR meta and have NOT been tested. EXP-A2-8 in
+  `EXPERIMENTS-NEXT.md` opens this scope. See
+  `scripts/probe_pca_meta.py`, `scripts/probe_lane4_nonlr_meta.py`,
+  `audit/2026-05-08-pca-meta-probe.md`,
+  `audit/2026-05-08-four-lane-research-extension.md`, A30b.
 - **Random forest as meta-stacker over K=4** (12 feat, today). OOF
   −1.54 bp vs LR-meta. Bagged-tree variant of the same finding;
   closes non-LR meta family across boosted *and* bagged tree
