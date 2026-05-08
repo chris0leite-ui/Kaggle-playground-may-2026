@@ -41,10 +41,13 @@ better" probe. Session probes A/B/C are referenced below.
 | A4 | Train and original ARE distinguishable at sequence level (stint length, lap-gap distribution) — synthesiser temporally downsamples | MEASURED | live (NEW) | This session Probe C: synth stint mean 3.87 vs orig 19.80; gap=1 frac 27.98% vs 99.60% | 2026-05-08 |
 | A5 | PRIMARY's residual loss is concentrated in INTERMEDIATE / WET compound rows | MEASURED, but residual is INTRINSIC | live (refined) | Probe A: 8 worst (Compound × Stint × position) cells AUC 0.68–0.86 vs global 0.954, but those cells are ≤1k rows each. Probe `probe_rain_specialist.py`: a single-LGBM specialist on all 18,737 rain rows hits AUC 0.92641 vs PRIMARY's 0.94157 on the same rows (−152 bp); mixed-prediction global AUC regresses 4.17 bp. PRIMARY already extracts near-ceiling via cross-Compound transfer. | 2026-05-08 |
 | A22 | Rain-specialist axis is closed — a fresh model trained on rain only loses cross-Compound transfer signal | MEASURED | live (NEW) | `probe_rain_specialist.py`; specialist −152 bp on its own segment, no path to meta-gate lift | 2026-05-08 |
+| A23 | Meta-architecture redesign at K=27 via segmentation cross is exhausted (DROPPED in favour of A9b) | superseded | dropped | Both alt segmentations this session at-or-below PRIMARY across all τ; combined with prior 9 variants → 11+ tested. See A9b for the canonical row | 2026-05-08 |
+| A24 | Rain-row sample-weighting in a global single-model preserves transfer better than a specialist (the "preserves transfer" intuition motivating Path 2) | FALSIFIED | dropped | `probe_rain_weighted.py`. K=2 meta NULL at weights {1,3,5,10}; even unweighted single LGBM is −70 bp on rain vs PRIMARY because PRIMARY's pool is multi-class and a single LGBM can't replicate that. The "preserves transfer" framing was wrong: PRIMARY's transfer comes from the multi-base pool, not from training-on-everyone | 2026-05-08 |
 | A6 | Per-row FE on the 14 raw columns is dead (residual variance ≈ marginal variance) | MEASURED | live | Five separate probes per `state/hypothesis-board.md` "load-bearing" item 2 | 2026-05-07 |
 | A7 | Target reformulations (`inv-laps`, `pit-horizon`, `reverse-cumulative`, `stint-progress`) are leaky under standard CV unless aggregates are refit per fold | MEASURED | live | `audit/2026-05-06-target-reform-leakage-audit.md`; collapse rates 88-100% | 2026-05-06 |
 | A8 | K=22 + Path-B Compound × Stint is the local optimum among 9 tested meta variants | MEASURED | live | `state/current.md`; "Nine variants tested across Days 14-19" | 2026-05-07 |
 | A9 | The K=22 LR-meta is rank-locked: any standalone OOF-computable base is absorbed | INFERRED | live | 5 cross-confirmations per `audit/2026-05-16-d16-virgin-axes-results.md` F4. Strong inference but doesn't rule out base-classes that violate the absorption argument's premises | 2026-05-08 |
+| A9b | At K=27, alternative Path-B segmentations (Compound × Stint × Year, Compound × RaceProgress-bin) are all NULL or regressing vs PRIMARY (Compound × Stint, τ=100k) | MEASURED | live (NEW) | This session, `scripts/probe_path_b_alt_segs.py`. cs_y delta vs PRIMARY: −2.25 / −0.61 / −0.16 bp at τ ∈ {5k, 20k, 100k}. c_rp delta vs PRIMARY: −1.71 / −0.65 / −0.16 bp. At τ=100k, PRIMARY's hier-meta lifts only +0.03 bp over a plain global K=27 LR-meta, so the "Path-B amp" is essentially gone at this pool size. Combined with the d14 Year/YxStint/Race sweep (9 variants null at K=21), d18 Compound×Year (null at K=24), and Yao/Vehtari covariance variant (null), the per-segment-stacker family has now been tested across **11+ variants** all at-or-below PRIMARY OOF | 2026-05-08 |
 | A10 | Sequence-level fingerprinting is +1 to +3 bp open lift | ASSUMED | dropped | `HANDOVER.md` item 1; no calibration anchor; the only sequence-class precedent (d16 GRU) was −0.043 bp NULL | 2026-05-08 |
 | A11 | RealMLP n_ens=24 is +1 to +3 bp standalone | ASSUMED | live (low confidence) | `HANDOVER.md` item 2; classical sqrt(n_ens) law gives ≤ 1 bp from variance reduction alone; lift would have to come from a ceiling effect we haven't tested | 2026-05-08 |
 | A12 | Per-Year CatBoost specialists are ±2 bp | ASSUMED | live (low confidence) | `HANDOVER.md` item 3; cited finding "Day-12 found 2023 was the easiest year" but doesn't translate directly to per-Year specialist lift band | 2026-05-08 |
@@ -77,22 +80,28 @@ handover — both rest on ungrounded prediction bands.
 **Dropped (do not act on):** A10, A15. These were the load-bearing
 claims of the handover's "open axes" — both refuted this session.
 
-## What the handover should say if A10, A15 are dropped
+## What the handover should say if A10, A15, A23 are dropped
 
 The actually-open axes given the dropped claims are:
 1. ~~**Targeted modelling on rain-condition rows** — closed by A22
    (single-model specialist −152 bp on rain segment).~~ A richer
    specialist (full-pool retrain on rain only) is theoretically possible
    but the cross-Compound transfer evidence makes it unlikely to lift.
-2. **Meta-architecture redesign beyond Compound × Stint** — actually
-   listed in `audit/2026-05-16-d16-virgin-axes-results.md` synthesis
-   but missing from `HANDOVER.md`. Specifically: alternative segmentation
-   crosses (Compound × Year, Compound × Stint × RaceProgress-bin),
-   nested hierarchy, non-Gaussian shrinkage.
-3. **Rain-row sample-weighting in a global model** (NOT a separate
-   specialist) — preserves cross-Compound transfer while addressing the
-   minority-class concern. Distinct from AV-sample-weighting (which is
-   bounded by AV-AUC=0.502, hence null).
+2. ~~**Meta-architecture redesign beyond Compound × Stint** — closed by
+   A9b. Two more variants tested null this session (Compound × Stint ×
+   Year, Compound × RaceProgress-bin); brings per-segment-stacker family
+   to 11+ variants all at-or-below PRIMARY. At τ=100k, PRIMARY's lift
+   over a plain global K=27 LR-meta is +0.03 bp — the "Path-B amp" is
+   essentially gone at this pool size.~~ Untested variants that violate
+   the LR-routing premise: nested hierarchy (per-Compound, then per-Stint
+   within), non-LR per-segment models (e.g., per-segment XGBoost head),
+   non-Gaussian shrinkage. None of these was tested.
+3. ~~**Rain-row sample-weighting in a global model** — closed by A24
+   (this session): K=2 LR-meta NULL at all weights {1,3,5,10}.~~
 4. **FastF1 soft features at non-driver-row resolution (A13b)** —
-   not separately probed.
+   not separately probed. Distinct from FastF1 hard-join (capped at
+   1.4% match rate).
 5. **Wrap-up / hedge-ladder / submission-budget burn** per Rule 12.
+6. **Scheduled assumption-recheck loop** — every entry in this file
+   tagged `live (low confidence)` should be re-checked at every
+   postmortem and at handover prep.

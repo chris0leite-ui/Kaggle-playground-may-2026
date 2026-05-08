@@ -112,18 +112,28 @@ pseudo-labels, twin-pool 2-meta, mode-id DGP base. The inference is
 that *any* standalone OOF-computable base is absorbed by the K=22
 [raw, rank, logit] LR-meta with [F_oof, expand] features.
 
-This doesn't rule out:
+**Day-19 update:** A9b adds two more variants at K=27 — Compound × Stint ×
+Year (-2.25 to -0.16 bp) and Compound × RaceProgress-bin (-1.71 to
+-0.16 bp). Per-segment-stacker family is now 11+ variants. Importantly,
+at τ=100k the PRIMARY's hier-meta lifts only +0.03 bp over a plain global
+K=27 LR-meta — the "Path-B amp" is essentially gone at this pool size.
+
+This still doesn't rule out:
 - Bases trained on a **different objective** (e.g., focal loss, ranking
   loss) that route through a non-AUC direction at the meta.
 - Bases whose prediction is **conditional** on an external state we
   don't have (FastF1 weather), where the conditioning isn't in the
   meta features.
-- Bases whose disagreement with the meta is concentrated in cells the
-  meta has no segment for — not yet probed at K=27.
+- **Non-LR per-segment heads** (e.g., per-segment XGBoost or LightGBM
+  head replacing the per-segment LR). The current Path-B is LR-on-LR;
+  a tree-based per-segment head could exploit non-linear interactions
+  that the LR meta cannot.
+- **Nested hierarchy**: per-Compound, then per-Stint within Compound,
+  with two levels of shrinkage. The current Path-B is flat.
 
-What might break it open: a deliberately mis-specified base (LightGBM
-trained on a different loss) and check whether it routes orthogonally.
-Cost: 1 hour. Not pursued.
+What might break it open: (i) a deliberately mis-specified base
+(LightGBM trained on a different loss) — cost 1 hour. (ii) a per-segment
+LightGBM head for the meta — cost ~2 hours. Neither pursued.
 
 ## W6 — The leader (0.95476) gap is unexplained (status: unsolved)
 
