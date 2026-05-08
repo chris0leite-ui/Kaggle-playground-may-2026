@@ -364,6 +364,62 @@ falsified, parked, or killed.** Full audit
   H9 alone (+0.631). Friction `lr-meta-multi-add-no-better-than-single-add`.
   `[owner: read-handover-lA8Nr | status: null]`
 
+## 12. Untested-mechanism sweep (2026-05-08 night)
+
+Origin: PI directive 2026-05-08 night "what shall we experiment now? we
+have a lot of time, you can take all night". Initial plan was three-
+pronged (FastF1 weather aggregates, per-segment LGBM head, sequence
+transformer with gap embedding); all three returned SKIP at probe.py
+BOTE (cost-efficiency 0.001-0.009 bp/min vs 0.01 DEFER threshold).
+
+RES-1 public-notebook + Kaggle discussion forum re-scan (Rule 22, last
+scan 8 days stale) replaced the initial plan with a stronger one. Pulled
+top kernels by score and votes; 4 modeling kernels dominate the 0.954+
+public LB:
+
+- **masayakawamata/s6e5-stacking-vibe-coding** — 2-layer GPU stack:
+  L0 = (yekenot RealMLP + own LogReg-FE) base OOFs;
+  L1 = (XGB / LGBM / CatBoost / Torch-MLP) stackers;
+  L2 = cuML L2 LogReg over (L0 + L1) OOFs.
+  89 variants in 0.9543-0.9545 range. Best: mlp_32x16 at 0.954471.
+- **svanikkolli/f1-lap-by-lap-prediction-engine-v3** — internal 5-model
+  stack (LGB + XGB-Optuna + 3 RealMLP variants) → stacking → 5-way
+  rank-blend with 4 public notebooks.
+- **flexonafft/f1-submission-blender-0-95418** — pure rank-blend of
+  high-LB public submissions; output is `0.95 * anchor + 0.05 * support`.
+- **sohailkhanlml/f1-pit-stop-blending-the-leaderboard-0-95418** —
+  same pattern; aggregates external public submissions.
+
+Our K=4 PRIMARY rank-correlates 0.991-0.996 with every 0.954+ public
+file pulled (mean / std distributions are nearly identical: ours
+0.199/0.302 vs public-super-0.95418 at 0.204/0.307). PI declined the
+blend route on principle (original work only); approved full
+replication of the masayakawamata 2-layer stack architecture (Prong S)
+and per-segment LGBM head (Prong B) as parallel CPU jobs.
+
+- **12a.** ~~Prong A — FastF1 weather aggregates~~ DROPPED (BOTE 0.001
+  bp/min SKIP; lower EV than emerging Prong S/B/blend mechanisms).
+  `[owner: ml-model-experiments-gbKiI | status: parked]`
+- **12b.** Prong B — Per-segment LightGBM head replacing inner LR
+  in Path-B Compound × Stint. Targets W5 third bullet (non-LR
+  per-segment head untested). BOTE override (PI-authorised overnight
+  budget). Cost ~90 min CPU.
+  `[owner: ml-model-experiments-gbKiI | status: wip]`
+- **12c.** ~~Prong D — Sequence transformer with explicit gap embedding~~
+  DROPPED (BOTE 0.006 bp/min SKIP; A32 narrowing makes gap-aware
+  attention unlikely to break rank-lock; superseded by Prong S).
+  `[owner: ml-model-experiments-gbKiI | status: parked]`
+- **12d.** Prong S — 2-layer stack architecture replication on our
+  base OOFs. L0 = K=4 base OOFs (yekenot-RealMLP, CatBoost-yekenot,
+  HGBC-deep, d16-orig); L1 = (LGBM / XGB / CatBoost / sklearn-MLP)
+  stackers with proper 5-fold OOF; L2 = LR over (L0 + L1). PI
+  directive: full replication. BOTE override (existence proof on
+  public LB at 0.9544). Cost ~180 min CPU.
+  `[owner: ml-model-experiments-gbKiI | status: wip]`
+- **12e.** ~~Prong P — blend with public submissions~~ DROPPED
+  (PI declined on principle; original work only).
+  `[owner: ml-model-experiments-gbKiI | status: parked]`
+
 ## 11. Multi-model FE testing campaign (2026-05-08 PM, late)
 
 Origin: PI directive after FE research synthesis. 16 candidate FE
