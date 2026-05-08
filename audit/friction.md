@@ -74,6 +74,31 @@ restating it.
   × position) cells are all INTERMEDIATE / WET. Per-cell AUC 0.68-0.86
   vs global 0.954. Suggests a rain-condition specialist as a candidate
   axis NOT currently in any open-axes list.
+- `anchor-cited-from-memory-not-measurement` (2026-05-08 PM, pca-k25-
+  ensemble branch): I cited the K=10+1 plain LR-meta OOF as ~0.94850 in
+  a PI-facing AskUserQuestion when designing the PCA-meta probe. Actual
+  anchor (re-measured by the probe itself) was **0.95417** — 5.7 bp off
+  the cited value. Didn't change the strategic framing (relative deltas
+  drive verdicts, not absolute level), but it's a discipline failure.
+  Root cause: I confused the K=10 plain LR-meta OOF with a different
+  number elsewhere in the docs and didn't verify before pasting.
+  **Fix:** when citing OOF anchors in PI-facing prose, grep
+  `state/calibration-ladder.md` and `audit/decisions.jsonl` first; if
+  the anchor isn't there as a clean datapoint, say "from memory, will
+  re-measure in probe" instead of pasting a number. Promotion
+  candidate: extension to Rule 26 (i)/(ii) — "(iii) every numerical
+  anchor in a BOTE / question is grep-cited or labelled 'from memory'".
+- `predictive-eff-rank-not-variance-eff-rank` (2026-05-08 PM): A25
+  recorded the K=27 logit pool's eff-rank as 3.23 and we treated that
+  as the **predictive** ceiling under LR-meta (per A30 wording). The
+  PCA-meta probe shows top-3 PCA-LR scores 0.95061 (−35.64 bp vs the
+  K=10 anchor 0.95417), while top-15 PCA-LR scores 0.95401 (≈anchor).
+  The 3.23 is **variance**-eff-rank; predictive eff-rank ≈ 15. Not a
+  friction in the strict sense (the original A25 claim was correct;
+  the inference from A25 to A30 was where the slip happened), but a
+  conceptual cleanup logged as A25b/A30 refinement. **Fix:**
+  `ASSUMPTIONS.md` A25 now reads "variance-eff-rank=3.23"; A30 cites
+  A30b/A30c for refinements.
 
 ## Week of 2026-05-07
 
