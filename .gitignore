@@ -21,9 +21,8 @@ submissions/*
 # Override: final Kaggle submission CSVs are committed
 !submissions/submission_*.csv
 
-# Inverted artifact-tracking policy (see CLAUDE.md):
-# Default-track .npy and .json under scripts/artifacts/.
-# Ignore per-fold checkpoints, transient prefixes, logs.
+# Artifact policy (revised 2026-05-08, post-cleanup):
+# Track .npy and .json under scripts/artifacts/, but block transient/junk.
 scripts/artifacts/*.log
 scripts/artifacts/*.db
 scripts/artifacts/*.pkl
@@ -33,6 +32,10 @@ scripts/artifacts/_smoke_*.npy
 scripts/artifacts/_smoke_*.json
 scripts/artifacts/tmp_*.npy
 scripts/artifacts/scratch_*.npy
+scripts/artifacts/*.txt
+scripts/artifacts/*.csv
+scripts/artifacts/*.csv.gz
+scripts/artifacts/*.md
 
 # Python
 __pycache__/

@@ -4,16 +4,15 @@
 > when the strategy-critic-loop fires (plateau, saturation, kickoff,
 > 50% checkpoint). Cap ≤150 lines.
 
-**Problem (BPS step 1).** Close the −28.6bp gap to top-5% (leader
-LB 0.95345 vs ours 0.95059 = d15b_path_b_K22_dae_only_tau20000) in
-12 remaining days. Day-15 confirmed that orthogonal new-base additions
-land at +0–1bp LB regardless of standalone diversity (DAE-class ρ
-0.9477 standalone → +1bp LB; new friction
-`path-b-amp-only-fires-on-meta-arch-not-base-add`). Day-16+ priority
-is META-ARCH REDESIGN axis (non-Gaussian shrinkage, Yao/Vehtari
-covariance-Σ BMA, alternative segmentation cross), which IS
-Path-B-amp-eligible. Pending PI decision: submit
-`path_b_K22_invlaps τ=20k` (OOF +2.75bp, predicted ~+4bp LB).
+**Problem (BPS step 1; Day-19, 2026-05-07).** Close the **−3.7 bp** gap
+to top-5 % boundary (0.95405) from PRIMARY 0.95368
+(`d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000`) in ~8 remaining days.
+In-pool axes empirically exhausted on K=27 with v4+h1d anchors: meta-arch
+redesign closed (C axis, 9 variants tested), external-data closed
+(D axis), gbdt-class redundant (B2). Only structurally distinct axis
+remaining is **A1 sequence-level** (HMM Compound transitions + AR(1)
+within-stint TyreLife — leaf 7h below). All other open leaves are
+optional / R5 HEDGE prep.
 
 **Claim convention.** Pick an unclaimed `open` leaf. Edit its
 `[owner: ...]` field to your branch slug (part after `claude/`).
@@ -124,7 +123,7 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
   G3 fail). Hold for final-window decision.
   `[owner: unclaimed | status: open]`
 
-## 8. Single-model path (PI hypothesis P1)
+## 6. Single-model path (PI hypothesis P1)
 
 External Kaggle notebook `romanrozen/f1-pit-driver-race-year-encoding-0-95354`
 publishes a single LGBM at OOF AUC **0.95241** (and single XGB 0.95232,
@@ -147,14 +146,14 @@ of (Driver×Race×Year), (Driver×Race), (Driver×Compound), (Race×Compound),
   (separate hypothesis from 8a; depends on 8a passing).
   `[owner: unclaimed | status: open]`
 
-## 6. Pool composition surgery
+## 7. Pool composition surgery
 
 - **6a.** Replace 3 most leakage-eating GBDTs with FM-class bases.
   cb_slow-wide-bag (-17 GKF rank), e5_optuna_lgbm (-13 rank).
   Risk: public-LB row-iid leak-eaters carry signal (d13c T2/T3).
   `[owner: unclaimed | status: open]`
 
-## 7. Gauge p_synth (overnight research sweep, 2026-05-06/07)
+## 8. Gauge p_synth (overnight research sweep, 2026-05-06/07)
 
 Umbrella: translate "what is the synthesizer's learned p(X,y)" into
 prediction signal. 5 phases × 19 probes. CPU-only. 0 submits. Audit at
@@ -256,7 +255,7 @@ problem-solving loop. Find focus." Audit at
   Sparse-LR base OOF 0.50039 (chance).
   `[owner: read-handover-62BCt | status: null]`
 
-## 8. Virgin axes complement to HANDOVER T1–T4 (Day-16 RESOLVED)
+## 10. Virgin axes complement to HANDOVER T1–T4 (Day-16 RESOLVED)
 
 Day-15 PM Conn–McLean re-entry. T1–T4 (combine-bases / target-reform /
 DAE-variants / meta-arch redesign) is owned by other branches; this leaf
