@@ -109,6 +109,26 @@ restating it.
   forest-family lever with non-trivial EV is Path-B Compound × Stint
   τ=100k refit on K=5 = K=4 + RF, which tests whether the +0.25 bp
   OOF transfers to LB through per-segment shrinkage.
+- `path-b-cs-absorbs-single-base-orthogonal-additions-below-0.5bp`
+  (add-random-forest-model-XJ3Dm 2026-05-08 evening, refit follow-up
+  to forest-base): K=5 = K=4 + RF-yekenot Path-B C×S τ=100k OOF
+  0.95405 vs K=4 PRIMARY 0.95403 — **OOF Δ +0.02 bp**, ρ=0.999917,
+  tie-band per Rule 27 (abort threshold 0.999). The +0.25 bp K=4+1
+  LR-meta forest lift gets melted to +0.02 bp once Compound × Stint
+  per-segment shrinkage averages it across segments. **Confirms and
+  generalizes the Day-15 friction
+  `path-b-amp-only-fires-on-meta-arch-not-base-add`:** Path-B
+  amplifies meta-architecture redesigns and high-orthogonality bases
+  (≥+0.5 bp standalone OOF lift), but absorbs single-base orthogonal
+  additions below that threshold. **Quantitative threshold derived
+  from this run + d15b precedent**: at ρ≈0.95-0.96 vs PRIMARY,
+  Path-B retains lifts ≥+0.5 bp OOF but absorbs lifts <+0.3 bp.
+  Three τ variants (5k/20k/100k) saved as R5 hedge candidates;
+  τ=5k flip ratio 0.240 (asymmetric R7-style) makes it final-
+  window-only per R7. **Forest family characterized end-to-end**:
+  forest-as-meta dead, forest-as-base capped at +0.25 bp K=4+1,
+  Path-B absorbs the lift at LB. Stop here on the forest axis;
+  pivot to other axes.
 - `nca-loss-matrix-O(n2)-OOM-at-50k`: NCA pairwise-distance loss
   matrix is O(n²) regardless of input dim; 50k subsample tries to
   allocate 18.6 GB. Fix: cap NCA fit subsample at 8-10k for 15 GB

@@ -340,3 +340,81 @@ forest levers" listed above can now be deprioritized:
   the partner).
 - `state/mechanism-ledger.md` — to be updated with the three
   forest-family entries.
+
+## Path-B K=5 refit — Path-B absorbs the forest lift
+
+PI directive (after the Optuna falsification): run the refit on K=5
+= K=4 + RF-yekenot (Angle A). Script:
+`scripts/path_b_K5_rf_yekenot.py`. τ sweep ∈ {5k, 20k, 100k}.
+Compound × Stint segmentation, MIN_ROWS=1000 — same shrinkage
+mechanism as the K=4 PRIMARY.
+
+| τ | OOF | ρ vs K=4 PRIMARY | flips +→−/−→+ | flip ratio | Verdict |
+|---|---:|---:|---:|---:|---|
+| 5,000 | 0.95403 | 0.998734 | 121/29 | 0.240 | asymmetric (R7-style) |
+| 20,000 | 0.95405 | 0.999448 | 86/23 | 0.267 | asymmetric |
+| **100,000** | **0.95405** | **0.999917** | **37/31** | **0.838** | **TIE band** |
+
+K=4 LR-meta baseline OOF 0.95399; K=4 + Path-B C×S τ=100k OOF
+(PRIMARY) 0.95403; K=5 LR-meta global OOF 0.95402; K=5 + Path-B
+C×S τ=100k OOF 0.95405. Path-B amp on the K=5 pool: 0.95405 −
+0.95402 = **+0.03 bp** (within fold noise). On K=5, Path-B has
+nothing to amplify because the global K=5 LR-meta has already
+absorbed the +0.25 bp K=4+1 forest lift through logit-space
+combination.
+
+**Pre-submit diff (Rule 27).** Spearman 0.999917 vs K=4 PRIMARY,
+exceeds the 0.999 abort threshold. Mean abs diff 1.84e-3 across
+188,165 rows; max abs diff 4.4e-2; rows with diff > 1e-3 = 33.5%.
+LB will tie 0.95351 within Kaggle's 5-decimal quantization. **PI
+held submission per Rule 27** (abort decision; saved as R5 hedge
+candidate, not submitted; submission count remains 41 of 270).
+
+## Synthesis: forest family characterized end-to-end
+
+The forest-class probe sweep is now complete on s6e5:
+
+1. **Forest as meta-stacker (Angles B, C):** FALSIFIED. Both pure
+   K=4 expansion and combined-input variants lose 0.7–1.5 bp to
+   LR-meta. Closes the non-LR meta family across boosted (Day-20
+   PCA-meta) AND bagged tree classes (today).
+
+2. **Forest as base (Angle A, Kitchen-sink, Optuna×2):** WEAK_PASS
+   at +0.25 bp K=4+1 LR-meta with std 0.013 bp across 4 independent
+   configs. Most-diverse positively-gating base in the K=4 era
+   (ρ=0.96 vs typical ≥0.996 for absorbed bases). Hyperparameter
+   tuning, feature breadth, and seed all leave the lift unchanged
+   — the +0.25 bp ceiling is set by the meta architecture (3-D
+   logit subspace), not by RF.
+
+3. **Path-B refit on K=5:** ABSORBED. The +0.25 bp K=4+1 LR-meta
+   gain melts to +0.02 bp once Compound × Stint per-segment
+   shrinkage averages it across (Compound × Stint) buckets. ρ vs
+   PRIMARY = 0.999917 → tie-band at LB. Confirms the Day-15
+   friction `path-b-amp-only-fires-on-meta-arch-not-base-add`:
+   per-segment shrinkage amplifies meta-architecture redesigns,
+   not single-base orthogonal additions.
+
+   The DAE precedent (d15b) had +0.715 bp OOF orthogonality on
+   K=22 → realized 1.4× amp at LB. The RF base on K=4 has only
+   +0.25 bp orthogonality — too low for Path-B's per-segment
+   retention, even at the same ρ band (~0.95).
+
+**Verdict on the forest family:** structural diversity benefit
+caps at +0.25 bp K=4+1 LR-meta; per-segment Path-B does not
+amplify single-base additions below ~+0.5 bp OOF; LB transfer
+band is "tie or marginal" (within ±2 bp). Forest base joins the
+hedge ladder as an R5 candidate.
+
+## Held submissions (R5 hedge eligible)
+
+Saved to `submissions/`:
+- `submission_path_b_K5_rf_yekenot_tau5000.csv` (asymmetric flips
+  121/29 — R7-style override territory; risky)
+- `submission_path_b_K5_rf_yekenot_tau20000.csv` (asymmetric 86/23)
+- `submission_path_b_K5_rf_yekenot_tau100000.csv` (balanced 37/31;
+  tie-band per Rule 27)
+
+OOF/test artifacts:
+- `oof_path_b_K5_rf_yekenot_tau{5k,20k,100k}_strat.npy`
+- `test_path_b_K5_rf_yekenot_tau{5k,20k,100k}_strat.npy`

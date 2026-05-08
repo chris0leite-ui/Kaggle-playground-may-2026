@@ -286,3 +286,16 @@ of Rule 24 (fold-safe label-conditional aggregates).
   is set by the meta architecture (3-D logit subspace ceiling),
   not by RF itself.** Path-B refit on K=5 = K=4 + RF-yekenot is
   the single remaining forest-family move with non-trivial EV.
+- **Path-B C×S τ-sweep on K=5 = K=4 + RF-yekenot** (5k/20k/100k).
+  Compound × Stint segmentation, MIN_ROWS=1000 — same mechanism
+  as the K=4 PRIMARY. K=5 LR-meta global OOF 0.95402; K=5 + Path-B
+  C×S τ=100k OOF 0.95405; **Path-B amp on K=5 = +0.03 bp within
+  fold noise**. ρ vs K=4 PRIMARY = 0.999917 → tie-band at LB per
+  Rule 27 (abort threshold 0.999). PI held submission per Rule 27;
+  saved as R5 hedge candidate. **Confirms Day-15 friction
+  `path-b-amp-only-fires-on-meta-arch-not-base-add`:** per-segment
+  shrinkage absorbs the +0.25 bp K=4+1 forest lift down to +0.02 bp
+  vs PRIMARY. Path-B amplifies meta-architecture redesigns, not
+  single-base orthogonal additions below ~+0.5 bp OOF. Forest
+  family characterized end-to-end on s6e5: structural diversity
+  benefit caps at +0.25 bp K=4+1; LB transfer is tie-band.
