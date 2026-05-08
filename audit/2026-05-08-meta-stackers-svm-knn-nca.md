@@ -109,17 +109,29 @@ on hard cases — i.e., a new base, not a new router.
 ## What would change the verdict
 
 If the K=4 pool's effective rank really is 3, no router can extract
-more than 3 dimensions of signal. The escape paths are:
+more than 3 dimensions of signal. Two follow-up tests this session
+closed two of the three escape paths:
 
-1. **Add a base that's structurally different from all 4** (yekenot
-   recipe to a non-tree class, sequence-level fingerprint, FastF1
-   hard-join). PRIMARY's improvement only comes from lifting the
-   *standalone* AUC of one of the K=4, or adding a 5th genuinely
-   independent prediction.
-2. **Combined raw-features + base-predictions input.** A meta-stacker
-   that sees both (e.g. NCA on `concat(K=4 bases, top-5 numeric)`)
-   could route by raw-feature regions where the bases disagree.
-   Untested in this arc.
+1. ~~**Combined raw-features + base-predictions input.**~~ TESTED.
+   `concat(K=4 bases, top-5 numeric)` → LR-meta = +0.03 bp (null);
+   kernel-SVM-meta = −1.64 bp (regress). The K=4 bases already absorb
+   the top-5 numerics — adding raw features to the meta input does
+   nothing because every base is already a model trained on those
+   features. Friction confirmed.
+2. **Sequence-level fingerprint LightGBM.** TESTED. Within-stint
+   structural features (stint_lap_idx, prev_stint_length, compound
+   history one-hot, position_change_in_stint, stint_lap_frac) added
+   to the standard 14-column feature set and trained as a single
+   LightGBM base. Standalone OOF 0.94202; gate K=4+1 **+0.15 bp**,
+   K=10+1 −0.08, K=27+1 −0.08. The +0.15 on K=4+1 is the only
+   positive meta-add in this entire branch's arc, but it's within
+   fold noise and absorbed at K=10 / K=27. Indication that the
+   sequence-feature axis is real but small at this scale; richer
+   features (HMM transition probabilities, AR(1) TyreLife, neural
+   sequence model) might extract more.
+3. **Add a base that's structurally different from all 4** (yekenot
+   recipe to a non-tree class, FastF1 hard-join). UNTESTED here;
+   remains the strongest open axis from HANDOVER.
 
 ## Artifacts
 

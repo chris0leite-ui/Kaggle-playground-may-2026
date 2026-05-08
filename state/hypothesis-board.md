@@ -87,6 +87,20 @@ parked. For history, read `audit/research/` and the postmortems.
   `non-parametric-meta-on-K=4-cant-beat-LR-meta-without-new-input`.
   K=4 is already saturated for meta-routing; logit effective rank
   ~3 ⇒ any router can at best tie LR-meta until a new base is added.
+- **Combined-input meta-stacker** (K=4 base predictions + top-5 raw
+  numerics standardised → 17-feature meta input). LR-meta: +0.03 bp
+  vs K=4 LR-meta (null). Kernel-SVM-meta γ=0.02: −1.64 bp (regress).
+  Confirms friction: the K=4 bases already absorb the top-5 numerics.
+- **Sequence-level fingerprint LightGBM** (HANDOVER #1 axis;
+  within-stint structure: prev_compound, compound_changes,
+  stint_lap_idx, prev_stint_length, position/tyre_life at stint
+  start, position_change_in_stint, stint_lap_frac, compound history
+  one-hot). Standalone OOF 0.94202. K=4+1 **+0.15 bp** (only
+  positive meta-add in this branch's arc), K=10+1 −0.08, K=27+1
+  −0.08. Magnitude within fold noise but structurally in the right
+  direction on the sparse pool. Richer sequence features (HMM
+  transitions, AR(1) TyreLife, RNN-class sequence model) could
+  potentially scale this up — open path for next session.
 
 ## Open priorities (best EV / cost first)
 
