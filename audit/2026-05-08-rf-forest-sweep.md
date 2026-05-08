@@ -174,6 +174,72 @@ candidate.
   or regress. The 3-D logit subspace ceiling is robust to
   inductive-class swap on the meta.
 
+## Kitchen-sink follow-up (RF on yekenot + constraint + inter-stint = 57 feat)
+
+PI directive after the initial sweep: combine every engineered
+feature family that has produced a positive single-base lift in
+this comp, since RF benefits from feature breadth (each tree
+samples a random subset). Substrate available without orig CSV /
+GPU: yekenot recipe (38) + d18 constraint violations (12) +
+EXP-3 inter-stint memory (7) = 57 features.
+
+Script: `scripts/probe_forest_kitchen_sink.py`
+Artifacts: `oof_rf_kitchen_sink_strat.npy`,
+`scripts/artifacts/probe_forest_kitchen_sink.json`
+Settings: same as Angle A (n_est=400, min_samples_leaf=100,
+max_samples=0.5).
+
+| Probe | n feat | standalone OOF | ρ vs PRIMARY | K=4+1 LR Δ | Pred LB Δ band |
+|---|---:|---:|---:|---:|---:|
+| Angle A (yekenot only) | 38 | 0.94178 | 0.9595 | +0.262 bp | −4.74 bp |
+| Kitchen-sink | 57 | **0.94054** | **0.9580** | **+0.248 bp** | −4.75 bp |
+
+**Findings.**
+
+1. **Feature breadth hurts RF on this data.** Adding 19 features
+   dropped standalone OOF by **−1.24 bp**. The 12 constraint
+   violations are mostly zero-valued indicators (synth violations
+   are rare); the 7 inter-stint features are weak predictors that
+   waste split capacity at random feature subsets. RF's bagging
+   over feature subsets means weak features dilute strong ones —
+   different from boosting, which can ignore weak features.
+
+2. **K=4+1 meta-gate lift is unchanged within fold noise.** +0.25
+   bp vs Angle A's +0.26 bp. The two probes agree to within 0.014
+   bp. **This is the cleanest reproducibility check the forest
+   family has had in this comp** — the +0.25 bp signal is now
+   demonstrated across two independent RF feature configurations,
+   raising the prior that it's a real signal rather than fold noise.
+
+3. **ρ marginally improves** (0.9580 vs 0.9595). The wider tableau
+   gives slightly more orthogonal predictions but the meta-utility
+   is identical. ρ matters less than logit-direction here, per
+   A30 (rank-lock at logit level).
+
+**Strategic implication.** The bottleneck for forest-class
+diversity in this comp is NOT feature substrate — it's the rank-
+lock at logit-direction level. **Adding more feature families to
+RF will not scale the +0.25 bp K=4+1 lift.** The remaining
+forest-family levers that could move the lift:
+
+- **Multi-seed RF bag** (cuts fold noise by √n; might surface
+  whether the +0.25 bp is a stable signal worth amplifying via
+  Path-B refit).
+- **Path-B Compound × Stint τ=100k refit on K=5** = K=4 +
+  RF-yekenot (the cheaper of the two, tests LB transfer
+  directly; +0.36 bp central LB at 1.4× amp floor).
+- **Forest variants** beyond plain RF (ExtraTrees with full
+  yekenot recipe; oblique-RF / RotationForest if available;
+  feature-bagged RF with explicit sub-recipes).
+
+The PI's hypothesis that RF benefits from feature breadth (per
+the irrigation precedent) is empirically refuted on this comp.
+The irrigation +35 bp RF-meta worked on a 14-bank of
+*error-orthogonal calibrated probability vectors* — already-
+distilled signal. Raw + engineered features, where most columns
+are correlated with each other, is a different feature regime
+where RF doesn't get the same lift from breadth.
+
 ## Friction tags
 
 - `non-lr-meta-falsified-across-inductive-classes` — promoted from

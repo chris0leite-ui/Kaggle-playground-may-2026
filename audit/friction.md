@@ -73,6 +73,21 @@ restating it.
   eligible per R5. Path-B refit on K=5 = K=4 + RF is the natural
   next probe; predicted central-LB band +0.36 bp at the historical
   1.4× amp floor.
+- `rf-feature-breadth-does-not-scale-on-s6e5`
+  (add-random-forest-model-XJ3Dm 2026-05-08 evening, follow-up to
+  Angle A): kitchen-sink RF (yekenot + 12 constraint violations + 7
+  inter-stint memory = 57 feat) standalone OOF 0.94054 (−1.24 bp vs
+  yekenot-only), K=4+1 LR-meta +0.25 bp at ρ=0.9580 (within fold
+  noise of Angle A's +0.26 bp). **Feature breadth hurts RF here:**
+  weak features dilute split capacity at the random-feature-subset
+  level; RF doesn't ignore weak features the way boosting can. The
+  irrigation +35 bp RF-meta precedent worked on a 14-bank of
+  already-distilled probability vectors (error-orthogonal); raw +
+  engineered features is a different regime. **First repro check
+  on the +0.25 bp forest-base lift** — two independent
+  configurations agree, raises prior the signal is real not fold
+  noise. Bottleneck is the rank-lock at logit-direction level, not
+  the feature substrate.
 - `nca-loss-matrix-O(n2)-OOM-at-50k`: NCA pairwise-distance loss
   matrix is O(n²) regardless of input dim; 50k subsample tries to
   allocate 18.6 GB. Fix: cap NCA fit subsample at 8-10k for 15 GB

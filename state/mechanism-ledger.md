@@ -262,3 +262,13 @@ of Rule 24 (fold-safe label-conditional aggregates).
   gating base in the K=4 era. +12 bp standalone over d15c ET-on-raw,
   4.4× larger min-meta lift. Hedge-eligible per R5; Path-B refit
   on K=5 is the natural next probe.
+- **Kitchen-sink RF** (yekenot + 12 constraint-violations + 7 inter-
+  stint memory = 57 feat) — standalone OOF **0.94054** (−1.24 bp vs
+  yekenot-only); K=4+1 LR-meta **+0.25 bp** at ρ=0.9580. **Feature
+  breadth hurts RF on this data** (weak features dilute split
+  capacity at the random-subset level). **K=4+1 lift is unchanged
+  within fold noise** vs Angle A — first reproducibility check on
+  the forest-base lift. PI hypothesis that RF scales with feature
+  breadth (per irrigation 14-bank meta precedent) is empirically
+  refuted on s6e5: the irrigation gain came from already-distilled
+  base predictions, not raw + engineered features.
