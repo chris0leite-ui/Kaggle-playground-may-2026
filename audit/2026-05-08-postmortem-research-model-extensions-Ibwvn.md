@@ -68,9 +68,13 @@ Cross-links: `audit/2026-05-08-four-lane-research-extension.md`,
 probe artefacts in `scripts/artifacts/probe_lane{1,2,3,4}_*.json`
 and `oof_lane*_strat.npy` (11 OOF arrays).
 
-## Promotion candidates (PI ratified: PENDING)
+## Promotion candidates (PI ratified: ALL REJECTED 2026-05-08)
 
-### [ ] Candidate 1 — extend Rule 33 with stratum-ECE precondition
+PI response: "no additions, no promotion." All three candidates remain
+as friction-log entries only; no edits applied to
+`.claude/skills/kaggle-comp/improvements.md` or `CLAUDE.md`.
+
+### [REJECTED] Candidate 1 — extend Rule 33 with stratum-ECE precondition
 
 **Tag:** `isotonic-per-stratum-needs-stratum-ECE-threshold`
 (2 confirmations this session; possibly more in archive.)
@@ -87,9 +91,9 @@ both regressed despite ECE diagnostics showing near-zero
 miscalibration per stratum (0.0001–0.0112 range across 12 strata
 total).
 
-**PI ratification:** _pending — PI to answer yes / no / edit_
+**PI ratification (2026-05-08):** REJECTED — no promotion.
 
-### [ ] Candidate 2 — add Q7 to pre-flight 6-question check
+### [REJECTED] Candidate 2 — add Q7 to pre-flight 6-question check
 
 **Tag:** `verify-domain-heuristic-against-synth-labelling`
 (Lane 2 P2.2 lost 9.48 bp.)
@@ -107,9 +111,9 @@ Q7 unanswered = forced SKIP."
 realism (~0). Deterministic clamp regressed −9.48 bp at OOF; would
 have lost a submission slot if deployed.
 
-**PI ratification:** _pending — PI to answer yes / no / edit_
+**PI ratification (2026-05-08):** REJECTED — no promotion.
 
-### [ ] Candidate 3 — tighten Rule 19 BOTE-seal threshold
+### [REJECTED] Candidate 3 — tighten Rule 19 BOTE-seal threshold
 
 **Tag:** `bote-seal-required-even-for-cheap-probes`
 (14 probes this session, 0 BOTE seals.)
@@ -127,11 +131,11 @@ becomes biased toward "things we ran with formal seals" and we lose
 agent-vs-actual rows for cheap probes — exactly the regime where
 priors are weakest.
 
-**PI ratification:** _pending — PI to answer yes / no / edit_
+**PI ratification (2026-05-08):** REJECTED — no promotion.
 
 ## PI additions (from step 4)
 
-_pending — PI to add any frictions / rules / decisions missed_
+PI response 2026-05-08: "no additions, no promotion." None.
 
 ## Framework version at session-end
 
