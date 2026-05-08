@@ -117,6 +117,25 @@ For the named-experiment-by-experiment ledger, see
   Path-B C×S on uncorrelated PCs loses 28-34 bp (Path-B needs base
   correlations to route). See `audit/2026-05-08-pca-meta-probe.md`,
   `scripts/probe_pca_meta.py`, A25b/A30b/A30c.
+- **EXP-NEW Phase 1-5b FE/meta campaign (issues leaf 11): closed
+  2026-05-08 PM.** 7 of 8 tier-A2/A3 picks NULL in Phase 1 smoke;
+  A2-2 (mandatory compound rule) +9.3 bp smoke, +1.4 bp full 5-fold,
+  +0.302 bp at K=4+1 plain LR-meta (below +0.5 strict gate);
+  TIE_EXPECTED on 4-gate filter. **Path-B amp test (Phase 4b):**
+  K=4 + A2-2 + Path-B C×S τ=100k OOF 0.95405 vs K=4 PRIMARY 0.95403
+  (Δ +0.26 bp); ρ 0.999893; WEAK. **A2-8 LightGBM stack-meta (Phase
+  5b):** 43 meta features incl. pairwise prediction products + abs-
+  diffs + logit-diffs + raw side info; 5-fold OOF 0.95390 vs Path-B
+  PRIMARY 0.95403 (Δ −1.30 bp); fold-std 0.00080 elevated; FAIL.
+  Tree stackers overfit interaction noise on K=4 pool; convex LR +
+  Path-B partial-pooling regularize better. **Rule 7 saturation
+  research scan:** Frontiers AI 2025 Bi-LSTM peer-effect features
+  (DriverAheadPit/Behind) are duplicative of A3-1 RankSortedGaps
+  (already null in smoke); only genuinely untried mechanism is a
+  Bi-LSTM/GRU sequence base on 10-lap windows (GPU-heavy, ~30-60 min
+  Kaggle T4); deferred. See `scripts/probe_a2_2_pathb_K4.py`,
+  `scripts/probe_a2_8_stack_meta.py`, `audit/decisions.jsonl` for
+  recorded outcomes; ISSUES leaf 11 closed `null`.
 
 ## Held submissions (do not submit)
 

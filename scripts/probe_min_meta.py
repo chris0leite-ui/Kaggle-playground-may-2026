@@ -1,13 +1,22 @@
 """scripts/probe_min_meta.py — min-meta gate for K=K+1 stack additions.
 
-Standardized probe: compare K=21 PRIMARY-pool LR meta OOF vs
-K=21 + N candidate bases LR meta OOF. Reports per-candidate delta-bp.
+Standardized probe: compare K-base PRIMARY-pool LR meta OOF vs
+K + N candidate bases LR meta OOF. Reports per-candidate delta-bp.
 
 Usage:
+  # Default K=21 baseline (back-compat):
   python scripts/probe_min_meta.py --candidates d6_rule_compound_stint d12_lr_meta
 
-Loads y from data/train.csv, K=21 from PRIMARY-pool list (d13e
-convention), candidate from `oof_<NAME>_strat.npy` / `test_<NAME>_strat.npy`.
+  # K=4 sparse pool (current PRIMARY since 2026-05-08 PM):
+  python scripts/probe_min_meta.py --candidates p1_lgbm_v3_with_a3_1 \\
+      --baseline-pool d17_h1d_yekenot_full,p1_single_cb_v4_gpu,f1_hgbc_deep,d16_orig_continuous_only
+
+  # Custom pool:
+  python scripts/probe_min_meta.py --candidates X --baseline-pool base1,base2,base3
+
+Loads y from data/train.csv, K-pool from base names supplied (or
+the K=21 default), candidate from `oof_<NAME>_strat.npy` /
+`test_<NAME>_strat.npy`.
 """
 from __future__ import annotations
 
@@ -27,6 +36,7 @@ ART = Path("scripts/artifacts")
 TARGET = "PitNextLap"
 SEED, N_FOLDS = 42, 5
 
+# Default baseline pool (K=21). Used when --baseline-pool is omitted.
 K21_BASES = [
     "baseline_two_anchor", "d2a_te", "m2_xgb", "e1_catboost_sub",
     "e3_hgbc", "e5_optuna_lgbm", "a_horizon", "b_lapsuntilpit",
@@ -35,6 +45,18 @@ K21_BASES = [
     "d6_rule_year_race", "d9_R6_next_compound", "d9_R10_driver_eb",
     "d9_R7_prev_compound", "d9f_FM_A", "d9f_FM_B",
 ]
+
+# K=4 forward-greedy sparse pool (current PRIMARY since 2026-05-08 PM).
+# Pass via --baseline-pool when gating new bases against the K=4 PRIMARY.
+K4_BASES = [
+    "d17_h1d_yekenot_full", "p1_single_cb_v4_gpu",
+    "f1_hgbc_deep", "d16_orig_continuous_only",
+]
+
+POOL_PRESETS = {
+    "K21": K21_BASES,
+    "K4":  K4_BASES,
+}
 
 
 def _pos(p: Path) -> np.ndarray:
@@ -72,16 +94,36 @@ def main():
                     help="base name(s); each must have oof_<NAME>_strat.npy "
                          "and test_<NAME>_strat.npy under scripts/artifacts/")
     ap.add_argument("--mode", choices=["add", "swap"], default="add",
-                    help="add = K22; swap = replace lowest-L1 K=21 base")
+                    help="add = K+1; swap = replace lowest-L1 base")
     ap.add_argument("--save-prefix", default=None,
                     help="save artifacts as oof_{prefix}_strat.npy etc")
+    ap.add_argument("--baseline-pool", default=None,
+                    help="comma-separated base names overriding K=21 default. "
+                         "Pass 'k4' as shorthand for the current K=4 PRIMARY "
+                         "(d17_h1d_yekenot_full,p1_single_cb_v4_gpu,"
+                         "f1_hgbc_deep,d16_orig_continuous_only).")
+    ap.add_argument("--primary-test", default=None,
+                    help="override path to PRIMARY test predictions for "
+                         "ρ comparison; defaults to K=21-era d13e artifact.")
     args = ap.parse_args()
 
-    y = pd.read_csv("data/train.csv", usecols=[TARGET])[TARGET].astype(int).values
-    primary_test = _pos(ART / "test_d13e_compound_stint_tau20000_strat.npy")
+    if args.baseline_pool is None:
+        pool_bases = K21_BASES
+        pool_label = "K=21"
+    elif args.baseline_pool.strip().lower() == "k4":
+        pool_bases = K4_BASES
+        pool_label = "K=4"
+    else:
+        pool_bases = [b.strip() for b in args.baseline_pool.split(",") if b.strip()]
+        pool_label = f"K={len(pool_bases)}"
 
-    pool_oofs = [_pos(ART / f"oof_{b}_strat.npy") for b in K21_BASES]
-    pool_tests = [_pos(ART / f"test_{b}_strat.npy") for b in K21_BASES]
+    y = pd.read_csv("data/train.csv", usecols=[TARGET])[TARGET].astype(int).values
+    primary_test_path = (Path(args.primary_test) if args.primary_test
+                         else ART / "test_d13e_compound_stint_tau20000_strat.npy")
+    primary_test = _pos(primary_test_path)
+
+    pool_oofs = [_pos(ART / f"oof_{b}_strat.npy") for b in pool_bases]
+    pool_tests = [_pos(ART / f"test_{b}_strat.npy") for b in pool_bases]
     P_oof_base = np.column_stack(pool_oofs)
     P_test_base = np.column_stack(pool_tests)
     F_oof_base = _expand(P_oof_base)
@@ -89,7 +131,8 @@ def main():
 
     t0 = time.time()
     oof_base, auc_base = _meta_oof(y, F_oof_base)
-    print(f"\n=== K=21 LR-meta baseline ===")
+    print(f"\n=== {pool_label} LR-meta baseline ({len(pool_bases)} bases) ===")
+    print(f"  bases: {pool_bases}")
     print(f"  OOF: {auc_base:.5f}  ({time.time()-t0:.1f}s)")
 
     cand_oofs = []
@@ -107,10 +150,10 @@ def main():
 
     t1 = time.time()
     oof_with, auc_with = _meta_oof(y, F_oof_with)
-    print(f"\n=== K=21 + {len(args.candidates)} ({'+'.join(args.candidates)}) ===")
+    print(f"\n=== {pool_label} + {len(args.candidates)} ({'+'.join(args.candidates)}) ===")
     print(f"  OOF: {auc_with:.5f}  ({time.time()-t1:.1f}s)")
     delta_bp = (auc_with - auc_base) * 1e4
-    print(f"  Δ vs K=21 baseline: {delta_bp:+.3f} bp")
+    print(f"  Δ vs {pool_label} baseline: {delta_bp:+.3f} bp")
 
     test_with, lr_full = _meta_full_test(y, F_oof_with, F_test_with)
     rho, _ = spearmanr(test_with, primary_test)
@@ -133,7 +176,9 @@ def main():
 
     summary = dict(
         candidates=args.candidates, mode=args.mode,
-        k_pool=len(K21_BASES), auc_base=auc_base, auc_with=auc_with,
+        baseline_pool=pool_bases, k_pool=len(pool_bases),
+        pool_label=pool_label,
+        auc_base=auc_base, auc_with=auc_with,
         delta_bp=float(delta_bp), rho_vs_primary=float(rho),
     )
     if args.save_prefix:
