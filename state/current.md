@@ -157,3 +157,7 @@ These don't beat PRIMARY on the leaderboard but are safe:
 - `path_b_K22_d12meta_tau100000` — landed at 0.95045 (eligible for the
   R7 final-window hedge).
 - `d15c` (Extra Trees), `d15d` (LightGBM-on-kNN-features) — R5 hedge only.
+- `path_b_K5_rf_yekenot_tau{5k,20k,100k}` (2026-05-08 evening) —
+  K=5 = K=4 + RF-yekenot Path-B refit; τ=100k ρ=0.999917 vs PRIMARY
+  (tie-band per Rule 27, PI held); τ=20k/5k asymmetric flips, R7-style
+  override risk. R5 hedge candidates.

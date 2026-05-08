@@ -76,6 +76,80 @@ restating it.
   +0.03 bp LR / −1.64 bp kernel — bases already absorb raw features.
   K=4 saturated for meta-routing; logit effective rank ~3. Need a
   fresh base, not a fresh router.
+- `non-lr-meta-falsified-across-bagged-and-boosted-tree-classes`
+  (add-random-forest-model-XJ3Dm 2026-05-08 evening): random forest
+  as meta-stacker over K=4 [P, rank, logit] OOF −1.54 bp vs LR-meta;
+  RF on combined input (K=4 expansion + 6 raw numerics) OOF −0.70
+  bp vs LR-on-same. Generalizes the Day-20 PCA-meta probe (LightGBM-
+  meta −1 to −2 bp) to bagged-tree class. The 3-D logit subspace
+  ceiling is robust across boosted *and* bagged tree-class metas.
+  Do not re-test tree-class metas on this comp's pool. See
+  `audit/2026-05-08-rf-forest-sweep.md`.
+- `forest-base-on-yekenot-recipe-most-diverse-positive-on-K4`
+  (add-random-forest-model-XJ3Dm 2026-05-08 evening): RF base on
+  yekenot FE recipe (no orig) → standalone OOF 0.94178, ρ=0.9595
+  vs PRIMARY-test, K=4+1 LR-meta +0.26 bp. Lowest ρ ever observed
+  on a positively-gating base in this comp. 4.4× larger min-meta
+  lift than `d15c_extra_trees` on raw (+0.06 bp at K=22+1). Hedge-
+  eligible per R5. Path-B refit on K=5 = K=4 + RF is the natural
+  next probe; predicted central-LB band +0.36 bp at the historical
+  1.4× amp floor.
+- `rf-feature-breadth-does-not-scale-on-s6e5`
+  (add-random-forest-model-XJ3Dm 2026-05-08 evening, follow-up to
+  Angle A): kitchen-sink RF (yekenot + 12 constraint violations + 7
+  inter-stint memory = 57 feat) standalone OOF 0.94054 (−1.24 bp vs
+  yekenot-only), K=4+1 LR-meta +0.25 bp at ρ=0.9580 (within fold
+  noise of Angle A's +0.26 bp). **Feature breadth hurts RF here:**
+  weak features dilute split capacity at the random-feature-subset
+  level; RF doesn't ignore weak features the way boosting can. The
+  irrigation +35 bp RF-meta precedent worked on a 14-bank of
+  already-distilled probability vectors (error-orthogonal); raw +
+  engineered features is a different regime. **First repro check
+  on the +0.25 bp forest-base lift** — two independent
+  configurations agree, raises prior the signal is real not fold
+  noise. Bottleneck is the rank-lock at logit-direction level, not
+  the feature substrate.
+- `rf-optuna-cant-tune-past-natural-+0.25bp-ceiling`
+  (add-random-forest-model-XJ3Dm 2026-05-08 evening, Optuna probe
+  follow-up to kitchen-sink): 15-trial TPE search on RF
+  hyperparameters (n_estimators, max_features, min_samples_leaf,
+  max_samples, max_depth, criterion) with single-fold proxy
+  objective (best fold-0 K=4 LR + RF blend ΔAUC). Best config
+  validated at full 5-fold on seeds 42 and 7. **K=4+1 LR-meta Δ
+  +0.268 bp seed=42, +0.238 bp seed=7; cross-seed |Δ|=0.030 bp.**
+  Across 4 independent RF runs (Angle A, Kitchen-sink, Optuna×2)
+  the K=4+1 lift sits in **+0.24-0.27 bp with std 0.013 bp** — the
+  signal is real, not fold noise. **Hyperparameter optimization
+  yields zero meaningful improvement past the natural +0.25 bp
+  ceiling.** Optuna pushed standalone OOF DOWN (log2/max_samples=
+  0.7/depth=15 trades calibration for tree diversity) but
+  meta-utility unchanged within fold noise. **Conclusion: the
+  +0.25 bp lift is set by the meta architecture (3-D logit subspace
+  ceiling, A30), not by RF — it cannot be tuned past this value.**
+  Operational implication: stop tuning RF; the only remaining
+  forest-family lever with non-trivial EV is Path-B Compound × Stint
+  τ=100k refit on K=5 = K=4 + RF, which tests whether the +0.25 bp
+  OOF transfers to LB through per-segment shrinkage.
+- `path-b-cs-absorbs-single-base-orthogonal-additions-below-0.5bp`
+  (add-random-forest-model-XJ3Dm 2026-05-08 evening, refit follow-up
+  to forest-base): K=5 = K=4 + RF-yekenot Path-B C×S τ=100k OOF
+  0.95405 vs K=4 PRIMARY 0.95403 — **OOF Δ +0.02 bp**, ρ=0.999917,
+  tie-band per Rule 27 (abort threshold 0.999). The +0.25 bp K=4+1
+  LR-meta forest lift gets melted to +0.02 bp once Compound × Stint
+  per-segment shrinkage averages it across segments. **Confirms and
+  generalizes the Day-15 friction
+  `path-b-amp-only-fires-on-meta-arch-not-base-add`:** Path-B
+  amplifies meta-architecture redesigns and high-orthogonality bases
+  (≥+0.5 bp standalone OOF lift), but absorbs single-base orthogonal
+  additions below that threshold. **Quantitative threshold derived
+  from this run + d15b precedent**: at ρ≈0.95-0.96 vs PRIMARY,
+  Path-B retains lifts ≥+0.5 bp OOF but absorbs lifts <+0.3 bp.
+  Three τ variants (5k/20k/100k) saved as R5 hedge candidates;
+  τ=5k flip ratio 0.240 (asymmetric R7-style) makes it final-
+  window-only per R7. **Forest family characterized end-to-end**:
+  forest-as-meta dead, forest-as-base capped at +0.25 bp K=4+1,
+  Path-B absorbs the lift at LB. Stop here on the forest axis;
+  pivot to other axes.
 - `nca-loss-matrix-O(n2)-OOM-at-50k`: NCA pairwise-distance loss
   matrix is O(n²) regardless of input dim; 50k subsample tries to
   allocate 18.6 GB. Fix: cap NCA fit subsample at 8-10k for 15 GB

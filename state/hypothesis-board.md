@@ -54,6 +54,13 @@ parked. For history, read `audit/research/` and the postmortems.
 - Yao/Vehtari covariance-modulated per-segment stacker — overshrinks
   along the highly-correlated base directions the stacker uses for
   routing.
+- **Non-LR meta architecture (LightGBM on PCA / raw expansion).**
+  PCA-meta probe 2026-05-08 PM: LightGBM meta is *worse* than LR meta
+  by 1-2 bp at every input representation tested (PCA top-K for K
+  in 3..27, K=10 / K=27 raw [P, rank, logit] expansion). EXP-NEW
+  closes FALSIFIED. The "non-LR meta" clause of A30 is empirically
+  refuted. See `scripts/probe_pca_meta.py`,
+  `audit/2026-05-08-pca-meta-probe.md`, A30b.
 - **Non-LR meta architecture — prediction-only-input scope
   FALSIFIED, pairwise-prediction-interaction scope OPEN.** PCA-meta
   probe 2026-05-08 PM: LightGBM meta is *worse* than LR meta by
@@ -71,6 +78,15 @@ parked. For history, read `audit/research/` and the postmortems.
   `scripts/probe_pca_meta.py`, `scripts/probe_lane4_nonlr_meta.py`,
   `audit/2026-05-08-pca-meta-probe.md`,
   `audit/2026-05-08-four-lane-research-extension.md`, A30b.
+- **Random forest as meta-stacker over K=4** (12 feat, today). OOF
+  −1.54 bp vs LR-meta. Bagged-tree variant of the same finding;
+  closes non-LR meta family across boosted *and* bagged tree
+  classes. See `audit/2026-05-08-rf-forest-sweep.md`,
+  `scripts/probe_forest_sweep.py` Angle B.
+- **Random forest as meta-stacker on combined input** (K=4 expansion
+  + 6 raw numerics = 18 feat, today). OOF −0.70 bp vs LR-on-same.
+  Adding raw signals to the meta does not rescue tree-class meta.
+  Same audit as Angle B; Angle C.
 - **Path-B segmentation in PC space.** PCA on K=27 logit pool
   decorrelates the routing variables; Path-B C×S on top-K PCs scores
   −28 to −34 bp vs K=10 plain LR. Path-B fires on redundant pools,
@@ -126,8 +142,19 @@ parked. For history, read `audit/research/` and the postmortems.
 ## Open priorities (best EV / cost first)
 
 (Reordered 2026-05-08 PM after EXP-NEW falsification: non-LR meta is
-closed, so the "structurally untested architecture" priority drops out.)
+closed, so the "structurally untested architecture" priority drops out.
+Updated 2026-05-08 evening after forest sweep: forest base on yekenot
+recipe is the first non-null new-base lift on K=4.)
 
+0. ~~Path-B Compound × Stint τ=100k refit on K=5 = K=4 + RF-yekenot.~~
+   **Closed 2026-05-08 evening.** Refit produced K=5 + Path-B C×S
+   τ=100k OOF 0.95405 (vs K=4 + Path-B PRIMARY 0.95403, Δ +0.02 bp).
+   ρ vs PRIMARY 0.999917 → tie-band at LB per Rule 27. PI held
+   submission. **Path-B absorbs the +0.25 bp K=4+1 forest lift to
+   +0.02 bp** — confirms Day-15 friction
+   `path-b-amp-only-fires-on-meta-arch-not-base-add`. Three τ
+   variants saved as R5 hedge. Forest family characterized
+   end-to-end. See `audit/2026-05-08-rf-forest-sweep.md`.
 1. **R5 hedge preparation for the final-window probe.** List the
    OOF-best candidates that were rejected for public-LB regression.
    Hedge ladder already populated. Cost 30 minutes. **Highest-value
@@ -157,5 +184,13 @@ override probe:
 - per-segment Compound × Stint, τ=100k (held)
 - ExtraTrees stack-add
 - LightGBM-on-kNN stack-add
+- **RF-yekenot stack-add** (today; ρ=0.959 most-diverse positively-
+  gating base on K=4; +0.26 bp OOF at K=4+1 LR-meta)
+- **Path-B K=5 = K=4 + RF-yekenot, τ=100k** (today; OOF 0.95405,
+  ρ=0.999917 vs PRIMARY → tie-band; balanced flips 37/31)
+- **Path-B K=5, τ=20k** (today; OOF 0.95405, ρ=0.999448; asymmetric
+  86/23 flips — R7-style)
+- **Path-B K=5, τ=5k** (today; OOF 0.95403, ρ=0.998734; asymmetric
+  121/29 flips — R7-style override territory, risky)
 - 22-base + d12 LR-meta + per-segment, τ=100k
 - DAE-only PRIMARY from Day 15 (the τ=20k variant)
