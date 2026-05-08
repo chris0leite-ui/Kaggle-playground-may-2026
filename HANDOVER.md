@@ -89,18 +89,20 @@ Audit: `audit/2026-05-06-target-reform-leakage-audit.md`.
 ## Read order on session start
 
 1. `CLAUDE.md` — state block + Rules 1-19 (Rule 19 = experimentation harness)
-2. `audit/2026-05-06-target-reform-leakage-audit.md` — **load-bearing** —
-   strict-OOF audit collapse table
-3. `audit/2026-05-16-d16-virgin-axes-results.md` — Day-16 virgin-axes
+2. `audit/INDEX.md` — quick map of audit/ subdirs (postmortems, research,
+   per-date)
+3. `audit/2026-05-06-target-reform-leakage-audit.md` — **load-bearing** —
+   strict-OOF audit collapse table (Rule 24 origin)
+4. `audit/2026-05-16-d16-virgin-axes-results.md` — Day-16 virgin-axes
    (11 probes, all NULL / falsified / parked)
-4. `audit/friction.md` — top tags `target-construction-layer-leakage`,
+5. `audit/friction.md` — top tags `target-construction-layer-leakage`,
    `path-b-amp-only-fires-on-meta-arch-not-base-add`,
    `path-b-amp-needs-orthogonal-signal-not-meta-derivatives`,
    `lr-meta-rank-lock-strong-anchor`
-5. `scripts/probe.py` — `bote()` + `gate()` harness (Rule 19)
-6. `scripts/probe_min_meta.py` — K=21+N stack-add gate
-7. `scripts/probe_target_reform_strict_oof.py` — strict-OOF audit pattern
-8. `scripts/pre_submit_diff.py` — MANDATORY before submit
+6. `scripts/probe.py` — `bote()` + `gate()` harness (Rule 19)
+7. `scripts/probe_min_meta.py` — K=21+N stack-add gate
+8. `scripts/probe_target_reform_strict_oof.py` — strict-OOF audit pattern
+9. `scripts/pre_submit_diff.py` — MANDATORY before submit
 
 
 ## Falsified or dead — do NOT retry

@@ -1,0 +1,13 @@
+{
+  "title": "Playground Series s6e5 — OOF / test artifacts",
+  "id": "USERNAME/s6e5-artifacts",
+  "subtitle": "Stacking pool OOF + test predictions for F1 PitNextLap (private)",
+  "description": "Derived numpy artifacts for the playground-series-s6e5 stacking pipeline: K=27 PRIMARY pool (K=21 + v4 + h1d + d16 + d18 + E2 + F2), HEDGE-eligible candidates (d15b, d13e, d15c, d15d, K22_d12meta, d18 trail), and Path-B hier-meta variants. Files map 1:1 onto scripts/artifacts/*.npy in the project repo. Comp data (train/test) is NOT included per Kaggle TOS; only derived predictions.\n\nSchema: oof_<NAME>_strat.npy, test_<NAME>_strat.npy. Loaded by scripts/probe_min_meta.py via the K21_BASES list.\n\nVersioning: each session-end wrap-up appends a version note 'YYYY-MM-DD <branch> +<probe>'.",
+  "isPrivate": true,
+  "licenses": [
+    {"name": "CC0-1.0"}
+  ],
+  "keywords": ["kaggle-internal", "stacking", "oof"],
+  "collaborators": [],
+  "data": []
+}

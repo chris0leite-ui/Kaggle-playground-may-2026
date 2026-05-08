@@ -29,8 +29,22 @@ from sklearn.model_selection import KFold, StratifiedKFold
 
 SEED = 42
 N_FOLDS = 5
-ART = Path("scripts/artifacts")
-ART.mkdir(parents=True, exist_ok=True)
+
+
+def _resolve_artifact_dir() -> Path:
+    """Pick scripts/artifacts/ (local) or /kaggle/input/s6e5-artifacts/
+    (Kaggle notebook with the dataset attached). Local wins if both exist."""
+    local = Path("scripts/artifacts")
+    kaggle = Path("/kaggle/input/s6e5-artifacts")
+    if local.exists() and any(local.iterdir()):
+        return local
+    if kaggle.exists():
+        return kaggle
+    local.mkdir(parents=True, exist_ok=True)
+    return local
+
+
+ART = _resolve_artifact_dir()
 
 
 def folds(y, task: str = "classification"):

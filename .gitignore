@@ -58,6 +58,12 @@ venv/
 .DS_Store
 Thumbs.db
 
+# Kaggle Dataset staging dir — only metadata + README tracked; hard-links
+# to scripts/artifacts/* live here transiently for upload.
+.kaggle-artifacts/*
+!.kaggle-artifacts/dataset-metadata.json
+!.kaggle-artifacts/README.md
+
 # CatBoost training artifacts (auto-generated)
 catboost_info/
 kernels/d15b-dae-gpu/output/d15b_dae_X_*_latent.npy
