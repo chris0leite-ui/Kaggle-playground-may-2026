@@ -63,12 +63,18 @@ this branch):
   ρ=0.999917 → tie-band, PI held submission per Rule 27. See
   § Path-B K=5 refit.
 
-## Promotion candidates (PI ratified: PENDING; not yet promoted)
+## Promotion candidates (PI ratified: NO; held until n≥2 comps)
 
-PI was asked for additions and ratification (postmortem step 4)
-but issued "wrap up" without engaging the questions; promotion
-candidates remain UNRATIFIED in `.claude/skills/kaggle-comp/improvements.md`.
-Re-ask next session.
+PI ratification call: **promote none of the three.** Reason given:
+all three patterns are observed on a single comp; promotion to
+`.claude/skills/kaggle-comp/improvements.md` requires cross-comp
+evidence (n≥2 comps with the same pattern) per the skill's header
+("when a friction pattern appears in 2+ comps, costs > 1 LB slot,
+or required a human nag"). Today is the first observation. Re-evaluate
+on the next comp's confirmation.
+
+Candidates remain documented below for the next comp's checkpoint;
+do not re-promote without confirming the same pattern recurs.
 
 ### Candidate 1 — non-LR meta closed across tree classes
 
@@ -135,11 +141,12 @@ of evidence; ratify only if PI sees the pattern.
 
 ## PI additions (from step 4)
 
-PI issued "wrap up" without engaging the postmortem questions.
-No additions captured this session. Re-ask next session: anything
-to add, frictions missed, rules to extract, decisions to flag.
-PI ratification of the three promotion candidates above is also
-pending.
+PI: "Nothing to add." Postmortem captures what mattered for this
+session. No additional frictions, rules, or decisions flagged.
+
+Promotion ratification call from PI: **promote none.** Hold all
+three candidates until cross-comp evidence (n≥2 comps) accumulates;
+re-evaluate on the next comp's confirmation.
 
 ## Framework version at session-end
 
