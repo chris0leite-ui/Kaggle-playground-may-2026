@@ -44,4 +44,6 @@ For pre-Day-13 entries, see `audit/archive-2026-05-06-claude-md-compression.md`.
 | **CatBoost yekenot transfer (v4)** | 0.95200 | n/a | n/a | Day 17 PM single-model lift; +24 bp at K=21+1 (double the previous v3); ρ vs PRIMARY 0.972. |
 | **RealMLP yekenot full (h1d)** | 0.95257 | n/a | n/a | Day 17 PM single-model; matched yekenot's published OOF within 1.6 bp. |
 | **23-base v4+h1d Compound × Stint, τ=100k** | 0.95415 | n/a | **0.95354** | PRIMARY (Day 17 PM); +30 bp OOF; realised gap −6.1 bp. |
-| **27-base v4+h1d+DGP-class, τ=100k** | 0.95432 | n/a | **0.95368** | **CURRENT PRIMARY (Day 18 PM)**; +1.4 bp on LB; realised gap −6.4 bp. |
+| **27-base v4+h1d+DGP-class, τ=100k** | 0.95432 | n/a | **0.95368** | Old PRIMARY (2026-05-07 PM); hedge-eligible per Rule R7 since 2026-05-08 PM PRIMARY swap. |
+| **K=10 forward-greedy + Path-B C×S τ=100k** | 0.95420 | n/a | **0.95356** | Sparse-pool calibration probe (2026-05-08 PM). Δ −1.2 bp vs old K=27 PRIMARY; OOF→LB transfer precise to 0.1 bp at this scale. |
+| **K=4 forward-greedy + Path-B C×S τ=100k** | 0.95403 | n/a | **0.95351** | **NEW PRIMARY (2026-05-08 PM).** Bases: yekenot-RealMLP, CatBoost-yekenot, f1_hgbc_deep, d16_orig_continuous_only. Δ −1.7 bp on LB vs old K=27 PRIMARY (was Δ −2.93 bp on OOF); LB outperformed OOF prediction by ~1.2 bp. 4 bases capture 99% of the bank's LB value with 15% of the bases. |

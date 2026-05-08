@@ -140,38 +140,51 @@ look anything up here** — speak plainly first, define inline if needed.
 ## Experiment short-codes you may encounter in older notes
 
 The team used letter-number codes within and between sessions. These are
-load-bearing for back-references; new notes should use descriptive names.
+**FROZEN file/code prefixes** used for sequencing, NOT calendar days.
+The "Day-N" mapping below was used in older prose but does NOT
+correspond to comp days; see `audit/friction.md` under
+`day-counter-drift`. New notes must use ISO dates ("2026-05-08") or
+comp-day-N anchored to comp start 2026-05-01.
 
-- **m5q, m5h, m5g, m5b, m5c, m5d** — Day-3 multi-rule pool variants.
-- **e1, e2, e3, e4, e5** — Day-3 alternative-base probes.
-- **a, b, f1, f2** — Day-3 hand-coded rule variants.
-- **d2a** — Day-2 target-encoding probe.
-- **d3a, d3b** — Day-3 unified-TE / sequence-FE probes.
-- **d4** — Day-4 alternative-meta probes.
-- **d5** — Day-5 recursive-GBDT / pseudo-label probes.
-- **d6** — Day-6 multi-rule-residual stack (had been PRIMARY).
-- **d9, d9b ... d9i** — Day-9 hashing-LR / FM-class sweep.
-- **d10, d10b, d10c, d10d** — Day-10 GroupKFold rebuild.
-- **d12** — Day-12 master synthesis (4 falsified, 1 structural finding).
-- **d13, d13a, d13b, d13c, d13d, d13e** — Day-13 Path-B exploration.
-- **d14** — Day-14 cohort sweep / DGP residuals.
-- **d15** — Day-15 four-branch deep dive (DAE became PRIMARY).
-- **d15b** — Day-15 DAE-only PRIMARY at LB 0.95059.
-- **d15c, d15d** — Day-15 ExtraTrees / kNN-LightGBM hedges.
-- **d16** — Day-16 virgin-axes round.
-- **d17, d17_h1d, d17_K23, d17_K24** — Day-17 yekenot transfer + Path-B
+The d-prefix labels (`d2a` … `d19`) are an iteration counter that
+ran ahead of the calendar by ~10 days. Treat them as opaque
+sequencing identifiers.
+
+- **m5q, m5h, m5g, m5b, m5c, m5d** — multi-rule pool variants
+  (early sessions).
+- **e1, e2, e3, e4, e5** — alternative-base probes (early sessions).
+- **a, b, f1, f2** — hand-coded rule variants.
+- **d2a** — target-encoding probe.
+- **d3a, d3b** — unified-TE / sequence-FE probes.
+- **d4** — alternative-meta probes.
+- **d5** — recursive-GBDT / pseudo-label probes.
+- **d6** — multi-rule-residual stack (had been PRIMARY).
+- **d9, d9b ... d9i** — hashing-LR / FM-class sweep.
+- **d10, d10b, d10c, d10d** — GroupKFold rebuild.
+- **d12** — master synthesis (4 falsified, 1 structural finding).
+- **d13, d13a, d13b, d13c, d13d, d13e** — Path-B exploration.
+- **d14** — cohort sweep / DGP residuals.
+- **d15** — four-branch deep dive (DAE became PRIMARY).
+- **d15b** — DAE-only PRIMARY at LB 0.95059.
+- **d15c, d15d** — ExtraTrees / kNN-LightGBM hedges.
+- **d16** — virgin-axes round.
+- **d17, d17_h1d, d17_K23, d17_K24** — yekenot transfer + Path-B
   variants.
-- **d18** — Day-18 reverse-engineer-data-generation arc.
-- **d19** — Day-19 overnight (4 axes closed).
+- **d18** — reverse-engineer-data-generation arc.
+- **d19** — overnight closure round (4 axes closed).
 - **v3, v4** — CatBoost research-recipe variants. v4 = yekenot transfer.
 - **h1d** — RealMLP yekenot full-recipe replication.
-- **K=21, K=22, K=23, K=24, K=27** — Pool sizes at successive PRIMARY
-  configurations.
-- **E1-E5, F1-F6, G/H/I/J, A1, A2, B1, B2, C1, D1** — Day-18/19 axis-and-
-  probe codes from the reverse-engineer-data-generation arc and the
-  Day-19 overnight closure round.
+- **K=4, K=10, K=21, K=22, K=23, K=24, K=27** — Pool sizes at successive
+  PRIMARY configurations. **K=4** is the active PRIMARY since
+  2026-05-08 PM.
+- **E1-E5, F1-F6, G/H/I/J, A1, A2, B1, B2, C1, D1** — axis-and-probe
+  codes from the reverse-engineer-data-generation arc and the
+  d19 overnight closure round.
+- **EXP-1, EXP-2, EXP-3, EXP-4, EXP-5** — 2026-05-08 sprint probes
+  (GRU retest, LambdaRank, inter-stint, dual-head, minimal-pool sweep).
+  Documented in `EXPERIMENTS-NEXT.md`.
 - **FM_A, FM_B** — Two FM variants from the d9f partition.
-- **Probe 1-5** — Day-17 PM diagnostic probes.
+- **Probe 1-5** — diagnostic probes from the yekenot-transfer session.
 
 ## Calibration ladder columns
 

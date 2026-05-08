@@ -8,16 +8,33 @@ following `WRAPUP.md` section B.
 
 ## Where we are
 
-**Best leaderboard score so far: 0.95368.** Rank 98 of 893 = top 11%. Top-5%
-boundary is 0.95405 (gap −3.7 basis points). Leader is at 0.95476.
+**Active PRIMARY: K=4 forward-greedy + Path-B Compound × Stint, τ=100k.**
+LB **0.95351**. Set 2026-05-08 PM as the new working baseline at a
+deliberate −1.7 bp cost vs the prior 27-base PRIMARY (LB 0.95368).
+Bases: yekenot-RealMLP (`d17_h1d_yekenot_full`), CatBoost-yekenot
+(`p1_single_cb_v4_gpu`), HGBC deep (`f1_hgbc_deep`), LightGBM on the
+original pre-synth data (`d16_orig_continuous_only`) — one per model
+class.
 
-**Current PRIMARY** is a stack of 27 base models combined with a per-segment
-shrinkage stacker (segments are tire compound × stint number, shrinkage
-strength 100,000). Submissions used: 39 of 270.
+Top-5% boundary is 0.95405 (gap −5.4 bp from K=4 PRIMARY). Leader is
+at 0.95476 (gap −12.5 bp). Bootstrap CI on a 20% public draw is ±12 bp
+wide, so both gaps fall partly inside public-LB sample noise.
+
+Submissions used: 41 of 270. Today (2026-05-08): 2 used. Comp-day:
+8 of 31. Days remaining: **23**.
+
+**Date convention.** Prose uses ISO dates ("2026-05-08") or
+comp-day-N anchored to comp start 2026-05-01. The `d13`..`d19`
+labels in script names and historical audit prose are FROZEN code
+prefixes (sequencing counter for experiment iterations) — they are
+NOT calendar days. See `audit/friction.md` under
+`day-counter-drift`.
 
 For the full status — what's in the stack, what's been tried, what's open
 — see `state/current.md` and `state/hypothesis-board.md`. The
-calibration anchors are in `state/calibration-ladder.md`.
+calibration anchors are in `state/calibration-ladder.md`. Today's
+errata are in `HANDOVER-ERRATA.md`. The persistent experiment menu is
+`EXPERIMENTS-NEXT.md`.
 
 ## 🔴 Critical: held submissions invalidated
 
@@ -42,22 +59,37 @@ SUBMIT:**
 
 Origin: `audit/2026-05-06-target-reform-leakage-audit.md`.
 
-## What axes are still open
+## What axes are still open (revised 2026-05-08 PM)
 
-In priority order — see `state/hypothesis-board.md` for full reasoning:
+The historical "open axes" list is now empirically closed except for
+one. See `EXPERIMENTS-NEXT.md` for the full reasoning trail.
 
-1. **Sequence-level fingerprinting** of within-stint structure (Compound
-   transitions, stint lengths, TyreLife progression). Predicted +1 to +3 bp.
-   2-3 hours CPU. Only structurally-orthogonal axis remaining.
-2. **RealMLP with 24 ensembles** instead of the current 4. Predicted
-   +1 to +3 bp standalone. 3.5 hours GPU.
-3. **Per-Year CatBoost specialists.** Predicted ±2 bp. 30 minutes GPU.
-4. **Final-window R5 hedge preparation.** 30 minutes; hedge ladder
-   already populated.
-5. **Wrap-up posture.** Top-11% achieved; reserve compute for the next
-   competition.
-6. **FastF1 hard-join.** The only path to top-5%, but capped at 1.4%
-   match rate by synthetic driver codes; cost 1-2 days.
+1. **Non-LR meta architecture** (EXP-NEW). The K=10+1 LR-meta gate
+   absorbed every structurally-different inductive bias we tested
+   (LambdaRank per-stint, inter-stint memory, stint-completion dual-
+   head, GRU-sequence-retest). All three NULL within ±0.05 bp despite
+   low rank-correlation (ρ 0.41–0.73). Pinpoints rank-lock at the
+   **logit-direction level**, not rank-correlation. The only untested
+   architectural variant is a non-LR meta-learner on K=4's [P, rank,
+   logit] expansion (gradient boosting or small NN). Cost ~1 hr CPU.
+   This is the cheapest test that could break the ceiling.
+2. **Final-window R5 hedge preparation.** 30 minutes; hedge ladder
+   in `state/hypothesis-board.md` is already populated. The K=27
+   Path-B submission at LB 0.95368 is hedge-eligible since K=4 is now
+   PRIMARY.
+3. **Acceptance / wrap-up posture.** The 12.5-bp gap to leader sits
+   inside the public-LB sample-noise band. We may already be near our
+   private-LB ceiling.
+
+Closed during the 2026-05-08 sprint:
+- Sequence-level fingerprinting (was the handover #1 item) —
+  d16 GRU at K=10+1 absorbs identically to its K=22+1 result.
+- Sparse-pool ceiling-break — K=4 captures 99% of bank's LB value;
+  no shrinkage / segmentation / pool-surgery breaks rank-lock.
+- All meta-architecture segmentation crosses — 11+ variants tested
+  null. Path-B amp itself is +0.04 bp on K=27.
+- All structural inductive-bias variants — 3 of 3 NULL despite low ρ.
+- External data (D axis) — closed per PI direction.
 
 ## Read order on session start
 

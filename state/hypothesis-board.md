@@ -54,6 +54,17 @@ parked. For history, read `audit/research/` and the postmortems.
 - Yao/Vehtari covariance-modulated per-segment stacker — overshrinks
   along the highly-correlated base directions the stacker uses for
   routing.
+- **Non-LR meta architecture (LightGBM on PCA / raw expansion).**
+  PCA-meta probe 2026-05-08 PM: LightGBM meta is *worse* than LR meta
+  by 1-2 bp at every input representation tested (PCA top-K for K
+  in 3..27, K=10 / K=27 raw [P, rank, logit] expansion). EXP-NEW
+  closes FALSIFIED. The "non-LR meta" clause of A30 is empirically
+  refuted. See `scripts/probe_pca_meta.py`,
+  `audit/2026-05-08-pca-meta-probe.md`, A30b.
+- **Path-B segmentation in PC space.** PCA on K=27 logit pool
+  decorrelates the routing variables; Path-B C×S on top-K PCs scores
+  −28 to −34 bp vs K=10 plain LR. Path-B fires on redundant pools,
+  not orthogonal ones. See A30c.
 - Kernel SVM family (Nyström-RBF + LinearSVC and + kernel-logistic):
   standalone OOF 0.912-0.914 (+56 bp over matched-feature linear LR,
   but −400 bp from PRIMARY); both variants null on K=10 sparse and
@@ -104,26 +115,29 @@ parked. For history, read `audit/research/` and the postmortems.
 
 ## Open priorities (best EV / cost first)
 
-1. **Sequence-level DGP fingerprinting.** Every base treats rows as
-   i.i.d. The synthesiser almost certainly broke within-stint
-   sequence coherence (Compound transitions, stint-length distributions,
-   within-stint TyreLife progression). Predicted +1 to +3 bp; cost
-   2-3 hours CPU. The only structurally-orthogonal axis remaining.
+(Reordered 2026-05-08 PM after EXP-NEW falsification: non-LR meta is
+closed, so the "structurally untested architecture" priority drops out.)
+
+1. **R5 hedge preparation for the final-window probe.** List the
+   OOF-best candidates that were rejected for public-LB regression.
+   Hedge ladder already populated. Cost 30 minutes. **Highest-value
+   next move now that all single-axis lift candidates are NULL.**
 2. **RealMLP with 24 ensembles** (instead of the current 4). Yekenot's
    published recipe. Predicted +1 to +3 bp standalone; cost 3.5 hours
-   GPU on Kaggle.
+   GPU on Kaggle. Low confidence — sqrt(n_ens) law gives ≤1 bp.
 3. **Per-Year CatBoost-yekenot specialists.** Day-12 found 2023 was the
-   easiest year. Predicted ±2 bp; cost 30 minutes GPU.
-4. **R5 hedge preparation for the final-window probe.** List the
-   OOF-best candidates that were rejected for public-LB regression.
-   Hedge ladder already populated. Cost 30 minutes.
-5. **Wrap-up posture.** Top-11% achieved. Reserve compute for the next
+   easiest year. Predicted ±2 bp; cost 30 minutes GPU. Low confidence.
+4. **Wrap-up posture.** Top-11% achieved. Reserve compute for the next
    competition. Durable artifacts already shipped (LR-diagnostic suite,
-   BOTE harness, decisions.jsonl).
-6. **FastF1 lap-by-lap pit-call hard-join.** Only single-mechanism path
+   BOTE harness, decisions.jsonl, PCA-meta probe).
+5. **FastF1 lap-by-lap pit-call hard-join.** Only single-mechanism path
    to top-5. Predicted +10 to +30 bp. Cost: 1-2 days of work, which is
    prohibitive given days remaining and the 1.4% match-rate cap from
    synthetic driver codes.
+
+(Dropped: "Sequence-level DGP fingerprinting" was already closed by
+A28 / EXP-1 — the GRU at K=10+1 is NULL; rank-lock is pool-size-
+independent.)
 
 ## Hedge ladder (final-window candidates)
 
