@@ -267,3 +267,28 @@ candidate.
 |---|---|---|
 | EXP-1 (GRU at K=10+1) | NULL Δ −0.045 bp (matches K=22+1 result of −0.043 bp) — rank-lock is pool-size-independent. Strong prior NOT to rerun field-state / H9 / lead-lag — they will show the same. | `scripts/probe_exp1_gru_retest.py` + `scripts/artifacts/probe_exp1_gru_retest.json` (Day-19 PM) |
 | EXP-5 (minimal-pool sweep) | K=4 forward-greedy is the smallest pool within 2 bp OOF of K=10. K=4 LB **0.95351** vs PRIMARY 0.95368 (LB Δ −1.7 bp; *better* than OOF prediction of −2.93 bp by ~1.2 bp). Operational simplification: **K=4 captures 99% of the bank's LB value with 15% of the bases.** | `scripts/probe_minimal_pool_sweep.py` + `scripts/artifacts/probe_minimal_pool_sweep.json` (Day-19 PM) |
+| EXP-2 (LambdaRank per-stint) | NULL Δ +0.042 bp at K=10+1 plain. Standalone OOF 0.855, ρ 0.73 vs K=10. **Different objective produces different RANK info but absorbs at LOGIT level.** | `scripts/probe_exp2_lambdarank_per_stint.py` + `scripts/artifacts/probe_exp2_lambdarank.json` (Day-19 PM) |
+| EXP-3 (inter-stint features) | NULL Δ −0.011 bp at K=10+1 plain. Standalone OOF 0.814, ρ **0.47** vs K=10 — extremely diverse rank but still absorbed. **Cross-stint memory features lie in K=10's logit subspace.** | `scripts/probe_exp3_inter_stint_features.py` + `scripts/artifacts/probe_exp3_inter_stint.json` (Day-19 PM) |
+| EXP-4 (stint-completion dual-head) | NULL Δ −0.014 bp (Head A), +0.035 bp (composed) at K=10+1. Head A standalone 0.629 vs PitNextLap; composed 0.918. ρ 0.41 (Head A). **Target decomposition produces low-ρ predictions but absorbs at logit level.** | `scripts/probe_exp4_stint_completion_dual_head.py` + `scripts/artifacts/probe_exp4_dual_head.json` (Day-19 PM) |
+
+## Day-19 PM synthesis: rank-lock is at the logit level, NOT at rank-correlation
+
+EXP-2/3/4 all produce predictions with low ρ vs K=10 (0.41 / 0.47 / 0.73)
+yet absorb at the K=10+1 LR-meta gate within ±0.05 bp. **Different rank
+information does not break rank-lock as long as the new base's logit
+prediction is expressible as a linear combination of the existing K=10's
+[P, rank, logit] = 30-feature expansion.**
+
+The 3-D logit subspace identified by Day-18 PM SVD diagnostics is now
+empirically confirmed as **the information ceiling of the 14-feature
+row-level data under the LR-meta family.**
+
+To break it requires one of:
+1. **New data outside the 14 columns** — but external data is off the
+   table per PI direction.
+2. **A non-LR meta-architecture** (gradient boosting on predictions,
+   neural meta-learner) — never tested. **This is the only structurally
+   open avenue.**
+3. **Acceptance that the gap to leader (10.8 bp) may be public-LB
+   sample noise** — the bootstrap CI on a 20% public draw is ±12 bp
+   wide; 10.8 bp falls inside.
