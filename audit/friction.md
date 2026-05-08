@@ -84,6 +84,18 @@ restating it.
   than base count.** Implication: the "3-D ceiling" framing in A25 was
   K=27-specific; K=4 is much tighter. Audit:
   `audit/2026-05-08-four-lane-research-extension.md`.
+- `predictive-eff-rank-not-variance-eff-rank` (2026-05-08 PM, pca-k25-
+  ensemble branch): A25 recorded the K=27 logit pool's eff-rank as 3.23
+  and we treated that as the **predictive** ceiling under LR-meta (per
+  A30 wording). The PCA-meta probe shows top-3 PCA-LR scores 0.95061
+  (−35.64 bp vs the K=10 anchor 0.95417), while top-15 PCA-LR scores
+  0.95401 (≈anchor). The 3.23 is **variance**-eff-rank; predictive
+  eff-rank ≈ 15. Original A25 claim was correct; the A25→A30 inference
+  is where the slip happened. **Fix:** `ASSUMPTIONS.md` A25 now reads
+  "variance-eff-rank=3.23"; A30 cites A30b/A30c for refinements.
+  Complementary to `pool-collapse-K4-effective-rank-1.33` and
+  `non-LR-meta-on-K4-regresses` — three independent confirmations that
+  the rank-lock framing needed precision.
 - `non-LR-meta-on-K4-regresses` (2026-05-08 PM): direct test of A30
   (the only architecturally-untested avenue per
   `state/hypothesis-board.md`). Gradient-boosted meta on K=4
@@ -91,7 +103,10 @@ restating it.
   **−7.77 bp**. Augmented LR with raw row features = −0.04 bp (flat).
   **A30 dropped from `live` to `FALSIFIED`.** LR is the right model
   class for combining 4 collinear bases — non-linearity overfits the
-  30-feature meta projection.
+  30-feature meta projection. Cross-confirmation: pca-k25-ensemble
+  branch tested LightGBM-meta and Path-B-on-PCs at K=27 — both
+  underperform LR by 1-7+ bp. **Two independent K-pool sizes, two
+  non-LR meta classes, all negative.**
 - `gap-feature-absorbed-by-tyrelife-stint-lap-compound` (2026-05-08 PM):
   W3 (downsampling) marginal is strong — P(pit | gap=1) = 8.5% vs
   P(pit | gap≥11) = 30%, a 3.5× gradient — but K=4 LR meta calibration
@@ -124,6 +139,20 @@ restating it.
   isotonic wastes parameters on noise. **Promotion candidate to
   CLAUDE.md Rule:** "Isotonic per-stratum recalibration requires ECE
   > 1% in the stratum to be worth attempting."
+- `anchor-cited-from-memory-not-measurement` (2026-05-08 PM, pca-k25-
+  ensemble branch): I cited the K=10+1 plain LR-meta OOF as ~0.94850 in
+  a PI-facing AskUserQuestion when designing the PCA-meta probe. Actual
+  anchor (re-measured by the probe itself) was **0.95417** — 5.7 bp off
+  the cited value. Didn't change the strategic framing (relative deltas
+  drive verdicts, not absolute level), but it's a discipline failure.
+  Root cause: confused the K=10 plain LR-meta OOF with a different
+  number elsewhere in the docs and didn't verify before pasting.
+  **Fix:** when citing OOF anchors in PI-facing prose, grep
+  `state/calibration-ladder.md` and `audit/decisions.jsonl` first; if
+  the anchor isn't there as a clean datapoint, say "from memory, will
+  re-measure in probe" instead of pasting a number. Promotion
+  candidate: extension to Rule 26 (i)/(ii) — "(iii) every numerical
+  anchor in a BOTE / question is grep-cited or labelled 'from memory'".
 
 ## Week of 2026-05-07
 
