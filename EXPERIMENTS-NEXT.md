@@ -204,6 +204,144 @@ a single LGBM base.
 
 ---
 
+## Tier A2 — added 2026-05-08 PM from FE research code-grounded read
+
+Origin: `audit/2026-05-08-fe-research-code-grounded.md`. All eight
+picks below are recovered by reading `external/kernels/<slug>.ipynb`
+directly. Picks 1, 2, 4, 6, 7 are **fold-safe by construction** (use
+`PitStop` not `PitNextLap`); picks 3, 5, 8 require explicit per-fold
+refit infrastructure. **All gate at K=4+1** — sparse pool has lower
+absorption capacity per A26.
+
+### EXP-A2-1 — Gap-to-car features (svanikkolli v12 §F5)
+**Status:** pending
+**Targets:** A25 (rank-lock at logit level); WEAKNESSES W5 (untried
+feature classes); arXiv 2501.04068 TimeSHAP analysis flags "Gap
+Ahead" as #1 driver of pit decisions.
+**Cost:** ~15 min CPU. Build cumulative race time per (Driver, Race,
+Year) via `cumsum(LapTime - PitStop * 22.0)`; sort by Position within
+each `(Race, Year, LapNumber)` lap; shift to find car ahead/behind.
+Derived: `gap_to_car_ahead`, `gap_to_car_behind`, `in_drs_range`
+(<1.2s), `undercut_viable` (0.5..4.0s), `threat_from_behind` (<2s),
+`gap_ahead_delta` (3-lap diff), `nearby_pit_pressure`.
+
+**What we learn if it passes:** field-state has mechanically
+different content from the F3 aggregates we killed at K=24+1; the
+cumulative-time + position-sort construction extracts a 4th
+direction the LR-meta on K=4 logits doesn't span. Strong evidence
+for opening a "gap-derived" base-class.
+
+**What we learn if it fails:** rank-lock at logit-direction level
+extends to position-sorted gap features. Confirms A29/A30 even
+under the strongest TimeSHAP-supported novel feature class.
+
+### EXP-A2-2 — Mandatory 2-compound rule (svanikkolli v12 §F6)
+**Status:** pending
+**Targets:** W5; FIA dry-race regulation that was implicit in our
+pool but never explicitly engineered.
+**Cost:** ~5 min CPU. Vectorised cummax of compound-changes within
+`(Driver, Race, Year)`:
+
+```python
+df['_comp_first']   = df.groupby(GRP)['Compound'].transform('first')
+df['_comp_changed'] = (df['Compound'] != df['_comp_first']).astype(int)
+df['n_compounds_used']      = df.groupby(GRP)['_comp_changed'].transform('cummax') + 1
+df['mandatory_pit_pending'] = ((df['n_compounds_used'] < 2) & (df['RaceProgress'] > 0.45))
+df['mandatory_urgency']     = df['mandatory_pit_pending'] * df['RaceProgress']
+```
+
+**What we learn if it passes:** explicit FIA regulation gives a 4th
+direction. Suggests other FIA / rule-derived features (DRS zones,
+qualifying-position penalties) might also lift.
+
+**What we learn if it fails:** the regulation is fully absorbed by
+`Stint × Compound` interactions already in the pool.
+
+### EXP-A2-3 — Bigram/trigram nested-fold TE sweep
+**Status:** pending
+**Targets:** A26 (TPS 1st-place pattern recurring across S6E2 / S5E11
+/ S6E4); the Day-17 P1 falsification was the *non-nested* form.
+**Cost:** ~12 min CPU. For pairs and triples in `{Driver, Race,
+Compound, Year, Stint}`, build string-concat columns and fit sklearn
+`TargetEncoder(cv=5, smooth='auto')`. Romanrozen's smoothing values:
+20/30/25/25/20/15 across configs.
+
+**What we learn if it passes:** the *nested-fold* (Driver, Race,
+Year) and (Driver, Race, Compound) TEs lift even though the
+non-nested form leaks. Re-opens the 3-way TE family with the safe
+construction.
+
+**What we learn if it fails:** 3-way TEs absorb at the K=4 LR-meta
+even in the safe form. Yekenot's 2-way is the right granularity.
+
+### EXP-A2-4 — VSC vs Full-SC proxy split (svanikkolli v12 §F4)
+**Status:** pending
+**Targets:** A24 (single-proxy field-state was NULL); two-threshold
+split to capture different SC regimes.
+**Cost:** ~8 min CPU. `field_median_lt = groupby(Race, Year,
+LapNumber).LapTime.median()`; `sc_ratio = field_median_lt / roll5_lt`
+(per (Driver, Race, Year)). Thresholds: `is_sc_proxy = (sc_ratio >
+1.08)`, `is_vsc_proxy = (1.08, 1.30]`, `is_full_sc_proxy = (>1.30)`.
+Plus `laps_since_sc/vsc/full_sc` cumulative-since-last-1 counters
+and `in_sc_window/in_vsc_window/in_full_sc_window` thresholds at
+3/2/5 laps.
+
+### EXP-A2-5 — Heilmeier `remaining_pit_stops_proxy`
+**Status:** pending
+**Targets:** A25 / W5; Heilmeier 2020 Applied Sci 10(21):7805 ablation
+flags this as the #1 most-impactful engineered feature.
+**Cost:** ~5 min CPU + per-fold refit. `expected_stops_for(Race,
+Year) = train_fold.groupby(['Race', 'Year'])['Stint'].max()` (only
+training rows); merge onto val and test; derived feature is
+`expected_stops - (Stint - 1)`.
+
+### EXP-A2-6 — Fuel load correction (svanikkolli v12 §F7)
+**Status:** pending
+**Targets:** W5; the synth probably preserves a fuel-burn signal in
+LapTime that's currently mixed with tyre degradation.
+**Cost:** ~3 min CPU. Single coefficient (0.035 s/lap):
+
+```python
+df['fuel_adj_lt']        = df['LapTime (s)'] + df['LapNumber'] * 0.035
+df['fuel_corrected_deg'] = (df['fuel_adj_lt']
+    - df.groupby(['Driver','Race','Year'])['fuel_adj_lt'].transform('first')).clip(-5, 20)
+```
+
+### EXP-A2-7 — Field-state competitor features (svanikkolli v12 §F3)
+**Status:** pending
+**Targets:** A24 reconsideration — these use `PitStop` (feature) not
+`PitNextLap` (target), so fold-safe by construction; not the same
+class as the per-(Race,Year,Lap) `transform('mean')` aggregates that
+were NULL at K=24+1.
+**Cost:** ~8 min CPU. `n_pitted_this_lap = transform('sum')` of
+PitStop, `field_pit_rate = transform('mean')` of PitStop,
+`cars_older_tyres = transform(lambda x: (x > x.mean()).sum())`,
+plus the simpler `avg/max/min_field_tyre_age` and derived
+`tyre_age_vs_field`, `is_oldest_tyre`.
+
+### EXP-A2-8 — LightGBM stack-meta on richly-featured matrix
+**Status:** pending
+**Targets:** **scope clarification of EXP-NEW**. The hypothesis-board
+"non-LR meta" entry was tested only on prediction-only inputs (PCA
+top-K, K=27 raw [P, rank, logit] expansion). Romanrozen's stack-meta
+is LightGBM on a ~54-column matrix: 5 OOFs + 5 rank-norm + 5 logit +
+10 pairwise products + 10 pairwise abs-diffs + 13 raw FE columns + 6
+TE columns. **This input space was not in the falsification set.**
+**Cost:** ~10 min CPU on K=4 (stack matrix build + LGBM 5-fold OOF).
+LGBM meta params from romanrozen: `num_leaves=31, lr=0.02,
+n_est=800, l1=2.0, l2=4.0`.
+
+**What we learn if it passes:** the EXP-NEW falsification was
+narrower than the hypothesis-board states; the open question is
+input-richness, not learner class. Re-opens "non-LR meta" with a
+wider scope.
+
+**What we learn if it fails:** EXP-NEW closure extends to richly-
+featured inputs. K=4 + Path-B C×S τ=100k LR-meta is the empirical
+ceiling.
+
+---
+
 ## Tier C — GPU, expensive
 
 ### EXP-9 — Sequence transformer with explicit gap modelling
