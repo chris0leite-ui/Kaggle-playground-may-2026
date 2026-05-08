@@ -69,6 +69,24 @@ parked. For history, read `audit/research/` and the postmortems.
   yet still nulled — 9th rank-lock confirmation that low correlation
   alone is not sufficient meta-utility. SVM family closed across both
   global and specialist axes.
+- **Kernel-SVM-meta on K=4 ensemble.** Nyström-RBF + LinearSVC over
+  the K=4 base predictions (12 feat: raw + rank + logit) with γ-sweep.
+  γ=0.02 *ties* Path-B PRIMARY at OOF 0.95403; γ=0.05/0.10 within
+  noise. Asymmetric flip diagnostics: linsvc drops 1882 PRIMARY
+  positives without adding any; klogreg adds 11608 without dropping.
+  Same OOF, structurally different rare-class operating points —
+  candidates for blend on a future submission slot.
+- **kNN with feature subsets** (10 subsets ≤5 features, distance-
+  weighted K=50). LR-pool over 10 heads → OOF 0.92285 (≈ LR-bank
+  ceiling 0.928). Best single subset: top-5 numeric at 0.89426.
+  Label-encoded categoricals (Compound_LE) hurt kNN distance.
+- **NCA-kNN on K=4 / K=10 ensemble** (Neighbourhood Components
+  Analysis = learned manifold distance). Standalone OOF 0.946–0.947
+  (~70 bp below LR-meta 0.954). K=4+1 gate ±0.07 bp; K=10+1 gate
+  ±0.02 bp — null on both pools. Friction
+  `non-parametric-meta-on-K=4-cant-beat-LR-meta-without-new-input`.
+  K=4 is already saturated for meta-routing; logit effective rank
+  ~3 ⇒ any router can at best tie LR-meta until a new base is added.
 
 ## Open priorities (best EV / cost first)
 
