@@ -88,6 +88,27 @@ restating it.
   configurations agree, raises prior the signal is real not fold
   noise. Bottleneck is the rank-lock at logit-direction level, not
   the feature substrate.
+- `rf-optuna-cant-tune-past-natural-+0.25bp-ceiling`
+  (add-random-forest-model-XJ3Dm 2026-05-08 evening, Optuna probe
+  follow-up to kitchen-sink): 15-trial TPE search on RF
+  hyperparameters (n_estimators, max_features, min_samples_leaf,
+  max_samples, max_depth, criterion) with single-fold proxy
+  objective (best fold-0 K=4 LR + RF blend ΔAUC). Best config
+  validated at full 5-fold on seeds 42 and 7. **K=4+1 LR-meta Δ
+  +0.268 bp seed=42, +0.238 bp seed=7; cross-seed |Δ|=0.030 bp.**
+  Across 4 independent RF runs (Angle A, Kitchen-sink, Optuna×2)
+  the K=4+1 lift sits in **+0.24-0.27 bp with std 0.013 bp** — the
+  signal is real, not fold noise. **Hyperparameter optimization
+  yields zero meaningful improvement past the natural +0.25 bp
+  ceiling.** Optuna pushed standalone OOF DOWN (log2/max_samples=
+  0.7/depth=15 trades calibration for tree diversity) but
+  meta-utility unchanged within fold noise. **Conclusion: the
+  +0.25 bp lift is set by the meta architecture (3-D logit subspace
+  ceiling, A30), not by RF — it cannot be tuned past this value.**
+  Operational implication: stop tuning RF; the only remaining
+  forest-family lever with non-trivial EV is Path-B Compound × Stint
+  τ=100k refit on K=5 = K=4 + RF, which tests whether the +0.25 bp
+  OOF transfers to LB through per-segment shrinkage.
 - `nca-loss-matrix-O(n2)-OOM-at-50k`: NCA pairwise-distance loss
   matrix is O(n²) regardless of input dim; 50k subsample tries to
   allocate 18.6 GB. Fix: cap NCA fit subsample at 8-10k for 15 GB

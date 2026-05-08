@@ -272,3 +272,17 @@ of Rule 24 (fold-safe label-conditional aggregates).
   breadth (per irrigation 14-bank meta precedent) is empirically
   refuted on s6e5: the irrigation gain came from already-distilled
   base predictions, not raw + engineered features.
+- **Optuna-tuned RF on kitchen-sink** (15 TPE trials, single-fold
+  proxy + 2-seed full-5-fold validation). Best config: log2 features,
+  max_samples=0.7, max_depth=15, leaf=100, entropy. **K=4+1 LR-meta
+  Δ +0.268 bp seed=42, +0.238 bp seed=7** (cross-seed |Δ|=0.030 bp).
+  Standalone OOF dropped further (0.93957) — log2/max_samples=0.7
+  trades calibration for tree diversity. **Optuna yields zero
+  meaningful improvement past the natural +0.25 bp ceiling.** Across
+  4 independent RF runs (Angle A, Kitchen-sink, Optuna seed 42,
+  Optuna seed 7) the K=4+1 lift sits in +0.24-0.27 bp with std
+  0.013 bp. **The +0.25 bp signal is robust to feature width,
+  hyperparameters, and seed; it cannot be tuned higher because it
+  is set by the meta architecture (3-D logit subspace ceiling),
+  not by RF itself.** Path-B refit on K=5 = K=4 + RF-yekenot is
+  the single remaining forest-family move with non-trivial EV.

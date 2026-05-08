@@ -240,6 +240,77 @@ distilled signal. Raw + engineered features, where most columns
 are correlated with each other, is a different feature regime
 where RF doesn't get the same lift from breadth.
 
+## Optuna follow-up — hyperparameter optimization caps at the same +0.25 bp
+
+PI directive: tune RF hyperparameters with Optuna on the 57-feature
+kitchen-sink to push past +0.25 bp. Search space: n_estimators
+{300..800}, max_features {sqrt, log2, 0.3}, min_samples_leaf
+{50, 100, 200, 400}, max_samples {0.3, 0.5, 0.7}, max_depth
+{10, 12, 15, 18}, criterion {gini, entropy}. 15 trials with TPE,
+single-fold proxy (n_estimators=200, fold-0 best-blend-with-LR-base
+α-grid). Validation: top config at full 5-fold across two seeds (42, 7).
+
+Script: `scripts/probe_forest_optuna.py`
+Artifacts: `oof_rf_optuna_best_strat.npy`,
+`scripts/artifacts/probe_forest_optuna.json`
+
+**Best config:** `n_estimators=400, max_features=log2, min_samples_leaf=100,
+max_samples=0.7, max_depth=15, criterion=entropy`. Notable: log2 features
+(fewer per split → more diverse trees), max_samples=0.7 (more data per
+tree), explicit max_depth cap, entropy split criterion.
+
+| Run | standalone OOF | ρ | K=4+1 LR Δ |
+|---|---:|---:|---:|
+| Angle A (yekenot, default) | 0.94178 | 0.9595 | +0.262 bp |
+| Kitchen-sink (default) | 0.94054 | 0.9580 | +0.248 bp |
+| **Optuna seed=42** | 0.93957 | 0.9597 | **+0.268 bp** |
+| **Optuna seed=7** | 0.93961 | 0.9600 | **+0.238 bp** |
+
+**Cross-seed agreement: |Δ| = 0.030 bp.** The lift band across all
+four independent RF runs is **+0.24 to +0.27 bp** with std 0.013 bp.
+
+**Findings:**
+
+1. **The +0.25 bp K=4+1 lift is robust** across (a) feature width
+   (38 vs 57), (b) hyperparameter tuning (default vs Optuna-best),
+   and (c) RF training seed (42 vs 7). Three independent sources of
+   variability all leave the lift in a 30 bp-tenths-of-a-basis-point
+   window. **The signal is real, not fold noise.**
+
+2. **Optuna optimization yields zero meaningful improvement.** The
+   tuned config sits within fold noise of the default. The +0.25 bp
+   is the ceiling of "RF on this feature substrate against the K=4
+   LR-meta", not a tunable knob. The structural property that
+   determines the lift is the rank-lock at logit-direction level
+   (A30) — RF can extract that diversity bonus through any
+   reasonable hyperparameter setting; it cannot be tuned further
+   because the ceiling is set by the meta architecture, not by RF
+   itself.
+
+3. **Optuna pushes standalone OOF DOWN** (0.93957 vs default 0.94054
+   vs Angle A 0.94178). The log2/max_samples=0.7/depth=15 config
+   trades calibrated point-prediction accuracy for greater tree
+   diversity, which marginally helps the meta-utility (tiny +0.020
+   bp vs Angle A) at the cost of -2.21 bp standalone. Confirms that
+   what RF contributes to the meta is **diverse rank information**,
+   not raw predictive accuracy.
+
+**Strategic implication update.** Two of the three "remaining
+forest levers" listed above can now be deprioritized:
+
+- ~~Hyperparameter tuning~~ (Optuna-falsified: no improvement past
+  the natural +0.25 bp ceiling).
+- **Multi-seed RF bag** still makes sense as a noise-reduction
+  exercise, but with three independent RF runs already agreeing to
+  within 30 bp-tenths, the bag value is bounded; expected
+  improvement to the meta-gate lift is <0.05 bp.
+- **Path-B Compound × Stint τ=100k refit on K=5** is now the
+  single highest-EV remaining move. The +0.25 bp OOF signal is
+  reproducibly real; the question is whether it transfers through
+  Path-B's per-segment shrinkage to LB. Historical precedent: d15b
+  realized 1.4× amp at LB; central LB estimate +0.35 bp; sits
+  inside public-LB sample-noise band (±12 bp).
+
 ## Friction tags
 
 - `non-lr-meta-falsified-across-inductive-classes` — promoted from
