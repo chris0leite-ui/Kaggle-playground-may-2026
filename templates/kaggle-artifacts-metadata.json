@@ -1,0 +1,11 @@
+{
+  "title": "<Comp slug> — OOF / test artifacts",
+  "id": "USERNAME/SLUG-artifacts",
+  "subtitle": "Stacking pool predictions (private)",
+  "description": "Derived numpy artifacts for the <comp-slug> stacking pipeline. Files map 1:1 onto scripts/artifacts/*.npy in the project repo. Comp data (train/test) is NOT included per Kaggle TOS; only derived predictions. Schema: oof_<NAME>_strat.npy, test_<NAME>_strat.npy.",
+  "isPrivate": true,
+  "licenses": [{"name": "CC0-1.0"}],
+  "keywords": ["kaggle-internal", "stacking", "oof"],
+  "collaborators": [],
+  "data": []
+}

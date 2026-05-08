@@ -1,0 +1,56 @@
+# Rename this file to .gitignore when copying into a new repo.
+# (Stored without the leading dot here so it's visible in `ls`.)
+
+# Per-comp config (machine-local; created from .comp.env.template)
+.comp.env
+
+# Data — keep placeholders, ignore content
+data/*
+!data/.gitkeep
+
+# Submissions — migrated to private Kaggle Dataset
+submissions/*
+!submissions/.gitkeep
+
+# Common data formats
+*.csv
+*.zip
+*.parquet
+*.feather
+*.h5
+
+# Artifacts — migrated to private Kaggle Dataset
+scripts/artifacts/*
+!scripts/artifacts/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+.venv/
+venv/
+
+# Kaggle credentials (NEVER commit these)
+.kaggle/
+
+# Claude Code local settings (may contain secrets)
+.claude/settings.local.json
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Kaggle Dataset staging dir — only metadata + README tracked
+.kaggle-artifacts/*
+!.kaggle-artifacts/dataset-metadata.json
+!.kaggle-artifacts/README.md
+
+# CatBoost training artifacts (auto-generated)
+catboost_info/
+
+# External Kaggle datasets pulled for reference (large CSVs)
+external/*/

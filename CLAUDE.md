@@ -35,10 +35,10 @@ If you find yourself reaching for an acronym, that's a smell.
    2 days no lift: web search, 2 prior-comp writeups, 5 untried
    mechanisms with citations.
 8. **Settled-once facts** in `comp-context.md`. Never re-ask.
-9. **150-line cap on session-read docs** (`CLAUDE.md`, `HANDOVER.md`,
-   `state/current.md`, `audit/friction.md`). Reference docs (glossary,
-   rules-history, mechanism-ledger, audit archive, postmortems) are
-   exempt — they are pulled on demand, not read by default.
+9. **~160-line guideline on session-read docs** (`CLAUDE.md`,
+   `HANDOVER.md`, `state/current.md`, `audit/friction.md`). Reference
+   docs (glossary, rules-history, mechanism-ledger, audit archive,
+   postmortems) are exempt — pulled on demand, not read by default.
 10. **Pull-style updates.** No proactive minute-level chatter; on PI pull,
     1-2 sentences with the latest fact.
 11. **Model routing.** Haiku read-only; Sonnet default; Opus hard. 10/day.
@@ -106,6 +106,9 @@ If you find yourself reaching for an acronym, that's a smell.
 35. **PI thoughts are append-only.** Transcribe PI voice-dumps to
     `knowledge-base/thoughts/YYYY-MM-DD-slug.md`. Never overwrite,
     delete, or archive on cleanup. Folder is permanent.
+36. **Session-end second-brain update.** Before wrap-up, add at least
+    one entry to `knowledge-base/thoughts/`; log open questions in
+    `questions/`; surface persistent flags in `flags/`.
 
 ## Defaults from prior-comp postmortem
 
@@ -139,12 +142,11 @@ Process docs (read once / on trigger):
 - `audit/friction-archive.md` — full historical friction (1,450 lines; do
   not read by default).
 
-- `knowledge-base/` — PI second-brain (permanent; Rule 35).
-  Subdirs: `thoughts/` (voice-dumps), `concepts/`, `friction/`, `flags/`, `questions/`.
+- `knowledge-base/` — PI second-brain (permanent; Rules 35-36).
+  Subdirs: `thoughts/`, `concepts/`, `friction/`, `flags/`, `questions/`.
+- `templates/` — copy-paste starters for a new competition repo.
 
-Other:
-- `.claude/skills/postmortem/SKILL.md`, `.claude/skills/kaggle-comp/{lr-diagnostics,setup}.md`.
-- `knowledge-base/README.md` — second-brain layout reference.
-- `scripts/`: `probe.py` (Rule 19 harness), `probe_min_meta.py`,
-  `pre_submit_diff.py` (Rule 27), `research_seed.py`,
-  `smoke_kaggle_artifacts.py`, `setup_artifact_dataset.sh`.
+Skills + scripts:
+- `.claude/skills/postmortem/SKILL.md`, `.claude/skills/kaggle-comp/`.
+- `scripts/`: `probe.py` (Rule 19), `probe_min_meta.py`,
+  `pre_submit_diff.py` (Rule 27), `research_seed.py`, smoke + setup.
