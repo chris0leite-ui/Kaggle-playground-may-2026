@@ -113,8 +113,26 @@ def main():
     P4 = np.column_stack(base_oofs)
     P4_test = np.column_stack(base_tests)
 
-    primary_oof = _pos(ART / "oof_K4_fwd_pathb_strat.npy")  # K=4 + Path-B
-    primary_test = _pos(ART / "test_K4_fwd_pathb_strat.npy")
+    primary_path = ART / "oof_K4_fwd_pathb_strat.npy"
+    primary_test_path = ART / "test_K4_fwd_pathb_strat.npy"
+    if primary_path.exists():
+        primary_oof = _pos(primary_path)
+        primary_test = _pos(primary_test_path)
+        primary_kind = "K4_fwd_pathb"
+    else:
+        # Fall back to plain K=4 LR meta computed in-script
+        print("  (PRIMARY composite OOF not on disk; using plain K=4 LR meta as substitute)")
+        F4_tmp = _expand(P4)
+        F4_test_tmp = _expand(P4_test)
+        primary_oof = np.zeros(len(y))
+        primary_test = np.zeros(F4_test_tmp.shape[0])
+        for tr, va in StratifiedKFold(n_splits=N_FOLDS, shuffle=True,
+                                       random_state=SEED).split(np.zeros(len(y)), y):
+            lr = LogisticRegression(C=1.0, max_iter=MAX_ITER, solver="lbfgs")
+            lr.fit(F4_tmp[tr], y[tr])
+            primary_oof[va] = lr.predict_proba(F4_tmp[va])[:, 1]
+            primary_test += lr.predict_proba(F4_test_tmp)[:, 1] / N_FOLDS
+        primary_kind = "K4_LR_meta_substitute"
 
     print("Building gap features ...")
     tr_x, te_x, gap_feats = build_gap_features(train, test)
@@ -137,7 +155,7 @@ def main():
     print("\n--- D1.2: per-gap calibration of K=4 PRIMARY")
     cal_rows = []
     for bucket in gap_table["gap_bucket"]:
-        mask = (gap_buckets == bucket).values
+        mask = np.asarray(gap_buckets == bucket)
         if mask.sum() < 100:
             continue
         p_mean = primary_oof[mask].mean()

@@ -161,7 +161,22 @@ def main():
     base_tests = [_pos(ART / f"test_{n}_strat.npy") for n in K4_FWD]
     P4 = np.column_stack(base_oofs)
     P4_test = np.column_stack(base_tests)
-    primary_oof = _pos(ART / "oof_K4_fwd_pathb_strat.npy")
+
+    primary_path = ART / "oof_K4_fwd_pathb_strat.npy"
+    if primary_path.exists():
+        primary_oof = _pos(primary_path)
+        primary_kind = "K4_fwd_pathb"
+    else:
+        print("  (PRIMARY composite OOF not on disk; using plain K=4 LR meta substitute)")
+        F4_tmp = _expand(P4)
+        F4_test_tmp = _expand(P4_test)
+        primary_oof = np.zeros(len(y))
+        for tr, va in StratifiedKFold(n_splits=N_FOLDS, shuffle=True,
+                                       random_state=SEED).split(np.zeros(len(y)), y):
+            lr = LogisticRegression(C=1.0, max_iter=MAX_ITER, solver="lbfgs")
+            lr.fit(F4_tmp[tr], y[tr])
+            primary_oof[va] = lr.predict_proba(F4_tmp[va])[:, 1]
+        primary_kind = "K4_LR_meta_substitute"
 
     print("Building priors features ...")
     tr_x, te_x, h_feats = build_priors_features(train, test)
