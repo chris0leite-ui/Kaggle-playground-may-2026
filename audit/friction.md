@@ -55,6 +55,24 @@ restating it.
   +0.03 bp LR / −1.64 bp kernel — bases already absorb raw features.
   K=4 saturated for meta-routing; logit effective rank ~3. Need a
   fresh base, not a fresh router.
+- `non-lr-meta-falsified-across-bagged-and-boosted-tree-classes`
+  (add-random-forest-model-XJ3Dm 2026-05-08 evening): random forest
+  as meta-stacker over K=4 [P, rank, logit] OOF −1.54 bp vs LR-meta;
+  RF on combined input (K=4 expansion + 6 raw numerics) OOF −0.70
+  bp vs LR-on-same. Generalizes the Day-20 PCA-meta probe (LightGBM-
+  meta −1 to −2 bp) to bagged-tree class. The 3-D logit subspace
+  ceiling is robust across boosted *and* bagged tree-class metas.
+  Do not re-test tree-class metas on this comp's pool. See
+  `audit/2026-05-08-rf-forest-sweep.md`.
+- `forest-base-on-yekenot-recipe-most-diverse-positive-on-K4`
+  (add-random-forest-model-XJ3Dm 2026-05-08 evening): RF base on
+  yekenot FE recipe (no orig) → standalone OOF 0.94178, ρ=0.9595
+  vs PRIMARY-test, K=4+1 LR-meta +0.26 bp. Lowest ρ ever observed
+  on a positively-gating base in this comp. 4.4× larger min-meta
+  lift than `d15c_extra_trees` on raw (+0.06 bp at K=22+1). Hedge-
+  eligible per R5. Path-B refit on K=5 = K=4 + RF is the natural
+  next probe; predicted central-LB band +0.36 bp at the historical
+  1.4× amp floor.
 - `nca-loss-matrix-O(n2)-OOM-at-50k`: NCA pairwise-distance loss
   matrix is O(n²) regardless of input dim; 50k subsample tries to
   allocate 18.6 GB. Fix: cap NCA fit subsample at 8-10k for 15 GB

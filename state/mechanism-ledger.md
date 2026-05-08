@@ -244,3 +244,21 @@ of Rule 24 (fold-safe label-conditional aggregates).
 - **Yao/Vehtari covariance-modulated per-segment stacker** (C1) —
   3 τ all regress vs plain shrinkage; per-segment-stacker family
   closed (9 variants tested over Days 14-19).
+
+## Day-20 PM forest sweep (3 angles)
+
+- **Random forest as meta-stacker** on K=4 [P, rank, logit] (12
+  features) — OOF 0.95384 vs LR-meta 0.95399 = **−1.54 bp falsified**.
+  Bagged-tree variant of the Day-20 PCA-meta probe finding for
+  LightGBM; closes the "non-LR meta" clause across both boosted
+  and bagged tree-class metas.
+- **Random forest on combined input** (K=4 [P, rank, logit] + 6 raw
+  numerics = 18 feat) — RF 0.95393 vs LR-on-same 0.95400 = **−0.70 bp
+  falsified**. Adding raw numerics to the meta does not rescue
+  tree-class meta — confirms `combined-input-meta-stacker-absorbed`.
+- **Random forest base on yekenot recipe** (no orig concat, 38 feat,
+  5-fold StratifiedKF) — standalone OOF **0.94178**; K=4+1 LR-meta
+  **+0.26 bp** at **ρ=0.9595** vs PRIMARY. Most-diverse positively-
+  gating base in the K=4 era. +12 bp standalone over d15c ET-on-raw,
+  4.4× larger min-meta lift. Hedge-eligible per R5; Path-B refit
+  on K=5 is the natural next probe.

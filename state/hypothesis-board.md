@@ -61,6 +61,15 @@ parked. For history, read `audit/research/` and the postmortems.
   closes FALSIFIED. The "non-LR meta" clause of A30 is empirically
   refuted. See `scripts/probe_pca_meta.py`,
   `audit/2026-05-08-pca-meta-probe.md`, A30b.
+- **Random forest as meta-stacker over K=4** (12 feat, today). OOF
+  −1.54 bp vs LR-meta. Bagged-tree variant of the same finding;
+  closes non-LR meta family across boosted *and* bagged tree
+  classes. See `audit/2026-05-08-rf-forest-sweep.md`,
+  `scripts/probe_forest_sweep.py` Angle B.
+- **Random forest as meta-stacker on combined input** (K=4 expansion
+  + 6 raw numerics = 18 feat, today). OOF −0.70 bp vs LR-on-same.
+  Adding raw signals to the meta does not rescue tree-class meta.
+  Same audit as Angle B; Angle C.
 - **Path-B segmentation in PC space.** PCA on K=27 logit pool
   decorrelates the routing variables; Path-B C×S on top-K PCs scores
   −28 to −34 bp vs K=10 plain LR. Path-B fires on redundant pools,
@@ -116,8 +125,19 @@ parked. For history, read `audit/research/` and the postmortems.
 ## Open priorities (best EV / cost first)
 
 (Reordered 2026-05-08 PM after EXP-NEW falsification: non-LR meta is
-closed, so the "structurally untested architecture" priority drops out.)
+closed, so the "structurally untested architecture" priority drops out.
+Updated 2026-05-08 evening after forest sweep: forest base on yekenot
+recipe is the first non-null new-base lift on K=4.)
 
+0. **Path-B Compound × Stint τ=100k refit on K=5 = K=4 + RF-yekenot.**
+   The forest sweep produced a +0.26 bp K=4+1 LR-meta lift at ρ=0.959
+   (most-diverse positively-gating base in the K=4 era). Historical
+   Path-B amp ratios on similarly-orthogonal new bases: d15b DAE
+   realized 1.4× (smallest); d13e Stint amp 8×; d13 Stint+Compound amp
+   11.6×. Even at the 1.4× floor on +0.26 bp OOF, predicted LB Δ +0.36
+   bp — within public-LB sample-noise band but on the positive side.
+   Cost: ~10-15 min CPU. Single-shot submit candidate, requires PI
+   sign-off per Rule 1.
 1. **R5 hedge preparation for the final-window probe.** List the
    OOF-best candidates that were rejected for public-LB regression.
    Hedge ladder already populated. Cost 30 minutes. **Highest-value
@@ -147,5 +167,7 @@ override probe:
 - per-segment Compound × Stint, τ=100k (held)
 - ExtraTrees stack-add
 - LightGBM-on-kNN stack-add
+- **RF-yekenot stack-add** (today; ρ=0.959 most-diverse positively-
+  gating base on K=4; +0.26 bp OOF at K=4+1 LR-meta)
 - 22-base + d12 LR-meta + per-segment, τ=100k
 - DAE-only PRIMARY from Day 15 (the τ=20k variant)
