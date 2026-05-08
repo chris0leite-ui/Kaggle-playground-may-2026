@@ -270,6 +270,7 @@ candidate.
 | EXP-2 (LambdaRank per-stint) | NULL Δ +0.042 bp at K=10+1 plain. Standalone OOF 0.855, ρ 0.73 vs K=10. **Different objective produces different RANK info but absorbs at LOGIT level.** | `scripts/probe_exp2_lambdarank_per_stint.py` + `scripts/artifacts/probe_exp2_lambdarank.json` (Day-19 PM) |
 | EXP-3 (inter-stint features) | NULL Δ −0.011 bp at K=10+1 plain. Standalone OOF 0.814, ρ **0.47** vs K=10 — extremely diverse rank but still absorbed. **Cross-stint memory features lie in K=10's logit subspace.** | `scripts/probe_exp3_inter_stint_features.py` + `scripts/artifacts/probe_exp3_inter_stint.json` (Day-19 PM) |
 | EXP-4 (stint-completion dual-head) | NULL Δ −0.014 bp (Head A), +0.035 bp (composed) at K=10+1. Head A standalone 0.629 vs PitNextLap; composed 0.918. ρ 0.41 (Head A). **Target decomposition produces low-ρ predictions but absorbs at logit level.** | `scripts/probe_exp4_stint_completion_dual_head.py` + `scripts/artifacts/probe_exp4_dual_head.json` (Day-19 PM) |
+| EXP-NEW (non-LR meta on K=27) | **FALSIFIED 2026-05-08 PM.** LightGBM as meta-learner is *worse* than LR at every input representation: PCA top-K (Δ −1.91 to −32.88 bp), K=10 raw expansion (−1.25 bp), K=27 raw expansion (+0.01 bp). Best LightGBM 0.95417 = K=10 anchor. Best LR (K=27 raw) 0.95428 (+1.09 bp). Bonus finding: A25's 3.23 eff-rank is variance-only; predictive eff-rank ≈ 15 PCs (top-3 PCA-LR scores 0.95061, top-15 reaches 0.95401). Variant C (Path-B on PCs) also NULL by 28-34 bp — Path-B needs base correlations to route. The "non-LR meta architecture" clause of A30 is empirically refuted. | `scripts/probe_pca_meta.py` + `scripts/artifacts/probe_pca_meta.json` + `audit/2026-05-08-pca-meta-probe.md` (Day-20 PM) |
 
 ## Day-19 PM synthesis: rank-lock is at the logit level, NOT at rank-correlation
 
@@ -292,3 +293,26 @@ To break it requires one of:
 3. **Acceptance that the gap to leader (10.8 bp) may be public-LB
    sample noise** — the bootstrap CI on a 20% public draw is ±12 bp
    wide; 10.8 bp falls inside.
+
+## Day-20 PM addendum (2026-05-08): the "non-LR meta" clause of (2) is
+empirically REFUTED
+
+The PCA-meta probe (`probe_pca_meta.py`, 4 variants) tested LightGBM as
+meta-learner against LR at every input representation. LightGBM is *worse*
+than LR by 1-2 bp at every K and on raw [P, rank, logit] expansions of
+both K=10 and K=27. Best LightGBM 0.95417 (≈anchor); best LR 0.95428.
+Two structural findings:
+
+a. **A25 wording correction.** The K=27 logit pool's eff-rank=3.23 is
+   variance, not predictive content. Top-3 PCA-LR scores 0.95061
+   (−35.64 bp); top-15 reaches 0.95401 (≈anchor). The LR-meta uses
+   ~15 PCs of predictive content, not 3.
+
+b. **Path-B mechanism clarified.** Path-B C×S on top-K PCs scores
+   0.95077-0.95133 (NULL by 28-34 bp). Decorrelating the routing
+   variables kills Path-B's per-segment lift. Path-B fires on
+   redundant pools, not orthogonal ones.
+
+**Net: the only structurally open clause of A30 closes negative.**
+Remaining options are (1) external data (PI ruled out), or (3)
+acceptance posture. See `audit/2026-05-08-pca-meta-probe.md`.

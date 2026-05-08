@@ -108,11 +108,15 @@ For the named-experiment-by-experiment ledger, see
   0.41–0.73). The d16 GRU re-tested at K=10+1 also NULL (Δ −0.045 bp
   matching prior K=22+1 result). **Rank-lock is at the logit-direction
   level, not at rank-correlation.** See `ASSUMPTIONS.md` A29, A30.
-- **Non-LR meta architecture (E axis, NEW):** the only architecturally-
-  untested avenue. Replace the LR meta with a gradient-boosting
-  meta-learner on K=4's [P, rank, logit] expansion, or a small neural
-  meta-learner. Cost ~1 hr CPU. See `EXPERIMENTS-NEXT.md` proposal
-  EXP-NEW.
+- **Non-LR meta architecture (E axis): closed 2026-05-08 PM
+  (FALSIFIED).** PCA-meta probe (4 variants, K=27 pool) shows
+  LightGBM as meta-learner is *worse* than LR at every input
+  representation tested. Best LightGBM 0.95417 ≈ K=10 anchor; best
+  LR 0.95428 (K=27+1). EXP-NEW closes negative. Bonus findings:
+  A25's 3.23 eff-rank is variance-only (predictive eff-rank ≈ 15);
+  Path-B C×S on uncorrelated PCs loses 28-34 bp (Path-B needs base
+  correlations to route). See `audit/2026-05-08-pca-meta-probe.md`,
+  `scripts/probe_pca_meta.py`, A25b/A30b/A30c.
 
 ## Held submissions (do not submit)
 
