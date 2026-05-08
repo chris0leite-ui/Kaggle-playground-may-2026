@@ -263,7 +263,7 @@ candidate.
 
 ## Verdicts — closed EXPs
 
-(Empty at session start; populated as EXPs complete.)
-
 | EXP | Verdict | Audit |
 |---|---|---|
+| EXP-1 (GRU at K=10+1) | NULL Δ −0.045 bp (matches K=22+1 result of −0.043 bp) — rank-lock is pool-size-independent. Strong prior NOT to rerun field-state / H9 / lead-lag — they will show the same. | `scripts/probe_exp1_gru_retest.py` + `scripts/artifacts/probe_exp1_gru_retest.json` (Day-19 PM) |
+| EXP-5 (minimal-pool sweep) | K=4 forward-greedy is the smallest pool within 2 bp OOF of K=10. K=4 LB **0.95351** vs PRIMARY 0.95368 (LB Δ −1.7 bp; *better* than OOF prediction of −2.93 bp by ~1.2 bp). Operational simplification: **K=4 captures 99% of the bank's LB value with 15% of the bases.** | `scripts/probe_minimal_pool_sweep.py` + `scripts/artifacts/probe_minimal_pool_sweep.json` (Day-19 PM) |
