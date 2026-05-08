@@ -24,6 +24,35 @@ restating it.
   git (3.9 GB → 31 MB on origin) but leaves a `.git` of the same
   size locally until `git gc --prune=now --aggressive` runs (slow,
   ~20-30 min on this size).
+- `handover-open-axes-overstated`: `HANDOVER.md` and
+  `state/{current,hypothesis-board}.md` listed sequence-level
+  fingerprinting and Driver×Race×Year interaction-TE as "open" or
+  "untouched" axes, but both had been falsified or had leaked under
+  earlier strict audits (d16 GRU −0.043 bp NULL; field-state −0.015 bp
+  NULL; combined-frame lead/lag −0.36 bp; `make_features_A` interaction
+  TE LB 0.94107 vs OOF 0.94970). Errata in `HANDOVER-ERRATA.md`. Fix:
+  every "open axis" line in the handover must cite the specific
+  variant that was NOT tried, distinguished from the tried-and-failed
+  version.
+- `oof-lb-gap-misread-as-overfit`: the team has been tracking a
+  consistent −5 to −6 bp OOF→LB gap as a structural overfit signal.
+  Probe B (Day-19) shows a bootstrapped 95% CI of [0.95309, 0.95550]
+  for a random 20% public draw on the PRIMARY OOF; the observed LB
+  0.95368 is well inside that band. The "gap" is sampling noise.
+  Fix: re-run the 1000-bootstrap CI before treating any OOF→LB
+  divergence as structural.
+- `synth-coherence-misframed`: the assumption that the synthesiser
+  "broke within-stint sequence coherence" is wrong. Probe C shows
+  physical constraints (Compound, TyreLife, LapNumber) are preserved
+  at ≥99.99%. Mechanism is temporal downsampling: synthetic stints
+  mean 3.87 laps vs original 19.80; gap=1 frac 27.98% vs 99.60%.
+- `assumption-vs-evidence-tracking`: introduced `ASSUMPTIONS.md` to
+  separate MEASURED / INFERRED / ASSUMED / FALSIFIED claims. Re-check
+  on every postmortem and at handover prep.
+- `residual-concentrated-on-rain-rows`: PRIMARY's worst (Compound × Stint
+  × position) cells are all INTERMEDIATE / WET. Per-cell AUC 0.68-0.86
+  vs global 0.954. Suggests a rain-condition specialist as a candidate
+  axis NOT currently in any open-axes list.
 
 ## Week of 2026-05-07
 
