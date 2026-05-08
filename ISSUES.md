@@ -345,6 +345,46 @@ falsified, parked, or killed.** Full audit
   H9 alone (+0.631). Friction `lr-meta-multi-add-no-better-than-single-add`.
   `[owner: read-handover-lA8Nr | status: null]`
 
+## 11. Multi-model FE testing campaign (2026-05-08 PM, late)
+
+Origin: PI directive after FE research synthesis. 16 candidate FE
+picks queued in `EXPERIMENTS-NEXT.md` Tier-A2 + Tier-A3 from three
+audit notes (`audit/2026-05-08-fe-research-{survey,code-grounded,
+extended}.md`). Plan at `/root/.claude/plans/now-carefully-plan-how-
+polished-dewdrop.md` (PI-approved). Funnel: Stage 0 BOTE → Stage 1
+LR ceiling probe → Stage 2 LGBM smoke → Stage 3 LGBM 5-fold OOF +
+80/20 holdout audit → Stage 4 K=4+1 stack-add gate. Only the TOP-1
+survivor goes through full multi-model build-out (LR + LGBM + CB +
+RealMLP + HGBC, including Kaggle GPU per PI authorisation 2026-05-
+08). EXP-A2-8 stack-meta architecture probe runs as an independent
+track regardless of FE-add outcomes.
+
+- **11a.** Phase 0 — BOTE pre-flight for ~13 picks (skipping
+  EXP-A2-1, A2-5, A3-5; A3-5 deferred per PI). Triage to ~8-10
+  PURSUE candidates; PI-sealed predictions logged per Rule 26.
+  `[owner: research-feature-engineering-7oCmj | status: open]`
+- **11b.** Phase 1-4 — funnel execution on PURSUE candidates.
+  Pass criterion at Stage 4: K=4+1 LR-meta ΔOOF ≥ +0.5 bp AND G3
+  flip ratio ≥ 0.5 AND ρ vs PRIMARY ∈ (0.95, 0.999).
+  `[owner: research-feature-engineering-7oCmj | status: open]`
+- **11c.** Phase 5a — multi-model build-out for TOP-1 survivor.
+  HGBC deep + shallow (~20 min CPU); LightGBM (already in Stage 3);
+  CatBoost CPU (~50 min) THEN Kaggle GPU v4 (~5 h); RealMLP n_ens=4
+  CPU (~90 min) THEN Kaggle GPU n_ens=24 (~3.5 h). 5 OOFs across
+  classes; gate each at K=4+1.
+  `[owner: research-feature-engineering-7oCmj | status: open]`
+- **11d.** Phase 5b — EXP-A2-8 LightGBM stack-meta on richly-
+  featured matrix (~54 cols including pairwise prediction products
+  + abs-diffs not in EXP-NEW falsification scope). Independent of
+  Stage 4 outcomes. `state/hypothesis-board.md` amended 2026-05-08
+  to clarify that pairwise-prediction-interaction scope was never
+  tested.
+  `[owner: research-feature-engineering-7oCmj | status: open]`
+- **11e.** Phase 6 — submission decision per surviving lift.
+  `scripts/pre_submit_diff.py` ρ check; PI sign-off; single-shot
+  Kaggle submit; `probe.py record-outcome` to close calibration.
+  `[owner: research-feature-engineering-7oCmj | status: open]`
+
 ---
 
 ## Falsified or dead (do not re-claim)
