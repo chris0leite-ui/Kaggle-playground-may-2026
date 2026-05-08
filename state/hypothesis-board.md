@@ -54,6 +54,12 @@ parked. For history, read `audit/research/` and the postmortems.
 - Yao/Vehtari covariance-modulated per-segment stacker — overshrinks
   along the highly-correlated base directions the stacker uses for
   routing.
+- Kernel SVM family (Nyström-RBF + LinearSVC and + kernel-logistic):
+  standalone OOF 0.912-0.914 (+56 bp over matched-feature linear LR,
+  but −400 bp from PRIMARY); both variants null on K=10 sparse and
+  K=27 dense pools (Δ −0.09 to +0.00 bp). 8th rank-lock confirmation;
+  kernel-class disagreement isn't enough when standalone-AUC gap to
+  GBDT-class exceeds 300 bp.
 
 ## Open priorities (best EV / cost first)
 
