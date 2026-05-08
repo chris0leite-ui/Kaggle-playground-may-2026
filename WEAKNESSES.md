@@ -51,23 +51,29 @@ matching only.
 Artifact: `scripts/probe_rain_specialist.py`,
 `scripts/artifacts/probe_rain_specialist.json`.
 
-## W2 — OOF→LB sampling-noise CI is wide (status: cold but worth re-checking)
+## W2 — OOF→LB sampling-noise CI is wide, BUT relative transfer is tight (status: refined)
 
 Bootstrapped 95% CI of a random 20% public draw is [0.95309, 0.95550]
-around an OOF of 0.95432 — a span of **24 bp**. This means a 4-bp OOF
-gain has a substantial chance of regressing on public LB just from the
-public-split lottery, and conversely a 4-bp OOF regression can land as
-a paper "lift" of a few bp. The team has been tracking OOF→LB deltas
-of order ±5 bp as if they were signal; the CI says they're not.
+around an OOF of 0.95432 — a span of **24 bp**. So the absolute LB
+level is sampled noisily.
+
+**Day-19 update (A27):** the K=10_fwd Path-B submission landed at LB
+0.95356 vs an OOF of 0.95420 — a Δ of −1.2 bp, exactly matching the
+OOF Δ vs PRIMARY of −1.19 bp. **Relative comparison between
+submissions of the same model class is precise to ~0.1 bp.** This
+means: cross-submission LB deltas can be trusted as signal; absolute
+LB level cannot.
 
 What might break it open: bootstrap a bigger sample by repeated
 seed-restarts of OOF generation, or use the published-LB pairs from
 identical-architecture submissions to bound the within-architecture
 public-split variance. We can also flag this in any submission decision
-as "expected uncertainty band ≈ ±12 bp."
+as "expected absolute uncertainty band ≈ ±12 bp; relative deltas trust
+to ±0.1 bp."
 
 Artifact: `scripts/probe_understand_problem.py` Probe B,
-`scripts/artifacts/probe_understand_problem.json`.
+`scripts/artifacts/probe_understand_problem.json`,
+`submissions/submission_K10_fwd_pathb.csv` LB 0.95356.
 
 ## W3 — Synthetic data temporally downsamples real stints (status: unsolved)
 
