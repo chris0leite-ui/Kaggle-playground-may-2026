@@ -6,10 +6,10 @@
 data/*
 !data/.gitkeep
 
-# Submissions — only final submission CSVs tracked
+# Submissions now live in private Kaggle Dataset chrisleitescha/s6e5-artifacts
+# (migration 2026-05-08). Working tree keeps a placeholder only.
 submissions/*
 !submissions/.gitkeep
-!submissions/submission_*.csv
 
 # Common data formats
 *.csv
@@ -21,21 +21,11 @@ submissions/*
 # Override: final Kaggle submission CSVs are committed
 !submissions/submission_*.csv
 
-# Artifact policy (revised 2026-05-08, post-cleanup):
-# Track .npy and .json under scripts/artifacts/, but block transient/junk.
-scripts/artifacts/*.log
-scripts/artifacts/*.db
-scripts/artifacts/*.pkl
-scripts/artifacts/*_fold[0-9]*.npy
-scripts/artifacts/*_fold[0-9]*.json
-scripts/artifacts/_smoke_*.npy
-scripts/artifacts/_smoke_*.json
-scripts/artifacts/tmp_*.npy
-scripts/artifacts/scratch_*.npy
-scripts/artifacts/*.txt
-scripts/artifacts/*.csv
-scripts/artifacts/*.csv.gz
-scripts/artifacts/*.md
+# Artifacts now live in private Kaggle Dataset chrisleitescha/s6e5-artifacts
+# (migration 2026-05-08). Local working copy in scripts/artifacts/ is rebuilt
+# via `kaggle datasets download chrisleitescha/s6e5-artifacts -p scripts/artifacts/ --unzip`.
+scripts/artifacts/*
+!scripts/artifacts/.gitkeep
 
 # Python
 __pycache__/
