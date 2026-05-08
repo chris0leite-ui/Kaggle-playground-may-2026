@@ -260,6 +260,103 @@ This independently confirms our R1/Strat-as-LB-proxy choice and the
 ~3 bp OOF→LB gap calibration. GroupKFold over-penalises by ~16 bp;
 Stratified is the right anchor.
 
+## Prior-comp 1st-place writeup synthesis
+
+A sixth focused agent attempted to read the actual *bodies* of recent
+TPS 1st-place writeups (S6E1, S6E2, S6E3, S6E4 irrigation, S5E10,
+S5E11, S5E12). Kaggle SPA renders behind JS for unauth fetches;
+Wayback Machine egress-blocked, archive.ph CAPTCHA-walled, Google /
+Bing cache returned 404. The agent recovered content via two indirect
+paths:
+
+1. **NVIDIA developer blogs** — KGMON team's S6E3 win + Grandmasters
+   Playbook + cuDF FE + cuML stacking blogs, written by Chris Deotte
+   et al., are open-access and substantively describe their methods.
+2. **BlamerX/Kaggle-Playground-Predection-Competition** GitHub agent
+   logs — explicitly quote and port from the writeup bodies of
+   S6E1/S6E2/S6E3/S6E4 with `Source: SXEY 1st place` attributions.
+
+**Honesty caveat:** the agent did NOT read the literal HTML of the
+S6E1/S6E2/S5E10/S5E11/S5E12/S6E4 1st-place writeup bodies. The
+recurrence of patterns across the indirect sources is the
+confidence anchor — multiple independent ports and quotes converge
+on the same 6 patterns.
+
+### Patterns recurring across ≥3 1st-place writeups (high confidence)
+
+1. **Inner-fold target encoding on bigram / trigram categorical
+   interactions.** S6E2 1st (`Contract×IS×OnlineSecurity` was the
+   #1 importance feature at 0.155), S5E11 1st (multi-target encoding
+   variant), S6E4 1st (145 pairwise TE features), Deotte across multiple
+   comps. Nested-fold (Deotte-style) to prevent leakage. **This is
+   the highest-confidence port we have evidence for.** Adjusts our
+   existing yekenot 2-way TE on `(Race, Compound)` + `(Race, Year)` to
+   include 3-way and exhaustive 2-way over more pairs.
+2. **Digit-level / modulo / rounding features on numericals.** S5E11
+   1st, S6E2 1st (`tenure % 10`, decimal-extraction from
+   `MonthlyCharges`), S6E4 1st (`Field_Area % 1` "magic anchor"
+   detecting synthetic-generation artifacts). Reproduced with
+   **+0.00028 OOF** in independent S6E3 port. **Particularly relevant
+   for synthetic data** — CTGAN / similar generators leak digit
+   patterns in low-order decimals.
+3. **Original (parent) dataset injection as anchor.** S6E2, S6E4,
+   S5E11. Target-encode against the source dataset, weight the anchor
+   ~0.30-0.40 in the final blend. We already do this via the yekenot
+   recipe's `aadigupta1601` original-data merge — confirms the pattern.
+4. **Multi-level / many-model stacking with hill-climbing weights.**
+   S6E3 KGMON (4-level stack of 150 models from 850 candidates), S5E12
+   1st ("Hill Climbing + Ridge Ensemble"), S6E2 1st ("Gap-Aware
+   Blend"). Hill-climb chosen over linear/NN stackers when bases are
+   highly correlated (avg ρ=0.997 in KGMON). We use forward-greedy
+   K=4; **un-explored adjacent: hill-climb with re-weighting (not just
+   inclusion) on the K=4 logit pool**.
+5. **Pseudo-labeling / knowledge distillation.** S6E1 1st (Deotte
+   quote: "we don't benefit from the fake targets; we benefit from
+   the new real features"), ported into S6E2 (V58/V59) and S6E3
+   (V53-V57). Self-distillation works for 1-2 iterations only before
+   degrading. **Already in Tier-A #8 (romanrozen variant).**
+6. **Diversity discipline — depth-2 stumps + OHE + LR scaling.** S6E2
+   1st champion class. Beats deeper single models. Inclusion of
+   weaker-but-uncorrelated bases (RealMLP, NODE, KAN, RGF) for
+   ensemble lift.
+
+### Outlier ideas worth testing on s6e5 (single-comp evidence)
+
+7. **Genetic programming feature discovery (S5E10 1st).** `gplearn`
+   to auto-discover arithmetic combinations on continuous columns
+   (LapNumber, TyreLife, Stint, RaceProgress). Strong fit when synth
+   has hidden generation rules. **Already Tier-C #11; S5E10 1st-place
+   evidence elevates this from "speculative" to "moderate-EV" if
+   we have the CPU budget.**
+8. **Decimal-modulo "magic anchors" on numericals (S6E4 trick).**
+   `LapNumber % 1`, `RaceProgress * 1000 % 10`, `TyreLife % 1`.
+   **Already Tier-C #12 (float-digit extraction); evidence
+   strengthens this from "speculative" to "moderate-EV"** because
+   S6E4 winner explicitly used `Field_Area % 1` as a magic anchor.
+9. **DVAE / DAE bottleneck features (S6E2 1st).** Denoising
+   variational autoencoder on train+test concatenated; AV-AUC=0.502
+   on s6e5 means combined fit is safe. 64-dim latent as auxiliary
+   input to GBDT, or as a pure diversity model. NB: this **failed
+   when ported to S6E3** (bottleneck destroyed signal in highly-
+   redundant input space). We already tested simple DAE; DVAE
+   specifically is untried.
+10. **Recursive knowledge distillation, 1-2 iterations only (S6E1
+    1st).** Train s6e5 best XGB on pseudo-labels of test rows where
+    `P > 0.98` or `P < 0.02` with weight 0.5. Per Deotte: more than 2
+    iterations degrade.
+11. **`baseline=` margin transfer (S6E1).** Convert XGB log-odds to
+    CatBoost `Pool(baseline=...)` so CatBoost trains on the residual
+    margin. Cheaper than full stacking, untried in our pipeline.
+12. **Per-(Driver, Race, Year) "AllCat" string concatenation (S6E2 /
+    Deotte).** Treat the tuple as a single high-cardinality
+    categorical; inner-fold TE. The 71% time-shuffle within (Driver,
+    Race, Year) groups means group ID itself is leak-free. **NB:
+    Day-17 P1 audit falsified the romanrozen Driver × Race × Year
+    TE in our per-fold-aggregated-on-full-train setup. The S6E2 /
+    Deotte variant uses NESTED-FOLD TE which is the safe form.**
+    Worth re-attempting with strict nested-fold sklearn
+    `TargetEncoder(cv=5)`.
+
 ## What the leader is probably doing
 
 Synthesising the three agents' findings: the most likely mechanism for
@@ -362,10 +459,21 @@ Academic / industry literature:
 Top-Grandmaster recipes:
 - Chris Deotte, NVIDIA cuDF blog (TPS-S5E2 1st), NVIDIA cuML stacking
   blog (TPS-S5E4 1st), "Grandmasters Playbook" (NVIDIA, 7 techniques).
+- KGMON team (Deotte, Puget et al.), NVIDIA blog "Winning a Kaggle
+  Competition with Generative AI–Assisted Coding" (TPS-S6E3 1st).
+- `cdeotte/KGMON-Playbook-2026` GitHub (notebooks 02_Feature_Engineering,
+  04_Stacking).
+- `BlamerX/Kaggle-Playground-Predection-Competition` GitHub (agent
+  logs porting / quoting from S6E1, S6E2, S6E3, S6E4 1st-place
+  writeups with explicit attribution).
+- `AdilShamim8/Kaggle_Competitions` GitHub (Top-1% reproduction of
+  S5E10 Road Accident Risk; confirms genetic-programming features).
 - Max Halford, "Target encoding done the right way" (closed-form
   additive smoothing).
 - TPS-S6E2 / S6E3 / S6E4 / S5E10 / S5E11 1st-place writeup titles
-  (bodies JS-rendered, not WebFetch-accessible).
+  (bodies JS-rendered, accessed indirectly via NVIDIA blogs and
+  GitHub agent logs as above).
+- Medium: Sanjay Bista S5E11 loan-prediction class-imbalance writeup.
 
 GitHub blend logs:
 - Beiciccc/predicting-f1-pit-stops (experiment_log.md, leaderboard_history.csv).
@@ -382,16 +490,33 @@ PI sign-off needed before any compute spend — present this audit's
 top-3 picks with the cost/EV table, ask whether to proceed with smoke
 or defer to wrap-up.
 
-**Revised top-3 after fifth-agent findings:**
+**Revised top-3 after sixth-agent prior-comp synthesis:**
 
-1. **Heilmeier `remaining_pit_stops_proxy`** (Tier-A #1; ~5 min CPU).
-2. **`baarzenzijncool` per-compound TyreLife cliff features** (item
-   #13; ~5 min CPU + per-fold refit). Supersedes Tier-A #4 (Pirelli
-   priors) since the repo's empirical thresholds are calibrated to
-   the s6e5 synth.
-3. **`cars_pitting_same_lap` field-state, fold-safe** (Tier-A #2;
-   ~10 min CPU).
+The prior-comp synthesis surfaced two patterns that recur across ≥3
+TPS 1st-place writeups (the highest-confidence ports we have
+evidence for) which beat the F1-domain candidates on prior strength.
+Final top-3:
 
-Total smoke + 5-fold OOF probe budget: ~30 min CPU for all three.
+1. **Bigram / trigram inner-fold target encoding sweep** (writeup
+   pattern #1; S6E2 1st + S5E11 1st + S6E4 1st all use it). For
+   pairs and triples in `{Driver, Race, Compound, Year, Stint}`,
+   build string-concat columns and fit `TargetEncoder(cv=5)`. ~12
+   min CPU. The Day-17 P1 falsification was the *non-nested* variant;
+   strict sklearn `TargetEncoder(cv=5)` is the safe nested-fold form.
+2. **Heilmeier `remaining_pit_stops_proxy`** (single-line domain
+   feature; Tier-A #1; TUM 2020 ablation flags as #1 most-impactful
+   engineered feature). ~5 min CPU.
+3. **`baarzenzijncool` per-compound TyreLife cliff features** (item
+   #13; ~5 min CPU + per-fold refit). The empirical thresholds are
+   calibrated to s6e5 synth.
+
+Reserve runner-ups (one slot each if any of top-3 lifts):
+- **Decimal-modulo "magic anchors"** (writeup pattern #8). `LapNumber
+  % 1`, `RaceProgress * 1000 % 10`, etc. ~3 min CPU. Cheap,
+  high-variance probe; explicit S6E4 1st-place precedent.
+- **`cars_pitting_same_lap` field-state, fold-safe** (Tier-A #2;
+  ~10 min CPU).
+
+Total smoke + 5-fold OOF probe budget: ~25-35 min CPU for the top-3.
 Within the Rule-2 envelope.
 
