@@ -6,7 +6,7 @@
 
 ---
 
-## Where we are (Day-19 PM, 2026-05-07 overnight)
+## Where we are (2026-05-08; 23 days to deadline)
 
 - **PRIMARY** = `d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000`, LB **0.95368**
   (Day-18 PM-late). K=27 = K=21 + v4 (CB yekenot transfer) + h1d (RealMLP

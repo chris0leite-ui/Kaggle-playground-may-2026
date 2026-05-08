@@ -1,7 +1,7 @@
 # Kaggle Playground Series s6e5 — F1 Pit Stop Prediction
 
 Workspace for the May 2026 Playground comp (`PitNextLap` row-level AUC).
-Deadline 2026-05-31. Day-19 of 27 at last cleanup.
+Deadline **2026-05-31 23:59 UTC** (23 days remaining as of 2026-05-08).
 
 ## Current state
 

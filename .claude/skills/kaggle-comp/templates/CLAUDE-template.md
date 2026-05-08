@@ -70,7 +70,9 @@ They override the kickoff-time defaults.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
-day: 1
+date: {{TODAY}}                   # ISO YYYY-MM-DD; updated each session
+days_to_deadline: {{DAYS_LEFT}}   # recompute = deadline - date
+session_log: []                   # most-recent first; cap ≤2 entries
 lb_best_today: {{LB_BEST}}        # leader's score on public LB today
 our_lb_best: null                 # update after first submit
 submissions_used_today: 0

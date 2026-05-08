@@ -31,7 +31,10 @@ Cap ≤150 lines. This is a checklist agents follow verbatim.
 
 3. **Update CLAUDE.md `## Current state` YAML.** Edit only fields
    that changed today, with today's audits as the source of truth:
-   - `day` (bump if rolling over)
+   - `date` (today, ISO format) and `days_to_deadline` (recompute
+     against `comp-context.md::deadline`)
+   - `session_log` (prepend a new entry; cap ≤2 entries — older
+     narratives roll into per-day audit notes, not the YAML)
    - `submissions_used_today`, `submissions_used_total`
    - `mechanism_families_explored` (append new entries; never reorder)
    - `lb_best_today`, `our_lb_best`
