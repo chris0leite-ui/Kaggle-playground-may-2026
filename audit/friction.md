@@ -74,6 +74,56 @@ restating it.
   × position) cells are all INTERMEDIATE / WET. Per-cell AUC 0.68-0.86
   vs global 0.954. Suggests a rain-condition specialist as a candidate
   axis NOT currently in any open-axes list.
+- `pool-collapse-K4-effective-rank-1.33` (2026-05-08 PM,
+  research-model-extensions-Ibwvn): SVD on the K=4 forward-greedy pool
+  shows logit effective rank = **1.33** (entropy on singular values),
+  far below K=27's 3.23 (A25). Component 1 alone captures 93.6% of
+  variance and correlates with TyreLife (−0.33), LapNumber (−0.30),
+  Compound dummies — the dominant direction is "tyre-degradation
+  pressure × compound." **Forward-greedy reduces effective rank faster
+  than base count.** Implication: the "3-D ceiling" framing in A25 was
+  K=27-specific; K=4 is much tighter. Audit:
+  `audit/2026-05-08-four-lane-research-extension.md`.
+- `non-LR-meta-on-K4-regresses` (2026-05-08 PM): direct test of A30
+  (the only architecturally-untested avenue per
+  `state/hypothesis-board.md`). Gradient-boosted meta on K=4
+  [P, rank, logit] = **−1.20 bp** vs LR; 2-hidden-layer MLP meta =
+  **−7.77 bp**. Augmented LR with raw row features = −0.04 bp (flat).
+  **A30 dropped from `live` to `FALSIFIED`.** LR is the right model
+  class for combining 4 collinear bases — non-linearity overfits the
+  30-feature meta projection.
+- `gap-feature-absorbed-by-tyrelife-stint-lap-compound` (2026-05-08 PM):
+  W3 (downsampling) marginal is strong — P(pit | gap=1) = 8.5% vs
+  P(pit | gap≥11) = 30%, a 3.5× gradient — but K=4 LR meta calibration
+  per gap-bucket has ECE 0.0001-0.0015 (near-perfect). Gap as meta
+  feature +0.02 bp; gap-augmented LGBM as base-level feature K=4+1
+  gate +0.001 bp; per-gap isotonic recalibration −2.18 bp. Conclusion:
+  TyreLife + Stint + LapNumber + Compound implicitly carry all gap
+  information. Closes W3 as an actionable axis.
+- `synth-divergence-from-F1-realism-on-last-lap` (2026-05-08 PM):
+  in this synth, P(pit | is_last_lap_of_race) = **0.38**, NOT ~0 as F1
+  reality dictates. n=21 so noisy, but the direction is opposite.
+  Senior-lens "race-end no-pit" rule clamp consequently misfires
+  (−9.48 bp under deterministic clamp). **Lesson:** F1-domain priors
+  must be empirically verified against the synth's labelling before
+  use; do not apply real-F1-strategy rules without checking.
+- `pitnextlap-not-deterministic-from-observed-row-structure`
+  (2026-05-08 PM): observation-time check showed only **29% of train
+  rows have lap L+1 (real, observed) present** in the data. When L+1
+  is observed, PitStop[L+1] matches PitNextLap[L] only 81% of the time.
+  PitNextLap is therefore a probabilistic forward-looking label whose
+  construction includes synth-introduced noise; this bounds achievable
+  AUC near where K=4 already sits (~0.954). Implication: a
+  discrete-time-hazard reformulation against `(stint ends in next k
+  laps)` doesn't cleanly map to PitNextLap — abandoned.
+- `isotonic-overfits-when-base-already-calibrated` (2026-05-08 PM,
+  2nd confirmation): per-gap isotonic (P1.3) and per-Compound isotonic
+  (P3.2) BOTH regressed (−2.18, −1.78 bp) despite ECE diagnostics
+  showing well-calibrated input. Pattern: when the base meta is
+  already near-zero ECE per stratum, fold-restricted per-stratum
+  isotonic wastes parameters on noise. **Promotion candidate to
+  CLAUDE.md Rule:** "Isotonic per-stratum recalibration requires ECE
+  > 1% in the stratum to be worth attempting."
 
 ## Week of 2026-05-07
 

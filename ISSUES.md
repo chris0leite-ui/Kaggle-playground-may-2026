@@ -67,6 +67,39 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
   `covariance-modulated-path-b-overshrinks-correlated-base-routing-directions-vs-plain-tau`.
   Day-19 overnight: 9th meta-arch variant tested; family closed.
   `[owner: ml-competition-analysis-rwD3f | status: null]`
+- **2e.** Non-LR meta on K=4 [P, rank, logit] (EXP-NEW; the architecturally-
+  untested avenue per A30). Tested 2026-05-08 PM
+  (research-model-extensions-Ibwvn). **All three variants NULL or
+  regressing:** gradient-boosted meta (LGBM num_leaves=15) Δ −1.20 bp;
+  2-hidden-layer MLP meta Δ −7.77 bp; augmented LR with raw row
+  features Δ −0.04 bp. **A30 dropped from `live` to `FALSIFIED`.**
+  Mechanism: K=4 logit pool collapses to 1.33-D (A31); non-linearity
+  at the meta layer overfits a 30-feature input on a sub-2-D signal.
+  See `audit/2026-05-08-four-lane-research-extension.md`,
+  `scripts/probe_lane4_nonlr_meta.py`,
+  `scripts/artifacts/probe_lane4_nonlr_meta.json`. **Closes the
+  meta-architecture lane completely.**
+  `[owner: research-model-extensions-Ibwvn | status: null]`
+- **2f.** Heuristic / domain-prior features as **meta inputs** (not as
+  base). Tested 2026-05-08 PM. 9 hand-crafted F1 features
+  (compound_tier, tyre_life_pctile_in_compound, laps_to_race_end,
+  is_last_3_laps, race_progress, n_distinct_compounds_so_far,
+  field_size_at_lap, stint_overrun) added alongside K=4 [P, rank,
+  logit]. K=4+heuristic-meta Δ −0.02 bp NULL. Deterministic rule
+  clamps regress −9.48 bp (synth label diverges from F1 realism on
+  is_last_lap; friction `synth-divergence-from-F1-realism-on-last-lap`).
+  Compound-tier monotonic LGBM K=4+1 Δ +0.19 bp within noise.
+  `scripts/probe_lane2_priors.py`,
+  `scripts/artifacts/probe_lane2_priors.json`.
+  `[owner: research-model-extensions-Ibwvn | status: null]`
+- **2g.** Per-Compound LR meta heads (routed at inference; distinct
+  from base-level per-Compound specialists which absorbed at K=10+1
+  per A4). Tested 2026-05-08 PM. Per-Compound LR Δ +0.11 bp; per-
+  Compound flat isotonic Δ −1.78 bp; rain-row meta blend Δ +0.03 bp.
+  WET segment too small (n=1,355) for any routing variant to fire.
+  W1 (rain residual) survives. `scripts/probe_lane3_routing.py`,
+  `scripts/artifacts/probe_lane3_routing.json`.
+  `[owner: research-model-extensions-Ibwvn | status: null]`
 
 ## 3. Target reformulation upstream of K=21 pool
 
