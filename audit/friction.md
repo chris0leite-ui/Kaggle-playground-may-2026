@@ -16,10 +16,31 @@ restating it.
 
 ## Week of 2026-05-08
 
-- Submission `kaggle datasets version` requires `~/.kaggle/kaggle.json`,
-  but the harness only exposes `KAGGLE_API_TOKEN` in the environment;
-  fix is to materialise `kaggle.json` from the env token before
-  running dataset commands.
+- `day-counter-drift` (PI-flagged 2026-05-08 PM): prose across
+  `state/`, `HANDOVER.md`, `audit/`, `glossary.md` referred to "Day-17
+  PM", "Day-18 PM", "Day-19" as if calendar-aligned. They were not.
+  The `d13`..`d19` labels are an experiment-iteration counter that
+  ran ~10 days ahead of the calendar. Today is **2026-05-08 = comp
+  day 8 of 31**, with 23 days remaining; "Day-19" prose was
+  hallucinated. **Fix forward:** all prose now uses ISO dates or
+  comp-day-N anchored to 2026-05-01. The `dN` short-codes remain as
+  frozen file/code prefixes (per `glossary.md`) and explicitly NOT
+  calendar days.
+- `pool-rank-lock-at-logit-direction-not-rank-correlation`
+  (2026-05-08 PM): three structurally-different inductive biases
+  (LambdaRank per-stint, inter-stint memory features, stint-completion
+  dual-head) all NULL at K=10+1 within ±0.05 bp despite low rank-
+  correlation (ρ 0.41–0.73). Pinpoints the rank-lock mechanism: the
+  K=10 [P, rank, logit] = 30-feature expansion can reconstruct any
+  new base's logit prediction as a linear combination. Different
+  rank info ≠ logit-direction contribution. See `ASSUMPTIONS.md` A29,
+  A30.
+- `K4-sparse-pool-promoted-to-PRIMARY` (2026-05-08 PM): K=4 forward-
+  greedy + Path-B Compound × Stint τ=100k landed at LB 0.95351 vs the
+  prior K=27 PRIMARY at 0.95368 (Δ −1.7 bp). The 17 extra bases were
+  buying us 1.7 bp on LB. Promoted to PRIMARY at this deliberate cost
+  for cleaner reference; old K=27 artefact retained as hedge per Rule
+  R7.
 - The audit-ml-repo branch's history rewrite removed binary blobs from
   git (3.9 GB → 31 MB on origin) but leaves a `.git` of the same
   size locally until `git gc --prune=now --aggressive` runs (slow,

@@ -3,85 +3,116 @@
 Updated whenever a new submission lands or the strategic picture shifts.
 For history, read `audit/postmortems/` and `audit/research/`.
 
-## Best submission so far
+**Date convention:** prose in this file uses **ISO dates** (e.g.
+"2026-05-08") or **comp-day-N** anchored to comp start 2026-05-01
+(so today = 2026-05-08 = comp day 8). The `d13`..`d19` labels in
+script names and audit prose are *frozen code/file prefixes*, not
+calendar days — see `glossary.md` and `audit/friction.md`
+under `day-counter-drift`.
 
-**Score: 0.95368 on the public leaderboard.** Rank 98 of 893 = top 11%.
+## PRIMARY (active) — set 2026-05-08 PM
 
-**What it is:** a stack of 27 base models combined with a per-segment
-shrinkage stacker. The 27 bases are:
+**Score: 0.95351 on the public leaderboard.** Direct LB-confirmed.
 
-- 21 models from the original pool (gradient-boosted trees of various
-  flavours, factorisation machines, rule-based residual learners, target
-  encoders).
-- A CatBoost model trained with a published Kaggle recipe ("yekenot
-  transfer" — floor-categorical features, count encoding, KBins-discretised
-  numerics, stratified concatenation of original-data augmentation).
-- A RealMLP neural network trained with the same yekenot recipe.
-- A LightGBM model trained on the original (pre-synth) Kaggle dataset
-  using continuous-only features.
-- A LightGBM model whose features are the per-step log-likelihood of a
-  causal chain decomposition of the synthetic data-generating process.
-- A k-nearest-neighbours preimage join: each row's distance to its
-  nearest neighbours in the original dataset, computed per Compound on
-  the seven feature columns the synthesiser left least distorted.
-- A constraint-violation feature set: ten physical constraints (e.g.,
-  TyreLife should grow monotonically within a stint), with violation
-  rates aggregated per row's group.
+**What it is:** the **K=4 forward-greedy** sparse pool combined with
+the same per-segment partial-pooling stacker (Compound × Stint, τ =
+100,000). The 4 bases are one per model class:
 
-**The stacker** is a per-segment partial-pooling logistic regression.
-Segments are (Compound × Stint number). Each segment's logistic
-regression is shrunk toward a global fit with strength τ = 100,000.
+- `d17_h1d_yekenot_full` — RealMLP trained with the yekenot recipe.
+- `p1_single_cb_v4_gpu` — CatBoost trained with the yekenot recipe.
+- `f1_hgbc_deep` — sklearn HistGradientBoostingClassifier (deep).
+- `d16_orig_continuous_only` — LightGBM trained on the original
+  (aadigupta1601 pre-synth) dataset, continuous-only features.
+
+**Why we promoted from K=27 → K=4 at a deliberate −1.7 bp LB cost:**
+
+1. **K=4 captures 99% of the bank's LB value with 15% of the bases**
+   (LB 0.95351 vs prior K=27 PRIMARY 0.95368, Δ −1.7 bp).
+2. **The K=27 pool's logit effective rank is 3.23.** SVD shows it
+   spans a 3-D subspace; 17 of the 27 bases were dead weight.
+3. **Path-B amp is a myth at this pool size.** The Compound × Stint
+   shrinkage stacker lifts only +0.04 bp over a plain global LR-meta
+   on K=27 — within fold noise. (Day-13 era +18 bp claim was
+   pool-specific and never replicated.)
+4. **Cleaner reference for any new direction.** A 4-base baseline is
+   easier to reason about, faster to retrain, and exposes new bases'
+   contributions more cleanly than a saturated 27-base pool.
+
+**Reference of the prior PRIMARY for hedge-eligibility:** the K=27 +
+Path-B Compound × Stint τ=100k submission at LB 0.95368 remains
+hedge-eligible per Rule R7 (it's the highest-LB prediction we have).
+See `submissions/submission_PRIMARY_d18_K27_pathb_tau100k.csv` (rebuild
+of the LB 0.95368 artefact).
 
 **Holdout-honest:** all label-derived features are refit per
 cross-validation fold using only training rows.
 
 ## Leaderboard ladder (from this team's submissions)
 
-| Date | Score | What changed |
-|---|---:|---|
-| Day 18 PM | 0.95368 | Added six DGP-class bases; same per-segment stacker. **PRIMARY.** |
-| Day 17 PM | 0.95354 | First submission with CatBoost-yekenot + RealMLP-yekenot bases. |
-| Day 17 mid | 0.95345 | Earlier configuration of the same idea. Crossed top-5% threshold. |
-| Day 17 AM | 0.95149 | Added two original-data and chain-decomposition bases. |
-| Day 16 | 0.95089 | First clean per-segment stacker on continuous-only features. |
-| Day 15 | 0.95059 | Added a denoising-autoencoder base. |
-| (earlier) | 0.95049 | Per-segment stacker first fired (Compound × Stint, τ=20k). |
-| Day 1 | 0.94113 | Two-anchor baseline (Stratified + GroupKFold). |
+| ISO date | Pool | Score | What changed |
+|---|---|---:|---|
+| 2026-05-08 PM | K=4 forward-greedy + Path-B C×S τ=100k | **0.95351** | **NEW PRIMARY.** Sparse-pool reduction; 99% of the bank's LB value with 15% of the bases. |
+| 2026-05-08 PM | K=10 forward-greedy + Path-B C×S τ=100k | 0.95356 | Sparse-pool calibration probe; precise OOF→LB transfer. |
+| 2026-05-07 PM | K=27 + Path-B C×S τ=100k | 0.95368 | Prior PRIMARY. Six DGP-class bases on top of K=21+v4+h1d+d16. |
+| 2026-05-07 PM (earlier) | K=23 v4+h1d + Path-B | 0.95354 | First with CatBoost-yekenot + RealMLP-yekenot. |
+| 2026-05-07 mid | K=24 LR-meta v3+h1d | 0.95345 | Crossed top-5% threshold. |
+| 2026-05-07 AM | K=23 + d16 + d18_chain Path-B τ=20k | 0.95149 | Original-data + chain-decomp bases. |
+| Earlier | K=22 + DAE + Path-B Compound×Stint τ=20k | 0.95089 | First clean per-segment stacker on continuous-only features. |
+| Earlier | K=22 + DAE Path-B τ=20k | 0.95059 | DAE base added. |
+| Earlier | K=21 + Path-B Compound × Stint τ=20k | 0.95049 | Per-segment stacker first fired. |
+| 2026-05-01 (kickoff) | Two-anchor baseline | 0.94113 | Stratified + GroupKFold baseline. |
 
 ## Submissions
 
-- **Used: 39 of 270.** Plenty of slots left. Per Rule 12, spend them.
-- **Today: 0 used.**
-- **Plateau: 0 days.** Day 18 PM pushed the leaderboard +1.4 bp.
+- **Used: 41 of 270.** Plenty of slots left. Per Rule 12, spend them.
+- **Today (2026-05-08): 2 used** (K=10 calibration; K=4 PRIMARY swap).
+- **Comp-day:** 8 of 31. **Days remaining: 23.**
 
 ## Distance to top-5%
 
-- Top-5% boundary: 0.95405. Gap: **−3.7 basis points.**
-- Leader: 0.95476 (MILANFX). Gap: −10.8 basis points.
+- Top-5% boundary: 0.95405. Gap from PRIMARY (K=4 LB 0.95351):
+  **−5.4 basis points** (was −3.7 vs old K=27 PRIMARY).
+- Leader: 0.95476. Gap: **−12.5 basis points** (was −10.8).
+- Bootstrap CI on a 20% public draw is ±12 bp wide, so both gaps fall
+  partly inside the public-LB sample-noise band. Cross-submission
+  *relative* deltas trust to ~±1 bp at this scale.
 
 ## What axes have been tried — high-level
 
 For the named-experiment-by-experiment ledger, see
 `state/mechanism-ledger.md`.
 
-- **Stacking pool growth (A axis):** 7 separate confirmations that
-  adding orthogonal new bases doesn't move the meta-stacker rankings
-  on test once the stack is saturated. The escape was a feature
-  recipe transfer (yekenot), not a new base.
-- **Anchor swap (B axis):** XGBoost trained with the yekenot recipe is
-  redundant with CatBoost-yekenot (correlation 0.987). RealMLP with 24
-  ensembles untested.
-- **Meta-architecture redesign (C axis): closed.** Nine variants tested
-  across Days 14-19. Compound × Stint with plain shrinkage τ=100,000 is
-  the local optimum.
-- **External data (D axis): closed.** debashish historical priors
-  closed by pre-flight (PI agreed with the harness's null prediction);
-  FastF1 capped at 1.4% match rate (synthetic driver codes); aadigupta
-  original data already in the stack.
-- **Sequence-level fingerprinting (A1, untouched):** every row in every
-  base is treated as independent of its stintmates. The synthesiser
-  almost certainly broke within-stint sequence coherence. This is the
-  one structurally-orthogonal axis still available.
+- **Stacking pool growth (A axis): closed.** Multiple confirmations
+  that adding orthogonal new bases doesn't move the meta-stacker
+  rankings once the stack is saturated. 2026-05-08 PM extended this
+  to: rank-lock holds at K=10+1 *and* at K=22+1 *and* at K=24+1 — i.e.
+  pool-size-independent. The escape was a feature-recipe transfer
+  (yekenot), not a new base.
+- **Anchor swap (B axis): closed.** XGBoost+yekenot is redundant with
+  CatBoost-yekenot (ρ=0.987). RealMLP n_ens=24 is the only untested
+  variant; classical sqrt(n_ens) law gives ≤1 bp from variance
+  reduction alone, so the EV is bounded.
+- **Meta-architecture redesign (C axis): closed.** Eleven+ variants
+  tested across Compound × Stint, Compound × Year, Compound ×
+  RaceProgress-bin, Compound × Stint × Year, Yao/Vehtari covariance,
+  multi-level. All within ±0.5 bp of plain global LR-meta on the
+  current pool. Path-B amp itself is +0.04 bp at K=27 — within fold
+  noise.
+- **External data (D axis): closed per PI direction.** aadigupta
+  original is in the pool; FastF1 hard-join capped at 1.4% match;
+  PI directed 2026-05-08 to NOT pursue further external data.
+- **Sequence / structural inductive bias (A1):** **closed 2026-05-08
+  PM.** Three different-task-framing probes (LambdaRank per-stint,
+  inter-stint memory features, stint-completion dual-head) all NULL
+  at K=10+1 within ±0.05 bp despite low rank-correlation (ρ
+  0.41–0.73). The d16 GRU re-tested at K=10+1 also NULL (Δ −0.045 bp
+  matching prior K=22+1 result). **Rank-lock is at the logit-direction
+  level, not at rank-correlation.** See `ASSUMPTIONS.md` A29, A30.
+- **Non-LR meta architecture (E axis, NEW):** the only architecturally-
+  untested avenue. Replace the LR meta with a gradient-boosting
+  meta-learner on K=4's [P, rank, logit] expansion, or a small neural
+  meta-learner. Cost ~1 hr CPU. See `EXPERIMENTS-NEXT.md` proposal
+  EXP-NEW.
 
 ## Held submissions (do not submit)
 
