@@ -39,7 +39,8 @@ better" probe. Session probes A/B/C are referenced below.
 | A2 | OOF→LB gap of −6.4 bp is **sampling noise**, not structural overfit | MEASURED | live | This session Probe B: bootstrapped 20% CI [0.95309, 0.95550] around 0.95432; observed 0.95368 inside band | 2026-05-08 |
 | A3 | Public LB and train are row-iid; AV-AUC = 0.502 | MEASURED | live | `comp-context.md` U3 probe; pre-baseline gate doc | 2026-05-04 |
 | A4 | Train and original ARE distinguishable at sequence level (stint length, lap-gap distribution) — synthesiser temporally downsamples | MEASURED | live (NEW) | This session Probe C: synth stint mean 3.87 vs orig 19.80; gap=1 frac 27.98% vs 99.60% | 2026-05-08 |
-| A5 | PRIMARY's residual loss is concentrated in INTERMEDIATE / WET compound rows | MEASURED | live (NEW) | This session Probe A; 8 worst (Compound × Stint × position) cells all rain-condition; AUC 0.68–0.86 vs global 0.954 | 2026-05-08 |
+| A5 | PRIMARY's residual loss is concentrated in INTERMEDIATE / WET compound rows | MEASURED, but residual is INTRINSIC | live (refined) | Probe A: 8 worst (Compound × Stint × position) cells AUC 0.68–0.86 vs global 0.954, but those cells are ≤1k rows each. Probe `probe_rain_specialist.py`: a single-LGBM specialist on all 18,737 rain rows hits AUC 0.92641 vs PRIMARY's 0.94157 on the same rows (−152 bp); mixed-prediction global AUC regresses 4.17 bp. PRIMARY already extracts near-ceiling via cross-Compound transfer. | 2026-05-08 |
+| A22 | Rain-specialist axis is closed — a fresh model trained on rain only loses cross-Compound transfer signal | MEASURED | live (NEW) | `probe_rain_specialist.py`; specialist −152 bp on its own segment, no path to meta-gate lift | 2026-05-08 |
 | A6 | Per-row FE on the 14 raw columns is dead (residual variance ≈ marginal variance) | MEASURED | live | Five separate probes per `state/hypothesis-board.md` "load-bearing" item 2 | 2026-05-07 |
 | A7 | Target reformulations (`inv-laps`, `pit-horizon`, `reverse-cumulative`, `stint-progress`) are leaky under standard CV unless aggregates are refit per fold | MEASURED | live | `audit/2026-05-06-target-reform-leakage-audit.md`; collapse rates 88-100% | 2026-05-06 |
 | A8 | K=22 + Path-B Compound × Stint is the local optimum among 9 tested meta variants | MEASURED | live | `state/current.md`; "Nine variants tested across Days 14-19" | 2026-05-07 |
@@ -79,13 +80,19 @@ claims of the handover's "open axes" — both refuted this session.
 ## What the handover should say if A10, A15 are dropped
 
 The actually-open axes given the dropped claims are:
-1. **Targeted modelling on rain-condition rows** (Probe A) — the
-   PRIMARY's residual loss is structurally concentrated in INTERMEDIATE
-   / WET cells; a rare-class specialist could plausibly close some of
-   that. NOT in any current "open axes" list.
+1. ~~**Targeted modelling on rain-condition rows** — closed by A22
+   (single-model specialist −152 bp on rain segment).~~ A richer
+   specialist (full-pool retrain on rain only) is theoretically possible
+   but the cross-Compound transfer evidence makes it unlikely to lift.
 2. **Meta-architecture redesign beyond Compound × Stint** — actually
    listed in `audit/2026-05-16-d16-virgin-axes-results.md` synthesis
-   but missing from `HANDOVER.md`.
-3. **FastF1 soft features at non-driver-row resolution (A13b)** —
+   but missing from `HANDOVER.md`. Specifically: alternative segmentation
+   crosses (Compound × Year, Compound × Stint × RaceProgress-bin),
+   nested hierarchy, non-Gaussian shrinkage.
+3. **Rain-row sample-weighting in a global model** (NOT a separate
+   specialist) — preserves cross-Compound transfer while addressing the
+   minority-class concern. Distinct from AV-sample-weighting (which is
+   bounded by AV-AUC=0.502, hence null).
+4. **FastF1 soft features at non-driver-row resolution (A13b)** —
    not separately probed.
-4. **Wrap-up / hedge-ladder / submission-budget burn** per Rule 12.
+5. **Wrap-up / hedge-ladder / submission-budget burn** per Rule 12.
