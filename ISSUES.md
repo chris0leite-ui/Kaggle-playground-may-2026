@@ -44,6 +44,25 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
 - **1d.** Regularised FFM re-attempt. d9e FFM strictly worse, but
   with stronger regularisation (dropout, L2) may flip the tie.
   `[owner: unclaimed | status: parked]`
+- **1e.** Kernel SVM family. **DONE 2026-05-08 — FAIL on both K=10
+  sparse and K=27 PRIMARY pools.** Two full-data variants on the
+  vanilla-LR 45-feature recipe with γ-swept Nyström-RBF approximation
+  (n_components=800, γ=0.02 chosen from a 5-point γ-sweep at smoke):
+  - Nyström-RBF + LinearSVC (squared-hinge): standalone OOF 0.91395.
+    K=10+1 Δ −0.09 bp / K=27+1 Δ −0.02 bp.
+  - Nyström-RBF + LogisticRegression (kernel-logistic, calibrated):
+    standalone OOF 0.91203. K=10+1 Δ −0.06 bp / K=27+1 Δ −0.00 bp.
+  Standalone OOF lifts +56 bp over matched-feature linear LR (0.85588)
+  — the kernel non-linearity does real work — but standalone is still
+  −400 bp from PRIMARY 0.95431, and the meta can't route diversity
+  gain when the AUC gap to GBDT-class is that large. ρ_test 0.82-0.84,
+  G3 flip ratio 0.00 (linsvc) / 0.13 (klogreg). 8th rank-lock
+  confirmation. New friction
+  `kernel-class-fails-when-standalone-AUC-gap-to-gbdt-exceeds-300bp`.
+  Smoke γ-sweep (n_components=1500): γ=0.005 → 0.00, γ=0.01 → 0.916,
+  γ=0.02 → 0.918, γ=0.04 → 0.914, γ=0.1 → 0.897, γ=0.5 → 0.847,
+  γ=1.0 → 0.815. `scripts/svm_kernel_probe.py`, `scripts/svm_gate.py`.
+  `[owner: explore-svm-kernels-TRcuo | status: null]`
 
 ## 2. Meta-layer innovations beyond Path-B hier-meta
 
