@@ -101,15 +101,17 @@ ff-merge before reading state below.
     (e) "Many small things" beats "one big bet": prefer 5×30-min
         probes over 1×3-h NN unless EV/cost-min strongly favors the
         big bet under the harness's BOTE.
-    (f) **Calibration loop (added 2026-05-06).** Every BOTE call
-        accepts `--metric-aligned true/false` (Q6, mandatory) and
-        `--pi-predicted-lb-bp X` (PI's own LB-Δ prediction tracked
-        next to the agent's `expected_lb_bp`). Records append to
-        `audit/decisions.jsonl` (decision-time log; locks framework_sha
-        + agent_branch at decision-time). After a submit lands, run
-        `python scripts/probe.py record-outcome NAME --actual-lb-bp X`
-        to close the loop; `python scripts/probe.py calibration`
-        emits PI vs agent vs actual error per family.
+    (f) **Calibration loop (added 2026-05-06; revised 2026-05-07 PM).**
+        Every BOTE call accepts `--metric-aligned true/false` (Q6,
+        mandatory). The `--pi-predicted-lb-bp X` flag is OPTIONAL
+        as of Day-19 wrap-up (Rule 26a sealed-prediction removed);
+        when omitted, calibration tracks agent expected vs actual
+        only. Records append to `audit/decisions.jsonl` (decision-
+        time log; locks framework_sha + agent_branch at decision-
+        time). After a submit lands, run `python scripts/probe.py
+        record-outcome NAME --actual-lb-bp X` to close the loop;
+        `python scripts/probe.py calibration` emits agent vs actual
+        error per family (PI column shown when set).
     (g) **Family kickoff seed (added 2026-05-06).** When opening a
         NEW mechanism family (one not in `mechanism_families_explored`),
         run `python scripts/research_seed.py FAMILY` to generate a
@@ -182,22 +184,26 @@ ff-merge before reading state below.
     features; Rule 25 covers feature-value transforms. Origin:
     PI Day-17 lesson on cross-comp generalisation discipline.
 
-26. **PI interaction protocol (non-coding PI; added 2026-05-06).**
-    PI is read+strategy, not keyboard. Agent runs all Python; PI
-    ratifies and calibrates. Anti-rubber-stamp rituals:
-    (a) **Sealed-prediction order.** Before agent reveals its BOTE
-        `expected_lb_bp` for any candidate, agent FIRST asks:
-        "what's your LB Δ prediction in bp?" PI commits a number +
-        one-line rationale to chat. THEN agent reveals its number
-        and they go to `audit/decisions.jsonl` together via
-        `--pi-predicted-lb-bp`. Agent revealing first poisons the
-        calibration loop via anchoring.
-    (b) **Three required questions on every BOTE.** Agent asks PI:
-        (i) PI-predicted LB Δ (sealed per (a));
-        (ii) Q6 — does training objective match row-AUC?;
-        (iii) which precedent is PI pricing this against? (cite a
-        calibration-ladder row). Skipping any → agent runs without
-        `--pi-predicted-lb-bp` and flags the omission in chat.
+26. **PI interaction protocol (non-coding PI; added 2026-05-06,
+    revised 2026-05-07 PM).** PI is read+strategy, not keyboard.
+    Agent runs all Python; PI ratifies and calibrates.
+    Anti-rubber-stamp rituals:
+    (a) **REMOVED 2026-05-07 PM (Day-19 wrap-up postmortem).**
+        Sealed-prediction order is no longer required. Agent reveals
+        its BOTE `expected_lb_bp` directly without first asking PI
+        for a sealed number. Calibration loop continues via
+        `audit/decisions.jsonl` (agent expected vs actual);
+        `pi_predicted_lb_bp` field becomes optional and may be
+        omitted. Removal rationale: protocol added cognitive overhead
+        for a non-coding PI without proportional calibration gain;
+        agent BOTE alone is the load-bearing prediction; PI
+        intervenes via direct correction (override-rate per (e))
+        rather than per-probe sealed numbers.
+    (b) **Two required questions on every BOTE** (was three; sealed
+        prediction dropped per (a)). Agent asks PI:
+        (i) Q6 — does training objective match row-AUC?;
+        (ii) which precedent is PI pricing this against? (cite a
+        calibration-ladder row). Q6 unanswered = forced SKIP.
     (c) **Devil's-advocate ritual.** Once per session, agent picks
         its strongest current recommendation and argues *against* it
         in 3 bullets. PI accepts the counter or rebuts it. Surfaces
@@ -214,6 +220,8 @@ ff-merge before reading state below.
         anti-pattern (Sethserver; MLE-bench HITL literature).
     Origin: `knowledge-base/concepts/agentic-kaggle-systems-comparison.md`
     HITL section + non-coding-PI reframe (2026-05-06 chat).
+    Revision origin: Day-19 postmortem PI directive
+    "remove asking for the sealed prediction".
 
 ## ⚠️ Defaults baked in from prior-comp postmortem
 
@@ -231,6 +239,8 @@ ff-merge before reading state below.
 ## Current state (Bookkeeper updates daily)
 
 ```yaml
+day: 19                           # 2026-05-07 overnight (branch `claude/ml-competition-analysis-rwD3f`). PRIMARY unchanged: LB 0.95368 (d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000). 0 LB submits this branch. **Day-19 overnight closes 4 axes**: D-axis (D1 SKIP'd pre-flight; PI sealed −2 to 0 NULL, harness 0.20bp/0.004 bp/min; PI + harness convergence = calibration loop working as intended), B-axis (B2 xgb_v4 K=27 verify +0.143 bp NULL; ρ 0.987; |w| 0.39; `gbdt-class-redundant-on-shared-FE` extends from K=24 → K=27), A-axis (A5 LGBM-v4-fs proxy std OOF 0.94510 below v3 ceiling; K=27+1 stack-add −0.106 bp NULL; **7th cross-confirm `lr-meta-rank-lock-strong-anchor`**; CB-v4-fs Kaggle GPU kernel scaffolded but deferred), C-axis (C1 Yao/Vehtari covariance-modulated Path-B V3 across 3 τ all REGRESS −0.47 to −0.59 bp vs V1 Path-B τ=100k; **9th meta-arch variant tested across Days 14-19; family closed**). New friction tags `external-data-axis-closed-by-pre-flight-when-pi-and-harness-agree`, `fs-aggregates-add-noise-not-signal-when-merged-into-yekenot-recipe-without-orig-aug`, `covariance-modulated-path-b-overshrinks-correlated-base-routing-directions-vs-plain-tau`, `meta-arch-redesign-family-empirically-exhausted-on-k27-pool`. Calibration: 4-of-4 NULL/regress this session; agent over-predicted by ~2 bp aggregate. Top-5% gap unchanged −3.7 bp. **The only remaining open structural axis is sequence-level (A1: HMM Compound transitions + AR(1) within-stint TyreLife)**; every K=27 base treats rows i.i.d. internally so this IS structurally orthogonal — but 7× rank-lock confirms suggest empirical absorption likely. Audit `audit/2026-05-07-d19-overnight-research.md`.
+
 day: 18                           # 2026-05-07 PM-late. **🎯 NEW PRIMARY: LB 0.95368 (d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000)** via branch `claude/reverse-engineer-data-generation-Hu8EK`. K=27 = K=21 + v4 (CB yekenot transfer) + h1d (RealMLP yekenot full) + d16 (orig cont_only) + d18 (chain decomp v1) + E2 (preimage kNN) + F2 (constraint violations). Path-B C×S τ=100k OOF 0.95432; LB +1.4 bp dead-center of predicted 0-2 bp band. Top-5% gap −3.7 bp (boundary 0.95405); leader 0.95476 (−10.8 bp). DGP-reverse-engineering arc (14 probes E1-E5 + F1-F6 + G/H/I/J/K1-K3) characterised synthesizer as **CTGAN-class GAN with custom signature** (F1 GPU replay forensics: lowest mean KS 0.134 to CTGAN replay; non-GAN→GAN P(replay-like) jump 0.06→0.13). d18 chain-decomp v1 K=21+1 +7.37 bp largest single-base of session. F2 surfaced load-bearing class-conditional pattern: y=1 rows break within-stint TyreLife consistency 19.6% more than y=0 rows. Combined-with-main solo K=23+v4+h1d+1: d16 +0.79 / E2 +0.42 / d18 +0.33 / F2 +0.25; DAE wildcard fizzled (+0.16; absorbed by RealMLP h1d). G/H/I CTGAN mode-id features fully absorbed by CatBoost CTR. New friction `pool-saturation-v4h1d-absorbs-dgp-class` + `sequential-axis-untouched` (biggest remaining DGP blind spot). _Sibling Day-18 PM_ branch `claude/ensemble-logistic-regression-research-MbLKu` ran 3-arc LR-diagnostic expedition (Arc A/B/C: 10 scripts) + 2 Tier-1 meta-arch tests (T2 K=10 PRIMARY artifact OOF 0.95381 −0.4 bp; T1#3 Path-B alt segmentations ALL sub-bp NULL). LR-diagnostic suite promoted to skill `.claude/skills/kaggle-comp/lr-diagnostics.md` + `templates/scripts/lr_diag/` (Day-1 toolkit for next Featured comp).
 lb_best_today: 0.95476            # MILANFX leader
 our_lb_best: 0.95368              # d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000 (NEW PRIMARY); gap to top-5% -3.7 bp; rank improving from #98 (top-11%)

@@ -57,6 +57,17 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
 - **2c.** GroupKF-meta as R5 HEDGE. d12 K=20 GKF clean; ρ vs
   Strat-meta 0.9856; private-LB-likely-real per d10/d13d probes.
   `[owner: unclaimed | status: open]`
+- **2d.** Yao/Vehtari covariance-modulated Path-B (V3 in c1 audit).
+  Per-segment LR with prior covariance Σ from inter-base sample
+  correlation; shrinks weights along low-eigenvalue (highly-correlated)
+  directions more than plain Path-B. K=27 implementation `scripts/
+  c1_yao_vehtari_bma.py` (V0 plain LR / V1 Path-B τ=100k / V2 plain BMA
+  / V3 Yao/Vehtari τ ∈ {10k, 50k, 200k}). Result: **V3 REGRESSES vs V1
+  by −0.47 to −0.59 bp across all τ.** V3 over-shrinks correlated
+  base-routing directions LR uses. Friction
+  `covariance-modulated-path-b-overshrinks-correlated-base-routing-directions-vs-plain-tau`.
+  Day-19 overnight: 9th meta-arch variant tested; family closed.
+  `[owner: ml-competition-analysis-rwD3f | status: null]`
 
 ## 3. Target reformulation upstream of K=21 pool
 
@@ -84,6 +95,19 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
 - **4a.** Pirelli pit-window scrape. Tier-2 highest absolute EV per
   Day-8 research. Compound × track × season metadata.
   `[owner: unclaimed | status: open]`
+- **4b.** debashish311601/formula-1-official-data-19502022 historical-
+  priors aggregate join. Untested by us; deployed by Rozen at LB
+  0.95354. Aggregate-key (Driver/Constructor/Circuit) join — synthetic-
+  augmentation perturbation doesn't bite at join level (vs FastF1 H2
+  which capped at 0.55 TyreLife correlation on row-level join). 60%
+  synthetic D### still won't match. Career-level priors (1950-2022)
+  outside any K=27 base's TE window. PI sealed band −2 to 0 bp;
+  agent BOTE +0.5 bp midpoint band (−1, +0.5, +2). Cost ~45 min CPU.
+  Harness verdict **SKIP** at 0.20 bp expected / 0.004 bp/min; PI
+  agreed pre-flight. Closed null-by-pre-flight; calibration logged
+  to `audit/decisions.jsonl` 2026-05-07. Friction tag candidate
+  `external-data-axis-closed-by-pre-flight-when-pi-and-harness-agree`.
+  `[owner: ml-competition-analysis-rwD3f | status: null-pre-flight]`
 
 ## 5. Final-3-day-window strategy (R5 HEDGE)
 

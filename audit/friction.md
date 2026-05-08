@@ -2,6 +2,45 @@
 
 One-liners. Distilled weekly per `~/.claude/skills/kaggle-comp/self-improvement.md`.
 
+## 2026-05-07 overnight (branch `claude/ml-competition-analysis-rwD3f`)
+
+- `tag: external-data-axis-closed-by-pre-flight-when-pi-and-harness-agree`
+  — D1 debashish historical-priors aggregate-key join: PI sealed band
+  −2 to 0 NULL; harness BOTE 0.20 bp / 0.004 bp/min → SKIP. Convergence
+  PI gut + family priors = calibration-loop working as intended; closed
+  ISSUES leaf 4b null-by-pre-flight without compute spend. **Fix:**
+  treat PI + harness convergence as a load-bearing close signal, not
+  rubber-stamping; record outcome=NULL via probe.py record-outcome.
+- `tag: fs-aggregates-add-noise-not-signal-when-merged-into-yekenot-recipe-without-orig-aug`
+  — d19 LGBM-v4-fs (yekenot items 2/3/4 + 24 fs cross-row aggregates,
+  no orig-aug) std OOF 0.94510 — 5 bp BELOW v3 honest fold-safe ceiling
+  0.94563. K=27+1 stack-add −0.106 bp NULL, ρ=0.987 (7th cross-confirm
+  `lr-meta-rank-lock-strong-anchor`). fs_cum_pits standalone AUC 0.797
+  doesn't survive integration into v4 recipe at LGBM class without
+  orig-aug rebalancing. **Fix:** when porting per-row FE into anchor
+  recipe, port orig-aug too (CB-GPU CTR may behave differently;
+  `kernels/a5-cb-v4-fs-gpu/` scaffold deferred per proxy NULL).
+- `tag: covariance-modulated-path-b-overshrinks-correlated-base-routing-directions-vs-plain-tau`
+  — C1 V3 Yao/Vehtari `(X'X+τΣ⁻¹)w = X'y+τΣ⁻¹w_global` regresses vs V1
+  plain τ shrinkage by −0.47 to −0.59 bp across τ ∈ {10k, 50k, 200k}.
+  V3 over-shrinks weights along low-eigenvalue (highly-correlated)
+  directions; K=27 LR-meta USES those correlated dims for useful base
+  routing. **Fix:** plain τ shrinkage is the right level for this pool;
+  Σ-prior would only fire if base-OOF residual covariance had strong
+  signal-vs-noise separation, which it doesn't here.
+- `tag: meta-arch-redesign-family-empirically-exhausted-on-k27-pool`
+  — Day-19 C1 closes the 9th meta-arch variant tested across Days
+  14-19 (Path-B alt-axes 4 NULL, twin-meta blend −1.79, conformal
+  isotonic 4 NULL, multi-level 4-tier 5 NULL, K=10 forward-selected
+  Path-B 9 NULL, V3 Yao/Vehtari 3 τ NULL). Compound × Stint with plain
+  shrinkage τ=100k IS the local optimum. **Fix:** retire meta-arch
+  redesign as a top-priority axis; only A1 sequence-level remains
+  structurally distinct. Promotion candidate for postmortem:
+  `meta-arch-redesign-9-variant-tally` as a pool-saturation diagnostic
+  the next agent should consult before proposing variant 10.
+
+---
+
 ## 2026-05-07 PM (branch `claude/review-handover-solutions-oE78b`)
 
 - `tag: cross-row-aggregates-fire-where-own-row-sequence-doesnt`

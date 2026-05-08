@@ -215,9 +215,9 @@ the watched artifact appears. Origin: s6e5 Day-18 — ~12 stale
 events fired on d18 watcher after the run ended; chat-token cost
 visible.
 
-### [ ] PI-protocol — Sealed-prediction is non-optional even on "do it now"
+### [~] PI-protocol — Sealed-prediction is non-optional even on "do it now" (SUPERSEDED 2026-05-07 PM)
 
-`tag: sealed-prediction-skipped-on-do-it-now-commands`. PI's
+~~`tag: sealed-prediction-skipped-on-do-it-now-commands`. PI's
 authorisation to start a probe is NOT implicit ratification of the
 agent's BOTE (back-of-envelope expected-value calculation). When PI
 says "do it" / "do it now" / "execute this" on a probe with a written
@@ -225,7 +225,67 @@ spec, the agent MUST still run Rule 26a (sealed-prediction): ask PI
 for LB Δ prediction in 1 line *before* allocating compute. Failing
 this poisons the calibration loop for the resulting decision. Origin:
 s6e5 Day-18 — d18 + d18b 18 min CPU each, no PI prediction logged in
-`audit/decisions.jsonl`; calibration data lost.
+`audit/decisions.jsonl`; calibration data lost.~~
+
+**SUPERSEDED 2026-05-07 PM (Day-19 wrap-up postmortem):** PI directive
+"remove asking for the sealed prediction" retired Rule 26a entirely.
+Sealed-prediction protocol no longer applies. See entry below for the
+removal record.
+
+### [x] PI-protocol — Sealed-prediction protocol REMOVED (Day-19)
+
+`tag: rule-26a-removed-by-pi-directive`. CLAUDE.md Rule 26a
+(sealed-prediction order) and Rule 26b reference to it removed
+2026-05-07 PM during Day-19 wrap-up postmortem on PI's verbatim
+directive: "remove asking for the sealed prediction". Calibration
+loop continues with agent-only predictions (`pi_predicted_lb_bp`
+optional). Rule 26b reduced from three required questions to two
+(Q6 metric-alignment + precedent citation). Rule 19f calibration
+loop description updated accordingly. **Removal rationale (PI):**
+sealed-prediction protocol added cognitive overhead for non-coding
+PI without proportional calibration gain; agent BOTE alone is the
+load-bearing prediction; PI intervenes via direct correction
+(override-rate per Rule 26e) rather than per-probe sealed numbers.
+**Origin:** s6e5 Day-19 postmortem. **Cross-ref:** the previous
+`sealed-prediction-skipped-on-do-it-now-commands` candidate above
+(now superseded) was a same-comp Day-18 friction; PI chose retirement
+over enforcement.
+
+### [x] comp-context — meta-arch redesign 9-variant-tally (Day-19)
+
+`tag: meta-arch-redesign-family-empirically-exhausted-on-k27-pool`.
+On s6e5 K=27 pool, meta-arch redesign family is empirically closed
+after 9 variants tested across Days 14-19:
+- Path-B alt-axes (Y×S, R×C, Driver_clustered×Stint, etc.) — 4 NULL
+- Twin-meta blend ρ=0.967 — −1.79 bp (`twin-pool-2-meta-collapses-rank-info`)
+- Conformal isotonic (4 schemes) — −2.5 to −9.6 bp
+- Multi-level 4-tier (5 configs) — NULL
+- K=10 forward-selected Path-B (9 configs) — sub-bp NULL
+- C1 V3 Yao/Vehtari covariance-Σ (3 τ) — −0.47 to −0.59 bp REGRESS
+Compound × Stint with plain shrinkage τ=100k IS the local optimum
+on this pool. Future probes targeting meta-arch redesign on similar
+pools require either (a) a fundamentally different segmentation axis
+that Compound × Stint cannot capture (e.g. sequence-conditional), or
+(b) a meta-objective change (e.g. row-AUC-aligned listwise loss;
+tested via LambdaRank Day-12, −86 bp REGRESSED; Q6 origin). 9-variant
+tally is a pool-saturation diagnostic; consult before proposing
+variant 10. **Origin:** s6e5 Day-19 C1 V3 Yao/Vehtari falsification.
+**Promoted:** PI directive Day-19 wrap-up.
+
+### [x] operational-tip — bash watcher pgrep self-match (Day-19)
+
+`tag: bash-watcher-pgrep-self-match-zombie-loops`. When polling for
+a Python process completion in a bash watcher, `pgrep -f
+"<script_name>"` matches the bash wrapper itself because Claude Code
+bash wrappers `eval` the command string. Symptoms: until-loop never
+exits, etime grows past expected wall, you end up with multiple
+zombie watchers. **Fixes (preferred order):** (1) `until [ -f
+<artifact_sentinel> ]; do sleep N; done` — file-existence is
+unambiguous; (2) `pgrep -f "^python.*<script>"` — anchor against
+bash; (3) use the Monitor tool (`tail -F` with grep on a sentinel
+line in the script's output). **Origin:** s6e5 Day-19 overnight: 4
+zombie watchers, ~10 min debugging + manual kills. Operational tier,
+not framework rule. **Promoted:** PI directive Day-19 wrap-up.
 
 ### [ ] PI-protocol — No-unexplained-abbreviations rule
 
