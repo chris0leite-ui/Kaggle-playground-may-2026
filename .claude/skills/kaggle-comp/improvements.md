@@ -7,6 +7,60 @@ or required a human nag. See self-improvement.md for the full distillation proto
 
 ## Pending (not yet applied to skill files)
 
+### [ ] kickoff-runbook.md / day-1: pool eff-rank diagnostic on Day 1
+
+`tag: pool-rank-lock-at-logit-direction-not-rank-correlation`.
+Origin: s6e5 2026-05-08 PM postmortem. Run SVD eff-rank on the
+base-prediction matrix as soon as ≥4 bases exist. If logit
+eff-rank stalls below `log2(K) + 1`, the pool is rank-collapsed
+regardless of nominal K. New bases will absorb at the LR meta if
+their logit prediction lies in the existing logit subspace —
+**low Spearman ρ to PRIMARY is necessary but not sufficient for
+amp-eligibility**. s6e5 evidence: ρ=0.41 (EXP-4 Head A) still
+absorbed at K=10+1 within ±0.05 bp; ρ=0.47 (EXP-3 inter-stint)
+also absorbed. The K=27 pool sat at logit eff-rank 3.23 — adding
+17 bases bought 1.7 bp on LB. If the diagnostic had fired Day 1,
+half a session of dead-axis exploration would have been saved.
+Code: `scripts/lr_diag_e1_svd.py` is the reusable template.
+
+### [ ] do-and-dont.md — ISO date convention in prose; never invent Day-N
+
+`tag: day-counter-drift`. Origin: s6e5 2026-05-08 PM (regression
+of prior fix `ba4d531`). Prose uses ISO dates ("2026-05-08") or
+comp-day-N anchored to comp start. **Never invent a "Day N"
+counter that is not calendar-anchored.** The `dN` short-codes in
+script names and historical audit prose are FROZEN sequencing
+identifiers and MUST NOT be reused as date references in new
+prose. Add a session-start sanity check: grep `state/*.md
+HANDOVER.md ASSUMPTIONS.md` for "Day N" patterns where N >
+days-since-comp-start, and surface as friction. PI noticed the
+regression instantly; one PI override + one session of cleanup.
+
+### [ ] do-and-dont.md — concurrent-CPU-heavy-job cap
+
+`tag: concurrent-CPU-job-violation`. Origin: s6e5 2026-05-08 PM.
+When dispatching 3+ Python jobs in parallel: if each uses
+`n_jobs=-1`, three-way CPU contention can saturate the machine
+to a near-halt (no fold completed in 25 min wall on 8-core, ≈75
+CPU-min wasted). Rule 31 already caps concurrent CPU-heavy jobs
+at 2; this addendum codifies the explicit n_jobs guidance. **If
+3 jobs are absolutely required, set `n_jobs=floor(N_CORES/3)` per
+process explicitly. Don't trust the OS scheduler to share fairly
+under LightGBM/CatBoost OpenMP.**
+
+### [ ] kickoff-runbook.md / probe-template — persist OOF arrays for every gate probe
+
+`tag: gate-probe-oof-not-persisted`. Origin: s6e5 2026-05-08 PM.
+Gate scripts (`probe_min_meta`, `probe_field_state`, etc.) MUST
+`np.save` their OOF and test arrays even when the verdict is
+NULL. Add `oof_<slug>_strat.npy` and `test_<slug>_strat.npy` in
+the script's success path unconditionally. Cost evidence: 2026-
+05-08 EXP-1 re-tested d16 GRU at K=10+1 in 5 min because its OOF
+was persisted; field-state, H9 transductive, combined-frame
+lead/lag would each have required ~30 min to rerun their producer
+scripts (90 min total deferred). With persistence, the
+triangulation would have been free.
+
 ### [ ] kickoff-runbook.md / day-1: simple-LR baseline as Day-1 ceiling probe
 
 `tag: lr-recipe-portable`. Day-1 of any new tabular comp, run the
