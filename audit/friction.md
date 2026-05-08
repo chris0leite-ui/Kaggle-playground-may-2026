@@ -62,6 +62,36 @@ restating it.
   buying us 1.7 bp on LB. Promoted to PRIMARY at this deliberate cost
   for cleaner reference; old K=27 artefact retained as hedge per Rule
   R7.
+- `kernel-class-fails-when-standalone-AUC-gap-to-gbdt-exceeds-300bp`
+  (explore-svm-kernels-TRcuo 2026-05-08 PM): kernel-SVM family
+  (Nyström-RBF + LinearSVC, kernel-logistic, 5 SVM specialists)
+  standalone OOF 0.91-0.92, all null at K=27+1 / K=10+1 (Δ −0.09 to
+  +0.05 bp). 8th-9th rank-lock confirmation. Even kernel-class
+  structural diversity insufficient when AUC gap to GBDT-class
+  exceeds 300 bp.
+- `non-parametric-meta-on-K=4-cant-beat-LR-meta-without-new-input`
+  (same branch): kernel-SVM-meta over K=4 ties Path-B PRIMARY
+  exactly (0.95403 OOF). NCA-kNN on K=4 / K=10 ensemble nulls
+  (±0.07 bp). Combined-input meta (K=4 preds + top-5 numerics)
+  +0.03 bp LR / −1.64 bp kernel — bases already absorb raw features.
+  K=4 saturated for meta-routing; logit effective rank ~3. Need a
+  fresh base, not a fresh router.
+- `nca-loss-matrix-O(n2)-OOM-at-50k`: NCA pairwise-distance loss
+  matrix is O(n²) regardless of input dim; 50k subsample tries to
+  allocate 18.6 GB. Fix: cap NCA fit subsample at 8-10k for 15 GB
+  RAM, accept the metric-fit-on-subsample tradeoff. Apply learned
+  projection to full 350k for kNN classify.
+- `lightgbm-pandas-2-string-dtype`: LightGBM's
+  `_check_for_bad_pandas_dtypes` rejects pandas StringDtype columns
+  (typed as `str` not `object`); detection via `dtype == object`
+  silently misses them. Fix: detect non-numeric cols via
+  `not pd.api.types.is_numeric_dtype(...)` instead.
+- `pandas-merge-many-to-many-row-explosion`: sequence-feature builder
+  used `sorted_df.merge(prev_seg, ...)` where prev_seg was not
+  deduplicated by merge key; produced 1.4M rows from 627k input. Fix:
+  build a single per-segment summary via `groupby(...).agg()` and
+  merge once with `validate="many_to_one"` to catch row explosions
+  immediately.
 - The audit-ml-repo branch's history rewrite removed binary blobs from
   git (3.9 GB → 31 MB on origin) but leaves a `.git` of the same
   size locally until `git gc --prune=now --aggressive` runs (slow,

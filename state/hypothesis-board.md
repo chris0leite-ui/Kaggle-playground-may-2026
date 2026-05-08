@@ -75,6 +75,53 @@ parked. For history, read `audit/research/` and the postmortems.
   decorrelates the routing variables; Path-B C×S on top-K PCs scores
   −28 to −34 bp vs K=10 plain LR. Path-B fires on redundant pools,
   not orthogonal ones. See A30c.
+- Kernel SVM family (Nyström-RBF + LinearSVC and + kernel-logistic):
+  standalone OOF 0.912-0.914 (+56 bp over matched-feature linear LR,
+  but −400 bp from PRIMARY); both variants null on K=10 sparse and
+  K=27 dense pools (Δ −0.09 to +0.00 bp). 8th rank-lock confirmation;
+  kernel-class disagreement isn't enough when standalone-AUC gap to
+  GBDT-class exceeds 300 bp.
+- SVM specialists (5 variants: linear-global / linear-per-Year /
+  linear-per-Compound / linear-per-Stint / gaussian-kernel-per-Year)
+  on the same 45-feature recipe. Every variant nulls at K=27 PRIMARY
+  (Δ −0.09 to +0.00 bp). Strongest was kernel-per-Year (+0.05 bp on
+  K=10 sparse, +0.00 on K=27). linear-per-Year produced the lowest
+  ρ_test in project history (0.548, vs prior low 0.71 of bagged LR)
+  yet still nulled — 9th rank-lock confirmation that low correlation
+  alone is not sufficient meta-utility. SVM family closed across both
+  global and specialist axes.
+- **Kernel-SVM-meta on K=4 ensemble.** Nyström-RBF + LinearSVC over
+  the K=4 base predictions (12 feat: raw + rank + logit) with γ-sweep.
+  γ=0.02 *ties* Path-B PRIMARY at OOF 0.95403; γ=0.05/0.10 within
+  noise. Asymmetric flip diagnostics: linsvc drops 1882 PRIMARY
+  positives without adding any; klogreg adds 11608 without dropping.
+  Same OOF, structurally different rare-class operating points —
+  candidates for blend on a future submission slot.
+- **kNN with feature subsets** (10 subsets ≤5 features, distance-
+  weighted K=50). LR-pool over 10 heads → OOF 0.92285 (≈ LR-bank
+  ceiling 0.928). Best single subset: top-5 numeric at 0.89426.
+  Label-encoded categoricals (Compound_LE) hurt kNN distance.
+- **NCA-kNN on K=4 / K=10 ensemble** (Neighbourhood Components
+  Analysis = learned manifold distance). Standalone OOF 0.946–0.947
+  (~70 bp below LR-meta 0.954). K=4+1 gate ±0.07 bp; K=10+1 gate
+  ±0.02 bp — null on both pools. Friction
+  `non-parametric-meta-on-K=4-cant-beat-LR-meta-without-new-input`.
+  K=4 is already saturated for meta-routing; logit effective rank
+  ~3 ⇒ any router can at best tie LR-meta until a new base is added.
+- **Combined-input meta-stacker** (K=4 base predictions + top-5 raw
+  numerics standardised → 17-feature meta input). LR-meta: +0.03 bp
+  vs K=4 LR-meta (null). Kernel-SVM-meta γ=0.02: −1.64 bp (regress).
+  Confirms friction: the K=4 bases already absorb the top-5 numerics.
+- **Sequence-level fingerprint LightGBM** (HANDOVER #1 axis;
+  within-stint structure: prev_compound, compound_changes,
+  stint_lap_idx, prev_stint_length, position/tyre_life at stint
+  start, position_change_in_stint, stint_lap_frac, compound history
+  one-hot). Standalone OOF 0.94202. K=4+1 **+0.15 bp** (only
+  positive meta-add in this branch's arc), K=10+1 −0.08, K=27+1
+  −0.08. Magnitude within fold noise but structurally in the right
+  direction on the sparse pool. Richer sequence features (HMM
+  transitions, AR(1) TyreLife, RNN-class sequence model) could
+  potentially scale this up — open path for next session.
 
 ## Open priorities (best EV / cost first)
 
