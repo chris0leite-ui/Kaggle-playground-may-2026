@@ -60,6 +60,15 @@ parked. For history, read `audit/research/` and the postmortems.
   K=27 dense pools (Δ −0.09 to +0.00 bp). 8th rank-lock confirmation;
   kernel-class disagreement isn't enough when standalone-AUC gap to
   GBDT-class exceeds 300 bp.
+- SVM specialists (5 variants: linear-global / linear-per-Year /
+  linear-per-Compound / linear-per-Stint / gaussian-kernel-per-Year)
+  on the same 45-feature recipe. Every variant nulls at K=27 PRIMARY
+  (Δ −0.09 to +0.00 bp). Strongest was kernel-per-Year (+0.05 bp on
+  K=10 sparse, +0.00 on K=27). linear-per-Year produced the lowest
+  ρ_test in project history (0.548, vs prior low 0.71 of bagged LR)
+  yet still nulled — 9th rank-lock confirmation that low correlation
+  alone is not sufficient meta-utility. SVM family closed across both
+  global and specialist axes.
 
 ## Open priorities (best EV / cost first)
 
