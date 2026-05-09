@@ -10,35 +10,27 @@ script names and audit prose are *frozen code/file prefixes*, not
 calendar days — see `glossary.md` and `audit/friction.md`
 under `day-counter-drift`.
 
-## PRIMARY (active) — set 2026-05-09 AM
+## PRIMARY (active) — set 2026-05-08 PM (kept across V4 lift per PI 2026-05-09)
 
-**Score: 0.95359 on the public leaderboard.** Direct LB-confirmed.
+**Score: 0.95351 on the public leaderboard.** Direct LB-confirmed.
 
-**What it is:** the K=4 forward-greedy pool **plus a fifth kNN-augmented
-LightGBM base (V4)**, all five [P, rank, logit] expanded and fed to the
-same per-segment partial-pooling stacker (Compound × Stint, τ = 100,000).
+**What it is:** the **K=4 forward-greedy** sparse pool combined with
+the same per-segment partial-pooling stacker (Compound × Stint, τ =
+100,000). The 4 bases are one per model class:
 
-The five bases:
 - `d17_h1d_yekenot_full` — RealMLP trained with the yekenot recipe.
 - `p1_single_cb_v4_gpu` — CatBoost trained with the yekenot recipe.
 - `f1_hgbc_deep` — sklearn HistGradientBoostingClassifier (deep).
 - `d16_orig_continuous_only` — LightGBM trained on the original
   (aadigupta1601 pre-synth) dataset, continuous-only features.
-- **`v4_knn_aug_base`** — LightGBM trained on row features plus the
-  kNN-target-mean (K=20 in standardised feature space:
-  LapNumber/TyreLife/RaceProgress/Stint/PitStop/Compound-onehot) and
-  kNN-target-std as input features. Per-fold OOF discipline: kNN tree
-  built on training rows in folds≠k. Standalone OOF AUC 0.94163;
-  ρ_spearman vs K=4 bases 0.85–0.94 (most diverse vs d16 at 0.85).
-  See `scripts/seq_coupled/build_knn_base.py`.
 
-**Why V4 worked where V3 didn't.** V3 (same kNN-target-mean as a META
-feature in a 14-feature LR meta) gave +0.01 bp on OOF — fully absorbed
-by linear meta. V4 (same feature ingested through tree splits inside a
-new BASE) gave +0.20 bp on OOF and **+0.80 bp on LB**. Tree
-non-linearity at the base layer extracts conditional structure linear
-meta absorption blocks. See
-`audit/2026-05-08-night-session-summary.md` for the full V1-V4 record.
+**K=5 V4 kNN-aug submission held as a confirmed lift, NOT as PRIMARY.**
+2026-05-09 AM submission of K=4+V4 (transductive kNN-target-mean
+ingested at the base layer) landed at LB 0.95359 = K=4 PRIMARY +0.8 bp.
+PI directive 2026-05-09: keep K=4 as PRIMARY for cleaner baseline
+during V6 work (learned-embedding kNN on top of the K=4 anchor).
+The K=5 file remains as a confirmed +0.8 bp hedge candidate at
+`submissions/submission_K5_kNNaugbase_pathb.csv`.
 
 **Why we promoted from K=27 → K=4 at a deliberate −1.7 bp LB cost:**
 
@@ -87,9 +79,9 @@ cross-validation fold using only training rows.
 
 ## Distance to top-5%
 
-- Top-5% boundary: 0.95405. Gap from PRIMARY (K=5 LB 0.95359):
-  **−4.6 basis points** (was −5.4 vs K=4 LB 0.95351).
-- Leader: 0.95476. Gap: **−11.7 basis points** (was −12.5).
+- Top-5% boundary: 0.95405. Gap from PRIMARY (K=4 LB 0.95351): **−5.4 bp**.
+- Gap from K=5 hedge candidate (LB 0.95359): −4.6 bp.
+- Leader: 0.95476. Gap from PRIMARY: −12.5 bp.
 - Bootstrap CI on a 20% public draw is ±12 bp wide, so both gaps fall
   partly inside the public-LB sample-noise band. Cross-submission
   *relative* deltas trust to ~±1 bp at this scale.
