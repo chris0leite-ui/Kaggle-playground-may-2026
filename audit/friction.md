@@ -16,6 +16,59 @@ restating it.
 
 ## Week of 2026-05-08
 
+- `rank-lock-at-conditional-target-correlation-not-just-logit-direction`
+  (2026-05-09 night ml-model-experiments-gbKiI): A29's prior framing
+  said "rank-lock at logit-direction not rank-correlation." The
+  seq-coupled meta probe (V1.1-V1.3 + V2.1-V2.3 + V3) refines this:
+  features can be feature-space-orthogonal to K=4 (look-ahead R² =
+  0.487 vs row-local span — 51% non-overlap variance) and STILL get
+  absorbed by the LR meta if their target-correlation is parallel
+  to the existing logit direction conditional on row context.
+  RankNet's direct-AUC pairwise loss arrives at the same 0.95400
+  ceiling as LR cross-entropy. LightGBM-meta at depth 4 also at the
+  ceiling. Loss-function variation doesn't escape it — the limitation
+  is information, not optimisation. **Fix:** update A29 framing to
+  "conditional-target-correlation level"; future untried-mechanism
+  proposals at the meta layer must argue NEW partial correlation with
+  y given K=4, not just feature-space orthogonality.
+- `transductive-feature-mechanism-one-dimensional-at-K4`
+  (2026-05-09 night): V4 (kNN-target-mean as base input via tree
+  splits) lifted +0.24 bp at K=4+1 LR meta and +0.80 bp on LB.
+  V5 (V4 + 5 fold-safe per-cell target encodings) and V6 (V4 +
+  task-learned-MLP-embedding kNN) both ABSORBED at meta with
+  ρ_spearman vs V4 = 0.989 and 0.988 respectively. Two structurally
+  different similarity metrics (raw-feature-distance kNN vs
+  MLP-embedding kNN) and an explicit per-cell aggregate (TE) all
+  produce the SAME logit direction at the meta. **Lesson:**
+  transductive label-derived features are one-dimensional in K=4
+  logit space; V4 captured the available transductive lift; multi-
+  flavor stacking doesn't help. Future candidates should aim for
+  orthogonal mechanism families (residual-targeted kNN — V7 idea;
+  different model classes via DGP factorisations), not more
+  transductive variants.
+- `rule-27-abort-threshold-empirically-too-strict-for-sub-bp-moves`
+  (2026-05-09 night): K=5 V4 kNN-aug submission had ρ_test_vs_K4 =
+  0.99989 — exceeds Rule 27's 0.999 abort threshold. PI authorised
+  override; LB landed at 0.95359 vs K=4 0.95351 = +0.8 bp delta,
+  NOT a tie. **Calibration:** ρ in 0.999-0.9999 zone produces
+  sub-bp to few-bp LB movement; not auto-tie. The 5-decimal Kaggle
+  quantization can still distinguish predictions that share rank
+  order on 99.989% of pairs because the 0.011% disagreement is
+  enough to flip per-row ranks at the sample-noise scale. **Fix:**
+  Rule 27's 0.999 floor stays as default but the override path is
+  "PI-authorised + calibration-probe framing + outcome logged."
+  Candidate for improvements.md (see postmortem).
+- `bote-on-already-falsified-prong-direction-burned-time`
+  (2026-05-09 early-night): agent ran BOTEs for Prong B (per-segment
+  LightGBM head) and Prong S (2-layer stack replication) before
+  asking PI; both SKIPped at 0.009 bp/min. PI then explicitly ruled
+  out replication ("do not replicate or copy"). The 5-10 min on BOTE
+  bookkeeping for Prongs B+S was wasted because PI's axis-of-
+  permission was different from the agent's BOTE-time priors.
+  **Fix:** when the directive is "be creative / original," ask PI
+  about axis-of-permission BEFORE running BOTEs on candidates that
+  may fall in axes the agent isn't sure of (e.g., is replication
+  in scope?). Cheap to ask; expensive to mis-pick the prong family.
 - `research-scan-duplicate-mechanism-claim` (2026-05-08 PM
   research-feature-engineering-7oCmj): proposed Frontiers AI 2025's
   `DriverAheadPit`/`DriverBehindPit` peer-effect features as a
