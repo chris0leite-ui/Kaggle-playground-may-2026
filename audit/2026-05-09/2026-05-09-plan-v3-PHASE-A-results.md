@@ -111,6 +111,31 @@ mode count is. Move to Phase B sweep.
 - `audit/2026-05-09/2026-05-09-q10-cell-marginal-confirmed.md`
 - v2 plan: `audit/2026-05-09/2026-05-09-decode-DGP-7step-plan-v2.md`
 
+## Architecture exclusion ledger (running)
+
+Each row is a candidate host architecture we've tested and the disc-AUC
+it produced against host synth. **HIT** = disc-AUC < 0.95 (host
+candidate). Otherwise EXCLUDED.
+
+| # | Architecture | Config | disc-AUC | Verdict | Source |
+|---:|---|---|---:|---|---|
+| 1 | SDV CTGAN | default cond, default sample, 5 ep, 20k synth-recursive | 0.9997 | EXCLUDED | Q3 smoke |
+| 2 | SDV CTGAN | default cond, default sample, 10 ep, 101k orig | 0.9993 | EXCLUDED | Q3 |
+| 3 | SDV CTGAN | default cond, **synth marginal**, 10 ep, 101k orig | 0.9993 | EXCLUDED | Q5 |
+| 4 | SDV CTGAN | default cond, 20 ep, 80k synth-recursive | 0.9993 | EXCLUDED | P3 (prior) |
+| 5 | SDV GaussianCopula | default | 0.9988 | EXCLUDED | qB |
+| 6 | SDV TVAE | 10 ep | _pending_ | — | qB |
+| 7 | SDV CopulaGAN | 10 ep | _pending_ | — | qB |
+| 8 | SDV CTGAN | 50 ep | _pending_ | — | qC |
+| 9 | SDV CTGAN | 100 ep | _pending_ | — | qC |
+| 10 | SDV CTGAN | pac=1, 30 ep | _pending_ | — | qC |
+| 11 | SDV CTGAN | embedding_dim=256, gen/disc=(512,512), 30 ep | _pending_ | — | qC |
+
+Important read: **all four EXCLUDED variants converge on disc-AUC
+0.999.** The disc separation is structural, not noise. When TVAE /
+CopulaGAN / longer CTGAN come in similar, the conclusion will be that
+SDV's library does not contain the host's generator.
+
 ## Status checklist
 
 - [x] Phase A0 — bootstrap, install
