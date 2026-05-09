@@ -1,0 +1,176 @@
+"""qAI — error-weighted base specialising on K=4 misclassification.
+
+For each row, sample weight = |y - K4_oof_pred| ** 1.5. This up-weights
+rows where K=4 PRIMARY is most uncertain or wrong. Fold-safe because
+K=4 OOF is computed in 5-fold StratifiedKF.
+
+The base uses yekenot-style 14 raw + 11 stint_imputed features = 25.
+LightGBM with sample weights focuses on the K=4 hard population
+(real drivers, PS=1 in non-2023 years, late-stint cells).
+
+Hypothesis: at the meta layer, this base provides a residual-correcting
+direction that K=4 cannot self-correct. Different from non-LR meta
+attempts because the base's TRAINING is conditioned on K=4 errors.
+
+Output: K=4+1 LR-meta gate with diagnostics on real-vs-ghost AUC lift.
+"""
+from __future__ import annotations
+
+import json
+import sys
+import time
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import lightgbm as lgb
+from scipy.stats import spearmanr
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import StratifiedKFold
+
+ROOT = Path("/home/user/Kaggle-playground-may-2026")
+DATA = ROOT / "data"
+ART = ROOT / "scripts/artifacts"
+sys.path.insert(0, str(ROOT / "scripts/dgp_v3"))
+from qAA_stint_imputed_base import build_stint_features, encode_categoricals
+
+SEED, N_FOLDS = 42, 5
+TARGET = "PitNextLap"
+
+
+def t(label, ts):
+    print(f"  [{time.time()-ts:6.1f}s] {label}", flush=True)
+
+
+def main():
+    ts = time.time()
+    out = {}
+
+    train = pd.read_csv(DATA / "train.csv")
+    test = pd.read_csv(DATA / "test.csv")
+    train_fe = build_stint_features(train)
+    test_fe = build_stint_features(test)
+
+    primary_oof = np.load(ART / "oof_K4_fwd_pathb.npy")
+    primary_test = np.load(ART / "test_K4_fwd_pathb.npy")
+    if primary_oof.ndim == 2: primary_oof = primary_oof[:, 1]
+    if primary_test.ndim == 2: primary_test = primary_test[:, 1]
+    y = train[TARGET].values
+
+    # Sample weight = |y - p|^1.5 (compresses easy rows, amplifies hard)
+    err = np.abs(y - primary_oof)
+    weights = (err ** 1.5).astype(np.float32)
+    weights = weights * (len(weights) / weights.sum())  # mean-1 normalise
+    print(f"  weights: min={weights.min():.4f}, mean={weights.mean():.4f}, p99={np.percentile(weights,99):.3f}")
+    print(f"  K=4 PRIMARY OOF AUC: {roc_auc_score(y, primary_oof):.5f}")
+
+    base_num = ["LapNumber", "TyreLife", "Position", "LapTime (s)",
+                "LapTime_Delta", "Cumulative_Degradation", "RaceProgress",
+                "Position_Change", "PitStop", "Stint", "Year"]
+    base_cat = ["Driver", "Compound", "Race"]
+    new_num = ["stint_imputed", "CumulativeTimeStint", "prev_lap_delta_stint",
+               "prev_lap_delta_drv", "stint_lap_idx", "stint_size",
+               "stint_lap_frac", "compound_changes", "position_at_stint_start",
+               "position_change_in_stint"]
+    new_cat = ["prev_compound"]
+    feat_cols = base_num + base_cat + new_num + new_cat
+    cat_cols = base_cat + new_cat
+    train_enc, test_enc = encode_categoricals(train_fe, test_fe, cat_cols)
+    X = train_enc[feat_cols].values
+    X_test = test_enc[feat_cols].values
+    cat_idx = [feat_cols.index(c) for c in cat_cols]
+
+    skf = StratifiedKFold(n_splits=N_FOLDS, shuffle=True, random_state=SEED)
+    oof = np.zeros(len(X))
+    test_pred = np.zeros(len(X_test))
+    fold_aucs = []
+    lgb_params = dict(
+        n_estimators=400, learning_rate=0.05, num_leaves=63,
+        min_child_samples=80, reg_alpha=0.1, reg_lambda=0.1,
+        subsample=0.8, subsample_freq=1, colsample_bytree=0.8,
+        random_state=SEED, n_jobs=-1, verbosity=-1,
+    )
+    for fold, (tr, va) in enumerate(skf.split(X, y)):
+        t1 = time.time()
+        m = lgb.LGBMClassifier(**lgb_params)
+        m.fit(X[tr], y[tr], sample_weight=weights[tr],
+              categorical_feature=cat_idx,
+              eval_set=[(X[va], y[va])],
+              callbacks=[lgb.early_stopping(40, verbose=False)])
+        oof[va] = m.predict_proba(X[va])[:, 1]
+        test_pred += m.predict_proba(X_test)[:, 1] / N_FOLDS
+        a = float(roc_auc_score(y[va], oof[va]))
+        fold_aucs.append(a)
+        print(f"  fold {fold+1} AUC = {a:.5f}  ({time.time()-t1:.0f}s)  best_iter={m.best_iteration_}", flush=True)
+
+    auc = float(roc_auc_score(y, oof))
+    print(f"\n  qAI standalone OOF AUC = {auc:.5f}", flush=True)
+
+    rho_oof = float(spearmanr(oof, primary_oof).correlation)
+    rho_test = float(spearmanr(test_pred, primary_test).correlation)
+    print(f"  rho_oof: {rho_oof:.5f}  rho_test: {rho_test:.5f}", flush=True)
+    out["oof_auc"] = auc
+    out["fold_aucs"] = fold_aucs
+    out["rho_oof_vs_primary"] = rho_oof
+    out["rho_test_vs_primary"] = rho_test
+
+    BASES = [
+        ("d17_h1d_yekenot_full", "oof_d17_h1d_yekenot_full_strat.npy"),
+        ("p1_single_cb_v4_gpu", "oof_p1_single_cb_v4_gpu_strat.npy"),
+        ("f1_hgbc_deep", "oof_f1_hgbc_deep_strat.npy"),
+        ("d16_orig_continuous_only", "oof_d16_orig_continuous_only_strat.npy"),
+    ]
+    base_oofs = []
+    for nm, fn in BASES:
+        o = np.load(ART / fn)
+        if o.ndim == 2: o = o[:, 1]
+        base_oofs.append(o)
+
+    def expand(p_list):
+        cols = []
+        for p in p_list:
+            p = np.clip(p, 1e-6, 1 - 1e-6)
+            cols += [p, pd.Series(p).rank().values / len(p), np.log(p / (1 - p))]
+        return np.column_stack(cols)
+
+    def lr_meta_oof(Xm, y_):
+        skf2 = StratifiedKFold(n_splits=N_FOLDS, shuffle=True, random_state=SEED)
+        om = np.zeros(len(y_))
+        for tr, va in skf2.split(Xm, y_):
+            mm = LogisticRegression(C=1.0, max_iter=2000, random_state=SEED)
+            mm.fit(Xm[tr], y_[tr])
+            om[va] = mm.predict_proba(Xm[va])[:, 1]
+        return om
+
+    Xm_K4 = expand(base_oofs)
+    Xm_K5 = expand(base_oofs + [oof])
+    auc_K4 = float(roc_auc_score(y, lr_meta_oof(Xm_K4, y)))
+    auc_K5 = float(roc_auc_score(y, lr_meta_oof(Xm_K5, y)))
+    delta = (auc_K5 - auc_K4) * 1e4
+    print(f"\n  K=4+1 lift: {delta:+.3f} bp", flush=True)
+    out["k4plus1_lift_bp"] = delta
+
+    # Diagnostic on real vs ghost
+    real_drivers_set = set(pd.read_csv(DATA / "original/f1_strategy_dataset_v4.csv").Driver.unique())
+    real_mask = train.Driver.isin(real_drivers_set).values
+    auc_real_K4 = float(roc_auc_score(y[real_mask], primary_oof[real_mask]))
+    auc_real_qAI = float(roc_auc_score(y[real_mask], oof[real_mask]))
+    auc_ghost_K4 = float(roc_auc_score(y[~real_mask], primary_oof[~real_mask]))
+    auc_ghost_qAI = float(roc_auc_score(y[~real_mask], oof[~real_mask]))
+    print(f"  real-driver:  K=4 {auc_real_K4:.5f} → qAI {auc_real_qAI:.5f}", flush=True)
+    print(f"  ghost-driver: K=4 {auc_ghost_K4:.5f} → qAI {auc_ghost_qAI:.5f}", flush=True)
+    out["auc_real_K4"] = auc_real_K4
+    out["auc_real_qAI"] = auc_real_qAI
+    out["auc_ghost_K4"] = auc_ghost_K4
+    out["auc_ghost_qAI"] = auc_ghost_qAI
+
+    np.save(ART / "dgp_v3_qAI_errwt_oof.npy", oof)
+    np.save(ART / "dgp_v3_qAI_errwt_test.npy", test_pred)
+    fp = ART / "dgp_v3_qAI_errwt.json"
+    fp.write_text(json.dumps(out, indent=2, default=str))
+    t(f"wrote {fp.name}", ts)
+
+
+if __name__ == "__main__":
+    main()

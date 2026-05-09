@@ -10,27 +10,67 @@ script names and audit prose are *frozen code/file prefixes*, not
 calendar days — see `glossary.md` and `audit/friction.md`
 under `day-counter-drift`.
 
-## PRIMARY (active) — set 2026-05-08 PM (kept across V4 lift per PI 2026-05-09)
+## PRIMARY (active) — set 2026-05-09 PM (autonomous loop BtmFl)
 
-**Score: 0.95351 on the public leaderboard.** Direct LB-confirmed.
+**Score: 0.95375 on the public leaderboard.** Direct LB-confirmed.
+**+2.4 bp lift over prior PRIMARY** (K=4 + Path-B C×S τ=100k at LB 0.95351).
 
-**What it is:** the **K=4 forward-greedy** sparse pool combined with
-the same per-segment partial-pooling stacker (Compound × Stint, τ =
-100,000). The 4 bases are one per model class:
+**What it is:** the **K=9 = K=4 + qAT + qAV + qAO + qAA + qAF**
+forward-greedy sparse pool combined with the per-segment partial-pooling
+stacker (Compound × Stint, τ = 20,000). Bases:
 
-- `d17_h1d_yekenot_full` — RealMLP trained with the yekenot recipe.
-- `p1_single_cb_v4_gpu` — CatBoost trained with the yekenot recipe.
-- `f1_hgbc_deep` — sklearn HistGradientBoostingClassifier (deep).
-- `d16_orig_continuous_only` — LightGBM trained on the original
-  (aadigupta1601 pre-synth) dataset, continuous-only features.
+- `d17_h1d_yekenot_full` — RealMLP yekenot recipe
+- `p1_single_cb_v4_gpu` — CatBoost yekenot recipe
+- `f1_hgbc_deep` — sklearn HistGradientBoostingClassifier (deep)
+- `d16_orig_continuous_only` — LightGBM on aadigupta1601 orig
+- **qAT** — orig-kNN K=1 strictest match, 4-feat distance, 3 features
+  (label/distance/level), 6-axis cell key with hierarchical fallback
+- **qAV** — orig-kNN K=1, 7-feat distance, same slim 3-feature design
+- **qAO** — orig-kNN multi-K (3+5+10), 6-feat per K, 6-axis cell
+- **qAA** — stint_imputed sequence features (Frontiers F1 paper recipe
+  on the recovered LapNumber-TyreLife+1 stint identity)
+- **qAF** — d16++ trained on orig with stint_imputed features
 
-**K=5 V4 kNN-aug submission held as a confirmed lift, NOT as PRIMARY.**
-2026-05-09 AM submission of K=4+V4 (transductive kNN-target-mean
-ingested at the base layer) landed at LB 0.95359 = K=4 PRIMARY +0.8 bp.
-PI directive 2026-05-09: keep K=4 as PRIMARY for cleaner baseline
-during V6 work (learned-embedding kNN on top of the K=4 anchor).
-The K=5 file remains as a confirmed +0.8 bp hedge candidate at
-`submissions/submission_K5_kNNaugbase_pathb.csv`.
+The 5 new decoded bases (qAT + qAV + qAO + qAA + qAF) escape rank-lock
+via slim per-row attribution against orig at the 6-axis cell key.
+The breakthrough mechanism: tight K (=1) + 6-axis cell + hierarchical
+fallback, with multiple distance-space variants.
+
+**Submitted:** 2026-05-09 13:23 UTC. LB 0.95375, public score COMPLETE.
+File: `submissions/submission_qAT_qAV_qAT_qAV_qAO_qAA_qAF_pathb_cs_tau20000.csv`
+(filename has duplicate qAT_qAV from qAX naming bug; data is correct).
+
+**Mechanism background:** see
+`audit/2026-05-09/2026-05-09-qAK-breakthrough.md` and
+`audit/2026-05-09/2026-05-09-final-results-summary.md`.
+
+## Reference of prior PRIMARY for hedge-eligibility
+
+The K=4 + Path-B C×S τ=100k at LB 0.95351 remains hedge-eligible per
+Rule R7 if the new K=9 PRIMARY regresses on private LB. See
+`submissions/submission_K4_PRIMARY_pathb_cs_tau100000.csv`.
+
+## Leaderboard ladder (with new PRIMARY)
+
+| ISO date | Pool | Score | What changed |
+|---|---|---:|---|
+| **2026-05-09 PM** | **K=9 + Path-B C×S τ=20k** | **0.95375** | **NEW PRIMARY**. orig-kNN K=1 6-axis cell + Path-B amp. +2.4 bp over K=4. |
+| 2026-05-09 AM | K=5 (K=4 + V4 kNN-aug) + Path-B τ=100k | 0.95359 | V4 kNN-target-mean ingested at base level. |
+| 2026-05-08 PM | K=4 + Path-B τ=100k | 0.95351 | Sparse-pool reduction. |
+| 2026-05-07 PM | K=27 + Path-B τ=100k | 0.95368 | DGP-class bases. |
+| 2026-05-07 AM | K=23 + Path-B τ=20k | 0.95154 | First with CB-yekenot + RealMLP-yekenot. |
+| Earlier dates | (see HANDOVER for full ladder) | | |
+
+**Top-5% boundary: 0.95405. Gap from PRIMARY: -3.0 bp** (was -5.4 bp).
+Leader: 0.95476. Gap from PRIMARY: -10.1 bp (was -12.5 bp).
+
+## Submissions
+
+- **Used: 42 of 270.** Plenty of slots left.
+- **Today (2026-05-09): 2 used** (K=5 V4 kNN-aug AM + K=9 PM PRIMARY).
+- **Comp-day:** 9 of 31. **Days remaining: 22.**
+
+
 
 **Why we promoted from K=27 → K=4 at a deliberate −1.7 bp LB cost:**
 
