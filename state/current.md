@@ -10,35 +10,32 @@ script names and audit prose are *frozen code/file prefixes*, not
 calendar days — see `glossary.md` and `audit/friction.md`
 under `day-counter-drift`.
 
-## PRIMARY (active) — set 2026-05-09 PM (autonomous loop BtmFl)
+## PRIMARY (active) — set 2026-05-09 PM (autonomous loop BtmFl + K=27 ensemble)
 
-**Score: 0.95375 on the public leaderboard.** Direct LB-confirmed.
-**+2.4 bp lift over prior PRIMARY** (K=4 + Path-B C×S τ=100k at LB 0.95351).
+**Score: 0.95385 on the public leaderboard.** Direct LB-confirmed.
+**+3.4 bp lift over original K=4 PRIMARY** (LB 0.95351). +1.0 bp over
+the prior K=9 PRIMARY (LB 0.95375).
 
-**What it is:** the **K=9 = K=4 + qAT + qAV + qAO + qAA + qAF**
-forward-greedy sparse pool combined with the per-segment partial-pooling
-stacker (Compound × Stint, τ = 20,000). Bases:
+**What it is:** K=11 = K=4 + qAT + qAV + qAO + qAA + qAF + qAK +
+K27_100k, with **Path-B Compound × Stint τ=100,000**.
 
-- `d17_h1d_yekenot_full` — RealMLP yekenot recipe
-- `p1_single_cb_v4_gpu` — CatBoost yekenot recipe
-- `f1_hgbc_deep` — sklearn HistGradientBoostingClassifier (deep)
-- `d16_orig_continuous_only` — LightGBM on aadigupta1601 orig
-- **qAT** — orig-kNN K=1 strictest match, 4-feat distance, 3 features
-  (label/distance/level), 6-axis cell key with hierarchical fallback
-- **qAV** — orig-kNN K=1, 7-feat distance, same slim 3-feature design
-- **qAO** — orig-kNN multi-K (3+5+10), 6-feat per K, 6-axis cell
-- **qAA** — stint_imputed sequence features (Frontiers F1 paper recipe
-  on the recovered LapNumber-TyreLife+1 stint identity)
-- **qAF** — d16++ trained on orig with stint_imputed features
+The K=27 base is the prior PRIMARY-of-old
+(`d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000`) treated as a single
+super-base — collapses 27 bases (incl. d18 chain decomp, F2 constraint,
+E2 preimage-kNN) into one prediction. Adding K=27_100k as a single
+base lifts +2.624 bp at K=4+1 plain LR-meta — proving prior K=27
+information was being lost in K=4-only PRIMARY.
 
-The 5 new decoded bases (qAT + qAV + qAO + qAA + qAF) escape rank-lock
-via slim per-row attribution against orig at the 6-axis cell key.
-The breakthrough mechanism: tight K (=1) + 6-axis cell + hierarchical
-fallback, with multiple distance-space variants.
+The 6 new orig-kNN slim-bases (qAK/qAO/qAA/qAF/qAT/qAV) ride on top
+of K=27 to give per-row attribution at the host's decoded 6-axis
+cell key.
 
-**Submitted:** 2026-05-09 13:23 UTC. LB 0.95375, public score COMPLETE.
-File: `submissions/submission_qAT_qAV_qAT_qAV_qAO_qAA_qAF_pathb_cs_tau20000.csv`
-(filename has duplicate qAT_qAV from qAX naming bug; data is correct).
+**Submitted:** 2026-05-09 13:40 UTC. LB 0.95385, public COMPLETE.
+File: `submissions/submission_qBF_K11_qAT_qAV_qAO_qAA_qAF_qAK_K27_100k_pathb_tau100000.csv`
+
+**OOF→LB transfer for this candidate**: OOF +4.032 bp → LB +3.4 bp,
+ratio 0.84× (lower than qAX's 1.19× because K=27 brings more
+redundancy with K=4 already-used bases).
 
 **Mechanism background:** see
 `audit/2026-05-09/2026-05-09-qAK-breakthrough.md` and
