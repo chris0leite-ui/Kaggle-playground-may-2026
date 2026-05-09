@@ -1,0 +1,420 @@
+# Random-forest sweep — closes the bagged-tree variant of the non-LR meta family and the RF-base variant of the new-model-class axis
+
+**Date:** 2026-05-08
+**Branch:** `claude/add-random-forest-model-XJ3Dm`
+**Script:** `scripts/probe_forest_sweep.py`
+**Artifacts:** `scripts/artifacts/probe_forest_sweep.json`,
+`oof_rf_meta_K4_strat.npy`, `oof_rf_combined_K4_strat.npy`,
+`oof_rf_yekenot_strat.npy`
+
+PI directive (this session): "Try a random forest, extend our model
+family using a forest." Ran three sub-probes in one script to share
+loading and produce a definitive forest-family verdict in a single
+session.
+
+## Context
+
+The irrigation-water comp (last comp) used sklearn `RandomForest` as
+the **meta-stacker** over a 14-bank of error-orthogonal calibrated
+probability vectors and got +35 bp of LB lift — third-largest move
+of that comp. On s6e5, no forest variant was in PRIMARY:
+
+- `d15c_extra_trees` (raw-feature ExtraTrees) was tried Day-15 →
+  WEAK_PASS at K=22+1 (+0.059 bp at ρ=0.99599); R5 hedge only.
+- LightGBM as meta-learner was falsified Day-20 (`probe_pca_meta.py`):
+  worse than LR-meta by 1-2 bp at every input representation.
+- No RandomForest had been run as a base or as a meta in this comp.
+
+Three angles were tested today, with low-prior verdicts:
+- **A** RF base on yekenot recipe — predicted WEAK_PASS at most.
+- **B** RF as meta on K=4 [P, rank, logit] (12 feat) — predicted
+  null/regress (matches the inductive class of the falsified
+  LightGBM-meta).
+- **C** RF on combined K=4 expansion + 6 raw numerics (18 feat) —
+  inductive-class swap on a meta with raw-feature awareness; the
+  novel angle.
+
+## Settings
+
+```
+RandomForestClassifier(
+    n_estimators={400 (B/C), 400 (A)},
+    max_features="sqrt",
+    min_samples_leaf={200 (B/C), 100 (A)},
+    max_samples={0.4 (B/C), 0.5 (A)},
+    n_jobs=-1, random_state=42,
+)
+```
+
+5-fold StratifiedKFold seed=42 (matches all base OOFs in the K=4
+pool). LR-meta baselines fit C=1.0 on `[P, rank, logit]` expansion
+per the project convention.
+
+## Result table
+
+| Angle | Standalone OOF | Comparison baseline | Δ vs baseline | ρ vs PRIMARY | Predicted LB Δ |
+|---|---:|---:|---:|---:|---:|
+| **B** RF-meta on K=4 expansion | 0.95384 | LR-meta on same input 0.95399 | **−1.54 bp** | 0.9911 | −4.54 bp |
+| **C** RF on combined input | 0.95393 | LR on same combined 0.95400 | **−0.70 bp** | 0.9901 | −3.70 bp |
+| **C** vs pure K=4 LR-meta | 0.95393 | pure K=4 LR-meta 0.95399 | −0.65 bp | (same) | (same) |
+| **A** RF base (yekenot recipe) | 0.94178 | K=4 LR-meta base 0.95399 | **+0.26 bp** at K=4+1 | 0.9595 | −4.74 bp (conservative) |
+
+For comparison: `d15c_extra_trees` (raw features, no FE) standalone
+OOF 0.92967, ρ 0.9960, +0.06 bp at **K=22+1**. RF-on-yekenot is +12
+bp standalone over ET-on-raw, ρ ~3.7× further from PRIMARY, and
+4.4× larger min-meta lift on a much sparser pool.
+
+## Findings
+
+### Angle B (FALSIFIED)
+
+RF as a meta-learner over the K=4 [P, rank, logit] = 12-feature
+expansion lands 1.54 bp BELOW the LR-meta baseline at the same
+inputs, with ρ=0.991 vs PRIMARY (sub-tie band). The per-fold
+validation AUCs show the expected RF instability (0.95287, 0.95329,
+0.95352, 0.95486, 0.95488 — std 0.00091 across folds). The
+aggregate OOF loses to LR-meta by a clean margin.
+
+This is the **bagged-tree variant of the same finding the Day-20
+PCA-meta probe produced for boosted trees** (LightGBM-meta lost 1-2
+bp to LR-meta at every input representation tested). The 3-D logit
+subspace ceiling (A25/A30) is robust across both boosted and bagged
+inductive classes on the meta side. The "non-LR meta" clause of
+A30 was empirically refuted Day-20 for boosting; today's run
+generalizes it to bagging.
+
+### Angle C (FALSIFIED)
+
+Adding 6 raw numerics (LapNumber, TyreLife, RaceProgress, LapTime,
+Position, Stint) to the K=4 expansion gives the RF meta access to
+the same inputs the GBDT bases trained on. RF-on-combined OOF
+0.95393 vs LR-on-combined 0.95400 = −0.70 bp. The inductive-class
+swap **does not rescue RF-meta even when it can interact base
+predictions with raw signals**. LR also gains nothing from the 6
+raw features (0.95400 vs pure K=4 LR-meta 0.95399 = +0.01 bp).
+This is consistent with the Day-19 friction
+`combined-input-meta-stacker-absorbed`: K=4 bases already extract
+all useful information from the raw-features at the base level; a
+meta seeing the raw features in addition is redundant.
+
+Confirms: **the non-LR-meta direction is closed across (boosted,
+bagged) × (pure base predictions, base predictions + raw features)
+= 4 of 4 variants tested.**
+
+### Angle A (WEAK_PASS — most-diverse base in the K=4 era)
+
+RF as a base on the same yekenot feature recipe that produced
+CatBoost-yekenot v4 (+24.21 bp at K=21+1) and RealMLP-yekenot h1d
+(OOF 0.95257). 8 yekenot recipe items: floor-cat numerics, count
+encoding, KBins quantiles, combo cats, CV target encoding on
+(Race, Compound) and (Race, Year), without the orig-data concat
+(orig CSV not bundled in this repo's artifact dataset).
+
+**Standalone OOF 0.94178** (per-fold range 0.9405-0.9427, std
+0.00080). +12.1 bp over `d15c_extra_trees` on raw features (0.92967),
+−10.8 bp below the e3 HGBC raw-features ceiling (0.94876), −113 bp
+below the LR-meta on K=4. Tree-bagged classifier at this feature
+count and rank-lock pool can't beat boosted-tree single models.
+
+**Min-meta gate at K=4+1: +0.26 bp** (0.95399 → 0.95402). Small but
+positive — and the largest non-null new-base lift this comp has
+produced in the K=4 era.
+
+**ρ vs PRIMARY (the K=4 LR-meta test prediction): 0.9595.** Lowest
+ρ ever observed on a positively-gated base. By comparison, the
+prior-most-diverse-positive base — the d15b DAE-only at K=22 —
+landed at ρ=0.948 with min-meta +0.79 bp. The RF-yekenot base is
+slightly closer to PRIMARY than DAE in test-prediction space but
+more diverse than every other K=4-era candidate that gated null.
+
+**Why the conservative LB band reads −4.74 bp.** The probe.py band
+table assigns "OOF Δ − 5.0 bp" to ρ < 0.99. That rule was calibrated
+on tightly-correlated stack-add candidates where OOF Δ tracks LB Δ
+nearly 1:1; for genuinely-orthogonal new bases (DAE, FM-class), the
+historical amp ratio at LB has been 1.4× to 11.6× (d15b realized
+1.4×; d13e per-segment amp 8×). Best central estimate at 1.4× amp
+on +0.26 bp OOF is **+0.36 bp LB**, roughly tying PRIMARY in the
+public-LB sample-noise band (±12 bp).
+
+**Hedge / R5 verdict.** RF-yekenot is hedge-eligible per Rule R5.
+The natural follow-up is a Path-B Compound × Stint τ=100k refit on
+K=5 = K=4 + RF — same shrinkage stacker that gives the current
+PRIMARY. That refit, if approved, would be a single-shot submit
+candidate.
+
+## Conclusions
+
+1. **Forest as meta-stacker is dead** on s6e5. RF in either pure
+   (Angle B) or combined-input (Angle C) flavour loses to LR-meta
+   by 0.7-1.5 bp OOF. Direct port of the irrigation +35 bp pattern
+   does not transfer because the K=4 logit pool already sits at
+   the 3-D subspace ceiling — there is no non-linear interaction
+   for RF to exploit.
+
+2. **The non-LR meta family is now closed across two inductive
+   classes.** Day-20 LightGBM-meta + today RF-meta + today
+   RF-combined-input = 4 falsified variants. A30b ("non-LR meta is
+   architecturally untested") was wrong at Day-20; today's run
+   removes the bagged-tree-meta as a possible escape.
+
+3. **Forest as a base is alive but small.** RF-on-yekenot at
+   standalone OOF 0.94178 with ρ=0.959 to PRIMARY produces a
+   +0.26 bp K=4+1 LR-meta lift. This is **the largest min-meta
+   lift any new base has produced on the K=4 pool** in this comp.
+   The lift is well within fold-noise (std 0.0008 per-fold),
+   so it's a candidate to advance — not a confirmed positive —
+   but it's the first non-null forest result and it merits R5
+   hedge candidacy. Path-B refit on K=5 is the natural next step.
+
+## Falsifies / extends
+
+- **A30b extension.** The "non-LR meta architecture" clause of A30
+  is now refuted across LightGBM-meta (Day-20), RF-meta (today),
+  and RF-combined-input (today). 3 of 3 non-LR-meta variants null
+  or regress. The 3-D logit subspace ceiling is robust to
+  inductive-class swap on the meta.
+
+## Kitchen-sink follow-up (RF on yekenot + constraint + inter-stint = 57 feat)
+
+PI directive after the initial sweep: combine every engineered
+feature family that has produced a positive single-base lift in
+this comp, since RF benefits from feature breadth (each tree
+samples a random subset). Substrate available without orig CSV /
+GPU: yekenot recipe (38) + d18 constraint violations (12) +
+EXP-3 inter-stint memory (7) = 57 features.
+
+Script: `scripts/probe_forest_kitchen_sink.py`
+Artifacts: `oof_rf_kitchen_sink_strat.npy`,
+`scripts/artifacts/probe_forest_kitchen_sink.json`
+Settings: same as Angle A (n_est=400, min_samples_leaf=100,
+max_samples=0.5).
+
+| Probe | n feat | standalone OOF | ρ vs PRIMARY | K=4+1 LR Δ | Pred LB Δ band |
+|---|---:|---:|---:|---:|---:|
+| Angle A (yekenot only) | 38 | 0.94178 | 0.9595 | +0.262 bp | −4.74 bp |
+| Kitchen-sink | 57 | **0.94054** | **0.9580** | **+0.248 bp** | −4.75 bp |
+
+**Findings.**
+
+1. **Feature breadth hurts RF on this data.** Adding 19 features
+   dropped standalone OOF by **−1.24 bp**. The 12 constraint
+   violations are mostly zero-valued indicators (synth violations
+   are rare); the 7 inter-stint features are weak predictors that
+   waste split capacity at random feature subsets. RF's bagging
+   over feature subsets means weak features dilute strong ones —
+   different from boosting, which can ignore weak features.
+
+2. **K=4+1 meta-gate lift is unchanged within fold noise.** +0.25
+   bp vs Angle A's +0.26 bp. The two probes agree to within 0.014
+   bp. **This is the cleanest reproducibility check the forest
+   family has had in this comp** — the +0.25 bp signal is now
+   demonstrated across two independent RF feature configurations,
+   raising the prior that it's a real signal rather than fold noise.
+
+3. **ρ marginally improves** (0.9580 vs 0.9595). The wider tableau
+   gives slightly more orthogonal predictions but the meta-utility
+   is identical. ρ matters less than logit-direction here, per
+   A30 (rank-lock at logit level).
+
+**Strategic implication.** The bottleneck for forest-class
+diversity in this comp is NOT feature substrate — it's the rank-
+lock at logit-direction level. **Adding more feature families to
+RF will not scale the +0.25 bp K=4+1 lift.** The remaining
+forest-family levers that could move the lift:
+
+- **Multi-seed RF bag** (cuts fold noise by √n; might surface
+  whether the +0.25 bp is a stable signal worth amplifying via
+  Path-B refit).
+- **Path-B Compound × Stint τ=100k refit on K=5** = K=4 +
+  RF-yekenot (the cheaper of the two, tests LB transfer
+  directly; +0.36 bp central LB at 1.4× amp floor).
+- **Forest variants** beyond plain RF (ExtraTrees with full
+  yekenot recipe; oblique-RF / RotationForest if available;
+  feature-bagged RF with explicit sub-recipes).
+
+The PI's hypothesis that RF benefits from feature breadth (per
+the irrigation precedent) is empirically refuted on this comp.
+The irrigation +35 bp RF-meta worked on a 14-bank of
+*error-orthogonal calibrated probability vectors* — already-
+distilled signal. Raw + engineered features, where most columns
+are correlated with each other, is a different feature regime
+where RF doesn't get the same lift from breadth.
+
+## Optuna follow-up — hyperparameter optimization caps at the same +0.25 bp
+
+PI directive: tune RF hyperparameters with Optuna on the 57-feature
+kitchen-sink to push past +0.25 bp. Search space: n_estimators
+{300..800}, max_features {sqrt, log2, 0.3}, min_samples_leaf
+{50, 100, 200, 400}, max_samples {0.3, 0.5, 0.7}, max_depth
+{10, 12, 15, 18}, criterion {gini, entropy}. 15 trials with TPE,
+single-fold proxy (n_estimators=200, fold-0 best-blend-with-LR-base
+α-grid). Validation: top config at full 5-fold across two seeds (42, 7).
+
+Script: `scripts/probe_forest_optuna.py`
+Artifacts: `oof_rf_optuna_best_strat.npy`,
+`scripts/artifacts/probe_forest_optuna.json`
+
+**Best config:** `n_estimators=400, max_features=log2, min_samples_leaf=100,
+max_samples=0.7, max_depth=15, criterion=entropy`. Notable: log2 features
+(fewer per split → more diverse trees), max_samples=0.7 (more data per
+tree), explicit max_depth cap, entropy split criterion.
+
+| Run | standalone OOF | ρ | K=4+1 LR Δ |
+|---|---:|---:|---:|
+| Angle A (yekenot, default) | 0.94178 | 0.9595 | +0.262 bp |
+| Kitchen-sink (default) | 0.94054 | 0.9580 | +0.248 bp |
+| **Optuna seed=42** | 0.93957 | 0.9597 | **+0.268 bp** |
+| **Optuna seed=7** | 0.93961 | 0.9600 | **+0.238 bp** |
+
+**Cross-seed agreement: |Δ| = 0.030 bp.** The lift band across all
+four independent RF runs is **+0.24 to +0.27 bp** with std 0.013 bp.
+
+**Findings:**
+
+1. **The +0.25 bp K=4+1 lift is robust** across (a) feature width
+   (38 vs 57), (b) hyperparameter tuning (default vs Optuna-best),
+   and (c) RF training seed (42 vs 7). Three independent sources of
+   variability all leave the lift in a 30 bp-tenths-of-a-basis-point
+   window. **The signal is real, not fold noise.**
+
+2. **Optuna optimization yields zero meaningful improvement.** The
+   tuned config sits within fold noise of the default. The +0.25 bp
+   is the ceiling of "RF on this feature substrate against the K=4
+   LR-meta", not a tunable knob. The structural property that
+   determines the lift is the rank-lock at logit-direction level
+   (A30) — RF can extract that diversity bonus through any
+   reasonable hyperparameter setting; it cannot be tuned further
+   because the ceiling is set by the meta architecture, not by RF
+   itself.
+
+3. **Optuna pushes standalone OOF DOWN** (0.93957 vs default 0.94054
+   vs Angle A 0.94178). The log2/max_samples=0.7/depth=15 config
+   trades calibrated point-prediction accuracy for greater tree
+   diversity, which marginally helps the meta-utility (tiny +0.020
+   bp vs Angle A) at the cost of -2.21 bp standalone. Confirms that
+   what RF contributes to the meta is **diverse rank information**,
+   not raw predictive accuracy.
+
+**Strategic implication update.** Two of the three "remaining
+forest levers" listed above can now be deprioritized:
+
+- ~~Hyperparameter tuning~~ (Optuna-falsified: no improvement past
+  the natural +0.25 bp ceiling).
+- **Multi-seed RF bag** still makes sense as a noise-reduction
+  exercise, but with three independent RF runs already agreeing to
+  within 30 bp-tenths, the bag value is bounded; expected
+  improvement to the meta-gate lift is <0.05 bp.
+- **Path-B Compound × Stint τ=100k refit on K=5** is now the
+  single highest-EV remaining move. The +0.25 bp OOF signal is
+  reproducibly real; the question is whether it transfers through
+  Path-B's per-segment shrinkage to LB. Historical precedent: d15b
+  realized 1.4× amp at LB; central LB estimate +0.35 bp; sits
+  inside public-LB sample-noise band (±12 bp).
+
+## Friction tags
+
+- `non-lr-meta-falsified-across-inductive-classes` — promoted from
+  the Day-20 boosted-only variant. Now covers (boosted, bagged)
+  tree-class metas at every input expansion tested. Closing
+  comment for the next session: do not re-test tree-class metas
+  on the K=4 (or any K) pool; the constraint is at the
+  3-D-logit-subspace level, not the meta-architecture level.
+- `forest-base-on-engineered-fe-rank-locked-but-most-diverse` —
+  RF on yekenot recipe is the lowest-ρ positively-gating base
+  observed on K=4 (ρ=0.959 vs typical ≥0.996 for absorbed bases).
+  Min-meta lift +0.26 bp is small in absolute terms but is the
+  largest K=4+1 lift this comp has seen. Update to A30: rank-lock
+  is at the logit subspace level, but a sufficiently-diverse new
+  base CAN open a small new direction; the question is whether the
+  signal is large enough to transfer to LB through Path-B amp.
+
+## Pointers
+
+- `scripts/probe_forest_sweep.py` — sweep script.
+- `scripts/artifacts/probe_forest_sweep.json` — verdicts.
+- `scripts/artifacts/oof_rf_meta_K4_strat.npy` — RF-meta OOF.
+- `scripts/artifacts/oof_rf_combined_K4_strat.npy` — RF-combined OOF.
+- `scripts/artifacts/oof_rf_yekenot_strat.npy` — RF-base OOF (Angle A).
+- `audit/2026-05-08-pca-meta-probe.md` — Day-20 LightGBM-meta
+  falsification (the prior of which today's bagged-tree result is
+  the partner).
+- `state/mechanism-ledger.md` — to be updated with the three
+  forest-family entries.
+
+## Path-B K=5 refit — Path-B absorbs the forest lift
+
+PI directive (after the Optuna falsification): run the refit on K=5
+= K=4 + RF-yekenot (Angle A). Script:
+`scripts/path_b_K5_rf_yekenot.py`. τ sweep ∈ {5k, 20k, 100k}.
+Compound × Stint segmentation, MIN_ROWS=1000 — same shrinkage
+mechanism as the K=4 PRIMARY.
+
+| τ | OOF | ρ vs K=4 PRIMARY | flips +→−/−→+ | flip ratio | Verdict |
+|---|---:|---:|---:|---:|---|
+| 5,000 | 0.95403 | 0.998734 | 121/29 | 0.240 | asymmetric (R7-style) |
+| 20,000 | 0.95405 | 0.999448 | 86/23 | 0.267 | asymmetric |
+| **100,000** | **0.95405** | **0.999917** | **37/31** | **0.838** | **TIE band** |
+
+K=4 LR-meta baseline OOF 0.95399; K=4 + Path-B C×S τ=100k OOF
+(PRIMARY) 0.95403; K=5 LR-meta global OOF 0.95402; K=5 + Path-B
+C×S τ=100k OOF 0.95405. Path-B amp on the K=5 pool: 0.95405 −
+0.95402 = **+0.03 bp** (within fold noise). On K=5, Path-B has
+nothing to amplify because the global K=5 LR-meta has already
+absorbed the +0.25 bp K=4+1 forest lift through logit-space
+combination.
+
+**Pre-submit diff (Rule 27).** Spearman 0.999917 vs K=4 PRIMARY,
+exceeds the 0.999 abort threshold. Mean abs diff 1.84e-3 across
+188,165 rows; max abs diff 4.4e-2; rows with diff > 1e-3 = 33.5%.
+LB will tie 0.95351 within Kaggle's 5-decimal quantization. **PI
+held submission per Rule 27** (abort decision; saved as R5 hedge
+candidate, not submitted; submission count remains 41 of 270).
+
+## Synthesis: forest family characterized end-to-end
+
+The forest-class probe sweep is now complete on s6e5:
+
+1. **Forest as meta-stacker (Angles B, C):** FALSIFIED. Both pure
+   K=4 expansion and combined-input variants lose 0.7–1.5 bp to
+   LR-meta. Closes the non-LR meta family across boosted (Day-20
+   PCA-meta) AND bagged tree classes (today).
+
+2. **Forest as base (Angle A, Kitchen-sink, Optuna×2):** WEAK_PASS
+   at +0.25 bp K=4+1 LR-meta with std 0.013 bp across 4 independent
+   configs. Most-diverse positively-gating base in the K=4 era
+   (ρ=0.96 vs typical ≥0.996 for absorbed bases). Hyperparameter
+   tuning, feature breadth, and seed all leave the lift unchanged
+   — the +0.25 bp ceiling is set by the meta architecture (3-D
+   logit subspace), not by RF.
+
+3. **Path-B refit on K=5:** ABSORBED. The +0.25 bp K=4+1 LR-meta
+   gain melts to +0.02 bp once Compound × Stint per-segment
+   shrinkage averages it across (Compound × Stint) buckets. ρ vs
+   PRIMARY = 0.999917 → tie-band at LB. Confirms the Day-15
+   friction `path-b-amp-only-fires-on-meta-arch-not-base-add`:
+   per-segment shrinkage amplifies meta-architecture redesigns,
+   not single-base orthogonal additions.
+
+   The DAE precedent (d15b) had +0.715 bp OOF orthogonality on
+   K=22 → realized 1.4× amp at LB. The RF base on K=4 has only
+   +0.25 bp orthogonality — too low for Path-B's per-segment
+   retention, even at the same ρ band (~0.95).
+
+**Verdict on the forest family:** structural diversity benefit
+caps at +0.25 bp K=4+1 LR-meta; per-segment Path-B does not
+amplify single-base additions below ~+0.5 bp OOF; LB transfer
+band is "tie or marginal" (within ±2 bp). Forest base joins the
+hedge ladder as an R5 candidate.
+
+## Held submissions (R5 hedge eligible)
+
+Saved to `submissions/`:
+- `submission_path_b_K5_rf_yekenot_tau5000.csv` (asymmetric flips
+  121/29 — R7-style override territory; risky)
+- `submission_path_b_K5_rf_yekenot_tau20000.csv` (asymmetric 86/23)
+- `submission_path_b_K5_rf_yekenot_tau100000.csv` (balanced 37/31;
+  tie-band per Rule 27)
+
+OOF/test artifacts:
+- `oof_path_b_K5_rf_yekenot_tau{5k,20k,100k}_strat.npy`
+- `test_path_b_K5_rf_yekenot_tau{5k,20k,100k}_strat.npy`

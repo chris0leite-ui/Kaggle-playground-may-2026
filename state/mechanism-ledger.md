@@ -245,6 +245,61 @@ of Rule 24 (fold-safe label-conditional aggregates).
   3 τ all regress vs plain shrinkage; per-segment-stacker family
   closed (9 variants tested over Days 14-19).
 
+## Day-20 PM forest sweep (3 angles)
+
+- **Random forest as meta-stacker** on K=4 [P, rank, logit] (12
+  features) — OOF 0.95384 vs LR-meta 0.95399 = **−1.54 bp falsified**.
+  Bagged-tree variant of the Day-20 PCA-meta probe finding for
+  LightGBM; closes the "non-LR meta" clause across both boosted
+  and bagged tree-class metas.
+- **Random forest on combined input** (K=4 [P, rank, logit] + 6 raw
+  numerics = 18 feat) — RF 0.95393 vs LR-on-same 0.95400 = **−0.70 bp
+  falsified**. Adding raw numerics to the meta does not rescue
+  tree-class meta — confirms `combined-input-meta-stacker-absorbed`.
+- **Random forest base on yekenot recipe** (no orig concat, 38 feat,
+  5-fold StratifiedKF) — standalone OOF **0.94178**; K=4+1 LR-meta
+  **+0.26 bp** at **ρ=0.9595** vs PRIMARY. Most-diverse positively-
+  gating base in the K=4 era. +12 bp standalone over d15c ET-on-raw,
+  4.4× larger min-meta lift. Hedge-eligible per R5; Path-B refit
+  on K=5 is the natural next probe.
+- **Kitchen-sink RF** (yekenot + 12 constraint-violations + 7 inter-
+  stint memory = 57 feat) — standalone OOF **0.94054** (−1.24 bp vs
+  yekenot-only); K=4+1 LR-meta **+0.25 bp** at ρ=0.9580. **Feature
+  breadth hurts RF on this data** (weak features dilute split
+  capacity at the random-subset level). **K=4+1 lift is unchanged
+  within fold noise** vs Angle A — first reproducibility check on
+  the forest-base lift. PI hypothesis that RF scales with feature
+  breadth (per irrigation 14-bank meta precedent) is empirically
+  refuted on s6e5: the irrigation gain came from already-distilled
+  base predictions, not raw + engineered features.
+- **Optuna-tuned RF on kitchen-sink** (15 TPE trials, single-fold
+  proxy + 2-seed full-5-fold validation). Best config: log2 features,
+  max_samples=0.7, max_depth=15, leaf=100, entropy. **K=4+1 LR-meta
+  Δ +0.268 bp seed=42, +0.238 bp seed=7** (cross-seed |Δ|=0.030 bp).
+  Standalone OOF dropped further (0.93957) — log2/max_samples=0.7
+  trades calibration for tree diversity. **Optuna yields zero
+  meaningful improvement past the natural +0.25 bp ceiling.** Across
+  4 independent RF runs (Angle A, Kitchen-sink, Optuna seed 42,
+  Optuna seed 7) the K=4+1 lift sits in +0.24-0.27 bp with std
+  0.013 bp. **The +0.25 bp signal is robust to feature width,
+  hyperparameters, and seed; it cannot be tuned higher because it
+  is set by the meta architecture (3-D logit subspace ceiling),
+  not by RF itself.** Path-B refit on K=5 = K=4 + RF-yekenot is
+  the single remaining forest-family move with non-trivial EV.
+- **Path-B C×S τ-sweep on K=5 = K=4 + RF-yekenot** (5k/20k/100k).
+  Compound × Stint segmentation, MIN_ROWS=1000 — same mechanism
+  as the K=4 PRIMARY. K=5 LR-meta global OOF 0.95402; K=5 + Path-B
+  C×S τ=100k OOF 0.95405; **Path-B amp on K=5 = +0.03 bp within
+  fold noise**. ρ vs K=4 PRIMARY = 0.999917 → tie-band at LB per
+  Rule 27 (abort threshold 0.999). PI held submission per Rule 27;
+  saved as R5 hedge candidate. **Confirms Day-15 friction
+  `path-b-amp-only-fires-on-meta-arch-not-base-add`:** per-segment
+  shrinkage absorbs the +0.25 bp K=4+1 forest lift down to +0.02 bp
+  vs PRIMARY. Path-B amplifies meta-architecture redesigns, not
+  single-base orthogonal additions below ~+0.5 bp OOF. Forest
+  family characterized end-to-end on s6e5: structural diversity
+  benefit caps at +0.25 bp K=4+1; LB transfer is tie-band.
+
 ## 2026-05-08 PM EXP-NEW Phase 1-5b (research-feature-engineering)
 
 - **A3-7 user-id smoothing on PitNextLap target** — dry-run −124 bp
