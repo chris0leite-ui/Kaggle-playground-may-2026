@@ -364,6 +364,107 @@ falsified, parked, or killed.** Full audit
   H9 alone (+0.631). Friction `lr-meta-multi-add-no-better-than-single-add`.
   `[owner: read-handover-lA8Nr | status: null]`
 
+## 12. Untested-mechanism sweep (2026-05-08 night)
+
+Origin: PI directive 2026-05-08 night "what shall we experiment now? we
+have a lot of time, you can take all night". Initial plan was three-
+pronged (FastF1 weather aggregates, per-segment LGBM head, sequence
+transformer with gap embedding); all three returned SKIP at probe.py
+BOTE (cost-efficiency 0.001-0.009 bp/min vs 0.01 DEFER threshold).
+
+RES-1 public-notebook + Kaggle discussion forum re-scan (Rule 22, last
+scan 8 days stale) replaced the initial plan with a stronger one. Pulled
+top kernels by score and votes; 4 modeling kernels dominate the 0.954+
+public LB:
+
+- **masayakawamata/s6e5-stacking-vibe-coding** — 2-layer GPU stack:
+  L0 = (yekenot RealMLP + own LogReg-FE) base OOFs;
+  L1 = (XGB / LGBM / CatBoost / Torch-MLP) stackers;
+  L2 = cuML L2 LogReg over (L0 + L1) OOFs.
+  89 variants in 0.9543-0.9545 range. Best: mlp_32x16 at 0.954471.
+- **svanikkolli/f1-lap-by-lap-prediction-engine-v3** — internal 5-model
+  stack (LGB + XGB-Optuna + 3 RealMLP variants) → stacking → 5-way
+  rank-blend with 4 public notebooks.
+- **flexonafft/f1-submission-blender-0-95418** — pure rank-blend of
+  high-LB public submissions; output is `0.95 * anchor + 0.05 * support`.
+- **sohailkhanlml/f1-pit-stop-blending-the-leaderboard-0-95418** —
+  same pattern; aggregates external public submissions.
+
+Our K=4 PRIMARY rank-correlates 0.991-0.996 with every 0.954+ public
+file pulled (mean / std distributions are nearly identical: ours
+0.199/0.302 vs public-super-0.95418 at 0.204/0.307). PI declined the
+blend route on principle (original work only); approved full
+replication of the masayakawamata 2-layer stack architecture (Prong S)
+and per-segment LGBM head (Prong B) as parallel CPU jobs.
+
+- **12a.** ~~Prong A — FastF1 weather aggregates~~ DROPPED (BOTE 0.001
+  bp/min SKIP; lower EV than emerging Prong S/B/blend mechanisms).
+  `[owner: ml-model-experiments-gbKiI | status: parked]`
+- **12b.** ~~Prong B — Per-segment LightGBM head replacing inner LR
+  in Path-B Compound × Stint.~~ PARKED 2026-05-09 — PI redirected
+  the night to original creative work (see leaf 13); Prong B not
+  executed. Could be revisited if a leaf without a transductive
+  base is needed.
+  `[owner: ml-model-experiments-gbKiI | status: parked]`
+- **12c.** ~~Prong D — Sequence transformer with explicit gap embedding~~
+  DROPPED (BOTE 0.006 bp/min SKIP; A32 narrowing makes gap-aware
+  attention unlikely to break rank-lock; superseded by Prong S).
+  `[owner: ml-model-experiments-gbKiI | status: parked]`
+- **12d.** ~~Prong S — 2-layer stack architecture replication on our
+  base OOFs.~~ PARKED 2026-05-09 — PI redirected to original work
+  ("do not replicate or copy"). Replication-only intent doesn't fit
+  the directive. Falsified-by-redirection rather than by execution.
+  `[owner: ml-model-experiments-gbKiI | status: parked]`
+- **12e.** ~~Prong P — blend with public submissions~~ DROPPED
+  (PI declined on principle; original work only).
+  `[owner: ml-model-experiments-gbKiI | status: parked]`
+
+## 13. Sequence-coupled meta + transductive base (2026-05-09 night)
+
+Origin: PI directive 2026-05-08 night — "show me you can do original
+work, investigate, be creative, work all night autonomously, surprise
+me, do not replicate or copy." Agent identified the hidden
+row-independence premise in A29's rank-lock framing and tested
+sequence-coupled meta features (V1-V3) and transductive bases
+(V4-V6).
+
+Findings: rank-lock at K=4 is at the **conditional-target-correlation
+level** given row data, not just the logit-direction level. Refines
+A29. Tree-base ingestion of transductive label info DOES extract a
+small lift; linear/RankNet/LGBM-meta absorption blocks it.
+
+- **13a.** V1 sequence-coupled meta (look-ahead/behind, session
+  aggregates, permutation-disagreement). LR row-local 0.95400, LR
+  full 36-feat 0.95401 (+0.03 bp WEAK), RankNet 0.95399 (-0.12 FAIL).
+  Loss-function variation doesn't escape the ceiling.
+  `[owner: ml-model-experiments-gbKiI | status: null]`
+- **13b.** V2 sharpenings: LR+interactions TIE (0.95400), residual-LR
+  REGRESS (-3.43 bp), LightGBM-meta REGRESS (-0.59 bp). Tree-meta on
+  K=4+seq-coupled overfits.
+  `[owner: ml-model-experiments-gbKiI | status: null]`
+- **13c.** V3 LR meta + kNN-target-mean (transductive label feature
+  at meta) — bare y_knn AUC 0.898 standalone, +0.01 bp at meta NULL.
+  `[owner: ml-model-experiments-gbKiI | status: null]`
+- **13d.** **V4 kNN-augmented LightGBM base** (transductive label at
+  base via tree splits). Standalone 0.94163, K=4+1 LR meta +0.24 bp,
+  K=5 + Path-B C×S τ=100k OOF 0.95405, **public LB 0.95359** (+0.8 bp
+  vs K=4 PRIMARY). Submitted (Rule 27 override authorised). PI
+  directive 2026-05-09: keep K=4 as PRIMARY; K=5 file held as +0.8 bp
+  hedge candidate.
+  `[owner: ml-model-experiments-gbKiI | status: done]`
+- **13e.** V5 V4 + multi-cell target encoding (5 cells, alpha=50
+  smoothing). Standalone +6.10 bp over V4 but at meta only +0.07 bp
+  (V5 replaces V4) / +0.06 bp K=6. ρ_spearman(V5, V4) = 0.989 —
+  TE absorbed by V4's logit direction.
+  `[owner: ml-model-experiments-gbKiI | status: null]`
+- **13f.** V6 V4 + task-learned-embedding kNN (sklearn MLP 64→32→16,
+  per-fold encoder, BallTree on penultimate-layer embedding).
+  Standalone +3.75 bp over V4 but at meta only +0.18 bp (V6 replaces
+  V4) / -0.02 bp K=6. ρ_spearman(V6, V4) = 0.988 — same absorption
+  as V5 despite different similarity metric. Transductive-feature
+  mechanism is one-dimensional in K=4 logit space.
+  `[owner: ml-model-experiments-gbKiI | status: null]`
+
 ## 11. Multi-model FE testing campaign (2026-05-08 PM, late)
 
 Origin: PI directive after FE research synthesis. 16 candidate FE

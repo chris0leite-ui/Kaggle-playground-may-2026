@@ -10,7 +10,7 @@ script names and audit prose are *frozen code/file prefixes*, not
 calendar days — see `glossary.md` and `audit/friction.md`
 under `day-counter-drift`.
 
-## PRIMARY (active) — set 2026-05-08 PM
+## PRIMARY (active) — set 2026-05-08 PM (kept across V4 lift per PI 2026-05-09)
 
 **Score: 0.95351 on the public leaderboard.** Direct LB-confirmed.
 
@@ -23,6 +23,14 @@ the same per-segment partial-pooling stacker (Compound × Stint, τ =
 - `f1_hgbc_deep` — sklearn HistGradientBoostingClassifier (deep).
 - `d16_orig_continuous_only` — LightGBM trained on the original
   (aadigupta1601 pre-synth) dataset, continuous-only features.
+
+**K=5 V4 kNN-aug submission held as a confirmed lift, NOT as PRIMARY.**
+2026-05-09 AM submission of K=4+V4 (transductive kNN-target-mean
+ingested at the base layer) landed at LB 0.95359 = K=4 PRIMARY +0.8 bp.
+PI directive 2026-05-09: keep K=4 as PRIMARY for cleaner baseline
+during V6 work (learned-embedding kNN on top of the K=4 anchor).
+The K=5 file remains as a confirmed +0.8 bp hedge candidate at
+`submissions/submission_K5_kNNaugbase_pathb.csv`.
 
 **Why we promoted from K=27 → K=4 at a deliberate −1.7 bp LB cost:**
 
@@ -51,7 +59,8 @@ cross-validation fold using only training rows.
 
 | ISO date | Pool | Score | What changed |
 |---|---|---:|---|
-| 2026-05-08 PM | K=4 forward-greedy + Path-B C×S τ=100k | **0.95351** | **NEW PRIMARY.** Sparse-pool reduction; 99% of the bank's LB value with 15% of the bases. |
+| 2026-05-09 AM | K=5 (K=4 + V4 kNN-aug LightGBM base) + Path-B C×S τ=100k | **0.95359** | First lift on K=4 PRIMARY in 8 days (+0.8 bp). Mechanism: tree splits ingesting kNN-target-mean (K=20 standardised feature space) at the BASE layer, not as a meta feature. Same feature at meta extracted +0.01 bp; at base extracted +0.8 bp on LB. ρ_test_vs_K4 0.99989 — Rule 27 abort threshold exceeded but PI-authorised override produced a real LB lift. Calibration data: ρ in 0.999-0.9999 zone is NOT auto-tie. |
+| 2026-05-08 PM | K=4 forward-greedy + Path-B C×S τ=100k | **0.95351** | Prior PRIMARY. Sparse-pool reduction; 99% of the bank's LB value with 15% of the bases. |
 | 2026-05-08 PM | K=10 forward-greedy + Path-B C×S τ=100k | 0.95356 | Sparse-pool calibration probe; precise OOF→LB transfer. |
 | 2026-05-07 PM | K=27 + Path-B C×S τ=100k | 0.95368 | Prior PRIMARY. Six DGP-class bases on top of K=21+v4+h1d+d16. |
 | 2026-05-07 PM (earlier) | K=23 v4+h1d + Path-B | 0.95354 | First with CatBoost-yekenot + RealMLP-yekenot. |
@@ -64,15 +73,15 @@ cross-validation fold using only training rows.
 
 ## Submissions
 
-- **Used: 41 of 270.** Plenty of slots left. Per Rule 12, spend them.
-- **Today (2026-05-08): 2 used** (K=10 calibration; K=4 PRIMARY swap).
-- **Comp-day:** 8 of 31. **Days remaining: 23.**
+- **Used: 42 of 270.** Plenty of slots left. Per Rule 12, spend them.
+- **Today (2026-05-09): 1 used** (K=5 V4 kNN-aug base — new PRIMARY).
+- **Comp-day:** 9 of 31. **Days remaining: 22.**
 
 ## Distance to top-5%
 
-- Top-5% boundary: 0.95405. Gap from PRIMARY (K=4 LB 0.95351):
-  **−5.4 basis points** (was −3.7 vs old K=27 PRIMARY).
-- Leader: 0.95476. Gap: **−12.5 basis points** (was −10.8).
+- Top-5% boundary: 0.95405. Gap from PRIMARY (K=4 LB 0.95351): **−5.4 bp**.
+- Gap from K=5 hedge candidate (LB 0.95359): −4.6 bp.
+- Leader: 0.95476. Gap from PRIMARY: −12.5 bp.
 - Bootstrap CI on a 20% public draw is ±12 bp wide, so both gaps fall
   partly inside the public-LB sample-noise band. Cross-submission
   *relative* deltas trust to ~±1 bp at this scale.
