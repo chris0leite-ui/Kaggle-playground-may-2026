@@ -83,12 +83,24 @@ fi
 ls -lh data/ 2>/dev/null | head -10
 
 # ---------------------------------------------------------------------------
-# Step 4 — reference notebooks (code-comp aid; optional)
+# Step 4 — local simulator smoke check
 # ---------------------------------------------------------------------------
-# Day-1 agent fills exact slugs after running:
+echo "--- smoke: random-vs-random in kaggle_environments ---"
+python - <<'PY' || echo "WARNING: simulator smoke failed; check kaggle-environments install."
+from kaggle_environments import make
+env = make("orbit_wars", configuration={"seed": 42}, debug=False)
+env.run(["random", "random"])
+final = env.steps[-1]
+print("smoke ok:", [(i, s.reward, s.status) for i, s in enumerate(final)])
+PY
+
+# ---------------------------------------------------------------------------
+# Step 5 — reference notebooks (optional; deferred)
+# ---------------------------------------------------------------------------
+# The comp ships its own working baseline (data/main.py — Nearest Planet
+# Sniper). Skip external notebook pulls on Day 1; only pull if you hit a
+# plateau and want cross-reference. To pull later:
 #   kaggle kernels list -s orbit-wars --sort-by voteCount
-# and pulling the top 3 with:
 #   kaggle kernels pull <user>/<slug> -p external/kernels/<slug>/
-# Skipping by default — see SETUP.md Step 3.
 
 echo "--- bootstrap done ---"

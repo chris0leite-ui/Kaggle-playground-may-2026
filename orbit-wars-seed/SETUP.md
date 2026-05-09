@@ -53,42 +53,85 @@ What `bootstrap.sh` does, in order:
 ls -lh data/
 ```
 
-For a code/agent comp expect a small bundle: a sample-replay JSON, an
-env-spec / brief, possibly a sample-agent Python file. There will not
-be a `train.csv` / `test.csv`. Inventory whatever appears.
+Orbit Wars ships **3 files** (~17 KB total, no train/test CSVs):
+
+- `README.md` — full game spec (board, planets, fleets, comets, combat,
+  observation/action format). The load-bearing read on Day 1.
+- `agents.md` — getting-started guide; CLI workflow; submit examples.
+- `main.py` — working baseline agent ("Nearest Planet Sniper" heuristic).
+  Use this as the local opponent for your first variants.
 
 If the download fails with an authentication error, `~/.kaggle/kaggle.json`
 is not in place or your token expired. Re-create it from
 https://www.kaggle.com/settings.
 
-### Step 3. Pull the reference notebooks
+### Step 3. Read the comp's own docs (replaces external-notebook pull)
+
+The comp ships a working baseline. Skip the external-notebook pull on
+Day 1 — read `data/README.md` and `data/agents.md` first, run the
+shipped `data/main.py` against `random` locally, and only pull
+external notebooks if you hit a plateau later.
 
 ```bash
-kaggle kernels list -s orbit-wars --sort-by voteCount | head -10
-# pick the top 3 and pull each:
-kaggle kernels pull <user>/<slug> -p external/kernels/<slug>/
+# Read the comp description / rules / evaluation pages:
+kaggle competitions pages orbit-wars --content                     # full
+kaggle competitions pages orbit-wars --content --page-name evaluation
+kaggle competitions pages orbit-wars --content --page-name rules
 ```
 
-Known starters worth trying first:
-- Bovard — "Getting Started" (Kaggle staff baseline).
-- Kashiwaba — "Reinforcement Learning Tutorial".
-- Sangram Patil — "[API] Download Replay".
-
-For each, read once and write a 2–3-sentence summary into
-`audit/<today>-day-1-data-inventory.md` describing the agent class
-(heuristic / search / IL / RL / hybrid).
+> Note: the older `kaggle competitions view` subcommand was removed
+> from the CLI; use `competitions pages --content` instead.
 
 ### Step 4. Local simulator probe
 
 ```bash
-python -c "import kaggle_environments; \
-  env = kaggle_environments.make('orbit_wars'); \
-  env.run(['random','random'])"
+pip install "kaggle-environments>=1.28.0"
+
+python -c "
+from kaggle_environments import make
+env = make('orbit_wars', configuration={'seed': 42}, debug=True)
+env.run(['random', 'random'])
+final = env.steps[-1]
+print([(i, s.reward, s.status) for i, s in enumerate(final)])
+"
 ```
 
-If the env name is wrong or the env doesn't ship offline yet, log it
-as friction in `audit/friction.md` and fall back to reading a sample
-replay JSON to learn the observation/action shapes by hand.
+The env name is `orbit_wars` (underscore), not `orbit-wars`. If the
+import or `make()` fails, install the pinned version above — Orbit
+Wars requires `kaggle-environments >= 1.28.0`.
+
+Then run the shipped baseline against `random`:
+
+```bash
+python -c "
+from kaggle_environments import make
+env = make('orbit_wars', configuration={'seed': 42}, debug=True)
+env.run(['data/main.py', 'random'])
+print([(i, s.reward, s.status) for i, s in enumerate(env.steps[-1])])
+"
+```
+
+### Step 5. Code-comp CLI quick-reference (new in this comp)
+
+These subcommands replace tabular-comp habits:
+
+```bash
+# Status + submissions you've made:
+kaggle competitions submissions orbit-wars
+
+# Per-submission ladder games:
+kaggle competitions episodes <SUBMISSION_ID>
+
+# Replay JSON for a specific game (visualisation/analysis):
+kaggle competitions replay <EPISODE_ID> -p replays/
+
+# Per-agent log output (debug crashes / behavior):
+kaggle competitions logs <EPISODE_ID> 0    # agent index 0
+kaggle competitions logs <EPISODE_ID> 1    # agent index 1
+
+# Live leaderboard:
+kaggle competitions leaderboard orbit-wars -s
+```
 
 ## Where the PI's voice goes
 
@@ -108,7 +151,8 @@ PI second-brain layout.
 
 Day-1 agent verifies:
 
-- [ ] `kaggle competitions view orbit-wars` returns success.
+- [ ] `kaggle competitions list -s orbit` shows orbit-wars with
+      `userHasEntered: True`.
 - [ ] `data/` has the comp bundle unzipped.
 - [ ] `external/kernels/` has at least 1 reference notebook.
 - [ ] `comp-context.md` is filled in (slug, deadline, daily submission

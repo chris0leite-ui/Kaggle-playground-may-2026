@@ -48,9 +48,14 @@ for cross-comp rule-number stability. Rule bodies are preserved verbatim.
 10. **Pull-style updates.** No proactive minute-level chatter; on PI pull,
     1-2 sentences with the latest fact.
 11. **Model routing.** Haiku read-only; Sonnet default; Opus hard. 10/day.
-12. **Spend the full daily submission budget.** Submissions are
-    calibration probes; the predicted-vs-actual-rank gap per agent
-    family is data.
+12. **Spend the full daily submission budget (Orbit Wars: 5/day).**
+    Submissions are calibration probes; the predicted-vs-actual-μ-rating
+    gap per agent family is data. **Caveat for Orbit Wars:** Kaggle
+    keeps your **rolling last 2 submissions** for final evaluation —
+    not 2 PI-selected. A late submit auto-evicts the previous one.
+    Plan submission order accordingly: never push speculative variants
+    after a known-good submit unless you're willing to lose the good
+    one's ladder spot.
 13. **Kaggle GPU is part of compute budget.** Local CPU-only; Kaggle
     notebooks are the GPU path. Port any 5-fold > 1h CPU before declaring
     "not cost-justified."
@@ -127,12 +132,18 @@ here for cross-comp comparison and so future tabular comps inherit them.
 Orbit Wars accumulates its own postmortem-derived defaults via
 WRAPUP step 4b → improvements.md.]
 
-- **R1** Two-anchor OOF.
-- **R2** Final selection along public-LB axis. PRIMARY = best public.
-  HEDGE = best OOF that regressed ≤30 bp on public.
-- **R5** Final-window OOF-best regression probe (mandatory in last 3 days).
-- **R7** Override-mechanism rules. Flip count <200 → HEDGE only;
-  >200 needs explicit PI sign-off.
+- **R1** [TABULAR-ONLY] Two-anchor OOF.
+- **R2** [TABULAR-ONLY] Final selection along public-LB axis. PRIMARY =
+  best public. HEDGE = best OOF that regressed ≤30 bp on public.
+  **Code-comp default for Orbit Wars:** the platform auto-keeps your
+  rolling last 2 submits — there is NO PI selection at the deadline.
+  The strategic question is "when to submit," not "what to submit at
+  the end." Heuristic: only push a new agent when its expected μ-gain
+  exceeds the current σ; the previous-2 submit is locked the moment a
+  3rd is pushed, so weak late submits are unrecoverable for ~24 h.
+- **R5** [TABULAR-ONLY] Final-window OOF-best regression probe.
+- **R7** [TABULAR-ONLY] Override-mechanism rules. Flip count <200 →
+  HEDGE only; >200 needs explicit PI sign-off.
 - **R8** End-of-comp: log final percentile to
   `~/.claude/skills/kaggle-comp/improvements.md`.
 

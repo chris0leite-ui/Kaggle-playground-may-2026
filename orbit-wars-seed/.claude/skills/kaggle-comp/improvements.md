@@ -10,6 +10,7 @@ or required a human nag. See self-improvement.md for the full distillation proto
 - `[CROSS-CUTTING]` — applies to any Kaggle comp (tabular or code/agent).
 - `[TABULAR-ONLY]` — applies only to tabular comps; ignore on Orbit Wars.
 - `[ADAPT-FOR-CODE-COMP]` — concept transfers but the implementation differs in code/agent comps; adaptation note inline.
+- `[CODE-COMP-DISCOVERED]` — new lessons that originate from a code/agent comp (Orbit Wars or successor). When promoted from this comp's friction, append entries here with the tag so future tabular comps can skip them and future code/agent comps inherit them.
 
 ---
 
