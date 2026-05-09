@@ -84,15 +84,68 @@ A30 (already FALSIFIED) extends with: even RankNet (direct AUC objective) and Li
 
 Decision-log entries (in `audit/decisions.jsonl`): seq_coupled_v1_lr_full, seq_coupled_v2.
 
-## Pending
+## Final results — full table
 
-- V1.3 RankNet 5-fold completion (fold 2 done at 0.95362; folds 3, 4 remaining — TIE pattern likely)
-- V3 kNN target-mean at meta (fold 1 done; folds 2-4 + LR meta remaining)
-- V4 kNN-augmented BASE — runs after V3 if V3 doesn't lift
+Anchor: K=4 PRIMARY (Path-B Compound × Stint τ=100k) OOF AUC = **0.95403**.
 
-## If everything fails
+| Variant | Features | OOF AUC | Δ vs PRIMARY | Δ vs LR-row-local | Verdict |
+|---|---|---:|---:|---:|---|
+| V1.1 LR row-local | 12 | 0.95400 | −0.25 bp | — (anchor) | — |
+| V1.2 LR full | 36 | 0.95401 | −0.22 bp | +0.03 bp | WEAK |
+| V1.3 RankNet pairwise | 36 | 0.95399 | −0.37 bp | −0.12 bp | FAIL |
+| V2.1 LR + interactions | 47 | 0.95400 | −0.30 bp | +0.00 bp | TIE |
+| V2.2 Two-stage residual LR | 12 + 24 | 0.95369 | −3.43 bp | −3.13 bp | REGRESS |
+| V2.3 LightGBM meta | 36 | 0.95397 | −0.59 bp | −0.30 bp | REGRESS |
+| V3 LR + kNN target-mean | 14 | 0.95401 | −0.17 bp | +0.01 bp | WEAK |
+| **V4 K=4+1 LR meta with V4 base** | **15** | **0.95402** | **−0.01 bp** | **+0.24 bp** | **WEAK** |
+| **V4 K=5 + Path-B C×S τ=100k** | (production) | **0.95405** | **+0.20 bp** | — | **WEAK** |
 
-The structural-mechanism search has empirically saturated at K=4 PRIMARY 0.95403 / LB 0.95351. The leaderboard gap to top-5% (5.4 bp) and to leader (12.5 bp) sits partly inside the public-LB ±12 bp sample-noise band, so the absolute distance is partly luck. Path forward narrows to:
+Bare V4 standalone OOF AUC: **0.94163**. ρ_spearman vs K=4 bases 0.85–0.94 (most diverse vs d16_orig at 0.85).
 
-1. **Add a fundamentally new BASE with new source information** — likely external aggregate data (FastF1 weather, Pirelli compound metadata) or a base trained on alternative DGP factorisations.
-2. **Wrap-up posture** — final R5 hedge-ladder preparation, then the comp's final submissions. PI directive 2026-05-08 PM was already pointing here.
+## What V4 actually demonstrated
+
+V4 (kNN target-mean ingested through tree splits inside a new LightGBM base) is the **first thing in 8 days that consistently beats LR row-local at K=4+1**, with all 5 folds showing a positive lift (range +0.12 to +0.44 bp; mean +0.24 bp).
+
+The V3 vs V4 contrast is structurally important:
+- V3 used the SAME kNN-target-mean as a META feature → +0.01 bp NULL.
+- V4 used the SAME kNN-target-mean as a BASE INPUT FEATURE, ingested through LightGBM tree splits → +0.24 bp consistently.
+
+This refines the structural finding: **tree non-linearity inside a base CAN retrieve signal that linear meta absorption blocks**. But the magnitude is small.
+
+## Why no submission
+
+K=5 + Path-B production OOF lift is +0.20 bp vs K=4 PRIMARY. Pre-submit prediction diff: **ρ_test_K5_vs_K4 = 0.999891** — exceeds Rule 27's 0.999 abort threshold. Per Rule 27, LB will tie. **Submission file built but held.**
+
+## Refined ASSUMPTIONS.md candidate updates
+
+A29 should now read: "Rank-lock at K=4 is at the **conditional-target-correlation** level. New row-local meta features whose target-correlation is parallel to the existing logit direction get absorbed even when their feature-space orthogonality vs row-local features is high (R²=0.487 confirmed). RankNet (direct AUC objective) does not escape it. **Tree non-linearity at the BASE layer (not meta) extracts a small +0.20 bp from transductive label-derived features, but the OOF→LB transfer at K=4+1 sits inside Rule 27's abort zone (ρ_test 0.99989).** The path to a leader-bridging lift is source information not derivable from row features."
+
+## Code artefacts (committed to `claude/ml-model-experiments-gbKiI`)
+
+- `scripts/seq_coupled/diag_lookahead_orthogonality.py` — diagnostic
+- `scripts/seq_coupled/build_features.py` — 24-feature builder
+- `scripts/seq_coupled/fit_meta.py` — V1 (LR + RankNet, 5-fold OOF)
+- `scripts/seq_coupled/fit_meta_v2_interactions.py` — V2 (LR+inter, residual, LGBM)
+- `scripts/seq_coupled/fit_meta_v3_knn.py` — V3 (kNN target-mean at meta)
+- `scripts/seq_coupled/build_knn_base.py` — V4 (kNN-augmented base)
+- `scripts/seq_coupled/gate_K4_plus_1.py` — K=4+1 plain LR-meta gate
+- `scripts/seq_coupled/path_b_K5.py` — production Path-B C×S K=5 candidate
+- `submissions/submission_K5_kNNaugbase_pathb.csv` — held, NOT submitted
+
+## Path forward (no internal-mechanism lift left)
+
+The empirical conclusion of the night is sharper than what was in the handover. The K=4 conditional-target-correlation ceiling holds even against:
+- Sequence-coupled meta features (V1.1, V1.2)
+- Direct AUC pairwise loss (V1.3)
+- Hand-crafted interactions (V2.1)
+- Two-stage residual LR (V2.2)
+- LightGBM meta (V2.3)
+- Transductive label-derived meta features (V3)
+
+It is breached only by:
+- Transductive label info ingested non-linearly inside a NEW BASE (V4) — but the lift is +0.20 bp at Path-B, inside Rule 27's tie-zone.
+
+Three avenues remain:
+1. **External aggregate data** at (Race, Year, Lap) granularity — explicitly UN-tested. PI declined the route earlier in the session, but the V4 finding suggests a tree-base that ingests external data via tree splits could break the ceiling more substantially than V4 did.
+2. **Wrap-up posture** — final R5 hedge-ladder preparation and the two final-submit slots. The K=5 file is now a hedge candidate.
+3. **Fundamentally new base on different DGP factorisation** — e.g., chain decomposition v2 conditioning on different orderings; orig-data future-feature joint at aggregate level.
