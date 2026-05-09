@@ -198,6 +198,61 @@ Postmortem: `audit/2026-05-09-postmortem-decode-data-process-5uLq3.md`.
 
 ---
 
+## Day-9 evening analyze-synthetic-data-generation-BtmFl (autonomous loop)
+
+**Twenty-one probes (qAA → qAY) translating decode insights into K=4+1 lift.**
+Headline: K=9 = K=4 + qAT + qAV + qAO + qAA + qAF + Path-B C×S τ=20k →
+**OOF +2.017 bp vs PRIMARY 0.95403** (PRIMARY 0.95421). Six commits
+pushed; audit at `audit/2026-05-09/2026-05-09-final-results-summary.md`
++ `audit/2026-05-09/2026-05-09-qAK-breakthrough.md`.
+
+**Breakthrough mechanism**: orig-kNN with **K=1 strictest match** (3
+features only: label/distance/level_used) inside the 6-axis cell key
+(Y, C, PS, R, S, LapN) with hierarchical fallback (L6→L5→L4→L3). Each
+slim base captures **per-row identity attribution** against orig rather
+than smooth aggregate. Two complementary distance spaces:
+- qAT: 4-feat (LapTime/Δ/CumDeg/RP) standardized euclidean
+- qAV: 7-feat (TyreLife/Position/LapTime/CumDeg/RP/Δ/LapNumber) standardized euclidean
+
+The 6-axis cell key matches the host's decoded cond-vector schema (qH-qM
+prior session). 79% of train rows fit at L6.
+
+**Key probe results**:
+- qAT alone: standalone OOF 0.821, ρ_test 0.644, K=4+1 plain LR-meta **+1.172 bp** PASS
+- qAV alone: standalone OOF 0.841, ρ_test 0.618 (lowest ever), K=4+1 +1.162 bp
+- qAK (K=3, 6 features): K=4+1 +0.717 bp PASS — first probe to break gate
+- qAR (yekenot recipe + kNN combined): K=4+1 +0.044 bp WEAK (kNN signal absorbed)
+- qAY (K=1 cosine): redundant with qAT (ρ 0.914)
+
+**Path-B C×S τ=20k amp ladder** vs PRIMARY 0.95403:
+| Pool | Δ_oof bp |
+|---|---:|
+| K=4 + qAT + qAV (qAX) | +1.800 |
+| K=7 qAT+qAV+qAF | +1.929 |
+| K=8 qAT+qAV+qAA+qAF | +1.974 |
+| **K=9 qAT+qAV+qAO+qAA+qAF** | **+2.017** ← BEST |
+| K=10 +qAK | +1.950 (qAK redundant) |
+
+**Submissions ready** (NOT submitted; awaits PI approval per Rule 1):
+- `submissions/submission_qAT_qAV_qAT_qAV_qAO_qAA_qAF_pathb_cs_tau20000.csv` (best)
+- 4 other qAT_qAV variants
+- 7 K=7 qAK_qAA_qAF / qAK_qAO_qAF variants
+
+**Friction tags proposed**:
+- `tight-K1-with-6-axis-cell-hierarchical-fallback-breaks-rank-lock`
+- `slim-feature-base-design-required-for-per-row-attribution-signal`
+  (qAR confirmed: yekenot+kNN absorbed; slim 3-feat qAT escaped)
+- `cell-granularity-not-distance-metric-determines-attribution-quality`
+  (qAY cosine ≈ qAT euclidean at 4-feat scale)
+
+**Updated rank-lock framing**: LR-meta absorbs base predictions whose
+conditional-target-correlation is parallel to K=4's logit, BUT does NOT
+absorb features that match each test row to specific orig rows via
+cell-conditional kNN at sufficient cell granularity. The MIDST 2025
+"loss-features-across-noises" pattern is the formal analog.
+
+---
+
 ## Archived per-branch session detail
 
 Detailed per-branch session summaries live under `audit/`:
