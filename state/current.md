@@ -10,19 +10,35 @@ script names and audit prose are *frozen code/file prefixes*, not
 calendar days — see `glossary.md` and `audit/friction.md`
 under `day-counter-drift`.
 
-## PRIMARY (active) — set 2026-05-08 PM
+## PRIMARY (active) — set 2026-05-09 AM
 
-**Score: 0.95351 on the public leaderboard.** Direct LB-confirmed.
+**Score: 0.95359 on the public leaderboard.** Direct LB-confirmed.
 
-**What it is:** the **K=4 forward-greedy** sparse pool combined with
-the same per-segment partial-pooling stacker (Compound × Stint, τ =
-100,000). The 4 bases are one per model class:
+**What it is:** the K=4 forward-greedy pool **plus a fifth kNN-augmented
+LightGBM base (V4)**, all five [P, rank, logit] expanded and fed to the
+same per-segment partial-pooling stacker (Compound × Stint, τ = 100,000).
 
+The five bases:
 - `d17_h1d_yekenot_full` — RealMLP trained with the yekenot recipe.
 - `p1_single_cb_v4_gpu` — CatBoost trained with the yekenot recipe.
 - `f1_hgbc_deep` — sklearn HistGradientBoostingClassifier (deep).
 - `d16_orig_continuous_only` — LightGBM trained on the original
   (aadigupta1601 pre-synth) dataset, continuous-only features.
+- **`v4_knn_aug_base`** — LightGBM trained on row features plus the
+  kNN-target-mean (K=20 in standardised feature space:
+  LapNumber/TyreLife/RaceProgress/Stint/PitStop/Compound-onehot) and
+  kNN-target-std as input features. Per-fold OOF discipline: kNN tree
+  built on training rows in folds≠k. Standalone OOF AUC 0.94163;
+  ρ_spearman vs K=4 bases 0.85–0.94 (most diverse vs d16 at 0.85).
+  See `scripts/seq_coupled/build_knn_base.py`.
+
+**Why V4 worked where V3 didn't.** V3 (same kNN-target-mean as a META
+feature in a 14-feature LR meta) gave +0.01 bp on OOF — fully absorbed
+by linear meta. V4 (same feature ingested through tree splits inside a
+new BASE) gave +0.20 bp on OOF and **+0.80 bp on LB**. Tree
+non-linearity at the base layer extracts conditional structure linear
+meta absorption blocks. See
+`audit/2026-05-08-night-session-summary.md` for the full V1-V4 record.
 
 **Why we promoted from K=27 → K=4 at a deliberate −1.7 bp LB cost:**
 
@@ -51,7 +67,8 @@ cross-validation fold using only training rows.
 
 | ISO date | Pool | Score | What changed |
 |---|---|---:|---|
-| 2026-05-08 PM | K=4 forward-greedy + Path-B C×S τ=100k | **0.95351** | **NEW PRIMARY.** Sparse-pool reduction; 99% of the bank's LB value with 15% of the bases. |
+| 2026-05-09 AM | K=5 (K=4 + V4 kNN-aug LightGBM base) + Path-B C×S τ=100k | **0.95359** | First lift on K=4 PRIMARY in 8 days (+0.8 bp). Mechanism: tree splits ingesting kNN-target-mean (K=20 standardised feature space) at the BASE layer, not as a meta feature. Same feature at meta extracted +0.01 bp; at base extracted +0.8 bp on LB. ρ_test_vs_K4 0.99989 — Rule 27 abort threshold exceeded but PI-authorised override produced a real LB lift. Calibration data: ρ in 0.999-0.9999 zone is NOT auto-tie. |
+| 2026-05-08 PM | K=4 forward-greedy + Path-B C×S τ=100k | **0.95351** | Prior PRIMARY. Sparse-pool reduction; 99% of the bank's LB value with 15% of the bases. |
 | 2026-05-08 PM | K=10 forward-greedy + Path-B C×S τ=100k | 0.95356 | Sparse-pool calibration probe; precise OOF→LB transfer. |
 | 2026-05-07 PM | K=27 + Path-B C×S τ=100k | 0.95368 | Prior PRIMARY. Six DGP-class bases on top of K=21+v4+h1d+d16. |
 | 2026-05-07 PM (earlier) | K=23 v4+h1d + Path-B | 0.95354 | First with CatBoost-yekenot + RealMLP-yekenot. |
@@ -64,15 +81,15 @@ cross-validation fold using only training rows.
 
 ## Submissions
 
-- **Used: 41 of 270.** Plenty of slots left. Per Rule 12, spend them.
-- **Today (2026-05-08): 2 used** (K=10 calibration; K=4 PRIMARY swap).
-- **Comp-day:** 8 of 31. **Days remaining: 23.**
+- **Used: 42 of 270.** Plenty of slots left. Per Rule 12, spend them.
+- **Today (2026-05-09): 1 used** (K=5 V4 kNN-aug base — new PRIMARY).
+- **Comp-day:** 9 of 31. **Days remaining: 22.**
 
 ## Distance to top-5%
 
-- Top-5% boundary: 0.95405. Gap from PRIMARY (K=4 LB 0.95351):
-  **−5.4 basis points** (was −3.7 vs old K=27 PRIMARY).
-- Leader: 0.95476. Gap: **−12.5 basis points** (was −10.8).
+- Top-5% boundary: 0.95405. Gap from PRIMARY (K=5 LB 0.95359):
+  **−4.6 basis points** (was −5.4 vs K=4 LB 0.95351).
+- Leader: 0.95476. Gap: **−11.7 basis points** (was −12.5).
 - Bootstrap CI on a 20% public draw is ±12 bp wide, so both gaps fall
   partly inside the public-LB sample-noise band. Cross-submission
   *relative* deltas trust to ~±1 bp at this scale.
