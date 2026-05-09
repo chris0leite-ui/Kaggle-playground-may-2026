@@ -37,6 +37,16 @@ File: `submissions/submission_qBF_K11_qAT_qAV_qAO_qAA_qAF_qAK_K27_100k_pathb_tau
 ratio 0.84× (lower than qAX's 1.19× because K=27 brings more
 redundancy with K=4 already-used bases).
 
+## Negative-result calibration (K=34 unrolled)
+
+qBH tested K=34 = (27 K=27-era individual bases) + (7 slim-kNN bases)
+plain LR-meta. Result: OOF +4.198 bp (slightly higher than K=11's
++4.032), but **LB 0.95373 = REGRESS −1.2 bp** vs K=11. OOF→LB transfer
+0.52× (vs K=11's 0.84×). **The K=27 super-base condensation works
+better than the unrolled 27 individuals at the LR-meta layer** — too
+many features over-parameterizes the meta and amplifies OOF noise.
+Lesson: **K=11 is the right level of abstraction**.
+
 **Mechanism background:** see
 `audit/2026-05-09/2026-05-09-qAK-breakthrough.md` and
 `audit/2026-05-09/2026-05-09-final-results-summary.md`.
