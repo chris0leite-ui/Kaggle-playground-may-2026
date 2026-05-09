@@ -16,6 +16,80 @@ restating it.
 
 ## Week of 2026-05-08
 
+- `synth-rows-are-not-literal-copies-of-orig-rows`
+  (2026-05-09 decode-data-process-5uLq3): the prior P1c interpretation
+  read 95% intra-synth 4-tuple PitNextLap concordance as "synth rows
+  are literal copies of orig rows." Q6 disproves this directly: only
+  27 of 627,305 synth rows match an orig row on the 6-tuple
+  `(LapTime, RaceProgress, LapTime_Delta, Position, TyreLife,
+  Position_Change)`. Q7 shows match rate decays from 97.55% at K=1 to
+  0.000% at K=6 — synth columns are sampled near-independently within
+  cells. The 95% P1c concordance was synth-internal mode-collapse,
+  not orig inheritance. **Fix:** retract the P1c interpretation in
+  `state/mechanism-ledger.md`; future inversion plans must work in the
+  per-cell density-ratio regime, not in the per-row tuple-lookup
+  regime.
+- `host-not-in-sdv-library`
+  (2026-05-09 decode-data-process-5uLq3): all four SDV synthesisers
+  tested (CTGAN at 5/10/20 ep + synth-marginal cond, GaussianCopula,
+  TVAE 10 ep, CopulaGAN) converge on disc-AUC 0.9988-0.9997 against
+  host synth, in a 0.5 pp band. The host's specific generator is not
+  in SDV's default library. **Fix:** future architecture sweeps should
+  start from non-SDV families (TabDDPM, normalising flow, GReaT) and
+  budget zero cycles on SDV variants.
+- `noise-on-continuous-cols-makes-disc-worse-not-better`
+  (2026-05-09 decode-data-process-5uLq3): three independent sweeps
+  (qF Gaussian-on-resample, qJ cell-scaled Gaussian, qV per-cell KDE
+  bandwidth) all show monotone-worse disc-AUC as noise sigma rises.
+  The host's continuous columns are NOT perturbed orig values.
+  **Fix:** any future "match host" attempt should start at sigma=0
+  (literal orig values per cell) and only add noise if a specific
+  test motivates it.
+- `cond-driver-stint-on-cell-saves-14pp`
+  (2026-05-09 decode-data-process-5uLq3): replacing uniform
+  Driver/Stint scrambling with synth-empirical conditional sampling
+  on `(Year, Compound, PitStop)` drops disc-AUC from 0.9716 (qF) to
+  0.8323 (qH). Driver and Stint distributions are STRUCTURED per
+  cell, not uniform over the 887/8-vocab. **Fix:** any analytic
+  resample pipeline should default to per-cell conditional
+  Driver/Stint sampling at the lowest cell key with reliable counts.
+- `extending-cond-axes-monotonic-down-to-LapN-then-sparsity-bites`
+  (2026-05-09 decode-data-process-5uLq3): the qH-qM sweep extending
+  the conditioning cell key from `(Y, C, PS)` through `(Y, C, PS,
+  Race, Stint, LapNumber)` drops disc-AUC monotonically (0.83 →
+  0.79 → 0.72 → 0.72). Adding Position or TyreLife to the cell key
+  *regresses* (0.73, 0.83) due to cell sparsity (orig rows per
+  cell drops below 3). **Fix:** the cell key sweet spot is six axes
+  on this dataset; future re-decompositions should not push past
+  LapNumber without expanding orig.
+- `affine-moment-matching-fails-skewness-non-trivial`
+  (2026-05-09 decode-data-process-5uLq3): qX showed synth's per-cell
+  mean and std differ from orig's (LapTime mean shift -2.81, std
+  ratio 0.87 median). qY then *applied* an affine transformation
+  (rescale orig to match synth mean+std) and disc-AUC went from 0.72
+  to 0.99. Skewness diffs (LapTime p90 = 70) imply non-Gaussian
+  per-cell densities; affine fixes break the skew. **Fix:** any
+  per-cell transform must preserve higher moments; skew-sensitive
+  tools (NF, copula on quantile transforms) over BGMM/affine.
+- `host-cont-vals-strictly-per-cell-no-cross-cell-mixing`
+  (2026-05-09 decode-data-process-5uLq3): qP's "45% NN same_all3" was
+  a natural cross-cell float overlap (cells like (2024, MEDIUM, PS=0)
+  and (2025, MEDIUM, PS=0) have similar LapTime distributions). qU
+  proves cross-cell value mixing makes disc *worse*, not better
+  (mix=0 0.7150 → mix=1 0.9800 monotonically). **Fix:** treat the
+  host's per-cell density as strictly cell-conditioned; do not model
+  smoothing across cells.
+- `rank-lock-saturation-puts-cap-on-K4plus1-with-decode-features`
+  (2026-05-09 decode-data-process-5uLq3): qZ d16++ (LightGBM trained
+  on orig with the qM cell-key features added) gives standalone
+  synth-train AUC 0.93985, +2.5 pp over current d16's 0.91483. But at
+  K=4+1 LR-meta gate it lifts only +0.149 bp (well below the +0.5
+  strict gate; ρ to PRIMARY 0.93). Rank-lock at logit-direction level
+  absorbs the structurally-distinct decode signal. **Fix:** plan-v3
+  call-out — decode-derived bases improve standalone AUC but rank-
+  lock saturates at K=4+1; future LB lift on this comp likely needs
+  a different meta architecture, not new bases.
+
 - `rank-lock-at-conditional-target-correlation-not-just-logit-direction`
   (2026-05-09 night ml-model-experiments-gbKiI): A29's prior framing
   said "rank-lock at logit-direction not rank-correlation." The
