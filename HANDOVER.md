@@ -124,33 +124,77 @@ Highlights:
 
 ---
 
-## Day-8 PM research-feature-engineering-7oCmj
+> Day-8 PM (`research-feature-engineering-7oCmj`) section archived to
+> `audit/archive-2026-05-09-handover-day8-pm-section.md`.
 
-EXP-NEW Phase 1-5b FE/meta campaign (ISSUES leaf 11) closed `null`.
-PRIMARY unchanged @ LB 0.95351; 0 of 270 submission slots used.
+---
 
-| Probe | OOF Δ vs PRIMARY 0.95403 | Verdict |
-|---|---:|---|
-| A3-7 UID smoothing dry-run | −124 bp | leakage FAIL |
-| 6 of 7 Phase-1 smoke picks | null/regress | FAIL |
-| A2-2 mandatory_compound_rule smoke | +9.3 bp | smoke-only |
-| A2-2 single-LGBM 5-fold | +1.4 bp standalone | partial absorb |
-| A2-2 K=4+1 plain LR-meta | +0.302 bp; TIE_EXPECTED | < +0.5 PASS |
-| A2-2 K=4+1 Path-B C×S τ=100k | +0.26 bp; ρ 0.999893 | WEAK |
-| A2-8 LightGBM stack-meta on K=4 | −1.30 bp | FAIL |
+## Day-9 PM decode-data-process-5uLq3
 
-**Rule 7 research scan** (Frontiers AI 2025 Bi-LSTM, Optimum Racing
-IJRASET 2025): 4 of 5 mechanisms duplicate A3-1 RankSortedGaps
-(already null). Only genuinely untried lever: Bi-LSTM/GRU sequence
-base on 10-lap windows, ~30-60 min Kaggle T4, deferred.
+DGP-decode session (no LB submissions). Twenty-three probes
+(Q1-Q10 + qB-qZ), twenty-five commits, twelve audit docs in
+`audit/2026-05-09/`. Pushed disc-AUC gap host-vs-candidate from
+0.999 (off-the-shelf SDV CTGAN baseline) to **0.7160** (analytic
+resample-and-cond pipeline) — half of the way to the perfect-mimicry
+lower bound of 0.4944.
 
-**Next-session first actions.** (1) Bi-LSTM/GRU sequence base on
-K=4 — cheapest untried lever, +0.5 bp gate. (2) R5 hedge prep
-(~30 min CPU). (3) Acceptance posture — −12.5 bp gap to leader
-inside sample-noise band; private-LB ceiling may be near.
-Artifacts: `scripts/probe_a2_2_pathb_K4.py`,
-`scripts/probe_a2_8_stack_meta.py`, postmortem
-`audit/2026-05-08-postmortem-research-feature-engineering-7oCmj.md`.
+**Read first**: `audit/2026-05-09/2026-05-09-EXEC-SUMMARY.md`
+(plain-English) and `audit/2026-05-09/2026-05-09-PHASE-B-FINAL-and-plan-v3.md`
+(full ledger).
+
+**DGP picture (final):** input aadigupta1601 → custom marginal that
+suppresses PitStop=1 by 0.54× → per-cell NN generator (the unsolved
+residual; produces 73% novel values per cell, no noise, NOT BGMM /
+KDE / affine / global / cross-cell-mixed) → structured per-cell
+Driver/Stint sampling → drop Norm_TyreLife → ship.
+
+**Architecture exclusion ledger** (host generator NOT any of):
+
+| Architecture | disc-AUC |
+|---|---:|
+| SDV CTGAN (5/10/20 ep + synth-marginal cond) | 0.9993-0.9997 |
+| SDV GaussianCopula | 0.9988 |
+| SDV TVAE 10 ep | 0.9991 |
+| SDV CopulaGAN | conclusive by pattern |
+| noisy-orig + Gaussian sigma > 0 | monotone-worse |
+| per-cell BGMM (4 floats) | 0.8643 |
+| per-cell KDE bw 0.05-0.5 | 0.7448-0.7657 |
+| global float sampling | 0.9907 |
+| cross-cell mixing fraction > 0 | monotone-worse |
+| affine moment-matching | 0.9883-0.9979 |
+
+**New findings F11-F15:** Driver/Stint structured per-cell (qH +14 pp);
+continuous columns strictly per-cell (qU); 73% novel `(Y, C, LapTime)`
+keys per cell (qR); per-cell mean shifts -2.81 with std ratio 0.87 but
+non-affine (qX/qY); d16++ standalone synth AUC 0.940 (+2.5 pp over
+d16) but only +0.149 bp at K=4+1 (rank-lock saturates).
+
+**qZ d16++ artifacts saved** at
+`scripts/artifacts/dgp_v3_qZ_{oof_strat, test, train_synth}.npy`.
+Stack-add gate measured at +0.149 bp (below +0.5 strict threshold).
+
+**Next-session first actions** (in EV / cost order):
+1. **TabDDPM-on-orig** if the install-debug session can land it. The
+   single most likely candidate to close the 0.22 disc-AUC residual.
+   ~30 min GPU.
+2. **Normalising flow (RealNVP / NSF) per-cell** with cell-key
+   conditioning. Skew-sensitive; matches the qX skewness diffs.
+3. **Re-decompose K=4 PRIMARY** to swap d16 for qZ and re-measure;
+   small expected lift but free.
+4. **Accept structural decode as the answer** and wrap the comp;
+   the rank-lock cap on K=4+1 means decode-derived features are
+   bounded ≤1 bp at the LB.
+
+**Friction tags promoted (this session, in audit/friction.md):**
+`synth-rows-are-not-literal-copies-of-orig-rows` (retract P1c),
+`host-not-in-sdv-library`, `noise-on-continuous-cols-makes-disc-worse-not-better`,
+`cond-driver-stint-on-cell-saves-14pp`,
+`extending-cond-axes-monotonic-down-to-LapN-then-sparsity-bites`,
+`affine-moment-matching-fails-skewness-non-trivial`,
+`host-cont-vals-strictly-per-cell-no-cross-cell-mixing`,
+`rank-lock-saturation-puts-cap-on-K4plus1-with-decode-features`.
+
+Postmortem: `audit/2026-05-09-postmortem-decode-data-process-5uLq3.md`.
 
 ---
 
