@@ -3,13 +3,33 @@
 `branch: claude/analyze-synthetic-data-generation-BtmFl`
 `session window: 2026-05-09 ~12:00 → ~13:30 UTC`
 
-## Headline number
+## Headline number (UPDATED post-qAT/qAU)
 
-**Best K=4+1+ combo at OOF: 0.95415 = +1.262 bp vs PRIMARY 0.95403.**
-K=7 = K=4 + qAK + qAO + qAF + Path-B Compound × Stint τ=20,000.
+**Best K=4+N combo at OOF: 0.95421 = +1.678 bp vs PRIMARY 0.95403.**
+K=8 = K=4 + qAT + qAO + qAA + qAF + Path-B Compound × Stint τ=20,000.
 
-PRIMARY LB: 0.95351. If LB transfer is 1×, expected LB ~0.95363. If
-V4-anomaly 5×, expected LB ~0.95414 (at top-5% boundary 0.95405).
+PRIMARY LB: 0.95351. If LB transfer is 1×, expected LB ~0.95368. If
+V4-anomaly 5×, expected LB ~0.95436 (above top-5% boundary 0.95405).
+
+### qAT — even slimmer than qAK (K=1 strictest match, 3 features)
+
+- standalone OOF 0.82093 (lowest of any positively-gating base ever)
+- ρ_test 0.644 (most diverse positively-gating base ever)
+- K=4+1 plain LR-meta lift: **+1.172 bp** (vs qAK's +0.717)
+
+The slim-er = better pattern: K=1 with 3 features outperforms K=3 with 6
+features. qAT proves that per-row attribution (not aggregation) is the
+breakthrough mechanism.
+
+### qAU final Path-B amp on top combos
+
+| Combo | K | Plain Δ bp | Path-B τ=20k Δ bp | Amp factor |
+|---|---:|---:|---:|---:|
+| **qAT+qAO+qAA+qAF** | **8** | **+1.551** | **+1.678** | **1.08×** |
+| qAT+qAK+qAO+qAA+qAF | 9 | +1.504 | +1.648 | 1.10× |
+| qAT+qAK+qAA+qAF | 8 | +1.469 | +1.580 | 1.07× |
+| qAT+qAO+qAF | 7 | +1.441 | +1.598 | 1.11× |
+| qAT+qAK+qAF | 7 | +1.405 | +1.599 | 1.14× |
 
 ## Probe ladder
 
