@@ -10,42 +10,45 @@ script names and audit prose are *frozen code/file prefixes*, not
 calendar days — see `glossary.md` and `audit/friction.md`
 under `day-counter-drift`.
 
-## PRIMARY (active) — set 2026-05-09 PM (autonomous loop BtmFl + K=27 ensemble)
+## PRIMARY (active) — set 2026-05-12 (blend 70/30)
 
-**Score: 0.95385 on the public leaderboard.** Direct LB-confirmed.
-**+3.4 bp lift over original K=4 PRIMARY** (LB 0.95351). +1.0 bp over
-the prior K=9 PRIMARY (LB 0.95375).
+**Score: 0.95386 on the public leaderboard.** Direct LB-confirmed.
+**+3.5 bp lift over original K=4 PRIMARY** (LB 0.95351). +0.1 bp over
+the K=11 + K=27 PRIMARY (LB 0.95385).
 
-**What it is:** K=11 = K=4 + qAT + qAV + qAO + qAA + qAF + qAK +
-K27_100k, with **Path-B Compound × Stint τ=100,000**.
+**What it is:** rank-blend at weights 0.7 / 0.3 of two LB-confirmed
+predictions:
+- K=11 + K=27 + Path-B τ=100k (LB 0.95385) — 70% weight
+- K=9 qAX (qAT+qAV+qAO+qAA+qAF + Path-B τ=20k, LB 0.95375) — 30% weight
 
-The K=27 base is the prior PRIMARY-of-old
-(`d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000`) treated as a single
-super-base — collapses 27 bases (incl. d18 chain decomp, F2 constraint,
-E2 preimage-kNN) into one prediction. Adding K=27_100k as a single
-base lifts +2.624 bp at K=4+1 plain LR-meta — proving prior K=27
-information was being lost in K=4-only PRIMARY.
+The cross-mechanism blend cancels small errors: K=11 uses K=27 super-base
++ slim-kNN; K=9 uses slim-kNN only. Their errors are partially
+orthogonal even though ρ_test = 0.9998. PI-authorized "all 3" override
+of Rule 27 abort threshold (ρ > 0.999) yielded LB 0.95386.
 
-The 6 new orig-kNN slim-bases (qAK/qAO/qAA/qAF/qAT/qAV) ride on top
-of K=27 to give per-row attribution at the host's decoded 6-axis
-cell key.
+**Submitted:** 2026-05-12 08:14 UTC. LB 0.95386, public COMPLETE.
+File: `submissions/submission_blend_K11_K9_w_70_30.csv`
 
-**Submitted:** 2026-05-09 13:40 UTC. LB 0.95385, public COMPLETE.
-File: `submissions/submission_qBF_K11_qAT_qAV_qAO_qAA_qAF_qAK_K27_100k_pathb_tau100000.csv`
+## Calibration data — qBI experiments (2026-05-12)
 
-**OOF→LB transfer for this candidate**: OOF +4.032 bp → LB +3.4 bp,
-ratio 0.84× (lower than qAX's 1.19× because K=27 brings more
-redundancy with K=4 already-used bases).
+Three candidates submitted to extract calibration data:
 
-## Negative-result calibration (K=34 unrolled)
+| Submission | OOF Δ | LB | vs K=11 |
+|---|---:|---:|---:|
+| qBI K=12 + qBA Manhattan + Path-B τ=100k | +4.161 | 0.95380 | -0.5 bp |
+| qBI K=34 C=0.1 (tighter LR reg) | +4.237 | 0.95374 | -1.1 bp |
+| **Blend 70/30 K=11+K=9** | — | **0.95386** | **+0.1 bp** |
 
-qBH tested K=34 = (27 K=27-era individual bases) + (7 slim-kNN bases)
-plain LR-meta. Result: OOF +4.198 bp (slightly higher than K=11's
-+4.032), but **LB 0.95373 = REGRESS −1.2 bp** vs K=11. OOF→LB transfer
-0.52× (vs K=11's 0.84×). **The K=27 super-base condensation works
-better than the unrolled 27 individuals at the LR-meta layer** — too
-many features over-parameterizes the meta and amplifies OOF noise.
-Lesson: **K=11 is the right level of abstraction**.
+Key learnings:
+- **qBA Manhattan kNN HURTS at LB despite +0.13 bp OOF** — different
+  distance metric introduces test-time noise vs euclidean kNN.
+- **K=34 unrolled never transfers** — C-sweep (1.0, 0.1, 0.03, 0.01) all
+  give LB 0.95373-0.95374. The 27 individual base predictions provide
+  redundant signal at the meta layer; over-parameterization is real but
+  regularization can't fix it.
+- **Rank-blending different-mechanism PRIMARYs ESCAPES the rank-lock**
+  even at ρ=0.9998 — small probability-rank differences in the K=9 vs
+  K=11 predictions, when blended, cancel uncorrelated errors.
 
 **Mechanism background:** see
 `audit/2026-05-09/2026-05-09-qAK-breakthrough.md` and
