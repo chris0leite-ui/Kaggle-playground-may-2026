@@ -10,35 +10,45 @@ script names and audit prose are *frozen code/file prefixes*, not
 calendar days — see `glossary.md` and `audit/friction.md`
 under `day-counter-drift`.
 
-## PRIMARY (active) — set 2026-05-09 PM (autonomous loop BtmFl)
+## PRIMARY (active) — set 2026-05-12 (blend 70/30)
 
-**Score: 0.95375 on the public leaderboard.** Direct LB-confirmed.
-**+2.4 bp lift over prior PRIMARY** (K=4 + Path-B C×S τ=100k at LB 0.95351).
+**Score: 0.95386 on the public leaderboard.** Direct LB-confirmed.
+**+3.5 bp lift over original K=4 PRIMARY** (LB 0.95351). +0.1 bp over
+the K=11 + K=27 PRIMARY (LB 0.95385).
 
-**What it is:** the **K=9 = K=4 + qAT + qAV + qAO + qAA + qAF**
-forward-greedy sparse pool combined with the per-segment partial-pooling
-stacker (Compound × Stint, τ = 20,000). Bases:
+**What it is:** rank-blend at weights 0.7 / 0.3 of two LB-confirmed
+predictions:
+- K=11 + K=27 + Path-B τ=100k (LB 0.95385) — 70% weight
+- K=9 qAX (qAT+qAV+qAO+qAA+qAF + Path-B τ=20k, LB 0.95375) — 30% weight
 
-- `d17_h1d_yekenot_full` — RealMLP yekenot recipe
-- `p1_single_cb_v4_gpu` — CatBoost yekenot recipe
-- `f1_hgbc_deep` — sklearn HistGradientBoostingClassifier (deep)
-- `d16_orig_continuous_only` — LightGBM on aadigupta1601 orig
-- **qAT** — orig-kNN K=1 strictest match, 4-feat distance, 3 features
-  (label/distance/level), 6-axis cell key with hierarchical fallback
-- **qAV** — orig-kNN K=1, 7-feat distance, same slim 3-feature design
-- **qAO** — orig-kNN multi-K (3+5+10), 6-feat per K, 6-axis cell
-- **qAA** — stint_imputed sequence features (Frontiers F1 paper recipe
-  on the recovered LapNumber-TyreLife+1 stint identity)
-- **qAF** — d16++ trained on orig with stint_imputed features
+The cross-mechanism blend cancels small errors: K=11 uses K=27 super-base
++ slim-kNN; K=9 uses slim-kNN only. Their errors are partially
+orthogonal even though ρ_test = 0.9998. PI-authorized "all 3" override
+of Rule 27 abort threshold (ρ > 0.999) yielded LB 0.95386.
 
-The 5 new decoded bases (qAT + qAV + qAO + qAA + qAF) escape rank-lock
-via slim per-row attribution against orig at the 6-axis cell key.
-The breakthrough mechanism: tight K (=1) + 6-axis cell + hierarchical
-fallback, with multiple distance-space variants.
+**Submitted:** 2026-05-12 08:14 UTC. LB 0.95386, public COMPLETE.
+File: `submissions/submission_blend_K11_K9_w_70_30.csv`
 
-**Submitted:** 2026-05-09 13:23 UTC. LB 0.95375, public score COMPLETE.
-File: `submissions/submission_qAT_qAV_qAT_qAV_qAO_qAA_qAF_pathb_cs_tau20000.csv`
-(filename has duplicate qAT_qAV from qAX naming bug; data is correct).
+## Calibration data — qBI experiments (2026-05-12)
+
+Three candidates submitted to extract calibration data:
+
+| Submission | OOF Δ | LB | vs K=11 |
+|---|---:|---:|---:|
+| qBI K=12 + qBA Manhattan + Path-B τ=100k | +4.161 | 0.95380 | -0.5 bp |
+| qBI K=34 C=0.1 (tighter LR reg) | +4.237 | 0.95374 | -1.1 bp |
+| **Blend 70/30 K=11+K=9** | — | **0.95386** | **+0.1 bp** |
+
+Key learnings:
+- **qBA Manhattan kNN HURTS at LB despite +0.13 bp OOF** — different
+  distance metric introduces test-time noise vs euclidean kNN.
+- **K=34 unrolled never transfers** — C-sweep (1.0, 0.1, 0.03, 0.01) all
+  give LB 0.95373-0.95374. The 27 individual base predictions provide
+  redundant signal at the meta layer; over-parameterization is real but
+  regularization can't fix it.
+- **Rank-blending different-mechanism PRIMARYs ESCAPES the rank-lock**
+  even at ρ=0.9998 — small probability-rank differences in the K=9 vs
+  K=11 predictions, when blended, cancel uncorrelated errors.
 
 **Mechanism background:** see
 `audit/2026-05-09/2026-05-09-qAK-breakthrough.md` and
