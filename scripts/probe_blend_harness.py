@@ -35,43 +35,43 @@ DATA = ROOT / "data"
 OUT_JSON = ART / "probe_blend_harness.json"
 
 # Each entry: (display_name, oof_npy, test_npy, lb_or_None).
-# LB-confirmed predictions on disk in order of LB score (descending).
+# Ordered by descending OOF AUC after the 2026-05-13 rebuild.
 INGREDIENTS = [
-    # K=27 super-base + Path-B C×S τ=100k — the best Path-B on disk
+    # K=11 = K=4 + 6 slim-kNN + K=27 + Path-B  (full stacker; predicted LB ~0.95385)
+    ("K11_full_pathb",
+     "K11_full_pathb_tau100000_oof.npy",
+     "K11_full_pathb_tau100000_test.npy",
+     None),
+    # K=8 = K=4 + qAT/qAV/qAO + K=27 + Path-B  (today's submitted hedge; LB 0.95382)
+    ("K8_qATqAVqAO_K27_pathb",
+     "K8_qAT_qAV_qAO_K27_pathb_tau100000_oof.npy",
+     "K8_qAT_qAV_qAO_K27_pathb_tau100000_test.npy",
+     0.95382),
+    # K=10 slim-kNN-only = K=4 + all 6 slim-kNN + Path-B  (no K=27; diversity leg)
+    ("K10_slim_pathb",
+     "K10_slim_pathb_tau100000_oof.npy",
+     "K10_slim_pathb_tau100000_test.npy",
+     None),
+    # K=27 super-base + Path-B  (LB-confirmed 0.95368)
     ("K27_pathb_100k",
      "oof_d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000_strat.npy",
      "test_d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000_strat.npy",
      0.95368),
-    # K=27 super-base + Path-B τ=20k (different shrinkage)
-    ("K27_pathb_20k",
-     "oof_d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau20000_strat.npy",
-     "test_d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau20000_strat.npy",
-     None),
-    # K=4 forward-greedy + Path-B (sparse-pool PRIMARY-of-2026-05-08)
-    ("K4_pathb",
-     "oof_K4_fwd_pathb.npy",
-     "test_K4_fwd_pathb.npy",
-     0.95351),
-    # K=23 v4+h1d + Path-B τ=100k (Day-17 PM)
+    # K=23 v4+h1d + Path-B  (LB-confirmed 0.95354)
     ("K23_v4h1d_pathb_100k",
      "oof_d17_path_b_K23_v4_h1d_tau100000_strat.npy",
      "test_d17_path_b_K23_v4_h1d_tau100000_strat.npy",
      0.95354),
-    # K=22 DAE + Path-B τ=20k (Day-15 PRIMARY)
-    ("K22_dae_pathb_20k",
-     "oof_d15b_path_b_K22_dae_only_tau20000_strat.npy",
-     "test_d15b_path_b_K22_dae_only_tau20000_strat.npy",
-     0.95059),
-    # K=22 continuous-only + Path-B τ=20k (Day-16 PRIMARY)
-    ("K22_cont_pathb_20k",
-     "oof_d16_path_b_K22_continuous_only_tau20000_strat.npy",
-     "test_d16_path_b_K22_continuous_only_tau20000_strat.npy",
-     0.95089),
+    # K=4 forward-greedy + Path-B  (LB-confirmed 0.95351)
+    ("K4_pathb",
+     "oof_K4_fwd_pathb.npy",
+     "test_K4_fwd_pathb.npy",
+     0.95351),
 ]
 
-# Reference PRIMARY for Rule 27 (we don't have current-LB-PRIMARY on
-# disk; use K27_pathb_100k as the closest LB-confirmed proxy).
-PRIMARY_PROXY = "K27_pathb_100k"
+# Reference PRIMARY for Rule 27 (use K=11 as the new proxy — closest to
+# current PRIMARY on disk).
+PRIMARY_PROXY = "K11_full_pathb"
 RULE_27_THRESHOLD = 0.999
 
 OPERATORS = ("arith", "gmean", "logit_mean", "rank_mean")
