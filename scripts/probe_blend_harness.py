@@ -204,8 +204,10 @@ def main() -> None:
 
     rows: list[dict] = []
     # 2-way to 5-way blends.
+    # Step schedule: coarser as dimension grows (keeps total evals near 2 min CPU).
+    step_by_k = {2: 0.05, 3: 0.1, 4: 0.2, 5: 0.25}
     for k in range(2, min(5, len(available)) + 1):
-        step = 0.05 if k == 2 else 0.1
+        step = step_by_k[k]
         grid = simplex_grid(k, step=step)
         for combo in combinations(available, k):
             names = [c["name"] for c in combo]
