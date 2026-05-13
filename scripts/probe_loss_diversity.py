@@ -41,7 +41,10 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 
 sys.path.insert(0, str(Path(__file__).parent))
-from p1_features import TE_CONFIGS, cv_target_encode  # noqa: E402
+from p1_features import (  # noqa: E402
+    TE_CONFIGS, cv_target_encode, feature_columns_for_lgbm,
+    make_features_static,
+)
 
 ART = Path("scripts/artifacts")
 DATA = Path("data")
@@ -137,44 +140,58 @@ def make_variants(base_rate: float) -> list[tuple[str, dict, bool]]:
 # -------------------- feature pipeline --------------------
 def build_features(train: pd.DataFrame, test: pd.DataFrame, y: np.ndarray,
                    fold_list: list[tuple[np.ndarray, np.ndarray]]):
-    """Raw cols + cat encodings + cross-validated target encodings.
+    """Full label-independent engineered features (matches cb_v4 / d19 family)
+    plus cross-validated target encodings. The "feA_te" recipe.
 
-    Returns X_train, X_test, feature names, categorical feature list.
+    Returns X_train, X_test, feature names, categorical feature list, and
+    the reindexed y aligned to train_A row order (make_features_static
+    sorts internally).
     """
-    # 14 raw + cat encodings
-    raw_cols = ["LapNumber", "PitStop", "TyreLife", "Position", "Stint",
-                "Year", "LapTime (s)", "LapTime_Delta",
-                "Cumulative_Degradation", "RaceProgress", "Position_Change"]
-    cat_cols_raw = ["Driver", "Race", "Compound"]
-    # build label-encoded categorical features (id-stable across train+test)
-    out_cat_cols = []
-    train_X = train[raw_cols].copy()
-    test_X = test[raw_cols].copy()
-    for c in cat_cols_raw:
-        uniques = pd.concat([train[c], test[c]]).astype(str).unique()
-        mp = {v: i for i, v in enumerate(sorted(uniques))}
-        train_X[f"{c}_cat"] = train[c].astype(str).map(mp).astype("int32")
-        test_X[f"{c}_cat"] = test[c].astype(str).map(mp).astype("int32")
-        out_cat_cols.append(f"{c}_cat")
+    print("  make_features_static on train...", flush=True)
+    train_A, state = make_features_static(train, fit=True)
+    print("  make_features_static on test...", flush=True)
+    test_A, _ = make_features_static(test, fit=False, state=state)
 
-    # Target encodings (cross-validated, fold-safe)
-    train_te_input = train.copy()
-    test_te_input = test.copy()
+    # make_features_static sorts by (Driver, Race, Year, LapNumber); rebuild y.
+    y_aligned = train_A[TARGET].astype(int).values
+
+    feats, cat_cols = feature_columns_for_lgbm(train_A)
+
+    # cross-validated target encodings on the reordered rows
+    print("  cross-validated target encodings...", flush=True)
+    # Note: fold_list was built on the original train.csv ordering. Since
+    # make_features_static reorders rows, we need a fresh fold_list aligned
+    # to train_A. The CALLER passes train_A's row indices.
+    train_te_input = train_A.copy()
+    test_te_input = test_A.copy()
     for cols, smooth, te_name in TE_CONFIGS:
-        if all(c in train.columns for c in cols):
+        if all(c in train_A.columns for c in cols):
             oof_enc, te_enc = cv_target_encode(
-                train_te_input, test_te_input, cols, pd.Series(y), fold_list,
-                smoothing=smooth)
-            train_X[te_name] = oof_enc
-            test_X[te_name] = te_enc
+                train_te_input, test_te_input, cols, pd.Series(y_aligned),
+                fold_list, smoothing=smooth)
+            train_A[te_name] = oof_enc
+            test_A[te_name] = te_enc
+            feats.append(te_name)
+            print(f"    {te_name}: train mean={oof_enc.mean():.4f}", flush=True)
 
-    feats = list(train_X.columns)
-    cat_cols = [c for c in out_cat_cols if c in feats]
-    # fillna numeric
+    X_train = train_A[feats].copy()
+    X_test = test_A[feats].copy()
+    for c in cat_cols:
+        X_train[c] = X_train[c].astype("int32")
+        X_test[c] = X_test[c].astype("int32")
     num_cols = [c for c in feats if c not in cat_cols]
-    train_X[num_cols] = train_X[num_cols].fillna(0).astype(np.float32)
-    test_X[num_cols] = test_X[num_cols].fillna(0).astype(np.float32)
-    return train_X, test_X, feats, cat_cols
+    X_train[num_cols] = X_train[num_cols].fillna(0).astype(np.float32)
+    X_test[num_cols] = X_test[num_cols].fillna(0).astype(np.float32)
+
+    # Build mapping back to original train.csv order for alignment with K=11
+    train_order = train_A["id"].values  # original row ids in reordered position
+    sort_back = np.argsort(train_order)  # reorder positions back to original
+    test_order = test_A["id"].values
+    orig_test_ids = pd.read_csv(DATA / "test.csv", usecols=["id"])["id"].values
+    test_pos_to_orig = {tid: i for i, tid in enumerate(test_order)}
+    test_align_idx = np.array([test_pos_to_orig[t] for t in orig_test_ids])
+
+    return X_train, X_test, feats, cat_cols, y_aligned, sort_back, test_align_idx
 
 
 # -------------------- train one variant --------------------
@@ -192,14 +209,18 @@ def train_variant(name: str, params: dict, use_focal: bool,
         ytr, yva = y[ti], y[vi]
 
         if use_focal:
+            # LightGBM 4.x: pass callable objective via params, not fobj kwarg.
+            p = dict(params)
+            p["objective"] = focal_obj
+            p.pop("metric", None)  # use feval instead
             dtr = lgb.Dataset(Xtr[feats], label=ytr,
                               categorical_feature=cat_cols)
             dva = lgb.Dataset(Xva[feats], label=yva,
                               categorical_feature=cat_cols)
             booster = lgb.train(
-                params, dtr, num_boost_round=params["n_estimators"],
+                p, dtr, num_boost_round=p["n_estimators"],
                 valid_sets=[dva], valid_names=["va"],
-                fobj=focal_obj, feval=focal_eval,
+                feval=focal_eval,
                 callbacks=[lgb.early_stopping(150, verbose=False),
                            lgb.log_evaluation(0)],
             )
@@ -229,11 +250,9 @@ def train_variant(name: str, params: dict, use_focal: bool,
               flush=True)
 
     auc_full = float(roc_auc_score(y, oof))
-    print(f"  standalone OOF AUC = {auc_full:.5f}  walls_sum={sum(walls):.1f}s",
+    print(f"  standalone OOF AUC = {auc_full:.5f} (reordered)  walls_sum={sum(walls):.1f}s",
           flush=True)
-
-    np.save(ART / f"loss_div_{name}_oof.npy", oof)
-    np.save(ART / f"loss_div_{name}_test.npy", test_pred)
+    # main() will re-align and save with the original train.csv row order.
     return oof, test_pred
 
 
@@ -269,33 +288,50 @@ def main() -> None:
     t0_total = time.time()
     train = pd.read_csv(DATA / "train.csv")
     test = pd.read_csv(DATA / "test.csv")
-    y = train[TARGET].astype(int).values
-    base_rate = float(y.mean())
+    y_orig = train[TARGET].astype(int).values
+    base_rate = float(y_orig.mean())
     print(f"train {train.shape}  test {test.shape}  base_rate {base_rate:.4f}",
           flush=True)
 
+    print("\nbuilding features (full pipeline: make_features_static + TE)...",
+          flush=True)
+    # Build features (reorders rows). Pass dummy fold_list; TE re-fits per fold
+    # internally using the y_aligned-stratified split built inside.
+    # First need y_aligned to build fold_list, so peek the reorder.
+    train_A_peek = (train.sort_values(["Driver", "Race", "Year", "LapNumber"])
+                    .reset_index(drop=True))
+    y_aligned_peek = train_A_peek[TARGET].astype(int).values
     skf = StratifiedKFold(n_splits=N_FOLDS, shuffle=True, random_state=SEED)
-    fold_list = list(skf.split(np.zeros(len(y)), y))
+    fold_list = list(skf.split(np.zeros(len(y_aligned_peek)), y_aligned_peek))
 
-    print("\nbuilding features...", flush=True)
-    X_train, X_test, feats, cat_cols = build_features(train, test, y, fold_list)
-    print(f"  feats={len(feats)}  cat_cols={cat_cols}", flush=True)
+    X_train, X_test, feats, cat_cols, y_aligned, sort_back, test_align_idx = \
+        build_features(train, test, y_orig, fold_list)
+    print(f"  feats={len(feats)}  cat_cols={len(cat_cols)}", flush=True)
 
+    # K=11 OOF / test are in ORIGINAL train.csv / test.csv row order.
     K11_oof = np.load(ART / "K11_full_pathb_tau100000_oof.npy").astype(np.float64)
     K11_test = np.load(ART / "K11_full_pathb_tau100000_test.npy").astype(np.float64)
-    K11_auc = float(roc_auc_score(y, K11_oof))
-    print(f"\nK=11 OOF reference: {K11_auc:.5f}", flush=True)
+    K11_auc = float(roc_auc_score(y_orig, K11_oof))
+    print(f"\nK=11 OOF reference (orig order): {K11_auc:.5f}", flush=True)
 
     variants = make_variants(base_rate)
     results = []
     for name, params, use_focal in variants:
-        oof, test_pred = train_variant(
+        # Train on the reordered X_train / y_aligned with the matching fold_list
+        oof_reordered, test_pred_reordered = train_variant(
             name, params, use_focal,
-            X_train, X_test, y, feats, cat_cols, fold_list)
-        standalone = float(roc_auc_score(y, oof))
+            X_train, X_test, y_aligned, feats, cat_cols, fold_list)
+        # Re-align OOF back to original train.csv row order to match K=11
+        oof = oof_reordered[sort_back]
+        test_pred = test_pred_reordered[test_align_idx]
+        # Save aligned artifacts
+        np.save(ART / f"loss_div_{name}_oof.npy", oof)
+        np.save(ART / f"loss_div_{name}_test.npy", test_pred)
+
+        standalone = float(roc_auc_score(y_orig, oof))
         rho_oof = float(spearmanr(oof, K11_oof).statistic)
         rho_test = float(spearmanr(test_pred, K11_test).statistic)
-        lift = k11_plus_one_gate(K11_oof, oof, y)
+        lift = k11_plus_one_gate(K11_oof, oof, y_orig)
         verdict = "STRONG" if lift > 0.5 else ("WEAK" if lift > 0.1 else "NULL")
         print(f"  -> standalone {standalone:.5f}  rho_oof_K11 {rho_oof:.6f}  "
               f"rho_test_K11 {rho_test:.6f}  K=11+1 lift {lift:+.3f} bp  [{verdict}]",
