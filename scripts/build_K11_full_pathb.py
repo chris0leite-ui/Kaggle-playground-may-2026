@@ -19,6 +19,7 @@ Outputs:
 """
 from __future__ import annotations
 
+import argparse
 import json
 import time
 from pathlib import Path
@@ -36,7 +37,7 @@ TARGET = "PitNextLap"
 SEED, N_FOLDS = 42, 5
 MIN_ROWS = 1000
 MAX_ITER = 500
-TAU = 100_000
+TAU = 100_000  # overridable via --tau
 
 
 def _pos(p: Path) -> np.ndarray:
@@ -232,4 +233,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--tau", type=int, default=100_000,
+                    help="Path-B shrinkage strength (smaller = more local).")
+    args = ap.parse_args()
+    TAU = args.tau
     main()
