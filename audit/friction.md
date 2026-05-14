@@ -16,6 +16,41 @@ restating it.
 
 ## Week of 2026-05-08
 
+- `cross-val-gate-misleading-for-wide-rho-additions`
+  (2026-05-14 bootstrap-ml-problem-solving-6gK6W): the K=11+1 LR-meta
+  cross-validation gate measured +18.194 bp lift for a rich-feature
+  LightGBM (control variant of the loss-diversity probe). Split-stability
+  check across seeds 42 and 43 confirmed the lift was not a fold-pair
+  artifact (drift 0.118 bp). Submission landed at LB 0.95232, a 15.4 bp
+  regression versus PRIMARY (0.95386). The base's ρ_test versus K=11
+  was 0.928 — wide-ρ additions overfit cross-validation patterns that
+  do not exist in the test distribution. **Fix:** updated empirical
+  transfer bands — TIE_ZONE at ρ_test >= 0.9999, REGRESSION_RISK at
+  ρ_test < 0.999, OK transfer only in between. Encoded in
+  `scripts/probe_blend_harness.py::RULE_27_*_THRESHOLD`.
+- `synth-label-decoupling-pitstop-pitnextlap`
+  (2026-05-14 bootstrap-ml-problem-solving-6gK6W): the natural relation
+  PitNextLap[L] = PitStop[L+1] holds in only 80.95% of observable-pair
+  train rows; per-(Driver,Race,Year) sum correlation Spearman 0.60.
+  The synthetic generator has a stochastic component that decouples
+  the two columns, breaking the observable-lead-feature trick and any
+  hard per-group constraint projection. **Fix:** treat the K=11
+  cross-validation score of 0.95443 as a Bayes-ceiling proxy for the
+  noise floor; mechanisms requiring perfect PitStop / PitNextLap
+  identity (group-constraint reconciliation, observable lookup) are
+  dead-listed.
+- `noise-ceiling-confirmed-via-5-null-probes`
+  (2026-05-14 bootstrap-ml-problem-solving-6gK6W): five distinct
+  mechanism classes tested overnight all NULL or REGRESSION:
+  K=12 wide-ρ base (LB regression), observable lead-feature (synth
+  decoupling), τ-trio harness (same top-1), K=11 tree recalibrator
+  (-0.314 bp at gate), adaptive blend by base-disagreement (max +0.019
+  bp). PRIMARY unchanged at LB 0.95386. **Fix:** next-session pivots
+  to NEW INFORMATION mechanisms (cross-domain training, multi-seed
+  bagging of the full pipeline, Bayesian group-prior with smoothing)
+  rather than refined weight or feature search on the existing K=11
+  stack.
+
 - `synth-rows-are-not-literal-copies-of-orig-rows`
   (2026-05-09 decode-data-process-5uLq3): the prior P1c interpretation
   read 95% intra-synth 4-tuple PitNextLap concordance as "synth rows
