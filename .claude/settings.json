@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git fetch:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(rg:*)",
+      "Bash(cat:*)",
+      "Bash(env:*)",
+      "Bash(kaggle competitions view:*)",
+      "Bash(kaggle competitions submissions:*)",
+      "Bash(kaggle competitions list:*)",
+      "Bash(kaggle competitions leaderboard:*)",
+      "Bash(kaggle kernels list:*)",
+      "Bash(kaggle kernels output:*)",
+      "Bash(kaggle datasets list:*)",
+      "Bash(python -c \"import:*\")",
+      "Bash(python scripts/probe.py bote:*)",
+      "Bash(python scripts/probe.py gate:*)",
+      "Bash(python scripts/probe_min_meta.py:*)",
+      "Bash(python scripts/pre_submit_diff.py:*)",
+      "Bash(python scripts/lb_status.py:*)"
+    ],
+    "ask": [
+      "Bash(kaggle competitions submit:*)",
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(rm -rf:*)"
+    ]
+  },
+  "_comment_kaggle_submit": "kaggle competitions submit always goes through ask (Rule 1 in CLAUDE.md: single-shot, explicitly PI-approved, no retry/until/while/for).",
+  "_comment_subagents": "Long-running Python (>5 min) must launch from the main thread per .claude/skills/kaggle-comp/agent-ops.md, not delegated to general-purpose subagents."
+}

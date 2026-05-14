@@ -1,544 +1,83 @@
 # Friction log
 
-One-sentence-per-item, weekly summaries. **For the full historical
-detail, including code snippets, mechanism explanations, and the
-running-diary entries from Days 1-19, see `audit/friction-archive.md`
-(1,450 lines, kept for back-reference; not read by default).**
+**Format**: `YYYY-MM-DD  <tag>  <one-line description>`. Append-only
+during the day. **Reset every Monday** (per `self-improvement.md`)
+by archiving last-week entries to `audit/friction-archive.md` and
+keeping only this-week + recurring-process frictions here.
 
-How to add an entry:
+This file is ≤150 lines. The full historical detail is in
+`audit/friction-archive.md` (1,450+ lines; do not read by default).
+Pre-distillation snapshots: `audit/archive-YYYY-MM-DD-friction-*.md`.
 
-1. One sentence describing what went wrong.
-2. One sentence describing the fix or what was learned.
-3. If durable, promote to a CLAUDE.md rule. If session-specific, leave here.
+## This week (2026-05-12 → 2026-05-14)
 
-If a fix is already a rule, reference the rule number rather than
-restating it.
+```
+2026-05-14  cv-gate-misleading-wide-rho   K=12 control-LGBM cross-val +18.194 bp; ρ_test 0.928; LB -15.4 bp REGRESSION. Bands updated.
+2026-05-14  synth-label-decoupling        PitNextLap[L]=PitStop[L+1] holds only 80.95% of observable pairs; per-(D,R,Y) sum Spearman 0.60. K=11 OOF 0.95443 = Bayes-ceiling proxy.
+2026-05-14  noise-ceiling-5-null-probes   5 mechanism classes overnight all NULL/REGRESSION; PRIMARY unchanged. Pivot to NEW-INFORMATION mechanisms.
+```
 
-## Week of 2026-05-08
+## Last week (2026-05-08 → 2026-05-11) — one-liner summary
 
-- `cross-val-gate-misleading-for-wide-rho-additions`
-  (2026-05-14 bootstrap-ml-problem-solving-6gK6W): the K=11+1 LR-meta
-  cross-validation gate measured +18.194 bp lift for a rich-feature
-  LightGBM (control variant of the loss-diversity probe). Split-stability
-  check across seeds 42 and 43 confirmed the lift was not a fold-pair
-  artifact (drift 0.118 bp). Submission landed at LB 0.95232, a 15.4 bp
-  regression versus PRIMARY (0.95386). The base's ρ_test versus K=11
-  was 0.928 — wide-ρ additions overfit cross-validation patterns that
-  do not exist in the test distribution. **Fix:** updated empirical
-  transfer bands — TIE_ZONE at ρ_test >= 0.9999, REGRESSION_RISK at
-  ρ_test < 0.999, OK transfer only in between. Encoded in
-  `scripts/probe_blend_harness.py::RULE_27_*_THRESHOLD`.
-- `synth-label-decoupling-pitstop-pitnextlap`
-  (2026-05-14 bootstrap-ml-problem-solving-6gK6W): the natural relation
-  PitNextLap[L] = PitStop[L+1] holds in only 80.95% of observable-pair
-  train rows; per-(Driver,Race,Year) sum correlation Spearman 0.60.
-  The synthetic generator has a stochastic component that decouples
-  the two columns, breaking the observable-lead-feature trick and any
-  hard per-group constraint projection. **Fix:** treat the K=11
-  cross-validation score of 0.95443 as a Bayes-ceiling proxy for the
-  noise floor; mechanisms requiring perfect PitStop / PitNextLap
-  identity (group-constraint reconciliation, observable lookup) are
-  dead-listed.
-- `noise-ceiling-confirmed-via-5-null-probes`
-  (2026-05-14 bootstrap-ml-problem-solving-6gK6W): five distinct
-  mechanism classes tested overnight all NULL or REGRESSION:
-  K=12 wide-ρ base (LB regression), observable lead-feature (synth
-  decoupling), τ-trio harness (same top-1), K=11 tree recalibrator
-  (-0.314 bp at gate), adaptive blend by base-disagreement (max +0.019
-  bp). PRIMARY unchanged at LB 0.95386. **Fix:** next-session pivots
-  to NEW INFORMATION mechanisms (cross-domain training, multi-seed
-  bagging of the full pipeline, Bayesian group-prior with smoothing)
-  rather than refined weight or feature search on the existing K=11
-  stack.
+```
+2026-05-09  rank-lock-conditional-target-corr  Features can be feature-orthogonal to K=4 and STILL absorbed if target-corr is parallel to existing logit direction conditional on row.
+2026-05-09  transductive-feature-1D-at-K4      V4 kNN-target-mean = +0.24 bp; V5/V6 with extra TE/MLP-embed absorb (ρ 0.989/0.988). Transductive lift is 1-D in K=4 logit space.
+2026-05-09  rule-27-abort-too-strict-sub-bp    K=5 V4 kNN-aug ρ_test 0.99989 (above 0.999 threshold) but LB +0.8 bp. Bands recalibrated.
+2026-05-09  bote-on-falsified-prong            Ran BOTEs for Prongs B/S before checking PI's axis-of-permission; 5-10 min wasted. Ask first when directive is "creative/original".
+2026-05-08  research-scan-duplicate-claim      Proposed Frontiers AI peer-effect features as "untried" — already in A3-1 RankSortedGaps and nulled. Grep ledger first.
+2026-05-08  tree-stack-meta-overfits-small-K   A2-8 LightGBM stack-meta on K=4 with 43 features lost -1.30 bp vs Path-B; -0.96 bp vs LR-meta. Convex LR beats GBDT at small K.
+2026-05-08  day-counter-drift                  Prose drifted to Day-17/18/19 calendar-aligned; they were experiment-iteration codes. Today comp-day-8. ISO dates only forward.
+2026-05-08  pool-rank-lock-logit-direction     3 inductive biases (LambdaRank/inter-stint/dual-head) NULL at K=10+1 within ±0.05 bp despite ρ 0.41-0.73.
+2026-05-08  K4-sparse-promoted-PRIMARY         K=4 forward-greedy LB 0.95351 vs K=27 0.95368 (Δ -1.7 bp). 17 bases were dead weight.
+2026-05-08  kernel-class-fails-at-300bp-gap    Kernel-SVM / NCA-kNN family null at K=27+1; structural diversity insufficient when AUC gap to GBDT > 300 bp.
+2026-05-08  non-LR-meta-on-K4-regresses        Gradient-boosted meta -1.20 bp; MLP meta -7.77 bp; augmented LR flat. A30 dropped to FALSIFIED.
+2026-05-08  rf-feat-breadth-doesnt-scale       Kitchen-sink RF (57 feat) -1.24 bp vs yekenot-only (38 feat); RF can't ignore weak features.
+2026-05-08  rf-optuna-cant-tune-past-0.25bp    +0.24-0.27 bp ceiling across 4 RF runs (Optuna seeds 42/7, hand). Set by meta architecture, not RF.
+2026-05-08  path-b-absorbs-base-lifts-below-0.5bp  K=5 = K=4 + RF τ=100k OOF Δ +0.02 bp from +0.25 bp K=4+1 base lift. Path-B absorbs single-base adds < +0.5 bp standalone.
+2026-05-08  isotonic-overfits-when-base-calibrated  Per-gap + per-Compound isotonic both regressed (-2.18, -1.78 bp). Promotion candidate: ECE > 1% gating.
+2026-05-08  anchor-cited-from-memory           Cited K=10+1 plain LR-meta OOF ~0.94850 in PI-facing prose; actual 0.95417 (5.7 bp off). Grep calibration-ladder before pasting numbers.
+```
 
-- `synth-rows-are-not-literal-copies-of-orig-rows`
-  (2026-05-09 decode-data-process-5uLq3): the prior P1c interpretation
-  read 95% intra-synth 4-tuple PitNextLap concordance as "synth rows
-  are literal copies of orig rows." Q6 disproves this directly: only
-  27 of 627,305 synth rows match an orig row on the 6-tuple
-  `(LapTime, RaceProgress, LapTime_Delta, Position, TyreLife,
-  Position_Change)`. Q7 shows match rate decays from 97.55% at K=1 to
-  0.000% at K=6 — synth columns are sampled near-independently within
-  cells. The 95% P1c concordance was synth-internal mode-collapse,
-  not orig inheritance. **Fix:** retract the P1c interpretation in
-  `state/mechanism-ledger.md`; future inversion plans must work in the
-  per-cell density-ratio regime, not in the per-row tuple-lookup
-  regime.
-- `host-not-in-sdv-library`
-  (2026-05-09 decode-data-process-5uLq3): all four SDV synthesisers
-  tested (CTGAN at 5/10/20 ep + synth-marginal cond, GaussianCopula,
-  TVAE 10 ep, CopulaGAN) converge on disc-AUC 0.9988-0.9997 against
-  host synth, in a 0.5 pp band. The host's specific generator is not
-  in SDV's default library. **Fix:** future architecture sweeps should
-  start from non-SDV families (TabDDPM, normalising flow, GReaT) and
-  budget zero cycles on SDV variants.
-- `noise-on-continuous-cols-makes-disc-worse-not-better`
-  (2026-05-09 decode-data-process-5uLq3): three independent sweeps
-  (qF Gaussian-on-resample, qJ cell-scaled Gaussian, qV per-cell KDE
-  bandwidth) all show monotone-worse disc-AUC as noise sigma rises.
-  The host's continuous columns are NOT perturbed orig values.
-  **Fix:** any future "match host" attempt should start at sigma=0
-  (literal orig values per cell) and only add noise if a specific
-  test motivates it.
-- `cond-driver-stint-on-cell-saves-14pp`
-  (2026-05-09 decode-data-process-5uLq3): replacing uniform
-  Driver/Stint scrambling with synth-empirical conditional sampling
-  on `(Year, Compound, PitStop)` drops disc-AUC from 0.9716 (qF) to
-  0.8323 (qH). Driver and Stint distributions are STRUCTURED per
-  cell, not uniform over the 887/8-vocab. **Fix:** any analytic
-  resample pipeline should default to per-cell conditional
-  Driver/Stint sampling at the lowest cell key with reliable counts.
-- `extending-cond-axes-monotonic-down-to-LapN-then-sparsity-bites`
-  (2026-05-09 decode-data-process-5uLq3): the qH-qM sweep extending
-  the conditioning cell key from `(Y, C, PS)` through `(Y, C, PS,
-  Race, Stint, LapNumber)` drops disc-AUC monotonically (0.83 →
-  0.79 → 0.72 → 0.72). Adding Position or TyreLife to the cell key
-  *regresses* (0.73, 0.83) due to cell sparsity (orig rows per
-  cell drops below 3). **Fix:** the cell key sweet spot is six axes
-  on this dataset; future re-decompositions should not push past
-  LapNumber without expanding orig.
-- `affine-moment-matching-fails-skewness-non-trivial`
-  (2026-05-09 decode-data-process-5uLq3): qX showed synth's per-cell
-  mean and std differ from orig's (LapTime mean shift -2.81, std
-  ratio 0.87 median). qY then *applied* an affine transformation
-  (rescale orig to match synth mean+std) and disc-AUC went from 0.72
-  to 0.99. Skewness diffs (LapTime p90 = 70) imply non-Gaussian
-  per-cell densities; affine fixes break the skew. **Fix:** any
-  per-cell transform must preserve higher moments; skew-sensitive
-  tools (NF, copula on quantile transforms) over BGMM/affine.
-- `host-cont-vals-strictly-per-cell-no-cross-cell-mixing`
-  (2026-05-09 decode-data-process-5uLq3): qP's "45% NN same_all3" was
-  a natural cross-cell float overlap (cells like (2024, MEDIUM, PS=0)
-  and (2025, MEDIUM, PS=0) have similar LapTime distributions). qU
-  proves cross-cell value mixing makes disc *worse*, not better
-  (mix=0 0.7150 → mix=1 0.9800 monotonically). **Fix:** treat the
-  host's per-cell density as strictly cell-conditioned; do not model
-  smoothing across cells.
-- `rank-lock-saturation-puts-cap-on-K4plus1-with-decode-features`
-  (2026-05-09 decode-data-process-5uLq3): qZ d16++ (LightGBM trained
-  on orig with the qM cell-key features added) gives standalone
-  synth-train AUC 0.93985, +2.5 pp over current d16's 0.91483. But at
-  K=4+1 LR-meta gate it lifts only +0.149 bp (well below the +0.5
-  strict gate; ρ to PRIMARY 0.93). Rank-lock at logit-direction level
-  absorbs the structurally-distinct decode signal. **Fix:** plan-v3
-  call-out — decode-derived bases improve standalone AUC but rank-
-  lock saturates at K=4+1; future LB lift on this comp likely needs
-  a different meta architecture, not new bases.
+## Process frictions (recurring across weeks; promote to rule or automate)
 
-- `rank-lock-at-conditional-target-correlation-not-just-logit-direction`
-  (2026-05-09 night ml-model-experiments-gbKiI): A29's prior framing
-  said "rank-lock at logit-direction not rank-correlation." The
-  seq-coupled meta probe (V1.1-V1.3 + V2.1-V2.3 + V3) refines this:
-  features can be feature-space-orthogonal to K=4 (look-ahead R² =
-  0.487 vs row-local span — 51% non-overlap variance) and STILL get
-  absorbed by the LR meta if their target-correlation is parallel
-  to the existing logit direction conditional on row context.
-  RankNet's direct-AUC pairwise loss arrives at the same 0.95400
-  ceiling as LR cross-entropy. LightGBM-meta at depth 4 also at the
-  ceiling. Loss-function variation doesn't escape it — the limitation
-  is information, not optimisation. **Fix:** update A29 framing to
-  "conditional-target-correlation level"; future untried-mechanism
-  proposals at the meta layer must argue NEW partial correlation with
-  y given K=4, not just feature-space orthogonality.
-- `transductive-feature-mechanism-one-dimensional-at-K4`
-  (2026-05-09 night): V4 (kNN-target-mean as base input via tree
-  splits) lifted +0.24 bp at K=4+1 LR meta and +0.80 bp on LB.
-  V5 (V4 + 5 fold-safe per-cell target encodings) and V6 (V4 +
-  task-learned-MLP-embedding kNN) both ABSORBED at meta with
-  ρ_spearman vs V4 = 0.989 and 0.988 respectively. Two structurally
-  different similarity metrics (raw-feature-distance kNN vs
-  MLP-embedding kNN) and an explicit per-cell aggregate (TE) all
-  produce the SAME logit direction at the meta. **Lesson:**
-  transductive label-derived features are one-dimensional in K=4
-  logit space; V4 captured the available transductive lift; multi-
-  flavor stacking doesn't help. Future candidates should aim for
-  orthogonal mechanism families (residual-targeted kNN — V7 idea;
-  different model classes via DGP factorisations), not more
-  transductive variants.
-- `rule-27-abort-threshold-empirically-too-strict-for-sub-bp-moves`
-  (2026-05-09 night): K=5 V4 kNN-aug submission had ρ_test_vs_K4 =
-  0.99989 — exceeds Rule 27's 0.999 abort threshold. PI authorised
-  override; LB landed at 0.95359 vs K=4 0.95351 = +0.8 bp delta,
-  NOT a tie. **Calibration:** ρ in 0.999-0.9999 zone produces
-  sub-bp to few-bp LB movement; not auto-tie. The 5-decimal Kaggle
-  quantization can still distinguish predictions that share rank
-  order on 99.989% of pairs because the 0.011% disagreement is
-  enough to flip per-row ranks at the sample-noise scale. **Fix:**
-  Rule 27's 0.999 floor stays as default but the override path is
-  "PI-authorised + calibration-probe framing + outcome logged."
-  Candidate for improvements.md (see postmortem).
-- `bote-on-already-falsified-prong-direction-burned-time`
-  (2026-05-09 early-night): agent ran BOTEs for Prong B (per-segment
-  LightGBM head) and Prong S (2-layer stack replication) before
-  asking PI; both SKIPped at 0.009 bp/min. PI then explicitly ruled
-  out replication ("do not replicate or copy"). The 5-10 min on BOTE
-  bookkeeping for Prongs B+S was wasted because PI's axis-of-
-  permission was different from the agent's BOTE-time priors.
-  **Fix:** when the directive is "be creative / original," ask PI
-  about axis-of-permission BEFORE running BOTEs on candidates that
-  may fall in axes the agent isn't sure of (e.g., is replication
-  in scope?). Cheap to ask; expensive to mis-pick the prong family.
-- `research-scan-duplicate-mechanism-claim` (2026-05-08 PM
-  research-feature-engineering-7oCmj): proposed Frontiers AI 2025's
-  `DriverAheadPit`/`DriverBehindPit` peer-effect features as a
-  research-backed untried mechanism, but A3-1 RankSortedGaps already
-  implements both `_ahead_pitted_lag1`/`_behind_pitted_lag1` and the
-  full gap-based peer family — and A3-1 NULLED in Phase 1 smoke.
-  Self-corrected before launching the probe. **Fix:** before
-  proposing any "research-backed untried mechanism," grep the
-  existing FE pick registry (`fe_picks_*.py`) for class-overlap;
-  read the smoke results table to confirm not-yet-tested. Cost of
-  catch was nil (caught in PI question construction); cost of miss
-  would have been ~10 min CPU spent reproducing a known null.
-- `tree-stack-meta-overfits-small-K-pool` (2026-05-08 PM): A2-8
-  LightGBM stack-meta on K=4 with 43 meta features (P + ranks +
-  logits + pairwise products + abs-diffs + logit-diffs + raw side
-  info) lost −1.30 bp vs Path-B PRIMARY and even −0.96 bp vs plain
-  LR-meta. Fold-std 0.00080 (vs typical ~0.00050). Tree depth-4
-  splits absorb interaction noise faster than they extract signal
-  on a 4-base pool. **Lesson:** convex LR + Path-B partial-pooling
-  regularize better than gradient boosting at small K. Add to
-  `audit/friction-archive.md` under axis-class falsifications.
-- `day-counter-drift` (PI-flagged 2026-05-08 PM): prose across
-  `state/`, `HANDOVER.md`, `audit/`, `glossary.md` referred to "Day-17
-  PM", "Day-18 PM", "Day-19" as if calendar-aligned. They were not.
-  The `d13`..`d19` labels are an experiment-iteration counter that
-  ran ~10 days ahead of the calendar. Today is **2026-05-08 = comp
-  day 8 of 31**, with 23 days remaining; "Day-19" prose was
-  hallucinated. **Fix forward:** all prose now uses ISO dates or
-  comp-day-N anchored to 2026-05-01. The `dN` short-codes remain as
-  frozen file/code prefixes (per `glossary.md`) and explicitly NOT
-  calendar days.
-- `pool-rank-lock-at-logit-direction-not-rank-correlation`
-  (2026-05-08 PM): three structurally-different inductive biases
-  (LambdaRank per-stint, inter-stint memory features, stint-completion
-  dual-head) all NULL at K=10+1 within ±0.05 bp despite low rank-
-  correlation (ρ 0.41–0.73). Pinpoints the rank-lock mechanism: the
-  K=10 [P, rank, logit] = 30-feature expansion can reconstruct any
-  new base's logit prediction as a linear combination. Different
-  rank info ≠ logit-direction contribution. See `ASSUMPTIONS.md` A29,
-  A30.
-- `K4-sparse-pool-promoted-to-PRIMARY` (2026-05-08 PM): K=4 forward-
-  greedy + Path-B Compound × Stint τ=100k landed at LB 0.95351 vs the
-  prior K=27 PRIMARY at 0.95368 (Δ −1.7 bp). The 17 extra bases were
-  buying us 1.7 bp on LB. Promoted to PRIMARY at this deliberate cost
-  for cleaner reference; old K=27 artefact retained as hedge per Rule
-  R7.
-- `kernel-class-fails-when-standalone-AUC-gap-to-gbdt-exceeds-300bp`
-  (explore-svm-kernels-TRcuo 2026-05-08 PM): kernel-SVM family
-  (Nyström-RBF + LinearSVC, kernel-logistic, 5 SVM specialists)
-  standalone OOF 0.91-0.92, all null at K=27+1 / K=10+1 (Δ −0.09 to
-  +0.05 bp). 8th-9th rank-lock confirmation. Even kernel-class
-  structural diversity insufficient when AUC gap to GBDT-class
-  exceeds 300 bp.
-- `non-parametric-meta-on-K=4-cant-beat-LR-meta-without-new-input`
-  (same branch): kernel-SVM-meta over K=4 ties Path-B PRIMARY
-  exactly (0.95403 OOF). NCA-kNN on K=4 / K=10 ensemble nulls
-  (±0.07 bp). Combined-input meta (K=4 preds + top-5 numerics)
-  +0.03 bp LR / −1.64 bp kernel — bases already absorb raw features.
-  K=4 saturated for meta-routing; logit effective rank ~3. Need a
-  fresh base, not a fresh router.
-- `non-lr-meta-falsified-across-bagged-and-boosted-tree-classes`
-  (add-random-forest-model-XJ3Dm 2026-05-08 evening): random forest
-  as meta-stacker over K=4 [P, rank, logit] OOF −1.54 bp vs LR-meta;
-  RF on combined input (K=4 expansion + 6 raw numerics) OOF −0.70
-  bp vs LR-on-same. Generalizes the Day-20 PCA-meta probe (LightGBM-
-  meta −1 to −2 bp) to bagged-tree class. The 3-D logit subspace
-  ceiling is robust across boosted *and* bagged tree-class metas.
-  Do not re-test tree-class metas on this comp's pool. See
-  `audit/2026-05-08-rf-forest-sweep.md`.
-- `forest-base-on-yekenot-recipe-most-diverse-positive-on-K4`
-  (add-random-forest-model-XJ3Dm 2026-05-08 evening): RF base on
-  yekenot FE recipe (no orig) → standalone OOF 0.94178, ρ=0.9595
-  vs PRIMARY-test, K=4+1 LR-meta +0.26 bp. Lowest ρ ever observed
-  on a positively-gating base in this comp. 4.4× larger min-meta
-  lift than `d15c_extra_trees` on raw (+0.06 bp at K=22+1). Hedge-
-  eligible per R5. Path-B refit on K=5 = K=4 + RF is the natural
-  next probe; predicted central-LB band +0.36 bp at the historical
-  1.4× amp floor.
-- `rf-feature-breadth-does-not-scale-on-s6e5`
-  (add-random-forest-model-XJ3Dm 2026-05-08 evening, follow-up to
-  Angle A): kitchen-sink RF (yekenot + 12 constraint violations + 7
-  inter-stint memory = 57 feat) standalone OOF 0.94054 (−1.24 bp vs
-  yekenot-only), K=4+1 LR-meta +0.25 bp at ρ=0.9580 (within fold
-  noise of Angle A's +0.26 bp). **Feature breadth hurts RF here:**
-  weak features dilute split capacity at the random-feature-subset
-  level; RF doesn't ignore weak features the way boosting can. The
-  irrigation +35 bp RF-meta precedent worked on a 14-bank of
-  already-distilled probability vectors (error-orthogonal); raw +
-  engineered features is a different regime. **First repro check
-  on the +0.25 bp forest-base lift** — two independent
-  configurations agree, raises prior the signal is real not fold
-  noise. Bottleneck is the rank-lock at logit-direction level, not
-  the feature substrate.
-- `rf-optuna-cant-tune-past-natural-+0.25bp-ceiling`
-  (add-random-forest-model-XJ3Dm 2026-05-08 evening, Optuna probe
-  follow-up to kitchen-sink): 15-trial TPE search on RF
-  hyperparameters (n_estimators, max_features, min_samples_leaf,
-  max_samples, max_depth, criterion) with single-fold proxy
-  objective (best fold-0 K=4 LR + RF blend ΔAUC). Best config
-  validated at full 5-fold on seeds 42 and 7. **K=4+1 LR-meta Δ
-  +0.268 bp seed=42, +0.238 bp seed=7; cross-seed |Δ|=0.030 bp.**
-  Across 4 independent RF runs (Angle A, Kitchen-sink, Optuna×2)
-  the K=4+1 lift sits in **+0.24-0.27 bp with std 0.013 bp** — the
-  signal is real, not fold noise. **Hyperparameter optimization
-  yields zero meaningful improvement past the natural +0.25 bp
-  ceiling.** Optuna pushed standalone OOF DOWN (log2/max_samples=
-  0.7/depth=15 trades calibration for tree diversity) but
-  meta-utility unchanged within fold noise. **Conclusion: the
-  +0.25 bp lift is set by the meta architecture (3-D logit subspace
-  ceiling, A30), not by RF — it cannot be tuned past this value.**
-  Operational implication: stop tuning RF; the only remaining
-  forest-family lever with non-trivial EV is Path-B Compound × Stint
-  τ=100k refit on K=5 = K=4 + RF, which tests whether the +0.25 bp
-  OOF transfers to LB through per-segment shrinkage.
-- `path-b-cs-absorbs-single-base-orthogonal-additions-below-0.5bp`
-  (add-random-forest-model-XJ3Dm 2026-05-08 evening, refit follow-up
-  to forest-base): K=5 = K=4 + RF-yekenot Path-B C×S τ=100k OOF
-  0.95405 vs K=4 PRIMARY 0.95403 — **OOF Δ +0.02 bp**, ρ=0.999917,
-  tie-band per Rule 27 (abort threshold 0.999). The +0.25 bp K=4+1
-  LR-meta forest lift gets melted to +0.02 bp once Compound × Stint
-  per-segment shrinkage averages it across segments. **Confirms and
-  generalizes the Day-15 friction
-  `path-b-amp-only-fires-on-meta-arch-not-base-add`:** Path-B
-  amplifies meta-architecture redesigns and high-orthogonality bases
-  (≥+0.5 bp standalone OOF lift), but absorbs single-base orthogonal
-  additions below that threshold. **Quantitative threshold derived
-  from this run + d15b precedent**: at ρ≈0.95-0.96 vs PRIMARY,
-  Path-B retains lifts ≥+0.5 bp OOF but absorbs lifts <+0.3 bp.
-  Three τ variants (5k/20k/100k) saved as R5 hedge candidates;
-  τ=5k flip ratio 0.240 (asymmetric R7-style) makes it final-
-  window-only per R7. **Forest family characterized end-to-end**:
-  forest-as-meta dead, forest-as-base capped at +0.25 bp K=4+1,
-  Path-B absorbs the lift at LB. Stop here on the forest axis;
-  pivot to other axes.
-- `nca-loss-matrix-O(n2)-OOM-at-50k`: NCA pairwise-distance loss
-  matrix is O(n²) regardless of input dim; 50k subsample tries to
-  allocate 18.6 GB. Fix: cap NCA fit subsample at 8-10k for 15 GB
-  RAM, accept the metric-fit-on-subsample tradeoff. Apply learned
-  projection to full 350k for kNN classify.
-- `lightgbm-pandas-2-string-dtype`: LightGBM's
-  `_check_for_bad_pandas_dtypes` rejects pandas StringDtype columns
-  (typed as `str` not `object`); detection via `dtype == object`
-  silently misses them. Fix: detect non-numeric cols via
-  `not pd.api.types.is_numeric_dtype(...)` instead.
-- `pandas-merge-many-to-many-row-explosion`: sequence-feature builder
-  used `sorted_df.merge(prev_seg, ...)` where prev_seg was not
-  deduplicated by merge key; produced 1.4M rows from 627k input. Fix:
-  build a single per-segment summary via `groupby(...).agg()` and
-  merge once with `validate="many_to_one"` to catch row explosions
-  immediately.
-- The audit-ml-repo branch's history rewrite removed binary blobs from
-  git (3.9 GB → 31 MB on origin) but leaves a `.git` of the same
-  size locally until `git gc --prune=now --aggressive` runs (slow,
-  ~20-30 min on this size).
-- `handover-open-axes-overstated`: `HANDOVER.md` and
-  `state/{current,hypothesis-board}.md` listed sequence-level
-  fingerprinting and Driver×Race×Year interaction-TE as "open" or
-  "untouched" axes, but both had been falsified or had leaked under
-  earlier strict audits (d16 GRU −0.043 bp NULL; field-state −0.015 bp
-  NULL; combined-frame lead/lag −0.36 bp; `make_features_A` interaction
-  TE LB 0.94107 vs OOF 0.94970). Errata in `HANDOVER-ERRATA.md`. Fix:
-  every "open axis" line in the handover must cite the specific
-  variant that was NOT tried, distinguished from the tried-and-failed
-  version.
-- `oof-lb-gap-misread-as-overfit`: the team has been tracking a
-  consistent −5 to −6 bp OOF→LB gap as a structural overfit signal.
-  Probe B (Day-19) shows a bootstrapped 95% CI of [0.95309, 0.95550]
-  for a random 20% public draw on the PRIMARY OOF; the observed LB
-  0.95368 is well inside that band. The "gap" is sampling noise.
-  Fix: re-run the 1000-bootstrap CI before treating any OOF→LB
-  divergence as structural.
-- `synth-coherence-misframed`: the assumption that the synthesiser
-  "broke within-stint sequence coherence" is wrong. Probe C shows
-  physical constraints (Compound, TyreLife, LapNumber) are preserved
-  at ≥99.99%. Mechanism is temporal downsampling: synthetic stints
-  mean 3.87 laps vs original 19.80; gap=1 frac 27.98% vs 99.60%.
-- `assumption-vs-evidence-tracking`: introduced `ASSUMPTIONS.md` to
-  separate MEASURED / INFERRED / ASSUMED / FALSIFIED claims. Re-check
-  on every postmortem and at handover prep.
-- `residual-concentrated-on-rain-rows`: PRIMARY's worst (Compound × Stint
-  × position) cells are all INTERMEDIATE / WET. Per-cell AUC 0.68-0.86
-  vs global 0.954. Suggests a rain-condition specialist as a candidate
-  axis NOT currently in any open-axes list.
-- `pool-collapse-K4-effective-rank-1.33` (2026-05-08 PM,
-  research-model-extensions-Ibwvn): SVD on the K=4 forward-greedy pool
-  shows logit effective rank = **1.33** (entropy on singular values),
-  far below K=27's 3.23 (A25). Component 1 alone captures 93.6% of
-  variance and correlates with TyreLife (−0.33), LapNumber (−0.30),
-  Compound dummies — the dominant direction is "tyre-degradation
-  pressure × compound." **Forward-greedy reduces effective rank faster
-  than base count.** Implication: the "3-D ceiling" framing in A25 was
-  K=27-specific; K=4 is much tighter. Audit:
-  `audit/2026-05-08-four-lane-research-extension.md`.
-- `predictive-eff-rank-not-variance-eff-rank` (2026-05-08 PM, pca-k25-
-  ensemble branch): A25 recorded the K=27 logit pool's eff-rank as 3.23
-  and we treated that as the **predictive** ceiling under LR-meta (per
-  A30 wording). The PCA-meta probe shows top-3 PCA-LR scores 0.95061
-  (−35.64 bp vs the K=10 anchor 0.95417), while top-15 PCA-LR scores
-  0.95401 (≈anchor). The 3.23 is **variance**-eff-rank; predictive
-  eff-rank ≈ 15. Original A25 claim was correct; the A25→A30 inference
-  is where the slip happened. **Fix:** `ASSUMPTIONS.md` A25 now reads
-  "variance-eff-rank=3.23"; A30 cites A30b/A30c for refinements.
-  Complementary to `pool-collapse-K4-effective-rank-1.33` and
-  `non-LR-meta-on-K4-regresses` — three independent confirmations that
-  the rank-lock framing needed precision.
-- `non-LR-meta-on-K4-regresses` (2026-05-08 PM): direct test of A30
-  (the only architecturally-untested avenue per
-  `state/hypothesis-board.md`). Gradient-boosted meta on K=4
-  [P, rank, logit] = **−1.20 bp** vs LR; 2-hidden-layer MLP meta =
-  **−7.77 bp**. Augmented LR with raw row features = −0.04 bp (flat).
-  **A30 dropped from `live` to `FALSIFIED`.** LR is the right model
-  class for combining 4 collinear bases — non-linearity overfits the
-  30-feature meta projection. Cross-confirmation: pca-k25-ensemble
-  branch tested LightGBM-meta and Path-B-on-PCs at K=27 — both
-  underperform LR by 1-7+ bp. **Two independent K-pool sizes, two
-  non-LR meta classes, all negative.**
-- `gap-feature-absorbed-by-tyrelife-stint-lap-compound` (2026-05-08 PM):
-  W3 (downsampling) marginal is strong — P(pit | gap=1) = 8.5% vs
-  P(pit | gap≥11) = 30%, a 3.5× gradient — but K=4 LR meta calibration
-  per gap-bucket has ECE 0.0001-0.0015 (near-perfect). Gap as meta
-  feature +0.02 bp; gap-augmented LGBM as base-level feature K=4+1
-  gate +0.001 bp; per-gap isotonic recalibration −2.18 bp. Conclusion:
-  TyreLife + Stint + LapNumber + Compound implicitly carry all gap
-  information. Closes W3 as an actionable axis.
-- `synth-divergence-from-F1-realism-on-last-lap` (2026-05-08 PM):
-  in this synth, P(pit | is_last_lap_of_race) = **0.38**, NOT ~0 as F1
-  reality dictates. n=21 so noisy, but the direction is opposite.
-  Senior-lens "race-end no-pit" rule clamp consequently misfires
-  (−9.48 bp under deterministic clamp). **Lesson:** F1-domain priors
-  must be empirically verified against the synth's labelling before
-  use; do not apply real-F1-strategy rules without checking.
-- `pitnextlap-not-deterministic-from-observed-row-structure`
-  (2026-05-08 PM): observation-time check showed only **29% of train
-  rows have lap L+1 (real, observed) present** in the data. When L+1
-  is observed, PitStop[L+1] matches PitNextLap[L] only 81% of the time.
-  PitNextLap is therefore a probabilistic forward-looking label whose
-  construction includes synth-introduced noise; this bounds achievable
-  AUC near where K=4 already sits (~0.954). Implication: a
-  discrete-time-hazard reformulation against `(stint ends in next k
-  laps)` doesn't cleanly map to PitNextLap — abandoned.
-- `isotonic-overfits-when-base-already-calibrated` (2026-05-08 PM,
-  2nd confirmation): per-gap isotonic (P1.3) and per-Compound isotonic
-  (P3.2) BOTH regressed (−2.18, −1.78 bp) despite ECE diagnostics
-  showing well-calibrated input. Pattern: when the base meta is
-  already near-zero ECE per stratum, fold-restricted per-stratum
-  isotonic wastes parameters on noise. **Promotion candidate to
-  CLAUDE.md Rule:** "Isotonic per-stratum recalibration requires ECE
-  > 1% in the stratum to be worth attempting."
-- `anchor-cited-from-memory-not-measurement` (2026-05-08 PM, pca-k25-
-  ensemble branch): I cited the K=10+1 plain LR-meta OOF as ~0.94850 in
-  a PI-facing AskUserQuestion when designing the PCA-meta probe. Actual
-  anchor (re-measured by the probe itself) was **0.95417** — 5.7 bp off
-  the cited value. Didn't change the strategic framing (relative deltas
-  drive verdicts, not absolute level), but it's a discipline failure.
-  Root cause: confused the K=10 plain LR-meta OOF with a different
-  number elsewhere in the docs and didn't verify before pasting.
-  **Fix:** when citing OOF anchors in PI-facing prose, grep
-  `state/calibration-ladder.md` and `audit/decisions.jsonl` first; if
-  the anchor isn't there as a clean datapoint, say "from memory, will
-  re-measure in probe" instead of pasting a number. Promotion
-  candidate: extension to Rule 26 (i)/(ii) — "(iii) every numerical
-  anchor in a BOTE / question is grep-cited or labelled 'from memory'".
+```
+recurring  subagent-non-execution            Subagents SIGTERM Python children at timeout/exit. 4-of-4 recurrence. Rule 28; agent-ops.md.
+recurring  pre-submit-diff-missing           3 identical LB 0.94991 submits in one day for missing ρ-check. Rule 27 mandatory.
+recurring  lesson-not-applied                Logged friction not applied same-session. Rule 29.
+recurring  kaggle-p100-torch-sm60-incompat   P100 + torch reproduced 12 days apart (Day-3 → Day-15). Rule 30.
+recurring  cpu-contention-multi-probe-batch  7 parallel LightGBM 4× slower; 3-parallel OOM. Rule 31.
+recurring  handover-collisions               Multi-agent HANDOVER 5 rewrites/4 conflicts in one session. Rule 32 (session-start fetch).
+recurring  premature-day-close               "Experiments done" interpreted as EOD. Day = Kaggle UTC quota. do-and-dont.md.
+recurring  jargon-drift-without-glossary     CLAUDE.md acronyms unauditable by PI on first read. Rule 0.
+recurring  bootstrap-token-name-mismatch     KAGGLE_API_TOKEN vs KAGGLE_KEY; env|grep first. agent-ops.md.
+```
 
-## Week of 2026-05-07
+## Killed-and-do-not-retry — pointer only
 
-- The `cross-row-aggregates-fire-where-own-row-sequence-doesnt` finding
-  (per-(Race, Year, LapNumber) aggregates lift a single LightGBM by
-  +15.58 bp standalone) survived strict fold-safe audit but evaporated
-  to zero at the meta-stacker — 7th rank-lock confirmation; promoted
-  to Rule 32 family.
-- Yao/Vehtari covariance-modulated Path-B regressed across three τ
-  values vs plain shrinkage; the per-segment-stacker family is now
-  empirically exhausted on K=27 (9 variants tested across Days 14-19).
-- D1 external-data join (debashish historical priors) closed null-by-
-  pre-flight when PI's sealed prediction (−2 to 0 bp) and the harness's
-  BOTE (0.20 bp) converged; treat PI + harness convergence as a
-  load-bearing close signal.
-- LR-bank effective rank ceiling is 2.0-2.19 even with 5 distinct LR
-  variants; LR-class is structurally low-rank for this comp; LR-only
-  candidates are bounded at +0.3-1 bp K=21+1 lift.
-- Per-segment LR with rich FE (Compound × Year, mega features)
-  delivered +60.8 bp standalone but routes through cb_year-cat at the
-  meta-stacker — friction
-  `per-segment-mega-LR-fires-only-at-LR-class-not-meta-class`.
-- The s6e4 "three axes must all be true" recipe (logits / class_weight
-  / multinomial) doesn't transfer; it applied to balanced-accuracy on
-  multinomial, not to binary AUC; check Q6 (Rule 16) before adopting
-  cross-comp recipes.
+Deduplicated list in `state/hypothesis-board.md ## Killed`. Full
+enumeration in `state/mechanism-ledger.md`. Recent highlights:
+target reformulation single-add (all leaky); Day-16 virgin-axes
+(11 of 11 null); non-LR meta on K=4 (LightGBM/MLP/RF all regress);
+kernel SVM 8 variants; Yao/Vehtari covariance Path-B; qBA Manhattan
+kNN (LB regress); K=34 unrolled at any C-sweep value.
 
-## Week of 2026-05-06 (load-bearing leakage discoveries)
+## How to add an entry
 
-- Target-construction-layer leakage discovered: per-group computations
-  on the label (`reverse_cum`, `inv_laps_until_pit`, `pit_horizon`)
-  inflated OOF by 88-100% when they used full-train labels per group
-  instead of fold-restricted ones; **this is the origin of Rule 24**.
-- Held submissions built on those targets must not be submitted
-  (`path_b_K22_invlaps_*`, `path_b_K23_dae_invlaps_*`,
-  `path_b_K25_megapool_*`).
-- The synthetic data-generating process is conditionally near-
-  independent: trained 4 LightGBM regressors to predict each of 4
-  features from the others; OOF RMSE matched marginal σ within 3 sig
-  figs across all four. Per-row feature engineering is dead.
-- ρ alone is not sufficient for meta-utility: 4+ confirmations of
-  bases with very low ρ (extreme diversity) that landed null at
-  meta-add. Codified in `scripts/probe.py` family priors.
-- LR-meta multi-add gives no more than the max of the individual
-  candidate gains, not the sum (Rule K).
-- The denoising-autoencoder base became PRIMARY at LB 0.95059 (+1 bp);
-  realised amp 1.4× — well below the 6-11.6× per-segment-stacker
-  precedent; the amp pattern is conditional on a meta-architecture
-  redesign, not a base addition.
-- The kitchen-sink recipe transfer from a public Kaggle notebook
-  (`yekenot`) lifted the stack by 24 bp at K=21+1 — the project's
-  largest single base-add. Public-notebook scan should have happened
-  16 days earlier; **this is the origin of Rule 22**.
-- Day-17 P1 single-model thesis falsified: best honest single LightGBM
-  with kitchen-sink Rozen recipe is OOF 0.94563; PRIMARY hier-meta is
-  0.95090. Stacking is +52 bp ahead.
-- Two-level stacking with the meta-OOF as a base produced LB regress
-  −63 bp on +30.79 bp OOF; meta-derivative bases don't fire Path-B amp
-  and DON'T transfer to the LB.
+1. One line, tag-prefixed. If you need a paragraph, file an audit
+   postmortem instead.
+2. Append-only. Chronology is the signal.
+3. If a fix is already a rule, reference the rule number rather
+   than restating.
+4. When a tag recurs 3+ times in a week, it's an automation
+   candidate — see `.claude/skills/kaggle-comp/self-improvement.md`
+   "Automation candidates".
 
-## Process frictions (recurring across weeks)
+## Weekly distillation checklist (Mondays)
 
-- Subagents dispatched for long-running Python jobs SIGTERM their child
-  processes when they time out or exit; 4-of-4 recurrence. **Rule 28**
-  forbids this.
-- The bootstrap script gated on `KAGGLE_API_TOKEN` while the sandbox
-  exposed `KAGGLE_KEY`; agent surfaced a false "missing token" blocker
-  twice. The bootstrap fallback is now wired in; agents must
-  `env | grep -i <service>` before asking PI for a credential.
-- Pre-submit-diff was MISSING multiple times; landed three identical
-  LB 0.94991 submissions in one day. **Rule 27** is now mandatory.
-- Same-session friction not applied within the same session multiple
-  times (`lesson-not-applied`). **Rule 29.**
-- P100 vs T4 GPU compatibility friction reproduced 12 days apart
-  (Day 3 → Day 15). **Rule 30.**
-- 7 parallel LightGBM probes ran 4× slower than 1; 3-parallel hit OOM.
-  **Rule 31.**
-- Multi-agent HANDOVER collisions: 5+ rewrites in one session,
-  4 merge conflicts, parallel branches submitting same probe.
-  **Rule 32** (session-start fetch).
-- Premature day-close on PI signal ambiguity; "go" interpreted as
-  "go submit." Both lessons now in `do-and-dont.md`.
-- 25+ acronyms in CLAUDE.md without inline expansion; PI couldn't audit
-  the file on first read. **Rule 0** (this session) addresses it.
-
-## Killed-and-do-not-retry summary
-
-For the deduplicated list, see `state/hypothesis-board.md`. For the
-full enumeration, see `state/mechanism-ledger.md`. Highlights:
-
-- Target reformulation single-add (all variants leaky).
-- Multi-level 4-tier per-segment stacker.
-- Day-16 virgin-axes round (11 of 11 null/falsified).
-- TabPFN v2.5/v2.6.
-- 16+ field factorisation machines.
-- Drop-GBDT pool refactor.
-- Simple K=21 blends.
-- α-calibrated τ resweep.
-- Multi-target NN.
-- Masked-column self-prediction.
-- Twin-pool 2-meta blending.
-- Yao/Vehtari covariance-modulated per-segment stacker.
+- [ ] Tag-frequency count: any tag ≥3 entries this week?
+- [ ] For each, decide: tighten existing guardrail, add new rule,
+      or automate (settings.json / agent-ops.md / skill edit).
+- [ ] Move last-week entries to `audit/friction-archive.md`.
+- [ ] Reset this file to ≤150 lines.
+- [ ] Update `.claude/skills/kaggle-comp/improvements.md` with any
+      promoted edits.

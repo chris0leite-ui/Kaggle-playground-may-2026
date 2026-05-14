@@ -77,6 +77,32 @@ committed" notice and stop. Don't sit on artifacts. Don't ask
    to feature branch AND merge to main (PI authorized 2026-05-04).
 ```
 
+## Auto-triggers (no PI prompting)
+
+These fire from context alongside the EOD wrap. Each is mechanical
+and has a single output artifact.
+
+- **Public-notebook re-scan** — triggers on 3 nulls / 5
+  saturations / 50% time checkpoint / PI says "redecompose": pull
+  top-5 notebooks (≥10 votes), diff their feature lists against
+  ours, ask which are NOT in our pool. Output:
+  `audit/research/YYYY-MM-DD-notebook-rescan.md`.
+- **Pool eff-rank refresh** — triggers whenever a new base lands
+  in the K-pool. SVD on the base-prediction matrix; if entropy of
+  singular values < `log2(K) + 1`, flag in `state/current.md` and
+  do NOT add another base before a meta-architecture refresh.
+- **80/20 holdout gate** — mandatory before any new-FE-family LB
+  submit. Independent seed; fit FE + inner-CV TE on 80% only;
+  eval on 20%. If holdout ≪ OOF by ≥10 bp, leak present.
+- **Friction-log scan** — triggers on weekly-loop and on
+  `audit/friction.md > 150 lines`. Reset friction.md to last-week
+  + recurring process frictions; archive the rest.
+- **Day-counter sanity** — at session start, grep
+  `state/*.md HANDOVER.md ASSUMPTIONS.md` for `Day N` references
+  where `N > days-since-comp-start`. If any hit, log friction
+  `day-counter-drift` and replace with ISO date or comp-day-N
+  anchored to comp start.
+
 ## Anti-patterns specific to Day-loop
 
 - **Don't sit on EOD artifacts.** Wrap is auto-trigger. Asking

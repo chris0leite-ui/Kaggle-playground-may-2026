@@ -109,8 +109,8 @@ hour with no signal.
 - **Opus**: hard reasoning — leakage diagnosis, novel mechanism
   brainstorm, plan design, persona rotations on stuck loops.
 
-Pair with submission-budget discipline: use the daily 5/day, don't
-sit on slots.
+Pair with submission-budget discipline: use the daily quota
+(`comp-context.md: submission_budget`), don't sit on slots.
 **Prevents**: top-tier model for routine `ls` calls. Disproportionate
 cost vs lift.
 
@@ -119,13 +119,14 @@ cost vs lift.
 **Trigger**: end of work session OR end of experiment queue OR
 PI pause.
 **Rule**: a "day" is a Kaggle UTC submission-quota day, not a
-work-session boundary. The day ends when EITHER (a) all 5 slots
-are used, OR (b) the PI explicitly declares EOD. **A day is not
-done because the queue is empty** — pick a new hypothesis. Default
-behaviour: drive toward (a). Re-rank queue by *expected learning
-per slot* at every replan (calibration-data-yield, not speculative
-lift). Compute may continue past EOD; LB submits cannot until UTC
-midnight refresh.
+work-session boundary. The daily cap is `comp-context.md:
+submission_budget` (read it; do not hardcode). The day ends when
+EITHER (a) all daily slots are used, OR (b) the PI explicitly
+declares EOD. **A day is not done because the queue is empty** —
+pick a new hypothesis. Default behaviour: drive toward (a).
+Re-rank queue by *expected learning per slot* at every replan
+(calibration-data-yield, not speculative lift). Compute may
+continue past EOD; LB submits cannot until UTC midnight refresh.
 **Prevents**: forfeiting Kaggle slots to UTC quota by closing the
 day too early on "experiments done"; under-spending the budget
 that exists specifically to gather mechanism-vs-LB calibration

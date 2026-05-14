@@ -121,11 +121,62 @@ Run `batch-D2-submit` from kickoff-bash.md. **Never wrap in a loop.**
 If kaggle command fails, surface the error verbatim, ask whether to
 retry. PI decides.
 
+### Bash batch D3 — Day-1 learning probes (mandatory)
+
+After the baseline LB result lands, run THREE cheap probes that
+have retroactively been the highest-EV moves in past comps. Each
+is <30 min total. The Day-1 audit MUST report all three.
+
+**D3.1 — Simple-LR ceiling probe (~30 s CPU)**
+
+```python
+KBins(20, quantile, onehot) on every numeric +
+OneHotEncoder on every cat → LogisticRegression(C=1, solver='liblinear')
+```
+
+Closes 80-90% of the GBDT-vs-`lr_raw` gap on Playground tabular
+comps. Then build the **mega LR** (~8 min CPU): all FE families
+concatenated, same LR head. Gap from mega-LR to single-GBDT tells
+you whether stacking is necessary (>100 bp gap → yes; <30 bp →
+probably not). See `examples/fe-recipe-simple-lr.md`.
+
+**D3.2 — Pool eff-rank diagnostic (~2 min CPU after ≥4 bases exist)**
+
+SVD on the base-prediction matrix; report `entropy(singular_values)`
+as effective rank. **If logit eff-rank stalls below `log2(K) + 1`,
+the pool is rank-collapsed regardless of nominal K.** Low Spearman
+ρ to PRIMARY is necessary but not sufficient for amp-eligibility
+(s6e5 evidence: ρ=0.41 still absorbed at K=10+1). Code template:
+`scripts/lr_diag_e1_svd.py`. If you don't have 4 bases yet on Day
+1, run this on Day 2 after the first 2-3 stack-adds. Skipping it
+cost s6e5 ~half a session of dead-axis exploration.
+
+**D3.3 — Strict 80/20 holdout for any new FE family (~10 min CPU)**
+
+StratifiedKFold with an INDEPENDENT seed; fold-0 as 20% holdout;
+fit FE + any inner-CV target encoding on the 80% only; train + eval
+on the 20%. If `holdout_AUC` < `5-fold OOF` by ≥ 10 bp, leak
+present — debug before any LB submit. Rules 24/25 origin lesson;
+s6e5 Day-17 caught the `make_features_A` 88-100% leakage trio.
+
 ### Bash batch E — Day-1 audit + Day-2 queue
 
 Run `batch-E-audit` from kickoff-bash.md. Computes calibration
 verdict, writes `audit/<date>-day-1-kickoff.md`, updates CLAUDE.md
 current-state, commits.
+
+**Day-1 audit MUST include** (in addition to OOF→LB gap):
+
+- D3.1 simple-LR + mega-LR OOF, gap to GBDT baseline.
+- D3.2 pool eff-rank (or "deferred to Day 2 — too few bases").
+- D3.3 80/20 holdout for any FE family used in the baseline.
+- Item 8 public-notebook scan: list of top-5 OOFs, our gap to each.
+- Item 11 single-model OOF target vs achieved.
+
+These five gates collectively prevent the four recurring Day-1
+miscalibrations: (a) jumping to stacking too early, (b) building
+on a leaky FE, (c) over-investing in a rank-collapsed pool,
+(d) ignoring a public-notebook recipe for 2+ weeks.
 
 ### Final chat turn — handoff
 

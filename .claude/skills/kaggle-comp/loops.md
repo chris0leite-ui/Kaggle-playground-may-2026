@@ -72,18 +72,87 @@ plateau, both fire, critic first.
 **Trigger** (mandatory): 3 consecutive nulls, OR 5 saturation events
 at the same LB, OR 2 days without LB lift.
 
+The agent will want to skip this. The human PI should enforce it.
+
+### Step 1 — Scout external sources (parallel, ≤200 words each)
+
+Dispatch three `general-purpose` research agents in one message,
+each writes its artifact to disk and returns a ≤200-word summary:
+
+- **Notebooks agent** — `kaggle kernels list -c <slug> --sort-by
+  voteCount` + WebFetch the top 5; for each, extract OOF / LB,
+  FE list, model class, any leakage / group-CV warnings. Write
+  to `audit/research/YYYY-MM-DD-notebooks.md`.
+- **Prior-comp agent** — WebSearch 2 prior tabular Playground
+  postmortems with the same metric AND similar class imbalance.
+  Pull mechanism families that worked. Write to
+  `audit/research/YYYY-MM-DD-prior-comp.md`.
+- **Domain agent** — WebSearch for the comp's real-world
+  decision drivers, citing ≥3 sources (academic / industry /
+  prior writeups). Write to
+  `audit/research/YYYY-MM-DD-domain.md`.
+
+### Step 2 — Persona rotation (Opus)
+
+Invoke the ML Researcher persona (see `personas.md`) on the three
+agent artifacts + current `state/hypothesis-board.md`. Return 5
+candidate mechanisms.
+
+### Step 3 — Dedup against ledger (MANDATORY before queueing)
+
+For EACH candidate, before adding to the experiment queue:
+
 ```
-1. Web search (Opus): top public notebooks for the comp slug, top
-   discussion threads in last 30 days.
-2. Read 2 prior-comp writeups in same domain (same metric, similar
-   class imbalance, similar data type).
-3. Persona rotation (Opus): invoke ML Researcher, return 5 untried
-   mechanisms with citations.
-4. Rank by predicted EV × cost-to-test → top 3 to experiment queue,
-   emit audit/YYYY-MM-DD-research.md with citations.
+grep -l "<mechanism keyword>" state/mechanism-ledger.md \
+                              state/hypothesis-board.md \
+                              audit/friction.md \
+                              audit/friction-archive.md \
+                              scripts/fe_picks_*.py 2>/dev/null
 ```
 
-The agent will want to skip this. The human PI should enforce it.
+If any grep hits, the candidate is NOT untried. Either reframe it
+(narrower scope, different variant per Rule 21) or drop it. This
+closes the recurring `research-scan-duplicate-mechanism-claim`
+friction (2026-05-08 PM: Frontiers AI peer-effect features were
+proposed as "untried" when `RankSortedGaps` already implements them
+and they were nulled in Phase 1 smoke).
+
+### Step 4 — Candidate template (one per surviving mechanism)
+
+Append to `audit/research/YYYY-MM-DD-research.md`:
+
+```yaml
+- name: <descriptive>             # Rule 34 — no letter-number codes
+  source: <citation URL or DOI>
+  dataset_analogy: <prior comp / paper> — <metric, class balance, row count>
+  ledger_grep: NO MATCH            # paste the actual grep output
+  mechanism_class: <FE | model | meta | calibration | external | sequence>
+  predicted_standalone_oof_lift: <bp range>
+  predicted_meta_add_lift: <bp range>     # given current K-pool eff-rank
+  cost_to_test:
+    cpu_min: <int>
+    gpu_min: <int>
+    submission_slots: 0..1
+  q6_metric_alignment: <one sentence — why training objective matches the row-AUC metric>
+  kill_criterion: <e.g., "smoke OOF below baseline at 50k rows">
+```
+
+### Step 5 — Rank and emit
+
+Rank by `predicted_meta_add_lift × probability_real / cost_to_test`.
+Top 3 to experiment queue. Emit
+`audit/research/YYYY-MM-DD-research.md` with citations and the
+filled candidate templates.
+
+### Anti-patterns (this loop)
+
+- ❌ Citing a "research-backed" mechanism without grepping the
+  ledger first.
+- ❌ Returning candidates that don't pass Q6 metric-alignment.
+- ❌ Letting a research-thin agent finding count as cleared.
+  Re-spawn with a sharper prompt or surface the gap.
+- ❌ Stacking the loop's output candidates without first running
+  the heuristic baseline (Experiment-loop step 1).
 
 ## Weekly-loop
 

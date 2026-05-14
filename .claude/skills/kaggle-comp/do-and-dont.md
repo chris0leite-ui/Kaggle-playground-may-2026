@@ -10,13 +10,15 @@
 - ✅ 4-gate leakage filter before every LB probe.
 - ✅ Minimal-input meta sanity check on every stacking candidate.
 - ✅ Ask PI before every submit. Single-shot.
-- ✅ Use the full daily 5/day submission budget. Slots not used by
-  Kaggle UTC midnight are forfeit. Don't sit on slots.
+- ✅ Use the full daily submission budget (`comp-context.md:
+  submission_budget`). Slots not used by Kaggle UTC midnight are
+  forfeit. Don't sit on slots.
 - ✅ Re-rank queue by *expected learning per slot* at every replan,
   not by speculative lift. Best slot reduces uncertainty about
   OOF→LB gap per family or about a pool member's behaviour.
 - ✅ **Auto-recognize day-end from context.** When `submissions_used_today`
-  hits 5, OR the PI says any of {"the day is done", "let's wrap up",
+  hits the daily cap (`comp-context.md: submission_budget`), OR the
+  PI says any of {"the day is done", "let's wrap up",
   "stop for today", "EOD", "we're done", or any close paraphrase},
   IMMEDIATELY execute the EOD wrap (loops.md Day-loop steps 5-7) in
   one batch without prompting. Don't ask "should I write the wrap?"

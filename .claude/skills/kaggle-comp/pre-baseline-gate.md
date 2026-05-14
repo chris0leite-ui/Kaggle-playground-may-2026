@@ -97,6 +97,42 @@ WebSearch best practices for the comp's metric at this imbalance
 
 Cite ≥4 sources. Output as a `metric_notes:` YAML block.
 
+### Item 8 — Public-notebook scan *(web-research agent)*
+
+`kaggle kernels list -c <slug> --sort-by voteCount` and pull the
+top 5 with ≥10 votes. For each: title, author, votes, CV scheme,
+FE tricks, model class, reported OOF / LB. Write to
+`external/kernels/notebooks-scan.md`.
+
+**Why mandatory Day-1**: s6e5 Rozen's 0.95354 recipe sat at 19-72
+votes the entire comp without being pulled; copying its features
+produced the project's biggest single lift (+24 bp) — discovered
+on Day-17. Origin of Rule 22. Re-scan at every plateau (day-loop
+auto-trigger).
+
+### Item 9 — High-card target-encoding inventory *(local Bash)*
+
+List every cat × cat (and cat³) combo with unique-key count in
+`(50, n_train/4)`. Flag the 3-way combo with the largest unique
+count as load-bearing. Origin of Rule 21 (the 3-way `(Driver,
+Race, Year)` was s6e5's load-bearing single trick at ~+200 bp
+standalone). Output: a table appended to
+`audit/<date>-pre-baseline-gate.md`.
+
+### Item 10 — Domain-physics feature list *(domain agent or PI)*
+
+5-10 features a domain expert would compute, each with a one-line
+physics rationale. Implement ALL before stacking. Forces
+single-model-first discipline (Rule 20).
+
+### Item 11 — Single-model OOF target *(synthesis)*
+
+Predict what a kitchen-sink single LGBM should hit, calibrated
+against the top public-notebook OOFs from item 8. Use as the
+floor against which stacking lift gets measured. If achieved
+single-model OOF is more than ~50 bp below the target, debug FE
+before any stacking probe.
+
 ## Agent dispatch pattern
 
 One message, three parallel `Agent` calls (subagent_type:
