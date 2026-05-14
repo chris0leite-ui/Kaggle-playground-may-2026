@@ -10,7 +10,31 @@ script names and audit prose are *frozen code/file prefixes*, not
 calendar days — see `glossary.md` and `audit/friction.md`
 under `day-counter-drift`.
 
-## PRIMARY (active) — set 2026-05-12 (blend 70/30)
+## Status as of 2026-05-14 (overnight iteration on bootstrap branch)
+
+**PRIMARY unchanged at LB 0.95386.** Four submissions used today (2026-05-14);
+all five tried mechanism classes were NULL or REGRESSION. Audit:
+`audit/2026-05-14-overnight-iteration.md`. Strategic conclusion:
+K=11 + LR-meta + Path-B is at or near the Bayes-optimal ceiling for
+row-feature prediction on this synthetic dataset. The synth generator
+decouples PitStop and PitNextLap with a stochastic component (~20%
+label disagreement on observable pairs), revealing a noise floor that
+no row-level model can recover.
+
+Today's submission ladder:
+| Submit | Mechanism | OOF lift | ρ_test vs K=11 | LB |
+|---|---|---:|---:|---:|
+| K=8 rebuilt (3-of-6 slim-kNN + K=27) | reproduction | n/a | 0.999901 | 0.95382 |
+| Blend 70/10/20 K=11/K=10/K=27 | harness top-1 (TIE_ZONE ρ) | +0.065 | 0.999955 | 0.95386 (tie) |
+| K=12 = K=11 + control_logloss LGBM | wide-ρ base add | +18.194 | **0.928** | **0.95232 (-15.4 bp REGRESSION)** |
+| Blend 60/15/25 K=11/K=10/K=27 | deeper-in-OK-zone | +0.059 | 0.99992 | 0.95386 (tie) |
+
+Empirical transfer bands updated (Rule 27 recalibration): TIE_ZONE at
+ρ_test ≥ 0.9999, REGRESSION_RISK at ρ_test < 0.999, OK transfer in
+between. The K=12 result is the cleanest demonstration of the
+cross-validation-gate transfer-trap at this saturation level.
+
+## PRIMARY (active) — set 2026-05-12 (blend 70/30); RECONFIRMED 2026-05-14
 
 **Score: 0.95386 on the public leaderboard.** Direct LB-confirmed.
 **+3.5 bp lift over original K=4 PRIMARY** (LB 0.95351). +0.1 bp over
