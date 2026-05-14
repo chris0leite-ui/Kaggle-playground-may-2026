@@ -35,14 +35,25 @@ DATA = ROOT / "data"
 OUT_JSON = ART / "probe_blend_harness.json"
 
 # Each entry: (display_name, oof_npy, test_npy, lb_or_None).
-# Ordered by descending OOF AUC after the 2026-05-13 rebuild.
+# Updated 2026-05-14 after K=12 regression confirmed only rho_test > 0.999
+# additions transfer. New tau-variant K=11 stacks added for tight-rho blending.
 INGREDIENTS = [
-    # K=11 = K=4 + 6 slim-kNN + K=27 + Path-B  (full stacker; predicted LB ~0.95385)
-    ("K11_full_pathb",
+    # K=11 tau=100k  (PRIMARY proxy; predicted LB ~0.95385)
+    ("K11_pathb_100k",
      "K11_full_pathb_tau100000_oof.npy",
      "K11_full_pathb_tau100000_test.npy",
      None),
-    # K=8 = K=4 + qAT/qAV/qAO + K=27 + Path-B  (today's submitted hedge; LB 0.95382)
+    # K=11 tau=20k  (more-local shrinkage on same 11 bases)
+    ("K11_pathb_20k",
+     "K11_full_pathb_tau20000_oof.npy",
+     "K11_full_pathb_tau20000_test.npy",
+     None),
+    # K=11 tau=5k  (very-local shrinkage on same 11 bases)
+    ("K11_pathb_5k",
+     "K11_full_pathb_tau5000_oof.npy",
+     "K11_full_pathb_tau5000_test.npy",
+     None),
+    # K=8 = K=4 + qAT/qAV/qAO + K=27 + Path-B  (LB-confirmed 0.95382)
     ("K8_qATqAVqAO_K27_pathb",
      "K8_qAT_qAV_qAO_K27_pathb_tau100000_oof.npy",
      "K8_qAT_qAV_qAO_K27_pathb_tau100000_test.npy",
@@ -57,22 +68,12 @@ INGREDIENTS = [
      "oof_d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000_strat.npy",
      "test_d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000_strat.npy",
      0.95368),
-    # K=23 v4+h1d + Path-B  (LB-confirmed 0.95354)
-    ("K23_v4h1d_pathb_100k",
-     "oof_d17_path_b_K23_v4_h1d_tau100000_strat.npy",
-     "test_d17_path_b_K23_v4_h1d_tau100000_strat.npy",
-     0.95354),
-    # K=4 forward-greedy + Path-B  (LB-confirmed 0.95351)
-    ("K4_pathb",
-     "oof_K4_fwd_pathb.npy",
-     "test_K4_fwd_pathb.npy",
-     0.95351),
 ]
 
-# Reference PRIMARY for Rule 27 (use K=11 as the new proxy — closest to
-# current PRIMARY on disk).
-PRIMARY_PROXY = "K11_full_pathb"
-RULE_27_THRESHOLD = 0.999
+# Reference PRIMARY for Rule 27 (K=11 tau=100k is the closest LB analogue).
+PRIMARY_PROXY = "K11_pathb_100k"
+RULE_27_TIE_THRESHOLD = 0.9999       # >= this: near-cert LB tie
+RULE_27_LIFT_FLOOR = 0.999           # < this on test: K=12-class LB regression risk
 
 OPERATORS = ("arith", "gmean", "logit_mean", "rank_mean")
 
@@ -249,10 +250,16 @@ def main() -> None:
         rho_vs_proxy_oof = float(spearmanr(oof_pred, primary_proxy["oof"]).statistic)
         rho_vs_proxy_test = float(spearmanr(test_pred, primary_proxy["test"]).statistic)
         n_add, n_drop = asymmetric_flip(primary_proxy["oof"], oof_pred, base_rate)
-        verdict = "ABORT_TIE" if rho_vs_proxy_test > RULE_27_THRESHOLD else "OK"
+        if rho_vs_proxy_test >= RULE_27_TIE_THRESHOLD:
+            verdict = "TIE_ZONE (LB likely == proxy at 5-decimal precision)"
+        elif rho_vs_proxy_test < RULE_27_LIFT_FLOOR:
+            verdict = "REGRESSION_RISK (rho_test < 0.999; K=12-class transfer failure)"
+        else:
+            verdict = "OK (rho_test in [0.999, 0.9999] transfer zone)"
         print(f"\nTop-1 pre-submit:")
         print(f"  rho_OOF  vs proxy = {rho_vs_proxy_oof:.6f}")
-        print(f"  rho_TEST vs proxy = {rho_vs_proxy_test:.6f} (Rule 27 threshold {RULE_27_THRESHOLD})")
+        print(f"  rho_TEST vs proxy = {rho_vs_proxy_test:.6f}")
+        print(f"  thresholds: lift floor {RULE_27_LIFT_FLOOR}, tie {RULE_27_TIE_THRESHOLD}")
         print(f"  flip_diff vs proxy (add / drop): {n_add} / {n_drop}")
         print(f"  verdict: {verdict}")
 
