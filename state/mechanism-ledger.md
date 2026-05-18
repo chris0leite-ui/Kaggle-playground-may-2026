@@ -442,3 +442,33 @@ of Rule 24 (fold-safe label-conditional aggregates).
 - **R6 Phase D: K=14 fold-fit bag (R5.2 + TRFv2 + bagged)** — OOF
   0.95448 (same as Phase B alone). Transformer adds nothing on top
   under Path-B. Phase B captures the full mechanism diversity.
+
+## 2026-05-18 Round 7 — Path-B segmentation sweep + DAE
+
+- **R7 Phase A swap-noise DAE** (`kernels/r7-swapnoise-dae-gpu/`).
+  Porto Seguro recipe: 3-layer MLP encoder [23→256→256→128] + 15%
+  swap-noise + MSE on train+test combined. Standalone OOF 0.94665
+  (stronger than transformer v1 0.91974, comparable to HMM 0.94713).
+  At K=14+Path-B for EVERY segmentation tested: Δ −0.09 to −0.15 bp.
+  Embedding-class diversity ABSORBED at meta for K=11-pool — closes
+  this version of DAE; v2 with deeper bottleneck or contrastive loss
+  may cross.
+- **R7 Phase B multi-segmentation Path-B sweep**
+  (`scripts/build_K13_pathb_multiseg.py`). 3 alternative segmentations
+  tested vs default Compound × Stint (R5.2 baseline OOF 0.95446):
+  - Year × Compound (20 seg): Δ −0.149 bp NULL
+  - **DriverClass × Stint (12 seg): Δ +0.106 bp WIN** (R7.1)
+  - Compound × Stint × LapBucket (120 seg): Δ +0.065 bp marginal
+  τ sweep on winner: τ=100k optimal (+0.106 bp), τ=20k regresses
+  (-0.129 bp), τ=500k marginal (+0.017 bp).
+- **R7.1 K=13 + Path-B DriverClass × Stint τ=100k — NEW PRIMARY,
+  LB 0.95389** (+0.02 bp over R5.2 PRIMARY). The named-vs-anonymous
+  driver split (named codes like VET vs synthetic D0XX) captures
+  pit-rate variance that Compound × Stint misses. First non-Compound
+  segmentation to beat the default in 6 weeks.
+- **R7 Phase D R7.2 cross-pollination**: 5-seed fold-fit bag of R7.1
+  (`scripts/build_K13_pathb_multiseg.py` + R6 fold-fit harness logic).
+  OOF 0.95450 (+0.264 bp over R7.1 single-seed; largest OOF lift of
+  session). ρ vs R7.1 = 0.999973 → TIE_ZONE; LB tied R7.1 at 0.95389.
+  Structurally distinct (5-seed averaged on alt segmentation) →
+  retained as private-LB hedge.

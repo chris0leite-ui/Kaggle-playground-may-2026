@@ -11,13 +11,23 @@ versions: `audit/archive-YYYY-MM-DD-handover-*.md`.
 
 ## Where we are
 
-**NEW PRIMARY: K=13 + Path-B τ=100k. LB 0.95387.** (Round 5 result.)
-Slightly above prior PRIMARY (LB 0.95386). Top-5% gap −1.8 bp;
-leader gap −8.9 bp. File:
-`submissions/submission_K13_seghmm_pathb_tau100000.csv`.
+**NEW PRIMARY: R7.1 K=13 + Path-B DriverClass × Stint τ=100k.
+LB 0.95389.** (Round 7 result.) +0.02 bp over prior PRIMARY (R5.2
+LB 0.95387). Top-5% gap −1.6 bp; leader gap −8.7 bp. File:
+`submissions/submission_K13_pathb_driverclass_stint_tau100000.csv`.
 
-Submissions: **45 / 270** total; **3 used 2026-05-18**. Comp-day
+Submissions: **49 / 270** total; **7 used 2026-05-18**. Comp-day
 **18 of 31**; days remaining **13**.
+
+**Round 7 finding**: DriverClass × Stint segmentation (named-vs-D0XX
+× Stint = 12 segments) on Path-B beats default Compound × Stint by
++0.106 bp at OOF, +0.02 bp at LB. The named-driver pit-rate
+differential (32-43% vs 16-22% for D0XX) is captured by this
+segmentation; Compound × Stint missed it.
+
+**Round 7 negative finding**: swap-noise DAE absorbs at meta for
+EVERY Path-B segmentation tested (-0.09 to -0.15 bp). Standalone
+OOF 0.94665 was decent but extracted no marginal value over K=13.
 
 **Round 5 plateau break**: K=11 (rebuilt slim-kNN) + r4_segment_fe
 (row-class) + r4_hmm_seq (sequence-class) under Path-B Compound×Stint
@@ -25,16 +35,47 @@ Submissions: **45 / 270** total; **3 used 2026-05-18**. Comp-day
 the REAL K=11 anchor (+0.245 bp at LR-meta OOF), and the **Path-B
 operator preserved +5 bp of LB transfer** vs LR-meta at the same OOF.
 
-Today's 5 submissions:
+Today's 7 submissions:
 | ref | LB | mechanism |
 |---|---|---|
 | 52772090 (R4) | 0.95354 | K=4 + seg + HMM LR-meta (R4 probe) |
 | 52773963 (R5.1) | 0.95382 | K=11 + seg + HMM LR-meta |
-| **52774385 (R5.2)** | **0.95387** | **K=13 + Path-B τ=100k** ← PRIMARY |
+| 52774385 (R5.2) | 0.95387 | K=13 + Path-B Compound×Stint τ=100k |
 | 52774692 (R5.3) | 0.95385 | 70/30 rank-blend R5.2 + K=27+Path-B |
 | 52776849 (R6.1) | 0.95387 | K=13+Path-B 5-seed fold-fit bag (ties R5.2) |
+| **52778581 (R7.1)** | **0.95389** | **K=13+Path-B DriverClass×Stint τ=100k** ← PRIMARY |
+| 52779240 (R7.2) | 0.95389 | R7.1 + 5-seed fold-fit bag (ties R7.1; hedge) |
 
-Submissions: 47 / 270; 5 used 2026-05-18; 5 remaining today.
+Submissions: 49 / 270; 7 used 2026-05-18; 3 remaining today.
+
+## Round 7 — multi-segmentation Path-B + swap-noise DAE (LATEST)
+
+PI: "go". Round 7 plan executed Phases A-D in parallel where possible.
+
+**Phase A — Swap-noise DAE (Kaggle T4, ~50 min)**: Porto Seguro
+3-layer MLP encoder [23→256→256→128] + 15% swap-noise + MSE
+reconstruction on train+test. Standalone OOF **0.94665** (stronger
+than transformer v1 0.91974 and v2 0.93330). At K=14+Path-B for
+every segmentation tested: Δ −0.09 to −0.15 bp (REGRESS). DAE
+absorbs at meta. Embedding-class diversity didn't help K=11 pool.
+
+**Phase B — Multi-segmentation Path-B sweep (~6 min CPU)**: 3
+segmentations tested:
+- Year × Compound (20 seg): Δ −0.149 bp NULL
+- **DriverClass × Stint (12 seg)**: Δ **+0.106 bp** WIN
+- Compound × Stint × LapBucket (120 seg): Δ +0.065 bp marginal
+τ sweep on winner: τ=100k optimal (+0.106), τ=20k regresses, τ=500k
+marginal.
+
+**Phase D — Cross-pollination (R6 fold-bag × R7 segmentation)**:
+5-seed fold-fit bag of K=13+Path-B DriverClass×Stint. OOF **0.95450**
+(+0.264 bp over R7.1 single-seed; largest OOF improvement of session).
+ρ vs R7.1 = 0.999973 → TIE_ZONE. R7.2 LB tied R7.1 at 0.95389;
+private LB may show the lift.
+
+**Submissions** (2 of today's 4 remaining slots used in R7):
+- R7.1: K=13+Path-B DriverClass×Stint τ=100k → **LB 0.95389** (PRIMARY)
+- R7.2: R7.1 + 5-seed fold-fit bag → LB 0.95389 (ties; hedge)
 
 ## Round 6 — operator-axis retest + fold-fit bagging + transformer v2
 
@@ -258,25 +299,41 @@ kNN diversity first.
 
 ## Next-session first actions (priority order)
 
-PRIMARY is R5.2 (LB 0.95387) — top-5% boundary still 1.8 bp away.
-R6 closed the cheap operator-axis exploration; remaining lift
-requires new mechanism classes or external data.
+PRIMARY is R7.1 (LB 0.95389) — top-5% boundary still 1.6 bp away.
+R7 closed two more axes (DAE absorbs; multi-tau on winner already
+optimal at 100k). Remaining cheap-EV is segmentation variants.
 
-1. **C2 swap-noise DAE on Kaggle T4** (~2-3 hr GPU). Porto Seguro
-   1st-place precedent. Embedding-class diversity not yet tested.
-   Highest unexplored EV per friction. **P ≈ 25% at +0.3-0.5 bp.**
-2. **Multi-segmentation Path-B sweep**. Untried segmentations:
-   Year × Compound (24 segments), Driver-cluster × Stint (15-30),
-   Compound × Stint × LapNumber-bucket (120). Different per-sub-
-   population shrinkage. ~20 min each, sweep 3 variants. **P ≈ 20%.**
-3. **OpenF1 C1 per-Race scalar join** (~45 min CPU). 1.4% match cap
-   from synthetic driver codes. **P ≈ 15% at +0.1-0.2 bp.**
-4. **Multi-pool rank-blend for hedge**: R5.2 + R6.1 fold-bag +
-   K=27+Path-B + new mechanism. Structurally distinct components
-   for private-LB variance.
-5. **Transformer v2 → C2 ensemble**: TRFv2 (OOF 0.93330) didn't
-   help at meta alone; combined with a DAE in the same pool might
-   create attention+embedding diversity.
+1. **More Path-B segmentations** (~30 min/segmentation CPU). The
+   DriverClass × Stint win (+0.106 bp OOF, +0.02 bp LB) opens
+   the door for more discrete-axis segmentations:
+   - Driver-tier × Stint (top-quartile / middle-half / bottom-quartile
+     by pit-rate × 6 stints = 18 segments)
+   - Race-cluster × Stint (high-pit-rate races vs low × stint)
+   - Year × Stint (4 × 6 = 24 segments)
+   - Compound × first-pit-window (5 × 4 buckets)
+   **P ≈ 25% one segmentation lifts ≥ +0.05 bp at LB.**
+2. **Multi-segmentation Path-B ensembling**: rank-blend output of
+   3+ Path-B variants (Compound×Stint + DriverClass×Stint + new).
+   Each captures different sub-population variance; blending should
+   stack. **P ≈ 30% at +0.05-0.10 bp.**
+3. **C1 OpenF1 per-Race scalar join** (~45 min CPU). 1.4% match
+   cap; not yet tried. **P ≈ 15% at +0.1-0.2 bp.**
+4. **DAE v2 architecture**: deeper bottleneck (64 dim), masked-
+   column pretraining (BERT-style), contrastive loss. ~3 hr Kaggle T4.
+   v1 absorbed at meta; v2 with stronger embedding signal might
+   cross the threshold. **P ≈ 20%.**
+5. **Public-notebook scan** (Rule 22; not done in 17 days). Check
+   if a top-kernel insight has emerged.
+6. **Submit R7.2 combo bag** during final-window R7d period — the
+   +0.264 bp OOF improvement may register on private LB.
+
+## Round 8 — hedge ladder for final-window R7d (Days 28-31)
+
+- **Final-1**: R7.1 K=13+Path-B DriverClass×Stint (LB 0.95389) — PRIMARY
+- **Final-2**: R7.2 K=13+Path-B DC×S 5-seed fold-fit bag (LB 0.95389,
+  ties; structurally distinct = 5-seed averaged; private-LB hedge)
+- **Final-3 backup**: K=27+Path-B τ=100k (LB 0.95368) — different
+  operator-pool composition
 
 ## Round 7 — hedge ladder for final-window R7d (Days 28-31)
 
@@ -386,6 +443,18 @@ Origin: `audit/2026-05-06-target-reform-leakage-audit.md`.
   fold split.** Still absorbs at K=14+Path-B meta (Δ −0.014 bp);
   not enough to overcome the 21 bp standalone gap to K=11 baseline.
   v3 with even larger arch + pretraining might cross the threshold.
+- **2026-05-18 (Round 7) — Path-B SEGMENTATION choice is a new
+  lift axis.** DriverClass × Stint (named-vs-D0XX × 6 = 12 segments)
+  beats default Compound × Stint by +0.106 bp OOF / +0.02 bp LB.
+  The named-driver pit-rate differential (32-43% vs 16-22%) is
+  captured by driver-class segmentation; Compound × Stint missed
+  it. Other untried segmentations may yield more lift.
+- **2026-05-18 (Round 7) — Swap-noise DAE (Porto Seguro recipe)
+  absorbs at K=14+Path-B for every segmentation tested.**
+  Standalone OOF 0.94665 (decent, better than HMM 0.94713
+  surprisingly close) but Δ −0.09 to −0.15 bp at meta. Embedding-
+  class diversity didn't help K=11 pool. DAE v2 (deeper, contrastive)
+  may cross.
 - **K=4 LR-meta operator OOF→LB transfer = ~5 bp drop.** Today's
   submission OOF 0.95405 → LB 0.95354. Matches K=4+Path-B's transfer
   (OOF 0.95403 → LB 0.95351). Future K=4-class submissions can be

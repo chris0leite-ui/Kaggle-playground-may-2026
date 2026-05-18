@@ -10,23 +10,36 @@ to comp start 2026-05-01. The `d13`..`d19` labels in script names
 and old audit prose are FROZEN code prefixes — never calendar days
 (per `glossary.md` and the `day-counter-drift` friction).
 
-## PRIMARY (active) — set 2026-05-18 Round 5
+## PRIMARY (active) — set 2026-05-18 Round 7
+
+**LB 0.95389** — R7.1 K=13 + Path-B DriverClass × Stint τ=100k.
+
+K=13 pool = K=11 (4 K=4 trees + 6 slim-kNN + K=27 super-base) +
+r4_segment_fe + r4_hmm_seq. Path-B applied with **DriverClass ×
+Stint** segmentation (named-vs-D0XX driver classification × 6
+stint values = 12 segments, 10 above MIN_ROWS=1000).
+
+File: `submissions/submission_K13_pathb_driverclass_stint_tau100000.csv`.
+OOF 0.95447 (+0.106 bp over default Compound × Stint baseline);
+OOF→LB transfer -5.8 bp (similar to all K=13+Path-B variants).
+
+The Round-7 finding: the named-driver pit-rate differential (32-43%
+vs 16-22% for anonymous D0XX) is captured by driver-class
+segmentation; default Compound × Stint missed it.
+
+## Prior PRIMARY R5.2 (2026-05-18 Round 5) — retained for hedge
 
 **LB 0.95387** — K=13 + Path-B Compound × Stint τ=100k.
-
-K=13 pool = K=11 (4 K=4 trees + 6 slim-kNN + K=27 super-base) + 2
-candidates (r4_segment_fe row-class, r4_hmm_seq sequence-class).
-The Round-5 plateau break: mechanism-orthogonal stacking + Path-B
-operator survives at REAL K=11 anchor and beats prior PRIMARY by
-+0.01 bp (within tie band, technically above).
-
 File: `submissions/submission_K13_seghmm_pathb_tau100000.csv`.
-OOF: 0.95446. OOF→LB transfer: -5.9 bp (similar to K=4+Path-B).
 
-Prior PRIMARY (LB 0.95386, 70/30 K=11+K=9 rank-blend, set 2026-05-12)
-remains the strongest non-Round-5 candidate.
+## Hedge candidate R7.2 (2026-05-18 Round 7)
 
-## Previous PRIMARY (2026-05-12) — retained for hedge ladder
+**LB 0.95389** (ties R7.1) — R7.1 + 5-seed fold-fit bag.
+File: `submissions/submission_K13_dcs_pathb_foldbag.csv`. OOF 0.95450
+(+0.264 bp over R7.1 single-seed; largest OOF lift of session).
+Structurally distinct hedge for private-LB variance.
+
+## Pre-Round-5 PRIMARY (2026-05-12) — retained for hedge ladder
 
 **LB 0.95386** (rank-blend 70/30 of two LB-confirmed submissions).
 
@@ -45,12 +58,14 @@ at the 5-decimal Kaggle quantisation.
 ## Today's status (2026-05-18)
 
 - Submissions used this comp: **46 / 270**. Daily cap: 10.
-- Today (2026-05-18): **5 used**:
-  - R4: K=4 + seg + HMM LR-meta → LB **0.95354** (proxy probe)
+- Today (2026-05-18): **7 used**:
+  - R4: K=4 + seg + HMM LR-meta → LB **0.95354**
   - R5.1: K=11 + seg + HMM LR-meta → LB **0.95382**
-  - R5.2: K=13 + Path-B τ=100k → LB **0.95387** ← PRIMARY
+  - R5.2: K=13 + Path-B Compound×Stint τ=100k → LB **0.95387**
   - R5.3: 70/30 rank-blend R5.2 + K=27+Path-B → LB **0.95385**
-  - R6.1: K=13+Path-B 5-seed fold-fit bag → LB **0.95387** (ties R5.2)
+  - R6.1: R5.2 + 5-seed fold-fit bag → LB **0.95387** (ties R5.2)
+  - **R7.1: K=13+Path-B DriverClass×Stint τ=100k → LB 0.95389** ← PRIMARY
+  - R7.2: R7.1 + 5-seed fold-fit bag → LB **0.95389** (ties R7.1; hedge)
 - Comp-day **18 of 31**. Days remaining: **13**.
 - Top-5% boundary: **0.95405**. Gap to PRIMARY: **−1.8 bp**.
 - Leader: **0.95476**. Gap to PRIMARY: **−8.9 bp**.
@@ -115,8 +130,10 @@ hedge probe:
 | 2026-05-09 PM | K=11 + K=27 + Path-B τ=100k | 0.95385 | +3.4 |
 | 2026-05-09 PM | K=10 + K=27 + Path-B τ=100k | 0.95384 | +3.3 |
 | 2026-05-09 PM | K=9 qAX (slim-kNN) | 0.95375 | +2.4 |
-| **2026-05-18 PM** | **K=13 (K=11 + seg + HMM) + Path-B τ=100k** | **0.95387** | **+3.6** |
-| 2026-05-18 PM | K=13+Path-B 5-seed fold-fit bag (R6.1) | 0.95387 | +3.6 (tied) |
+| **2026-05-18 PM R7** | **K=13+Path-B DriverClass×Stint τ=100k (R7.1)** | **0.95389** | **+3.8** |
+| 2026-05-18 PM R7 | K=13+Path-B DC×S 5-seed fold-bag (R7.2) | 0.95389 | +3.8 (tied; hedge) |
+| 2026-05-18 PM R5 | K=13 (K=11+seg+HMM)+Path-B Compound×Stint τ=100k (R5.2) | 0.95387 | +3.6 |
+| 2026-05-18 PM R6 | R5.2 + 5-seed fold-fit bag (R6.1) | 0.95387 | +3.6 (tied) |
 | 2026-05-09 AM | K=5 (K=4 + V4 kNN-aug) Path-B τ=100k | 0.95359 | +0.8 |
 | 2026-05-18 PM | K=11 + seg + HMM LR-meta | 0.95382 | +3.1 |
 | 2026-05-18 PM | 70/30 R5.2 + K=27+Path-B rank-blend | 0.95385 | +3.4 |
