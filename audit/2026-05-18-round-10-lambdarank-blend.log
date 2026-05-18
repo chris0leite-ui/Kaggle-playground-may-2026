@@ -1,0 +1,34 @@
+== R10 LambdaRank standalone + rank-blend with R7.1 PRIMARY ==
+  rows: 439,140  test: 188,165  stints: 113,567  pos: 87,381 (19.90%)
+
+[1/3] Training LambdaRank 5-fold ...
+  fold 1: row-AUC=0.85612  wall=7.3s
+  fold 2: row-AUC=0.85626  wall=7.6s
+  fold 3: row-AUC=0.85513  wall=6.9s
+  fold 4: row-AUC=0.85581  wall=6.7s
+  fold 5: row-AUC=0.85222  wall=6.6s
+  Standalone OOF AUC: 0.85512  fold-std=0.00150
+
+[2/3] Full-train fit → test predictions ...
+  test pred range: [-5.120, 3.078]  mean=-0.934  wall=8.9s
+  Saved: oof_R10_lambdarank_strat.npy + test_R10_lambdarank_strat.npy
+
+[3/3] Rank-blend with R7.1 PRIMARY ...
+  R7.1 PRIMARY K=13+Path-B OOF: 0.95447
+  ρ_OOF(λrank, R7.1):  0.72709
+  ρ_test(λrank, R7.1): 0.74466
+
+   w(R7.1)  w(λrank)  blend OOF   Δ vs R7.1  ρ_test vs R7.1
+      0.99      0.01    0.95447     -0.032 bp        0.999979 ↓
+      0.97      0.03    0.95439     -0.808 bp        0.999808 ↓
+      0.95      0.05    0.95422     -2.528 bp        0.999460 ↓
+      0.90      0.10    0.95338    -10.884 bp        0.997763 ↓
+      0.80      0.20    0.95000    -44.662 bp        0.990428 ↓
+      0.70      0.30    0.94440   -100.713 bp        0.977197 ↓
+      0.50      0.50    0.92693   -275.421 bp        0.932771 ↓
+
+  Best in ρ-band [0.99, 0.9999]: w_R71=0.97, Δ -0.808 bp, ρ_test 0.999808
+  Verdict: MARGINAL
+  Wrote: submissions/submission_R10_blend_r71_lrank_97_03.csv
+
+Wall 52.4s. Wrote probe_r10_lambdarank_blend.json

@@ -1,0 +1,16 @@
+=== R10 operator-vs-pool probe — plain LR-meta sweep ===
+
+Pool                         K     F   OOF AUC    wall
+------------------------------------------------------------
+K=13 (baseline)             13    39   0.95445   23.8s   Δ vs K=13 LR-meta: +0.000 bp  
+K=14 + NB4 (TE-base)        14    42   0.95445   29.8s   Δ vs K=13 LR-meta: +0.005 bp  
+K=14 + C1 (ext)             14    42   0.95445   24.8s   Δ vs K=13 LR-meta: -0.031 bp ↓
+K=15 + NB4 + C1             15    45   0.95444   22.8s   Δ vs K=13 LR-meta: -0.062 bp ↓
+
+  Reference: R7.1 PRIMARY K=13+Path-B DC×Stint τ=100k OOF: 0.95447
+  Path-B-vs-LR-meta lift on K=13: +0.195 bp
+
+  Decision rule (resolve operator-vs-pool open question):
+    K=14 + NB4 (TE-base)     : Δ +0.005 bp → POOL-STRUCTURAL
+    K=14 + C1 (ext)          : Δ -0.031 bp → POOL-STRUCTURAL
+    K=15 + NB4 + C1          : Δ -0.062 bp → POOL-STRUCTURAL
