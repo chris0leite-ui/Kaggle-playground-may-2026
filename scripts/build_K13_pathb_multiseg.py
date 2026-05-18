@@ -1,13 +1,23 @@
-"""scripts/build_K13_pathb_multiseg.py — Round 7 Phase B
+"""scripts/build_K13_pathb_multiseg.py — Round 7/8 multi-seg Path-B
 
 Multi-segmentation Path-B sweep on R5.2 K=13 pool. Default Path-B
-uses Compound × Stint (24 segments); this script sweeps three new
-segmentations to test whether different per-sub-population
-shrinkage captures additional patterns:
+uses Compound × Stint (24 segments); this script sweeps alternative
+segmentations to test whether different per-sub-population shrinkage
+captures additional patterns.
 
-- B.1 Year × Compound (4 × 5 = 20 segments)
-- B.2 Driver-class × Stint (named-vs-D0XX × 6 = 12 segments)
-- B.3 Compound × Stint × LapNumber-bucket (5 × 6 × 4 = 120 segments)
+R7 segmentations (from prior session):
+- year_compound — Year × Compound (4 × 5 = 20 segments). NULL.
+- driverclass_stint — named-vs-D0XX × Stint (2 × 6 = 12). +0.106 bp WIN.
+- compound_stint_lapbucket — Compound × Stint × LapBucket (120). marginal.
+
+R8 additions (this session):
+- year_stint — Year × Stint (4 × 6 = 24). Label-free.
+- driver_tier_stint — Driver tier by mean(PitStop feature) × Stint
+  (4 × 6 = 24). Label-free (PitStop is observable in test).
+- race_cluster_stint — Race median-split by mean(PitStop) × Stint
+  (2 × 6 = 12). Label-free.
+- compound_firstpit_window — Compound × first-PitStop-lap quartile-window
+  per (Driver, Race, Year) group (5 × 4 = 20). Label-free.
 
 For each: run Path-B with τ=100k; compare OOF to R5.2 baseline.
 If any Δ ≥ +0.1 bp, sweep τ ∈ {20k, 100k, 500k} on the winner.
@@ -98,6 +108,98 @@ def build_seg(name, train, test):
         seg_te = (c_te * 24) + (s_te * 4) + lb_te
         return seg_tr, seg_te, len(cmp) * 6 * 4, "Compound×Stint×LapBucket"
 
+    if name == "year_stint":
+        # Year × Stint = 4 × 6 = 24 segments. Label-free.
+        cats_y = sorted(set(train["Year"].astype(int).unique()) |
+                        set(test["Year"].astype(int).unique()))
+        ymap = {y: i for i, y in enumerate(cats_y)}
+        yr_tr = train["Year"].astype(int).map(ymap).values
+        yr_te = test["Year"].astype(int).map(ymap).values
+        s_tr = np.clip(train["Stint"].astype(int).values, 0, 5)
+        s_te = np.clip(test["Stint"].astype(int).values, 0, 5)
+        seg_tr = yr_tr * 6 + s_tr
+        seg_te = yr_te * 6 + s_te
+        return seg_tr, seg_te, len(cats_y) * 6, "Year×Stint"
+
+    if name == "driver_tier_stint":
+        # Tier each Driver by mean(PitStop) (FEATURE column, not target) over
+        # train+test combined → 4 quartile tiers × 6 stint = 24 segments.
+        # Quartile breaks computed on ROW-LEVEL driver-rate distribution
+        # so tiers split rows evenly (avoids degeneracy from many anonymous
+        # zero-pit-rate drivers each with few rows).
+        combined = pd.concat([train[["Driver", "PitStop"]],
+                              test[["Driver", "PitStop"]]], ignore_index=True)
+        drv_rate = combined.groupby("Driver")["PitStop"].mean()
+        rate_by_drv = drv_rate.to_dict()
+        rates_per_row_train = np.array([rate_by_drv[d]
+                                         for d in train["Driver"].astype(str).values])
+        qbreaks = np.quantile(rates_per_row_train, [0.25, 0.5, 0.75])
+        # searchsorted side='right' gives tier in {0,1,2,3}; clamp to 3.
+        def _tier(rate):
+            return min(int(np.searchsorted(qbreaks, rate, side="right")), 3)
+        tier_by_drv = {d: _tier(r) for d, r in rate_by_drv.items()}
+        default_tier = 1
+        tier_tr = np.array([tier_by_drv.get(d, default_tier)
+                            for d in train["Driver"].astype(str).values])
+        tier_te = np.array([tier_by_drv.get(d, default_tier)
+                            for d in test["Driver"].astype(str).values])
+        s_tr = np.clip(train["Stint"].astype(int).values, 0, 5)
+        s_te = np.clip(test["Stint"].astype(int).values, 0, 5)
+        seg_tr = tier_tr * 6 + s_tr
+        seg_te = tier_te * 6 + s_te
+        return seg_tr, seg_te, 4 * 6, "DriverTier×Stint"
+
+    if name == "race_cluster_stint":
+        # Median-split Race by mean(PitStop) (FEATURE) → 2 clusters × 6 stint.
+        combined = pd.concat([train[["Race", "PitStop"]],
+                              test[["Race", "PitStop"]]], ignore_index=True)
+        race_rate = combined.groupby("Race")["PitStop"].mean()
+        med = float(np.median(race_rate.values))
+        cluster_by_race = {r: int(v >= med) for r, v in race_rate.items()}
+        cl_tr = np.array([cluster_by_race.get(r, 0)
+                          for r in train["Race"].astype(str).values])
+        cl_te = np.array([cluster_by_race.get(r, 0)
+                          for r in test["Race"].astype(str).values])
+        s_tr = np.clip(train["Stint"].astype(int).values, 0, 5)
+        s_te = np.clip(test["Stint"].astype(int).values, 0, 5)
+        seg_tr = cl_tr * 6 + s_tr
+        seg_te = cl_te * 6 + s_te
+        return seg_tr, seg_te, 2 * 6, "RaceCluster×Stint"
+
+    if name == "compound_firstpit_window":
+        # First lap where PitStop==1 per (Driver, Race, Year) → 4 quartile
+        # windows × 5 Compound = 20 segments. Uses PitStop (FEATURE).
+        combined = pd.concat([
+            train[["Driver", "Race", "Year", "PitStop", "LapNumber"]],
+            test[["Driver", "Race", "Year", "PitStop", "LapNumber"]],
+        ], ignore_index=True)
+        pit_rows = combined[combined["PitStop"] == 1]
+        first_pit = pit_rows.groupby(["Driver", "Race", "Year"])["LapNumber"].min()
+        qbreaks = np.quantile(first_pit.values, [0.25, 0.5, 0.75])
+        def _win(lap):
+            if lap < qbreaks[0]: return 0
+            if lap < qbreaks[1]: return 1
+            if lap < qbreaks[2]: return 2
+            return 3
+        win_by_grp = {k: _win(v) for k, v in first_pit.items()}
+        default_win = 1
+        keys_tr = list(zip(train["Driver"].astype(str).values,
+                           train["Race"].astype(str).values,
+                           train["Year"].astype(int).values))
+        keys_te = list(zip(test["Driver"].astype(str).values,
+                           test["Race"].astype(str).values,
+                           test["Year"].astype(int).values))
+        w_tr = np.array([win_by_grp.get(k, default_win) for k in keys_tr])
+        w_te = np.array([win_by_grp.get(k, default_win) for k in keys_te])
+        cats_c = sorted(set(train["Compound"].astype(str).unique()) |
+                        set(test["Compound"].astype(str).unique()))
+        cmp = {c: i for i, c in enumerate(cats_c)}
+        c_tr = train["Compound"].astype(str).map(cmp).values
+        c_te = test["Compound"].astype(str).map(cmp).values
+        seg_tr = c_tr * 4 + w_tr
+        seg_te = c_te * 4 + w_te
+        return seg_tr, seg_te, len(cmp) * 4, "Compound×FirstPitWindow"
+
     raise ValueError(f"unknown seg name: {name}")
 
 
@@ -159,12 +261,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tau", type=int, default=100_000)
     ap.add_argument("--segs", nargs="+",
-                    default=["year_compound", "driverclass_stint",
-                             "compound_stint_lapbucket"])
+                    default=["year_stint", "driver_tier_stint",
+                             "race_cluster_stint", "compound_firstpit_window"])
+    ap.add_argument("--out", default=None,
+                    help="Output JSON path (default: audit/2026-05-18-round-8-multiseg.json)")
     args = ap.parse_args()
 
     t0 = time.time()
-    print(f"=== R7 Phase B: multi-segmentation Path-B τ={args.tau} ===",
+    print(f"=== multi-segmentation Path-B τ={args.tau} ===",
           flush=True)
     train = pd.read_csv(DATA / "train.csv")
     test = pd.read_csv(DATA / "test.csv")
@@ -211,7 +315,7 @@ def main():
         np.save(ART / f"test_K13_pathb_{seg_name}_tau{args.tau}.npy", test_pred)
 
     # Summary
-    print(f"\n=== Summary (R7 Phase B multi-segmentation Path-B) ===",
+    print(f"\n=== Summary (multi-segmentation Path-B) ===",
           flush=True)
     print(f"{'segmentation':<30s}{'OOF':>9s}{'Δ_bp':>9s}{'ρ_R52':>10s}",
           flush=True)
@@ -228,10 +332,12 @@ def main():
     print(f"  Total wall: {time.time()-t0:.1f}s", flush=True)
 
     Path("audit").mkdir(exist_ok=True)
-    Path("audit/2026-05-18-round-7-phase-b.json").write_text(json.dumps({
+    out_path = args.out or "audit/2026-05-18-round-8-multiseg.json"
+    Path(out_path).write_text(json.dumps({
         "tau": args.tau, "ref_auc": ref_auc, "results": results,
         "survivors": [r["name"] for r in survivors],
     }, indent=2))
+    print(f"  Wrote summary: {out_path}", flush=True)
 
 
 if __name__ == "__main__":

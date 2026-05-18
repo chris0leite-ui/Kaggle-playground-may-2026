@@ -1,0 +1,10 @@
+=== R7 Phase B: multi-segmentation Path-B τ=100000 ===
+  K=13 pool: ['yekenot', 'cb_v4', 'hgbc_deep', 'd16_orig', 'qAT', 'qAV', 'qAO', 'qAA', 'qAF', 'qAK', 'K27_100k', 'seg_fe', 'HMM']
+  R5.2 baseline (Compound×Stint τ=100k) OOF: 0.95446
+
+  -- segmentation: year_stint --
+     Year×Stint: 24 segments, 17 above MIN_ROWS=1000
+    fold 1: 18.7s  (segments used: 17/24)
+    fold 2: 15.3s  (segments used: 17/24)
+    fold 3: 16.5s  (segments used: 17/24)
+    fold 4: 19.0s  (segments used: 17/24)
