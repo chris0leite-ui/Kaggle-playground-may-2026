@@ -340,26 +340,57 @@ kNN diversity first.
 ## Next-session first actions (priority order)
 
 PRIMARY is R7.1 (LB 0.95389) — top-5% boundary still 1.6 bp away.
-R7 closed two axes (DAE absorbs; multi-tau on winner already optimal
-at 100k); R8 closes the seg-axis hunt (1/7 win, no further +0.10 bp
-discoveries expected from segmentation alone).
+R7 closed DAE + multi-tau; R8 closes seg-axis hunt (1/7 win). EOD
+Strategy-critic verdict (`audit/2026-05-18-strategy-critique.md`):
+**queue Σ × P(real) ≈ 0.058 bp realistic vs 1.6 bp gap. Structural
+shortfall — strategic posture pivots from "reach top-5% by stacking
+research candidates" to "maximise hedge ladder while scouting for
+a +1 bp single mechanism."**
 
-1. **C1 OpenF1 per-Race scalar join** (~45 min CPU). 1.4% match
-   cap; not yet tried. **P ≈ 15% at +0.1-0.2 bp.** First priority
-   now that seg-axis hunt is closed.
-2. **DAE v2 architecture**: deeper bottleneck (64 dim), masked-
-   column pretraining (BERT-style), contrastive loss. ~3 hr Kaggle T4.
-   v1 absorbed at meta; v2 with stronger embedding signal might
-   cross the threshold. **P ≈ 20%.**
-3. **Public-notebook scan** (Rule 22; **18+ days overdue**). BLOCKED
-   on kaggle CLI 401 auth (env var KaggleAPIToke fails); needs creds
-   refresh before this can be done.
-4. **R8 60/20/20 rank-blend (R7.1 + DriverTier + RaceCluster)** —
-   artifact saved (`submissions/submission_R8_blend_60_20_20_r71_dt_rc.csv`),
-   not submitted. OOF +0.079 bp vs R7.1 at TIE_ZONE ρ. Ready for
-   final-window R7d private-LB hedge.
-5. **Submit R7.2 combo bag** during final-window R7d period — the
-   +0.264 bp OOF improvement may register on private LB.
+EOD Research-loop ran 3 PM agents (notebooks, prior-comp, domain);
+output at `audit/research/2026-05-18-research-pm-addendum.md`.
+Top-3 untested candidates ranked by EV / cost:
+
+1. **NB4 — Per-(Compound × Stint) target-mean as BASE learner**
+   (segmentation-as-base, not as Path-B operator — NOVEL axis).
+   5-fold fold-refit (R24) + inner-CV (R33). Standalone OOF
+   predicted +5-15 bp; meta add at K=13+Path-B predicted +0.1-0.3
+   bp. **Cost: 25-30 min CPU.**
+2. **C4 — UID magic-feature groupby base** (IEEE-CIS Fraud
+   precedent). UID = `Driver_Race_floor(Lap/W)` for W ∈ {5,10,20};
+   20-40 per-UID groupby aggregates of LapTime / TyreLife /
+   Position / Cumulative_Degradation. **Cost: 25 min CPU.** Predicted
+   meta add +0.1-0.5 bp.
+3. **Competitor pit cascade** (NB1+DM3 merged) — within-(Race,
+   LapNumber) cross-driver aggregate of `PitStop[L-1]`, `PitStop[L-2]`.
+   Verified: `PitStop` column IS exposed in train+test. **Cost:
+   25 min CPU.** Predicted meta add +0.1-0.4 bp.
+
+Tier-B (longer / external):
+- **C1 OpenF1 per-Race scalar join** (~45 min CPU + data pull)
+- **NB5/DM1 Race-abrasiveness scalar** (Pirelli rating × Compound;
+  quick 26-row lookup once Pirelli ratings copied)
+- **DM2 Compound-cliff-lap ratio** (FastF1 pull ~1-2 h)
+- **NB2 Lap-time derivative** (rolling-3 of LapTime; ~20 min)
+- **NB3 undercut_window_score** (sigmoid scalar; ~15 min)
+
+Closed by EOD R8:
+- **C2 DAE swap-noise** — TESTED R7 Phase A, absorbed at meta
+- **C3 Per-(Race, LapNumber) Bayesian shrinkage** — FALSIFIED 3
+  variants in `tier-a-batch.md`. Per-group shrinkage trades row-rank
+  for group-smoothness; AUC is rank.
+- **Segment-FE targeted at MEDIUM × Stint 2** — REFUTED by 5-min
+  specialist probe. Subset specialist (18 features) gets AUC 0.881
+  vs PRIMARY 0.898 on the segment; segment IS at noise floor for
+  row features. Strategy-critic Section 1 surfaces *intrinsically
+  hard* segments, not feature-deficient ones.
+- **R22 public-notebook scan** — BLOCKED on kaggle CLI 401 auth
+  (env-var/creds issue). Needs refresh before scan can run.
+
+Held submissions ready for final-window R7d hedge ladder:
+- R7.2 fold-bag (LB 0.95389 tied; private-LB hedge)
+- R8 60/20/20 multi-seg rank-blend (untested at LB; private-LB hedge)
+- K=27+Path-B τ=100k (LB 0.95368; different operator pool)
 
 ## Round 8 — hedge ladder for final-window R7d (Days 28-31)
 
