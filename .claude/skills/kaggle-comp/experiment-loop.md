@@ -24,6 +24,21 @@ go to Kaggle GPU notebooks (P100 / T4×2). Don't declare
 ## Steps
 
 ```
+0. Ledger-grep gate (mandatory, <30 sec):
+   - grep the candidate's mechanism name / descriptive keyword in:
+       state/mechanism-ledger.md
+       state/hypothesis-board.md
+       audit/friction.md
+       audit/friction-archive.md
+       scripts/fe_picks_*.py
+   - if a prior result exists, READ it before RUN. Many "next-session"
+     probes are re-discoveries.
+   - SKIP the candidate if the prior result was OOF Δ < +0.5 bp AND
+     no anchor-pool change has happened since the prior result.
+     (2026-05-18 friction `tier-a3-menu-stale` + cost: re-ran a2_2
+     and a3_1 full 5-fold (~60+55 min CPU) when the K=4+1 verdict
+     was already recorded in hypothesis-board.md.)
+
 1. Heuristic baseline (skip if N/A):
    - closed-form rule / threshold / hand-coded
    - bound the lift available

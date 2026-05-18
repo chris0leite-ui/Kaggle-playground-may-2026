@@ -34,6 +34,24 @@ with the five sections below. No PI confirmation required. Output
 is a delta on prior critiques — only document what *changed* or
 what was newly discovered.
 
+## Ordering at plateau (2026-05-18 promotion)
+
+**At plateau triggers (5th of the 5 fire conditions above): run
+Section 5 FIRST, then 1-4.**
+
+Headroom math is the cheapest decisive strategic input (~5 min) —
+it tells you whether the queue can mathematically reach the goal
+BEFORE you spend compute on it. If queue-midpoint-discounted lift
+< headroom, sections 1-4 still inform the work but the strategic
+posture (lift-seeking vs variance-reduction vs hedge-prep) is
+already decided.
+
+2026-05-18 evidence (s6e5): session ran 15 mechanism probes over
+3 rounds. Section 5 ran in Round 3 only; the queue-midpoint result
+(1.4 bp discounted vs 1.9 bp gap) would have pivoted Round 1
+compute from mechanism probes to infrastructure (kNN-base rebuild)
+if it had fired first.
+
 ## The 5-question template
 
 ### 1. Per-segment failure map

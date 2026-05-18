@@ -9,12 +9,26 @@ conversation, so no anchoring.
 
 | Symptom | Persona |
 |---|---|
+| **First claim of "structural ceiling" / "row-feature exhausted" — BEFORE any other rotation** | **Senior ML Engineer** (review mode; pressure-test the saturation claim for methodological flaws) |
 | "We've ruled this out, the ceiling is structural" | **Junior ML Engineer** (no prior-attempts memory) |
 | Same mechanism family for 3+ days, no lift | **ML Researcher** (external knowledge) |
 | Stuck on a specific bug or infra issue | **Problem-Solver** |
 | Candidate looks too good — needs pressure | **Senior ML Engineer** (review mode) |
 | All models saturated, need a fresh angle on data | **Data Analyst** (no ML knowledge) |
 | Agent refuses to brainstorm, won't enumerate | **"10 Wild Options"** |
+
+**Rotation order at plateau** (2026-05-18 promotion): on the FIRST
+ceiling claim of a session, rotate Senior ML Engineer (review mode)
+BEFORE the brainstorm-class personas. The Senior persona surfaces
+methodological flaws (proxy substitution, anchor bias, missing
+C-sweep, ρ-band thresholds) cheaply; brainstorm personas accumulate
+evidence against a claim that may already be wrong. s6e5 evidence:
+Round-2 ran 9 fresh probes against K=4 proxy gate; Round-3 Senior
+ML in 5 min surfaced the proxy-substitution concern and Pearson
+ρ=0.998 K=4↔K=27 residual correlation (refuting the concern but
+yielding the killer datum). 9 of those Round-2 probes were
+informative even without the proxy concern, but knowing the result
+beforehand would have re-prioritised.
 
 ## Prompt templates
 

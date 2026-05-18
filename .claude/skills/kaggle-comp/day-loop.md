@@ -102,6 +102,23 @@ and has a single output artifact.
   where `N > days-since-comp-start`. If any hit, log friction
   `day-counter-drift` and replace with ISO date or comp-day-N
   anchored to comp start.
+- **Snapshot-freshness audit** — at session start, after the Kaggle
+  artifact dataset is pulled, verify that the PRIMARY's underlying
+  base OOFs are on disk. Cheap shell check:
+  ```bash
+  # extract base names referenced by the latest build_K*.py PRIMARY
+  # script and verify each oof_<base>_strat.npy is present.
+  PRIMARY_BUILD=$(ls scripts/build_K*.py | tail -1)  # most-recent K=N build
+  grep -oE '"[a-zA-Z0-9_]+_oof\.npy"' "$PRIMARY_BUILD" | sort -u | while read f; do
+    [[ -f "scripts/artifacts/${f//\"}" ]] || echo "MISSING: ${f//\"}"
+  done
+  ```
+  If any are missing, the artifact snapshot is stale relative to
+  PRIMARY. Probes will gate against an older anchor (1.8-3.5 bp
+  behind real PRIMARY in s6e5). Either rebuild the missing bases
+  (~30-60 min each) or explicitly downgrade the session's
+  candidate-screening threshold. (2026-05-18 friction
+  `artifact-snapshot-blocks-k11-gating`.)
 
 ## Anti-patterns specific to Day-loop
 

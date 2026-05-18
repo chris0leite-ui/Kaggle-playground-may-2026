@@ -84,6 +84,66 @@ Status markers: `[x]` applied · `[~]` superseded · `[ ]` open
   competitions submit` and `git push` routed through `ask` to
   enforce R1 + branch discipline.
 
+## Applied 2026-05-18 (round-1+2+3 wrap; PI-ratified)
+
+- `[x]` **bootstrap.sh — auto-isolate `KAGGLE_API_TOKEN` when it
+  starts with `KGAT_`.** `tag: kggt-token-needs-isolated-auth`.
+  Harness-issued KGAT_ token is incompatible with simultaneous
+  KAGGLE_USERNAME + KAGGLE_KEY; the CLI tries basic-auth and 403s
+  on private datasets. `bootstrap.sh` now detects the KGAT_ prefix
+  and unsets the username/key pair. Cost evidence: ~10 min lost on
+  2026-05-18 before the workaround was found by trial. Applies to
+  every future harness-cloned session.
+
+- `[x]` **experiment-loop.md — step 0 mandatory ledger-grep gate.**
+  `tag: pre-probe-ledger-grep`. Before any ≥10-min probe, grep the
+  candidate's mechanism name in `state/mechanism-ledger.md`,
+  `state/hypothesis-board.md`, `audit/friction*.md`, and
+  `scripts/fe_picks_*.py`. If a prior result with OOF Δ < +0.5 bp
+  is recorded AND the anchor pool is unchanged, SKIP. Cost evidence
+  (s6e5 2026-05-18): re-ran a2_2 mandatory-compound (60 min CPU)
+  and a3_1 rank-sorted-gaps (55 min CPU) full 5-fold when
+  hypothesis-board.md already recorded "K=4+1 +0.302 bp WEAK" and
+  predicted ~+0.337 bp. 115 min CPU for zero new information.
+
+- `[x]` **strategy-critic.md — Section 5 (headroom math) FIRST at
+  plateau, not last.** `tag: headroom-math-decisive-not-final`.
+  Headroom math is the cheapest decisive strategic input (~5 min)
+  — it tells you whether the queue can mathematically reach the
+  goal BEFORE compute is spent on it. If queue-midpoint-discounted
+  lift < headroom, the strategic posture (lift-seeking vs
+  variance-reduction vs hedge-prep) is already decided. Cost
+  evidence (s6e5 2026-05-18): 15 mechanism probes over 3 rounds;
+  Section 5 ran in Round 3 only. The queue-midpoint result
+  (1.4 bp discounted vs 1.9 bp gap) would have pivoted Round-1
+  compute to infrastructure (kNN-base rebuild) if it had fired
+  first.
+
+- `[x]` **personas.md — Senior ML Engineer (review mode) FIRST
+  on initial "structural ceiling" claim.** `tag:
+  senior-ml-first-on-ceiling-claim`. Senior persona surfaces
+  methodological flaws (proxy substitution, anchor bias, missing
+  C-sweep, ρ-band thresholds) cheaply; running it BEFORE
+  brainstorm-class personas (10 Wild Options, Junior ML) prevents
+  accumulating evidence against a claim that may already be wrong.
+  Cost evidence (s6e5 2026-05-18): Round-2 ran 9 fresh probes
+  against the K=4 proxy gate; Round-3 Senior ML in 5 min surfaced
+  the proxy-substitution concern AND yielded the killer Pearson
+  ρ=0.998 K=4↔K=27 residual-correlation datum. Round-2 work would
+  have been re-prioritised if the Senior persona had fired first.
+
+- `[x]` **day-loop.md — snapshot-freshness audit at session
+  start.** `tag: artifact-snapshot-blocks-k11-gating`. After the
+  Kaggle artifact dataset is pulled, verify the PRIMARY's
+  underlying base OOFs are on disk via a `grep`-the-build-script
+  shell snippet. If any are missing, the snapshot is stale
+  relative to PRIMARY (1.8-3.5 bp gating gap in s6e5's case).
+  Either rebuild the missing bases (~30-60 min each) or downgrade
+  the candidate-screening threshold. Cost evidence (s6e5
+  2026-05-18): 6 slim-kNN bases missing from 2026-05-08 snapshot;
+  every Round-1+2 probe ran against K=4 proxy (3.5 bp behind
+  PRIMARY) without the agent flagging.
+
 ## Applied previously (kept from earlier sessions)
 
 - `[~]` **PI-protocol — Sealed-prediction protocol REMOVED (Day-19).**
