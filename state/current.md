@@ -45,11 +45,12 @@ at the 5-decimal Kaggle quantisation.
 ## Today's status (2026-05-18)
 
 - Submissions used this comp: **46 / 270**. Daily cap: 10.
-- Today (2026-05-18): **4 used**:
+- Today (2026-05-18): **5 used**:
   - R4: K=4 + seg + HMM LR-meta → LB **0.95354** (proxy probe)
   - R5.1: K=11 + seg + HMM LR-meta → LB **0.95382**
-  - R5.2: K=13 + Path-B τ=100k → LB **0.95387** ← NEW BEST (PRIMARY)
+  - R5.2: K=13 + Path-B τ=100k → LB **0.95387** ← PRIMARY
   - R5.3: 70/30 rank-blend R5.2 + K=27+Path-B → LB **0.95385**
+  - R6.1: K=13+Path-B 5-seed fold-fit bag → LB **0.95387** (ties R5.2)
 - Comp-day **18 of 31**. Days remaining: **13**.
 - Top-5% boundary: **0.95405**. Gap to PRIMARY: **−1.8 bp**.
 - Leader: **0.95476**. Gap to PRIMARY: **−8.9 bp**.
@@ -115,6 +116,7 @@ hedge probe:
 | 2026-05-09 PM | K=10 + K=27 + Path-B τ=100k | 0.95384 | +3.3 |
 | 2026-05-09 PM | K=9 qAX (slim-kNN) | 0.95375 | +2.4 |
 | **2026-05-18 PM** | **K=13 (K=11 + seg + HMM) + Path-B τ=100k** | **0.95387** | **+3.6** |
+| 2026-05-18 PM | K=13+Path-B 5-seed fold-fit bag (R6.1) | 0.95387 | +3.6 (tied) |
 | 2026-05-09 AM | K=5 (K=4 + V4 kNN-aug) Path-B τ=100k | 0.95359 | +0.8 |
 | 2026-05-18 PM | K=11 + seg + HMM LR-meta | 0.95382 | +3.1 |
 | 2026-05-18 PM | 70/30 R5.2 + K=27+Path-B rank-blend | 0.95385 | +3.4 |

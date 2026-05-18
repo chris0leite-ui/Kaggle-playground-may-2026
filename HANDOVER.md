@@ -25,15 +25,46 @@ Submissions: **45 / 270** total; **3 used 2026-05-18**. Comp-day
 the REAL K=11 anchor (+0.245 bp at LR-meta OOF), and the **Path-B
 operator preserved +5 bp of LB transfer** vs LR-meta at the same OOF.
 
-Today's 4 submissions:
+Today's 5 submissions:
 | ref | LB | mechanism |
 |---|---|---|
 | 52772090 (R4) | 0.95354 | K=4 + seg + HMM LR-meta (R4 probe) |
 | 52773963 (R5.1) | 0.95382 | K=11 + seg + HMM LR-meta |
-| **52774385 (R5.2)** | **0.95387** | **K=13 + Path-B τ=100k** ← new best |
+| **52774385 (R5.2)** | **0.95387** | **K=13 + Path-B τ=100k** ← PRIMARY |
 | 52774692 (R5.3) | 0.95385 | 70/30 rank-blend R5.2 + K=27+Path-B |
+| 52776849 (R6.1) | 0.95387 | K=13+Path-B 5-seed fold-fit bag (ties R5.2) |
 
-Submissions: 46 / 270; 4 used 2026-05-18; 6 remaining today.
+Submissions: 47 / 270; 5 used 2026-05-18; 5 remaining today.
+
+## Round 6 — operator-axis retest + fold-fit bagging + transformer v2
+
+PI: "go" / "iterate, follow what skill says, think deeper."
+
+**Phase A — Operator-axis retest at K=11+Path-B**: re-gated 5 prior
+LR-meta nulls (conformal_widths, rrf_k60, meta_lgbm_rank, trimmed_rank,
+seg_fe_v2). **5/5 NULL under Path-B too** (Δ −0.026 to −0.090 bp).
+The R5 +5 bp Path-B-vs-LR-meta swing was **pool-composition-specific**
+(seg+HMM × Path-B segment-shrinkage interaction), NOT a general
+operator advantage.
+
+**Phase B — Proper fold-fit bagging**: rewrote `run_pathb` test-prediction
+path to bag per-fold per-seed (5 seeds × 5 folds = 25 fits averaged).
+Bag predictions DIFFER from single-seed (ρ=0.999988 vs ρ=1.0 in R5's
+broken full-train bag). OOF 0.95448 (+0.212 bp). **LB 0.95387 — ties
+R5.2 within 5-decimal quantization (TIE_ZONE prediction confirmed).**
+Variance reduction is real but quantized away at LB precision.
+
+**Phase C — Transformer v2 (Kaggle T4)**: D=256, 6 layers, 15 epochs,
+GroupKFold by sequence (was Stratified per row in v1). Standalone
+OOF **0.93330 (+13.5 bp vs v1's 0.91974)** despite the harder split.
+At K=14+Path-B: Δ −0.014 bp (absorbed at meta). Still 21 bp below
+K=11 baseline; doesn't reach meta-utility threshold.
+
+**Phase D — Multi-class combos**: K=14 fold-fit bag (R5.2 pool +
+TRFv2 + bagged) = OOF 0.95448, same as Phase B alone. Transformer
+adds nothing on top under Path-B.
+
+## Round 5 — multi-class + Path-B operator + slim-kNN rebuild
 
 ## Round 5 — multi-class + Path-B operator + slim-kNN rebuild (LATEST)
 
@@ -227,29 +258,34 @@ kNN diversity first.
 
 ## Next-session first actions (priority order)
 
-PRIMARY is now R5.2 (LB 0.95387) — top-5% boundary still 1.8 bp away.
+PRIMARY is R5.2 (LB 0.95387) — top-5% boundary still 1.8 bp away.
+R6 closed the cheap operator-axis exploration; remaining lift
+requires new mechanism classes or external data.
 
-1. **Proper multi-seed bagging** (~30 min CPU). Modify Path-B to
-   bag at FOLD-FIT level (average per-fold predictions across seeds)
-   not full-train fit (which is seed-invariant). Variance reduction
-   could yield +0.2-0.5 bp at LB.
-2. **Multi-tau Path-B blend**: rank-blend K=13+Path-B τ=100k with
-   τ=20k (built but not submitted; tighter shrinkage). Each tau
-   weights segments differently; blend may capture both extremes.
-3. **Transformer v2** (~4-6 hr Kaggle T4 GPU). Larger model
-   (D_MODEL=256, 6 layers, 15 epochs), GroupKFold by sequence
-   (R1d compliant), longer training. Current v1 OOF 0.91974 is
-   weak; v2 could land 0.94+, useful at K=11+Path-B+TRF stack.
-4. **C2 swap-noise DAE on Kaggle T4** (~2-3 hr GPU). Porto Seguro
-   precedent; embedding-class diversity orthogonal to row + seq.
-5. **C1 OpenF1 per-Race scalar join** (~45 min). Sub-bp expected
-   but novel join key.
-6. **Hedge ladder for final-window R7d** (Days 28-31):
-   - Final-1 = **R5.2 K=13+Path-B** (LB 0.95387) — new PRIMARY
-   - Final-2 = K=27+Path-B τ=100k (LB 0.95368) — structurally
-     different operator (no seg+HMM, no row/seq augmentation)
-   - Final-3 hedge = R5.1 K=11+seg+HMM LR-meta (LB 0.95382) —
-     different operator class, mechanism-orthogonal pool
+1. **C2 swap-noise DAE on Kaggle T4** (~2-3 hr GPU). Porto Seguro
+   1st-place precedent. Embedding-class diversity not yet tested.
+   Highest unexplored EV per friction. **P ≈ 25% at +0.3-0.5 bp.**
+2. **Multi-segmentation Path-B sweep**. Untried segmentations:
+   Year × Compound (24 segments), Driver-cluster × Stint (15-30),
+   Compound × Stint × LapNumber-bucket (120). Different per-sub-
+   population shrinkage. ~20 min each, sweep 3 variants. **P ≈ 20%.**
+3. **OpenF1 C1 per-Race scalar join** (~45 min CPU). 1.4% match cap
+   from synthetic driver codes. **P ≈ 15% at +0.1-0.2 bp.**
+4. **Multi-pool rank-blend for hedge**: R5.2 + R6.1 fold-bag +
+   K=27+Path-B + new mechanism. Structurally distinct components
+   for private-LB variance.
+5. **Transformer v2 → C2 ensemble**: TRFv2 (OOF 0.93330) didn't
+   help at meta alone; combined with a DAE in the same pool might
+   create attention+embedding diversity.
+
+## Round 7 — hedge ladder for final-window R7d (Days 28-31)
+
+- **Final-1**: R5.2 K=13+Path-B (LB 0.95387) — current PRIMARY.
+- **Final-2**: R6.1 K=13+Path-B fold-fit bag (LB 0.95387) —
+  structurally-distinct (5-seed averaged) tied LB; private-LB
+  variance hedge.
+- **Final-3 backup**: K=27+Path-B τ=100k (LB 0.95368) — different
+  operator-pool composition, no seg+HMM augmentation.
 
 ## 🔴 Critical: held submissions — DO NOT submit
 
@@ -331,6 +367,25 @@ Origin: `audit/2026-05-06-target-reform-leakage-audit.md`.
   seeds because they come from a single FULL-TRAIN fit. For true
   bagging, switch to fold-fit averaging (skip the full-train fit
   for test) or vary the base OOFs themselves.
+- **2026-05-18 (Round 6) — The R5 +5 bp Path-B-vs-LR-meta swing
+  is pool-composition-specific, NOT a general operator advantage.**
+  5 prior LR-meta nulls (conformal_widths, rrf_k60, meta_lgbm_rank,
+  trimmed_rank, seg_fe_v2) ALL nulled at K=11+Path-B too (Δ −0.026
+  to −0.090 bp). The R5 lift was specific to the seg+HMM mechanism-
+  orthogonality × Path-B segment-shrinkage interaction. Generalizing
+  "Path-B always preserves more signal than LR-meta" is FALSE.
+- **2026-05-18 (Round 6) — Fold-fit bagging works mechanically but
+  is LB-quantized at this precision.** `scripts/build_K13_seghmm_pathb_foldbag.py`
+  averages per-fold per-seed test predictions across 5 seeds × 5
+  folds = 25 fits. Bag predictions DIFFER from single-seed (ρ=0.999988
+  vs ρ=1.0 in R5's broken full-train bag). OOF +0.212 bp; LB tied
+  at 0.95387 (5-decimal quantization). May register on private LB.
+- **2026-05-18 (Round 6) — Transformer v2 with GroupKFold +
+  larger arch (D=256, 6 layers) improved standalone OOF by +13.5
+  bp over v1 (0.91974 → 0.93330) despite structurally harder
+  fold split.** Still absorbs at K=14+Path-B meta (Δ −0.014 bp);
+  not enough to overcome the 21 bp standalone gap to K=11 baseline.
+  v3 with even larger arch + pretraining might cross the threshold.
 - **K=4 LR-meta operator OOF→LB transfer = ~5 bp drop.** Today's
   submission OOF 0.95405 → LB 0.95354. Matches K=4+Path-B's transfer
   (OOF 0.95403 → LB 0.95351). Future K=4-class submissions can be

@@ -411,3 +411,34 @@ of Rule 24 (fold-safe label-conditional aggregates).
   (-0.02 bp vs R5.2). The 30% K=27 weight pulls toward K=27+Path-B's
   lower LB. Rank-blending with structurally-different operator
   doesn't help when one source dominates by both OOF and LB.
+
+## 2026-05-18 Round 6 — operator-axis retest + proper bagging
+
+- **R6 Phase A: 5-candidate operator-axis retest at K=13+Path-B
+  τ=100k — 5/5 NULL.** Re-gated conformal_widths, rrf_k60,
+  meta_lgbm_rank, trimmed_rank, r4_segment_fe_v2 — all previously
+  null under K=4 LR-meta. Δ −0.026 to −0.090 bp under Path-B too.
+  The R5 +5 bp Path-B-vs-LR-meta swing is POOL-SPECIFIC (seg+HMM
+  × Path-B interaction), not a general operator advantage.
+  The "test all prior nulls under Path-B" hypothesis is FALSIFIED
+  for these 5 candidates.
+- **R6 Phase B: K=13+Path-B 5-seed fold-fit bag** —
+  `scripts/build_K13_seghmm_pathb_foldbag.py`. Replaces `run_pathb`'s
+  full-train test path with per-fold per-seed test-prediction
+  averaging (25 fits across 5×5). Bag OOF 0.95448 (+0.212 bp over
+  single-seed R5.2). Predictions DIFFER from single-seed (ρ=0.999988
+  vs ρ=1.0 in R5's broken bag — true bagging now). LB submission
+  **0.95387 — ties R5.2 within 5-decimal quantization (TIE_ZONE
+  prediction confirmed).** Variance reduction works mechanically;
+  may register on private LB.
+- **R6 Phase C: Transformer v2 (Kaggle T4)** — D_MODEL=256, 6 layers,
+  15 epochs, GroupKFold by (Year, Race, Driver) sequence (was
+  Stratified per row in v1). Standalone OOF 0.93330, **+13.5 bp**
+  over v1's 0.91974 DESPITE the structurally harder GroupKFold
+  split. Bigger arch + proper split worked. At K=14+Path-B (R5.2
+  + TRFv2): Δ −0.014 bp — absorbed at meta. Standalone OOF still
+  21 bp below K=11 baseline (0.95443); doesn't reach meta-utility
+  threshold. v3 with even larger arch + pretraining might cross.
+- **R6 Phase D: K=14 fold-fit bag (R5.2 + TRFv2 + bagged)** — OOF
+  0.95448 (same as Phase B alone). Transformer adds nothing on top
+  under Path-B. Phase B captures the full mechanism diversity.
