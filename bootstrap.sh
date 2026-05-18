@@ -35,6 +35,18 @@ if [[ -z "${KAGGLE_API_TOKEN:-}" && -n "${KAGGLE_KEY:-}" ]]; then
     export KAGGLE_API_TOKEN="$KAGGLE_KEY"
 fi
 
+# KGAT_-prefixed harness token is incompatible with KAGGLE_USERNAME +
+# KAGGLE_KEY basic-auth. If all three are set, the CLI tries basic-auth
+# (which 403s on private datasets with the KGAT_ key). Unset the pair
+# so only KAGGLE_API_TOKEN remains. (2026-05-18 friction
+# `kggt-token-needs-isolated-auth`; cost ~10 min on first occurrence.)
+if [[ "${KAGGLE_API_TOKEN:-}" =~ ^KGAT_ ]]; then
+    if [[ -n "${KAGGLE_USERNAME:-}" || -n "${KAGGLE_KEY:-}" ]]; then
+        echo "--- credentials: KGAT_ harness token detected; unsetting KAGGLE_USERNAME + KAGGLE_KEY to avoid CLI basic-auth conflict ---"
+        unset KAGGLE_USERNAME KAGGLE_KEY
+    fi
+fi
+
 if [[ -f "$KAGGLE_JSON" ]]; then
     echo "--- credentials: $KAGGLE_JSON found, using it ---"
 elif [[ -n "${KAGGLE_USERNAME:-}" && -n "${KAGGLE_KEY:-}" ]]; then
