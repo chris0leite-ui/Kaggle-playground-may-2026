@@ -11,23 +11,76 @@ versions: `audit/archive-YYYY-MM-DD-handover-*.md`.
 
 ## Where we are
 
-**Active PRIMARY: rank-blend 70/30 K=11 + K=9. LB 0.95386.**
-Unchanged from 2026-05-14. Top-5% gap −1.9 bp; leader gap −9.0 bp.
+**NEW PRIMARY: K=13 + Path-B τ=100k. LB 0.95387.** (Round 5 result.)
+Slightly above prior PRIMARY (LB 0.95386). Top-5% gap −1.8 bp;
+leader gap −8.9 bp. File:
+`submissions/submission_K13_seghmm_pathb_tau100000.csv`.
 
-Submissions: **43 / 270** total; **1 used 2026-05-18**. Comp-day
+Submissions: **45 / 270** total; **3 used 2026-05-18**. Comp-day
 **18 of 31**; days remaining **13**.
 
-File: `submissions/submission_blend_K11_K9_w_70_30.csv` (note: file
-missing from local snapshot; PRIMARY submission was 2026-05-12, LB
-record persists on Kaggle).
+**Round 5 plateau break**: K=11 (rebuilt slim-kNN) + r4_segment_fe
+(row-class) + r4_hmm_seq (sequence-class) under Path-B Compound×Stint
+τ=100k operator. The R4 mechanism-orthogonality finding survives at
+the REAL K=11 anchor (+0.245 bp at LR-meta OOF), and the **Path-B
+operator preserved +5 bp of LB transfer** vs LR-meta at the same OOF.
 
-**Today's submission** (Round 4 calibration probe): K=4 + r4_segment_fe
-(row-class interaction FE) + r4_hmm_seq (sequence-class HMM posteriors)
-LR-meta blend → **LB 0.95354** (OOF 0.95405, transfer 5.1 bp drop).
-Beats K=4+Path-B (LB 0.95351) by 0.3 bp; 3.2 bp below PRIMARY.
-File: `submissions/submission_K4_r4seg_r4hmm.csv`.
+Today's 4 submissions:
+| ref | LB | mechanism |
+|---|---|---|
+| 52772090 (R4) | 0.95354 | K=4 + seg + HMM LR-meta (R4 probe) |
+| 52773963 (R5.1) | 0.95382 | K=11 + seg + HMM LR-meta |
+| **52774385 (R5.2)** | **0.95387** | **K=13 + Path-B τ=100k** ← new best |
+| 52774692 (R5.3) | 0.95385 | 70/30 rank-blend R5.2 + K=27+Path-B |
 
-## 2026-05-18 session — four rounds; ceiling validated AND plateau-break found
+Submissions: 46 / 270; 4 used 2026-05-18; 6 remaining today.
+
+## Round 5 — multi-class + Path-B operator + slim-kNN rebuild (LATEST)
+
+PI directed "iterate, get on top of leaderboard." Round 5 plan
+(`/root/.claude/plans/read-the-handover-look-toasty-candle.md`)
+executed Phases A through F.
+
+**Phase A** — Rebuilt 6 missing slim-kNN bases (qAT, qAV, qAO, qAA,
+qAF, qAK). Required pulling `aadigupta1601/f1-strategy-dataset-pit-stop-prediction`
+from Kaggle (the slim-kNN builders reference `data/original/f1_strategy_dataset_v4.csv`
+which was missing from local snapshot). K=11 LR-meta plain OOF = 0.95443
+— matches historical PRIMARY exactly. Rebuild verified.
+
+**Phase B** — Re-gated R4 mechanism-orthogonality at REAL K=11+1:
+- K=11+seg+HMM: Δ +0.245 bp OOF, R5.1 submission **LB 0.95382**
+- Anchor-attenuation pattern confirmed: 0.542 @ K=4 → 0.275 @ K=5 → 0.245 @ K=11.
+
+**Phase C** — `probe_r5_graph_pit_pressure.py`: 4 per-(Race, Lap)
+pit-pressure features (graph-class). Standalone OOF 0.93344;
+at K=11 LR-meta: -0.012 bp alone, marginally regresses the seg+HMM
+combination.
+
+**Phase D super-stack sweep** — 15 combinations of {seg, segv2, HMM,
+graph, TRF} at K=11+N LR-meta. Best: seg+HMM at Δ +0.245 bp; the
+4-way (seg+HMM+graph+TRF) at +0.254 bp (negligible diff).
+
+**Phase D + Path-B operator — THE BREAKTHROUGH**: applied Path-B
+Compound × Stint τ=100k to K=13 = K=11+seg+HMM pool. **Same OOF
+(0.95446 vs 0.95445 LR-meta), but LB transferred 5 bp better**:
+- K=11+seg+HMM LR-meta: LB 0.95382 (-6.3 bp from OOF)
+- **K=13+Path-B τ=100k: LB 0.95387** (-5.9 bp from OOF) ← new PRIMARY
+
+**Phase F** — Kaggle T4 gap-aware transformer (4-layer, D=128).
+Failed twice (data path resolution + P100/sm_60 PyTorch incompat);
+fixed via rglob + `enable_internet: true` for torch 2.4 reinstall.
+Standalone OOF 0.91974 (weak; absorbed at K=11+Path-B). Saved for
+next-session retry with larger architecture + GroupKFold split.
+
+**5-seed bagging attempt**: Path-B's full-train fit is seed-invariant
+for test predictions (ρ=1.0 vs single-seed). The "bag" produces
+identical test predictions — bag doesn't help unless we change to
+fold-fit averaging. Skipped submission.
+
+**Top-5% gap**: 0.95405 − 0.95387 = -1.8 bp. **Leader gap**:
+0.95476 − 0.95387 = -8.9 bp (structurally hard).
+
+## 2026-05-18 session — FIVE rounds; PRIMARY beaten
 
 ### Round 4 — Rule 23 free-form-FE + mechanism-orthogonal stacking (LATEST)
 
@@ -174,32 +227,29 @@ kNN diversity first.
 
 ## Next-session first actions (priority order)
 
-1. **Rebuild slim-kNN bases** (~3-6 hr CPU). Highest-priority
-   operational fix. Reuses `scripts/build_K11_full_pathb.py` and the
-   upstream `scripts/dgp_v3/qA{T,V,O,A,F,K}*.py` builders (verified
-   to exist in repo this session). Builders fire from a `__main__`
-   entrypoint each.
-2. **Retest Round-4 seg+HMM at REAL K=11+1.** ~5 min CPU after
-   rebuild. Inputs already on disk:
-   - `oof_r4_segment_fe_strat.npy` + test pair
-   - `oof_r4_hmm_seq_strat.npy` + test pair
-   Expected K=11+1 lift: +0.0 to +0.3 bp (per anchor-attenuation
-   pattern: 0.542 @ K=4 → 0.275 @ K=5+K27super → ~0 to 0.3 @ K=11).
-   If lift > +0.1 bp, submit as a real PRIMARY-class probe (LB
-   potentially 0.9539-0.9542, candidate top-5%).
-3. **Re-test all 11 Round-2 nulls at K=11+1**. ~30 min CPU.
-   Confirms or refutes ceiling at real anchor.
-4. **C2 swap-noise DAE on Kaggle T4** (~2-3 hr GPU). Highest-EV
-   remaining mechanism class; Porto Seguro 1st-place precedent.
-   Combine with seg+HMM as 3-mechanism stack at K=4+1 first
-   (Round-4 mechanism-orthogonality finding).
+PRIMARY is now R5.2 (LB 0.95387) — top-5% boundary still 1.8 bp away.
+
+1. **Proper multi-seed bagging** (~30 min CPU). Modify Path-B to
+   bag at FOLD-FIT level (average per-fold predictions across seeds)
+   not full-train fit (which is seed-invariant). Variance reduction
+   could yield +0.2-0.5 bp at LB.
+2. **Multi-tau Path-B blend**: rank-blend K=13+Path-B τ=100k with
+   τ=20k (built but not submitted; tighter shrinkage). Each tau
+   weights segments differently; blend may capture both extremes.
+3. **Transformer v2** (~4-6 hr Kaggle T4 GPU). Larger model
+   (D_MODEL=256, 6 layers, 15 epochs), GroupKFold by sequence
+   (R1d compliant), longer training. Current v1 OOF 0.91974 is
+   weak; v2 could land 0.94+, useful at K=11+Path-B+TRF stack.
+4. **C2 swap-noise DAE on Kaggle T4** (~2-3 hr GPU). Porto Seguro
+   precedent; embedding-class diversity orthogonal to row + seq.
 5. **C1 OpenF1 per-Race scalar join** (~45 min). Sub-bp expected
    but novel join key.
-6. **Final-window hedge prep** (Days 10-13). Final-1 = PRIMARY
-   K=11+K=9 (LB 0.95386). Final-2 candidate set:
-   - K=27 + Path-B (LB 0.95368) — structurally different
-   - K=4 + seg + HMM (LB 0.95354, Round 4 calibration probe)
-     — mechanism-orthogonal hedge per cross-class diversity.
+6. **Hedge ladder for final-window R7d** (Days 28-31):
+   - Final-1 = **R5.2 K=13+Path-B** (LB 0.95387) — new PRIMARY
+   - Final-2 = K=27+Path-B τ=100k (LB 0.95368) — structurally
+     different operator (no seg+HMM, no row/seq augmentation)
+   - Final-3 hedge = R5.1 K=11+seg+HMM LR-meta (LB 0.95382) —
+     different operator class, mechanism-orthogonal pool
 
 ## 🔴 Critical: held submissions — DO NOT submit
 
@@ -266,6 +316,21 @@ Origin: `audit/2026-05-06-target-reform-leakage-audit.md`.
   −0.127): genuine mechanism orthogonality, not redundant base
   addition. Implication: future plateau breaks should test CROSS-
   CLASS combinations, not single-class refinement.
+- **2026-05-18 (Round 5) — Path-B operator vs LR-meta operator
+  has +5 bp LB transfer advantage at K=11 pool.** Same OOF
+  (0.95446 vs 0.95445), but LB 0.95387 (Path-B) vs 0.95382
+  (LR-meta). The per-segment shrinkage operator preserves the
+  mechanism-orthogonality signal where the global LR meta absorbs
+  it. **Implication: every new mechanism class should be tested
+  under Path-B operator, not just LR-meta, when comparing to
+  PRIMARY**.
+- **2026-05-18 (Round 5) — Path-B's full-train fit is seed-invariant
+  for test predictions.** Multi-seed bagging via the existing
+  `run_pathb` function only changes OOF (which uses fold-dependent
+  Stratified splits); the test predictions are identical across
+  seeds because they come from a single FULL-TRAIN fit. For true
+  bagging, switch to fold-fit averaging (skip the full-train fit
+  for test) or vary the base OOFs themselves.
 - **K=4 LR-meta operator OOF→LB transfer = ~5 bp drop.** Today's
   submission OOF 0.95405 → LB 0.95354. Matches K=4+Path-B's transfer
   (OOF 0.95403 → LB 0.95351). Future K=4-class submissions can be

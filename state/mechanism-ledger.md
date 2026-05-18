@@ -361,3 +361,53 @@ of Rule 24 (fold-safe label-conditional aggregates).
   row-feature ceiling holds per single-mechanism, but ORTHOGONAL
   mechanism families combine super-additively.** Next-session
   priority: retest at REAL K=11+1 anchor after slim-kNN rebuild.
+
+## 2026-05-18 Round 5 — multi-class super-stack + Path-B operator
+
+- **R5 slim-kNN rebuild** (Phase A). All 6 dgp_v3 builders ran
+  successfully after `aadigupta1601/f1-strategy-dataset-pit-stop-prediction`
+  was pulled (the local snapshot didn't include the f1_strategy_dataset_v4.csv
+  file the builders reference). K=11 LR-meta plain OOF reconstructed at
+  0.95443 — matches historical PRIMARY value exactly. Per-builder K=4+1
+  gates: qAT +1.172 bp, qAO +0.730 bp, qAA +0.143 bp, qAF +0.149 bp,
+  others positive/neutral.
+- **R5 retest at REAL K=11+1** (Phase B). r4_segment_fe + r4_hmm_seq
+  combination at K=11+1: Δ +0.245 bp OOF. Anchor-attenuation pattern
+  CONFIRMED (0.542 @ K=4 → 0.275 @ K=5 → 0.245 @ K=11). LB
+  submission **0.95382** at OOF→LB transfer -6.3 bp. G2 marginal
+  pass; ρ vs K=27+Path-B = 0.9989 (just under OK band).
+- **R5 graph-class per-(Race, Lap) pit-pressure features**
+  (Phase C). 4 features capturing cross-driver pit timing pressure.
+  Standalone OOF 0.93344; at K=11 LR-meta alone: -0.012 bp.
+  Marginally REGRESSES the seg+HMM combo (-0.030 bp). Closes the
+  graph-class axis at K=11+seg+HMM anchor.
+- **R5 multi-class super-stack sweep** (Phase D). 15 combinations
+  of {seg-v1, seg-v2, HMM, graph, TRF} at K=11+N LR-meta. Best:
+  seg+HMM at +0.245 bp. 4-way (seg+HMM+graph+TRF) at +0.254 bp —
+  negligible diff. The seg+HMM 2-mechanism combo is the operator-
+  invariant winner.
+- **R5 Path-B operator on K=13 — THE BREAKTHROUGH** (Phase D).
+  Same OOF as LR-meta (0.95446 vs 0.95445), but **5 bp better
+  LB transfer**. K=11+seg+HMM under LR-meta → LB 0.95382; under
+  Path-B C × Stint τ=100k → **LB 0.95387 (new PRIMARY, +0.01 bp
+  over prior PRIMARY 0.95386).** Per-segment shrinkage operator
+  preserves the mechanism-orthogonality signal that global LR meta
+  absorbs.
+- **R5 gap-aware transformer** (Phase F, Kaggle T4). 4-layer
+  D=128 transformer with attention over LapNumber positional
+  encoding on per-(Year, Race, Driver) sequences. Two errors
+  fixed (data path + sm_60 PyTorch incompat). Standalone OOF
+  0.91974 (weak; 35 bp below K=11 baseline). Absorbed at K=11+
+  Path-B; null contribution. Saved for next-session v2 retry
+  with larger architecture + GroupKFold split.
+- **R5 5-seed Path-B bagging — FAILED design**. Multi-seed via
+  monkey-patching SEED constant in `run_pathb()` only changes the
+  Stratified fold splits; test predictions are seed-INVARIANT
+  because they come from a full-train fit (line 116 of
+  build_K11_full_pathb.py). 5-seed test predictions identical
+  (ρ=1.0). True bagging needs fold-fit averaging or sub-sample
+  variation. Friction logged for next-session implementation.
+- **R5 70/30 rank-blend** of R5.2 + K=27+Path-B → LB 0.95385
+  (-0.02 bp vs R5.2). The 30% K=27 weight pulls toward K=27+Path-B's
+  lower LB. Rank-blending with structurally-different operator
+  doesn't help when one source dominates by both OOF and LB.

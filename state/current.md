@@ -10,7 +10,23 @@ to comp start 2026-05-01. The `d13`..`d19` labels in script names
 and old audit prose are FROZEN code prefixes — never calendar days
 (per `glossary.md` and the `day-counter-drift` friction).
 
-## PRIMARY (active) — set 2026-05-12, reconfirmed 2026-05-14
+## PRIMARY (active) — set 2026-05-18 Round 5
+
+**LB 0.95387** — K=13 + Path-B Compound × Stint τ=100k.
+
+K=13 pool = K=11 (4 K=4 trees + 6 slim-kNN + K=27 super-base) + 2
+candidates (r4_segment_fe row-class, r4_hmm_seq sequence-class).
+The Round-5 plateau break: mechanism-orthogonal stacking + Path-B
+operator survives at REAL K=11 anchor and beats prior PRIMARY by
++0.01 bp (within tie band, technically above).
+
+File: `submissions/submission_K13_seghmm_pathb_tau100000.csv`.
+OOF: 0.95446. OOF→LB transfer: -5.9 bp (similar to K=4+Path-B).
+
+Prior PRIMARY (LB 0.95386, 70/30 K=11+K=9 rank-blend, set 2026-05-12)
+remains the strongest non-Round-5 candidate.
+
+## Previous PRIMARY (2026-05-12) — retained for hedge ladder
 
 **LB 0.95386** (rank-blend 70/30 of two LB-confirmed submissions).
 
@@ -28,15 +44,15 @@ at the 5-decimal Kaggle quantisation.
 
 ## Today's status (2026-05-18)
 
-- Submissions used this comp: **43 / 270**. Daily cap: 10
-  (`comp-context.md: submission_budget`).
-- Today (2026-05-18): **1 used**:
-  - K=4 + r4_segment_fe + r4_hmm_seq LR-meta (R4 plateau-break
-    probe) — LB **0.95354** (OOF 0.95405, transfer −5.1 bp).
-    Beats K=4+Path-B by 0.3 bp; 3.2 bp behind PRIMARY.
+- Submissions used this comp: **46 / 270**. Daily cap: 10.
+- Today (2026-05-18): **4 used**:
+  - R4: K=4 + seg + HMM LR-meta → LB **0.95354** (proxy probe)
+  - R5.1: K=11 + seg + HMM LR-meta → LB **0.95382**
+  - R5.2: K=13 + Path-B τ=100k → LB **0.95387** ← NEW BEST (PRIMARY)
+  - R5.3: 70/30 rank-blend R5.2 + K=27+Path-B → LB **0.95385**
 - Comp-day **18 of 31**. Days remaining: **13**.
-- Top-5% boundary: **0.95405**. Gap to PRIMARY: **−1.9 bp**.
-- Leader: **0.95476**. Gap to PRIMARY: **−9.0 bp**.
+- Top-5% boundary: **0.95405**. Gap to PRIMARY: **−1.8 bp**.
+- Leader: **0.95476**. Gap to PRIMARY: **−8.9 bp**.
 
 ## Transfer bands (Rule 27 recalibration, 2026-05-14)
 
@@ -98,7 +114,10 @@ hedge probe:
 | 2026-05-09 PM | K=11 + K=27 + Path-B τ=100k | 0.95385 | +3.4 |
 | 2026-05-09 PM | K=10 + K=27 + Path-B τ=100k | 0.95384 | +3.3 |
 | 2026-05-09 PM | K=9 qAX (slim-kNN) | 0.95375 | +2.4 |
+| **2026-05-18 PM** | **K=13 (K=11 + seg + HMM) + Path-B τ=100k** | **0.95387** | **+3.6** |
 | 2026-05-09 AM | K=5 (K=4 + V4 kNN-aug) Path-B τ=100k | 0.95359 | +0.8 |
+| 2026-05-18 PM | K=11 + seg + HMM LR-meta | 0.95382 | +3.1 |
+| 2026-05-18 PM | 70/30 R5.2 + K=27+Path-B rank-blend | 0.95385 | +3.4 |
 | 2026-05-18 AM | K=4 + r4_segment_fe + r4_hmm_seq LR-meta | 0.95354 | +0.3 |
 | 2026-05-08 PM | K=4 + Path-B τ=100k | 0.95351 | 0 |
 | 2026-05-07 PM | K=27 + Path-B τ=100k | 0.95368 | (pre-sparse) |
