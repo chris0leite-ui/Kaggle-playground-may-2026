@@ -1,0 +1,44 @@
+=== multi-segmentation Path-B τ=100000 ===
+  K=13 pool: ['yekenot', 'cb_v4', 'hgbc_deep', 'd16_orig', 'qAT', 'qAV', 'qAO', 'qAA', 'qAF', 'qAK', 'K27_100k', 'seg_fe', 'HMM']
+  R5.2 baseline (Compound×Stint τ=100k) OOF: 0.95446
+
+  -- segmentation: driver_tier_stint --
+     DriverTier×Stint: 24 segments, 20 above MIN_ROWS=1000
+    fold 1: 25.7s  (segments used: 19/24)
+    fold 2: 23.5s  (segments used: 19/24)
+    fold 3: 22.3s  (segments used: 19/24)
+    fold 4: 27.8s  (segments used: 19/24)
+    fold 5: 26.3s  (segments used: 19/24)
+     OOF AUC: 0.95447  Δ vs R5.2 = +0.050 bp
+     ρ_test vs R5.2: 0.999770
+
+  -- segmentation: race_cluster_stint --
+     RaceCluster×Stint: 12 segments, 10 above MIN_ROWS=1000
+    fold 1: 11.3s  (segments used: 10/12)
+    fold 2: 13.6s  (segments used: 10/12)
+    fold 3: 14.3s  (segments used: 10/12)
+    fold 4: 11.7s  (segments used: 10/12)
+    fold 5: 15.0s  (segments used: 10/12)
+     OOF AUC: 0.95446  Δ vs R5.2 = +0.042 bp
+     ρ_test vs R5.2: 0.999826
+
+  -- segmentation: compound_firstpit_window --
+     Compound×FirstPitWindow: 20 segments, 16 above MIN_ROWS=1000
+    fold 1: 19.7s  (segments used: 16/20)
+    fold 2: 15.8s  (segments used: 16/20)
+    fold 3: 18.5s  (segments used: 16/20)
+    fold 4: 18.7s  (segments used: 16/20)
+    fold 5: 22.4s  (segments used: 16/20)
+     OOF AUC: 0.95445  Δ vs R5.2 = -0.091 bp
+     ρ_test vs R5.2: 0.999761
+
+=== Summary (multi-segmentation Path-B) ===
+segmentation                        OOF     Δ_bp     ρ_R52
+------------------------------------------------------------
+DriverTier×Stint              0.95447   +0.050  0.999770  
+RaceCluster×Stint             0.95446   +0.042  0.999826  
+Compound×FirstPitWindow       0.95445   -0.091  0.999761 ↓
+
+  Survivors (Δ ≥ +0.10 bp): []
+  Total wall: 361.7s
+  Wrote summary: audit/2026-05-18-round-8-multiseg.json

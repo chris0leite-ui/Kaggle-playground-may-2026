@@ -11,13 +11,19 @@ versions: `audit/archive-YYYY-MM-DD-handover-*.md`.
 
 ## Where we are
 
-**NEW PRIMARY: R7.1 K=13 + Path-B DriverClass × Stint τ=100k.
+**PRIMARY: R7.1 K=13 + Path-B DriverClass × Stint τ=100k.
 LB 0.95389.** (Round 7 result.) +0.02 bp over prior PRIMARY (R5.2
 LB 0.95387). Top-5% gap −1.6 bp; leader gap −8.7 bp. File:
 `submissions/submission_K13_pathb_driverclass_stint_tau100000.csv`.
 
-Submissions: **49 / 270** total; **7 used 2026-05-18**. Comp-day
-**18 of 31**; days remaining **13**.
+Round 8 ran additional Path-B segmentation sweep (4 more variants).
+**0 / 4 cleared the +0.10 bp survivor gate**; 2 / 4 marginal at +0.05
+bp (DriverTier × Stint, RaceCluster × Stint). PRIMARY unchanged.
+PI declined submit for R8 to preserve daily slots.
+
+Submissions: **49 / 270** total; **7 used 2026-05-18** (3 daily
+slots still available at session end). Comp-day **18 of 31**; days
+remaining **13**.
 
 **Round 7 finding**: DriverClass × Stint segmentation (named-vs-D0XX
 × Stint = 12 segments) on Path-B beats default Compound × Stint by
@@ -48,7 +54,41 @@ Today's 7 submissions:
 
 Submissions: 49 / 270; 7 used 2026-05-18; 3 remaining today.
 
-## Round 7 — multi-segmentation Path-B + swap-noise DAE (LATEST)
+## Round 8 — additional segmentation sweep (LATEST)
+
+PI: continuation of Day-18 after R7 found DriverClass × Stint winner.
+Mandate: test 4 more segmentations to determine whether segmentation
+axis is a generic lift dim or a one-off.
+
+**Results** (5-fold CV on K=13 pool, τ=100k, vs R5.2 Compound × Stint
+baseline OOF 0.954460):
+
+| Segmentation | OOF | Δ bp | ρ vs R5.2 |
+|---|---:|---:|---:|
+| Year × Stint (smoke) | 0.95445 | −0.100 | 0.99974 |
+| **DriverTier × Stint** | 0.95447 | **+0.050** | 0.99977 |
+| **RaceCluster × Stint** | 0.95446 | **+0.042** | 0.99983 |
+| Compound × FirstPitWindow | 0.95445 | −0.091 | 0.99976 |
+
+**Survivor gate (Δ ≥ +0.10 bp): 0 / 4.** 2 marginal hits at +0.05.
+Total CPU 484 s (8 min, faster than estimated).
+
+**Cross-axis 60/20/20 rank-blend (R7.1 + DriverTier + RaceCluster)**:
+OOF +0.079 bp over R7.1 PRIMARY at rank-ρ 0.99997 (TIE_ZONE band).
+Artifact saved at `submissions/submission_R8_blend_60_20_20_r71_dt_rc.csv`
+but **not submitted** (PI declined; preserve slots; ready for final-
+window R7d private-LB hedge if still best by then).
+
+**Segmentation-axis assessment (R7+R8 combined)**: 7 segs tested,
+1 clear WIN (DriverClass × Stint +0.106 bp), 3 marginal at +0.04-
++0.07 bp, 3 NULL. Driver-axis is unique +0.10 bp lift dim; 4-class
+DriverTier captures same signal at lower magnitude as 2-class
+DriverClass. Race-cluster axis (separate dim) marginal. Year-axis
+and FirstPitWindow NULL. Rule 21 ≥ 3 variants now satisfied for
+the segmentation hyperparameter. Friction `two-axis-operator-sweep-
+missed` has more corroborating data; awaiting PI promotion call.
+
+## Round 7 — multi-segmentation Path-B + swap-noise DAE
 
 PI: "go". Round 7 plan executed Phases A-D in parallel where possible.
 
@@ -300,31 +340,25 @@ kNN diversity first.
 ## Next-session first actions (priority order)
 
 PRIMARY is R7.1 (LB 0.95389) — top-5% boundary still 1.6 bp away.
-R7 closed two more axes (DAE absorbs; multi-tau on winner already
-optimal at 100k). Remaining cheap-EV is segmentation variants.
+R7 closed two axes (DAE absorbs; multi-tau on winner already optimal
+at 100k); R8 closes the seg-axis hunt (1/7 win, no further +0.10 bp
+discoveries expected from segmentation alone).
 
-1. **More Path-B segmentations** (~30 min/segmentation CPU). The
-   DriverClass × Stint win (+0.106 bp OOF, +0.02 bp LB) opens
-   the door for more discrete-axis segmentations:
-   - Driver-tier × Stint (top-quartile / middle-half / bottom-quartile
-     by pit-rate × 6 stints = 18 segments)
-   - Race-cluster × Stint (high-pit-rate races vs low × stint)
-   - Year × Stint (4 × 6 = 24 segments)
-   - Compound × first-pit-window (5 × 4 buckets)
-   **P ≈ 25% one segmentation lifts ≥ +0.05 bp at LB.**
-2. **Multi-segmentation Path-B ensembling**: rank-blend output of
-   3+ Path-B variants (Compound×Stint + DriverClass×Stint + new).
-   Each captures different sub-population variance; blending should
-   stack. **P ≈ 30% at +0.05-0.10 bp.**
-3. **C1 OpenF1 per-Race scalar join** (~45 min CPU). 1.4% match
-   cap; not yet tried. **P ≈ 15% at +0.1-0.2 bp.**
-4. **DAE v2 architecture**: deeper bottleneck (64 dim), masked-
+1. **C1 OpenF1 per-Race scalar join** (~45 min CPU). 1.4% match
+   cap; not yet tried. **P ≈ 15% at +0.1-0.2 bp.** First priority
+   now that seg-axis hunt is closed.
+2. **DAE v2 architecture**: deeper bottleneck (64 dim), masked-
    column pretraining (BERT-style), contrastive loss. ~3 hr Kaggle T4.
    v1 absorbed at meta; v2 with stronger embedding signal might
    cross the threshold. **P ≈ 20%.**
-5. **Public-notebook scan** (Rule 22; not done in 17 days). Check
-   if a top-kernel insight has emerged.
-6. **Submit R7.2 combo bag** during final-window R7d period — the
+3. **Public-notebook scan** (Rule 22; **18+ days overdue**). BLOCKED
+   on kaggle CLI 401 auth (env var KaggleAPIToke fails); needs creds
+   refresh before this can be done.
+4. **R8 60/20/20 rank-blend (R7.1 + DriverTier + RaceCluster)** —
+   artifact saved (`submissions/submission_R8_blend_60_20_20_r71_dt_rc.csv`),
+   not submitted. OOF +0.079 bp vs R7.1 at TIE_ZONE ρ. Ready for
+   final-window R7d private-LB hedge.
+5. **Submit R7.2 combo bag** during final-window R7d period — the
    +0.264 bp OOF improvement may register on private LB.
 
 ## Round 8 — hedge ladder for final-window R7d (Days 28-31)

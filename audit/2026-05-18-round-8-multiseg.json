@@ -1,0 +1,37 @@
+{
+  "tau": 100000,
+  "ref_auc": 0.954460092421731,
+  "results": [
+    {
+      "name": "driver_tier_stint",
+      "label": "DriverTier\u00d7Stint",
+      "n_seg": 24,
+      "n_segments_used": 20,
+      "auc": 0.9544651160653153,
+      "delta_bp": 0.050236435842343496,
+      "rho_test": 0.9997696870011555,
+      "wall": 150.39105319976807
+    },
+    {
+      "name": "race_cluster_stint",
+      "label": "RaceCluster\u00d7Stint",
+      "n_seg": 12,
+      "n_segments_used": 10,
+      "auc": 0.9544642718074141,
+      "delta_bp": 0.0417938568308962,
+      "rho_test": 0.9998262168734956,
+      "wall": 80.37200212478638
+    },
+    {
+      "name": "compound_firstpit_window",
+      "label": "Compound\u00d7FirstPitWindow",
+      "n_seg": 20,
+      "n_segments_used": 16,
+      "auc": 0.9544510305575901,
+      "delta_bp": -0.09061864140957887,
+      "rho_test": 0.9997607466886296,
+      "wall": 113.29158854484558
+    }
+  ],
+  "survivors": []
+}

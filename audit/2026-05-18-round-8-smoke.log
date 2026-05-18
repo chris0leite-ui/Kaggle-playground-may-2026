@@ -8,3 +8,15 @@
     fold 2: 15.3s  (segments used: 17/24)
     fold 3: 16.5s  (segments used: 17/24)
     fold 4: 19.0s  (segments used: 17/24)
+    fold 5: 19.4s  (segments used: 17/24)
+     OOF AUC: 0.95445  Δ vs R5.2 = -0.100 bp
+     ρ_test vs R5.2: 0.999739
+
+=== Summary (R7 Phase B multi-segmentation Path-B) ===
+segmentation                        OOF     Δ_bp     ρ_R52
+------------------------------------------------------------
+Year×Stint                    0.95445   -0.100  0.999739 ↓
+
+  Survivors (Δ ≥ +0.10 bp): []
+  Total wall: 122.4s
+  Wrote summary: audit/2026-05-18-round-8-smoke.json

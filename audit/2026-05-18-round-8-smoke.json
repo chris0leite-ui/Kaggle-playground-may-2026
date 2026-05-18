@@ -1,0 +1,17 @@
+{
+  "tau": 100000,
+  "ref_auc": 0.954460092421731,
+  "results": [
+    {
+      "name": "year_stint",
+      "label": "Year\u00d7Stint",
+      "n_seg": 24,
+      "n_segments_used": 17,
+      "auc": 0.9544501293651484,
+      "delta_bp": -0.09963056582629193,
+      "rho_test": 0.9997388700321785,
+      "wall": 112.31989049911499
+    }
+  ],
+  "survivors": []
+}
