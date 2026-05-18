@@ -265,18 +265,25 @@ def main():
                              "race_cluster_stint", "compound_firstpit_window"])
     ap.add_argument("--out", default=None,
                     help="Output JSON path (default: audit/2026-05-18-round-8-multiseg.json)")
+    ap.add_argument("--extra-bases", nargs="+", default=[],
+                    help="Append bases to the K=13 pool (expects "
+                         "oof_<name>_strat.npy + test_<name>_strat.npy in ART/).")
     args = ap.parse_args()
 
     t0 = time.time()
-    print(f"=== multi-segmentation Path-B τ={args.tau} ===",
-          flush=True)
+    pool_files = list(K13_FILES) + [
+        (n, f"oof_{n}_strat.npy", f"test_{n}_strat.npy")
+        for n in args.extra_bases
+    ]
+    K = len(pool_files)
+    print(f"=== Path-B sweep (K={K}) τ={args.tau} ===", flush=True)
     train = pd.read_csv(DATA / "train.csv")
     test = pd.read_csv(DATA / "test.csv")
     y = train[TARGET].astype(int).values
 
-    oofs = [_pos(ART / o) for _, o, _ in K13_FILES]
-    tests = [_pos(ART / t) for _, _, t in K13_FILES]
-    print(f"  K=13 pool: {[n for n, _, _ in K13_FILES]}", flush=True)
+    oofs = [_pos(ART / o) for _, o, _ in pool_files]
+    tests = [_pos(ART / t) for _, _, t in pool_files]
+    print(f"  K={K} pool: {[n for n, _, _ in pool_files]}", flush=True)
 
     # R5.2 baseline reference
     ref_oof = _pos(ART / "K13_seghmm_pathb_tau100000_oof.npy")
@@ -310,9 +317,19 @@ def main():
         print(f"     OOF AUC: {auc:.5f}  Δ vs R5.2 = {delta_bp:+.3f} bp",
               flush=True)
         print(f"     ρ_test vs R5.2: {rho_test:.6f}", flush=True)
-        # Save artifact
-        np.save(ART / f"oof_K13_pathb_{seg_name}_tau{args.tau}.npy", oof)
-        np.save(ART / f"test_K13_pathb_{seg_name}_tau{args.tau}.npy", test_pred)
+        # Save artifact (K reflects actual pool size after --extra-bases)
+        np.save(ART / f"oof_K{K}_pathb_{seg_name}_tau{args.tau}.npy", oof)
+        np.save(ART / f"test_K{K}_pathb_{seg_name}_tau{args.tau}.npy", test_pred)
+        # Also write a submission CSV for any K≠13 (Rule 27 / PI submit gate)
+        if K != 13:
+            sub = pd.DataFrame({
+                "id": test["id"].values,
+                TARGET: np.clip(test_pred, 0.001, 0.999),
+            })
+            Path("submissions").mkdir(exist_ok=True)
+            sub_path = f"submissions/submission_K{K}_pathb_{seg_name}_tau{args.tau}.csv"
+            sub.to_csv(sub_path, index=False)
+            print(f"     Wrote submission: {sub_path}", flush=True)
 
     # Summary
     print(f"\n=== Summary (multi-segmentation Path-B) ===",

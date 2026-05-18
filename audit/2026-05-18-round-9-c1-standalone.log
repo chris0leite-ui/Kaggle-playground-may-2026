@@ -1,0 +1,47 @@
+== R9 Phase B: C1 external per-Race scalars (Aadigupta) ==
+  train (439140, 16)  test (188165, 15)  prior 0.1990
+  Loading external: data/original/f1_strategy_dataset_v4.csv
+    ext rows: 101371, Race levels (ext): 28
+    s6e5 Race levels: 26, ext Race levels: 28, overlap: 26
+  Aggregates: ['Race', 'lap_time_median_race', 'lap_time_std_race', 'cum_deg_max_race', 'pos_chg_std_race', 'race_len_max_lap']
+    28 Race rows, sample:
+                 Race  lap_time_median_race  lap_time_std_race  cum_deg_max_race  pos_chg_std_race  race_len_max_lap
+ Abu Dhabi Grand Prix                89.893           4.477939           140.379          3.889638                58
+Australian Grand Prix                84.365          15.507837           162.505          2.801950                58
+  Austrian Grand Prix                71.068           6.871676           128.197          4.255315                71
+    Joined: train NA-rows=0, test NA-rows=0
+  features: 19 (raw 14 + 5 ext scalars)
+    ['Driver', 'Compound', 'Race', 'Year', 'PitStop', 'LapNumber', 'Stint', 'TyreLife', 'Position', 'LapTime (s)', 'LapTime_Delta', 'Cumulative_Degradation', 'RaceProgress', 'Position_Change', 'lap_time_median_race', 'lap_time_std_race', 'cum_deg_max_race', 'pos_chg_std_race', 'race_len_max_lap']
+/usr/local/lib/python3.11/dist-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+  warnings.warn(
+/usr/local/lib/python3.11/dist-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+  warnings.warn(
+  Fold 1: AUC=0.95027 iters=1361 wall=36.2s
+/usr/local/lib/python3.11/dist-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+  warnings.warn(
+/usr/local/lib/python3.11/dist-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+  warnings.warn(
+  Fold 2: AUC=0.94811 iters=1050 wall=29.0s
+/usr/local/lib/python3.11/dist-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+  warnings.warn(
+/usr/local/lib/python3.11/dist-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+  warnings.warn(
+  Fold 3: AUC=0.94912 iters=1191 wall=31.1s
+/usr/local/lib/python3.11/dist-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+  warnings.warn(
+/usr/local/lib/python3.11/dist-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+  warnings.warn(
+  Fold 4: AUC=0.94839 iters=1275 wall=33.9s
+/usr/local/lib/python3.11/dist-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+  warnings.warn(
+/usr/local/lib/python3.11/dist-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+  warnings.warn(
+  Fold 5: AUC=0.94921 iters=1135 wall=30.3s
+
+  Standalone OOF AUC: 0.94902  fold-std=0.00075  total wall=162.1s
+  G1 PASS (standalone ≥ 0.948)
+  Saved: oof_C1_race_external_strat.npy test_C1_race_external_strat.npy
+  Diagnostic: C1 OOF AUC on Spanish Grand Prix             (20483 rows): 0.9082
+  Diagnostic: C1 OOF AUC on Bahrain Grand Prix             (19535 rows): 0.9143
+  Diagnostic: C1 OOF AUC on Emilia Romagna Grand Prix      (15483 rows): 0.9100
+  Diagnostic: C1 OOF AUC on Saudi Arabian Grand Prix       (18111 rows): 0.9711

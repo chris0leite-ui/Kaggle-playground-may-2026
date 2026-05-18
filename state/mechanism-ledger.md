@@ -472,3 +472,46 @@ of Rule 24 (fold-safe label-conditional aggregates).
   session). ρ vs R7.1 = 0.999973 → TIE_ZONE; LB tied R7.1 at 0.95389.
   Structurally distinct (5-seed averaged on alt segmentation) →
   retained as private-LB hedge.
+
+## 2026-05-18 Round 9 — Closure of row-feature axis
+
+After R8 multi-seg sweep null (4 segs, none > +0.10 bp) and R8 EOD
+strategy-critic verdict "structural shortfall vs 1.6 bp top-5% gap",
+R9 ran dual-track on the last 2 viable research-loop candidates.
+
+- **R9 NB4 — Per-(Compound × Stint) target-mean as BASE learner.**
+  Novel TE grouping (mechanism-ledger had no Compound × Stint entry;
+  6 existing TE_CONFIGS in `scripts/p1_features.py:336-342` do not
+  include this combo). Built via `cv_target_encode` (fold-safe;
+  re-fits stats per fold's training rows). Standalone OOF **0.94850**
+  (G1 PASS, between hgbc_deep 0.94870 and HMM 0.94713). K=14 + Path-B
+  DriverClass × Stint τ=100k: OOF 0.954469 (**Δ vs R7.1 PRIMARY
+  −0.022 bp NULL**). The TE-broadcast-at-base mechanism is absorbed
+  at the K=13+Path-B meta layer — Path-B already extracts the per-
+  (Compound, Stint) signal at META; same signal injected at BASE is
+  redundant and slightly dilutes rank-lock. Segmentation-as-base
+  axis CLOSED.
+
+- **R9 C1 — Aadigupta external per-Race feature scalars.** 5 scalars
+  (lap-time median / std, cum-deg max, pos-change std, race-length
+  max) joined to s6e5 train/test by Race name (26/26 overlap). NOT
+  target-derived → trivially Rule 24 safe; no transductive footprint.
+  Standalone OOF **0.94902** (G1 PASS; ~5 bp better standalone than
+  NB4). K=14 + Path-B DriverClass × Stint τ=100k: OOF 0.954466
+  (**Δ vs R7.1 PRIMARY −0.045 bp NULL**; ρ_test 0.999981 TIE_ZONE).
+  External-data injection — the only structural lever surfaced by
+  the EOD strategy-critic — ALSO absorbs at the K=13+Path-B meta
+  layer. C1 regressed MORE than NB4 because yekenot's existing 6
+  TE_CONFIGS touch Race in 5 of 6 configs; the per-Race scalars
+  duplicate signal density already absorbed by the pool. Data-class
+  axis (D) for K=13+Path-B CLOSED.
+
+- **R9 strategic conclusion.** Rank-lock at K=13+Path-B is
+  structurally confirmed across three axes: operator family (R6 v2
+  transformer, R7 DAE absorbed); mechanism class (R4 segment-FE
+  G2-fail, R4-R5 HMM/pit-cascade null, R9 NB4 absorbed); data class
+  (R9 C1 absorbed). The remaining structurally distinct mechanism
+  classes lie OUTSIDE row-features: A1 seq2seq transformer on
+  per-(Driver, Race) lap sequences, graph mechanism with competitor
+  edges, survival/hazard model on stint-life. PRIMARY R7.1 unchanged;
+  3 daily slots held for R10 mechanism-expansion probes.

@@ -58,7 +58,7 @@ at the 5-decimal Kaggle quantisation.
 ## Today's status (2026-05-18)
 
 - Submissions used this comp: **46 / 270**. Daily cap: 10.
-- Today (2026-05-18): **7 used**:
+- Today (2026-05-18): **7 used**, 3 unused at session-end:
   - R4: K=4 + seg + HMM LR-meta → LB **0.95354**
   - R5.1: K=11 + seg + HMM LR-meta → LB **0.95382**
   - R5.2: K=13 + Path-B Compound×Stint τ=100k → LB **0.95387**
@@ -66,6 +66,10 @@ at the 5-decimal Kaggle quantisation.
   - R6.1: R5.2 + 5-seed fold-fit bag → LB **0.95387** (ties R5.2)
   - **R7.1: K=13+Path-B DriverClass×Stint τ=100k → LB 0.95389** ← PRIMARY
   - R7.2: R7.1 + 5-seed fold-fit bag → LB **0.95389** (ties R7.1; hedge)
+  - R8 multi-seg sweep: 4 segs / none > +0.10 bp (`audit/2026-05-18-round-8-multiseg.json`).
+  - R8 60/20/20 multi-seg blend: OOF +0.079 bp, ρ TIE_ZONE, NOT submitted.
+  - **R9 NB4** (Compound×Stint TE-as-base): K=14 Δ vs R7.1 PRIMARY **−0.022 bp NULL**; standalone 0.94850 G1✓.
+  - **R9 C1** (Aadigupta per-Race scalars): K=14 Δ vs R7.1 PRIMARY **−0.045 bp NULL**; standalone 0.94902 G1✓.
 - Comp-day **18 of 31**. Days remaining: **13**.
 - Top-5% boundary: **0.95405**. Gap to PRIMARY: **−1.8 bp**.
 - Leader: **0.95476**. Gap to PRIMARY: **−8.9 bp**.
@@ -162,12 +166,22 @@ hedge probe:
 
 ## What axes remain open
 
-1. **NEW-INFORMATION mechanisms** (next-session pivot per 2026-05-14
-   audit) — anything that injects signal not derivable from existing
-   row features: cross-domain pretrain, FastF1 hard-join (capped at
-   1.4% match), multi-seed bagging of the full pipeline.
+1. **MECHANISM EXPANSION beyond row-feature ceiling** (R9 forced
+   pivot 2026-05-18). R9 closed BOTH residual row-feature axes:
+   NB4 TE-as-base (−0.022 bp NULL) and C1 external Aadigupta scalars
+   (−0.045 bp NULL). Rank-lock at K=13+Path-B is structurally
+   confirmed across operator / mechanism / data-class. Three
+   structurally orthogonal candidates remain (none tested):
+   1. **A1 seq2seq transformer** on per-(Driver, Race) lap
+      sequences (HMM K=13 base was BW one-shot on 4 states; full
+      attention-LSTM untried). ~2 hr Kaggle T4.
+   2. **Graph mechanism** (Race, Lap) per-row graph with competitor
+      edges; LightGCN / GAT 2-layer. ~3 hr local CPU or Kaggle T4.
+   3. **Survival** Cox PH on stint-life as hazard-base. ~30 min CPU.
 2. **Blend operator sweep** — arithmetic / geometric / log-odds /
    trimmed mean over 4 LB-confirmed PRIMARYs. Cost 5 min.
-3. **Path-B C×S on a fresh 27-base + slim-kNN union** — qBG attempt
-   timed out at 16+ min. Rerun with τ=100k only.
-4. **R5 hedge preparation** — 30 min; ladder above is the candidate set.
+3. **R7d hedge ladder finalisation** (final-window posture, days
+   28-31 = May 28-31). Ladder candidate set documented above.
+4. **NEW-INFO mechanism via cross-domain pretrain** (still on the
+   2026-05-14 list, but FastF1 hard-join capped at 1.4% match;
+   C1 falsified the simpler per-Race scalar variant of this axis).
