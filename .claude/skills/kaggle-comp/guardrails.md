@@ -133,6 +133,40 @@ that exists specifically to gather mechanism-vs-LB calibration
 data; locking onto a single submitted candidate when 4 slots could
 have probed pool/stack/recipe variants.
 
+## 13. Multi-seed bag — verify test-prediction path is seed-variant
+
+Before launching a multi-seed loop on any meta-operator harness,
+verify the **test-prediction** code path actually varies with seed.
+For Path-B-class operators (`run_pathb` in
+`scripts/build_K11_full_pathb.py:116-128`), the test path fits on
+FULL training data — a convex fit is seed-invariant, so multi-seed
+test predictions are identical (ρ=1.0). The fold-OOF path IS
+seed-variant (fold splits differ), so OOF AUC will shift, but
+test won't.
+
+For true bagging variance reduction:
+- Average per-fold-fit test predictions across seeds (not full-train), or
+- Vary the BASE OOFs (re-run base models with different seeds), or
+- Sub-sample bootstrap the training rows before each Path-B fit.
+
+**Prevents**: 17+ min CPU wasted on identical-output bag loops.
+Cost evidence: 2026-05-18 Round 5 K=13+Path-B 5-seed bag attempt
+produced ρ=1.0 vs single-seed (`audit/2026-05-18-postmortem-research-improvements-jjI84-r4-r5.md`).
+
+## 14. Vectorise probe aggregators before full-data run
+
+Probe scripts with O(N) Python row-loops over training data MUST
+be replaced with vectorized pandas / numpy before the full-data
+run. Smoke at 50k rows first; if smoke wall time × (full N / 50k)
+> 5 min on a contended CPU box, vectorize and re-smoke before
+launching full.
+
+**Prevents**: ~10 min wasted-CPU per re-write iteration. Cost
+evidence: 2026-05-18 R5 Phase C `probe_r5_graph_pit_pressure.py`
+initial smoke took 8+ min on row-loop aggregator (with Phase A
+running concurrently); vectorized pandas-merge variant ran in
+0.04 s on the same data. Row-loop was a hot path with dict lookups.
+
 ## How to check yourself
 
 Before any LB submit, answer in audit:

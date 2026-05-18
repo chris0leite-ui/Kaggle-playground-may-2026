@@ -18,6 +18,11 @@ Pre-distillation snapshots: `audit/archive-YYYY-MM-DD-friction-*.md`.
 2026-05-18  research-loop-overdue         10-day gap from prior research-loop (2026-05-08) despite plateau hitting Rule 7 thresholds on 2026-05-14. Rule 7 auto-fire not triggered; promotion candidate.
 2026-05-18  kaggle-pages-recaptcha-gated  WebFetch on Kaggle /code and /discussion returns only page title; reCAPTCHA blocks notebook scrape. Switch R22 scan to authenticated `kaggle kernels list -c <slug> --sort-by voteCount`.
 2026-05-18  tier-a3-menu-stale            10 of 13 Tier-A2/A3 picks from 2026-05-08 still pending 10 days later; menu was never executed. Rule 18 (claim-the-leaf) didn't bind because session focus drifted to K=11/Path-B variants instead.
+2026-05-18  operator-vs-mechanism-axis    Same OOF (K=11+seg+HMM, 0.95446) at LR-meta gives LB 0.95382; under Path-B C×Stint τ=100k gives LB 0.95387. +5 bp LB transfer purely from operator. Mechanism-class and operator-class are orthogonal axes; past LR-meta nulls should be retested under Path-B.
+2026-05-18  pathb-bag-seed-invariant-test 5-seed bag of K=13+Path-B produced identical test predictions (ρ=1.0). run_pathb fits FULL train for test (lines 116-128), only fold-OOF varies with seed. ~17 min CPU wasted. Multi-seed bag harness must use fold-fit averaging for variance reduction.
+2026-05-18  gpu-kernel-prior-pattern-skip Phase F transformer needed 3 push iterations (data path rglob; sm_60 P100 torch reinstall; enable_internet for pip). All 3 fixes documented in prior kernels (p1-xgb-v4-gpu, d15b-dae-gpu). Cost ~30 min ops; would have been 1 push if I'd grep'd kernels/ first.
+2026-05-18  snapshot-missing-orig-dataset Slim-kNN rebuild Phase A failed for 5/6 builders: data/original/f1_strategy_dataset_v4.csv not in local snapshot. Downloaded via `kaggle datasets download -d aadigupta1601/f1-strategy-dataset-pit-stop-prediction`. Bootstrap.sh should validate or pull this file.
+2026-05-18  cpu-contention-phase-c-starved Phase A (qAO/qAF) + Phase C (probe_r5_graph) ran concurrently; Phase C smoke took 8+ min CPU (vs ~30s alone) before being killed and restarted post Phase A. Rule 30 "≤2 concurrent CPU-heavy" was technically met but contention was severe.
 ```
 
 ## Last week (2026-05-08 → 2026-05-11) — one-liner summary

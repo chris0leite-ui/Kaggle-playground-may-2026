@@ -84,6 +84,51 @@ Status markers: `[x]` applied · `[~]` superseded · `[ ]` open
   competitions submit` and `git push` routed through `ask` to
   enforce R1 + branch discipline.
 
+## Applied 2026-05-18 (round-4+5 wrap; PI-ratified)
+
+- `[x]` **guardrails.md §13 — multi-seed bag harness must verify
+  test-prediction path is seed-variant.** `tag: pathb-bag-seed-invariant-test`.
+  `run_pathb` in `scripts/build_K11_full_pathb.py:116-128` fits on
+  FULL training data for test predictions; LR convex fit is
+  seed-invariant given the same training set, so multi-seed bag
+  test predictions are identical (ρ=1.0 confirmed empirically).
+  Only the fold-OOF path is seed-variant. For true bagging:
+  average per-fold-fit test predictions across seeds, vary base
+  OOFs, or sub-sample-bootstrap the training rows. Cost evidence:
+  2026-05-18 R5 5-seed Path-B bag wasted ~17 min CPU.
+
+- `[x]` **experiment-loop.md — operator class is distinct from
+  mechanism class.** `tag: operator-vs-mechanism-axis`. When
+  retesting a previously-null mechanism, sweep at least two
+  operator classes (LR-meta with alternate C, plus Path-B at one τ)
+  before declaring the mechanism dead. Same OOF can show wildly
+  different LB transfer under different operators. Cost evidence:
+  2026-05-18 R5 K=11 + r4_segment_fe + r4_hmm_seq pool produced
+  OOF 0.95446 under both LR-meta and Path-B; LB differed by +5 bp
+  (Path-B 0.95387 vs LR-meta 0.95382). Closed mechanism-class
+  results are operator-conditional unless verified across operators.
+
+- `[x]` **bootstrap.sh — auto-pull `data/original/f1_strategy_dataset_v4.csv`
+  if absent.** `tag: snapshot-missing-orig-dataset`. The slim-kNN
+  builders (`scripts/dgp_v3/qA*.py`) reference this file via
+  `DATA / "original/f1_strategy_dataset_v4.csv"` but the 2026-05-08
+  artifact snapshot didn't include it. Without it, 5 of 6 builders
+  in Phase A fail silently with FileNotFoundError. `bootstrap.sh`
+  now checks and `kaggle datasets download -d
+  aadigupta1601/f1-strategy-dataset-pit-stop-prediction` if absent.
+  Cost evidence: 2026-05-18 R5 Phase A first-run failed for 5/6
+  builders before manual pull.
+
+- `[x]` **guardrails.md §14 — vectorise probe aggregators before
+  full-data run.** `tag: cpu-contention-phase-c-starved`. Probe
+  scripts with O(N) Python row-loops over training rows must be
+  replaced with pandas/numpy vectorized equivalents before the
+  full-data smoke. Smoke at 50k rows first; if smoke wall × (full
+  N / 50k) > 5 min on contended CPU, vectorize before full. Cost
+  evidence: 2026-05-18 R5 Phase C `probe_r5_graph_pit_pressure.py`
+  smoke took 8+ min CPU on row-loop aggregator (vectorized variant
+  ran in 0.04 s on same data).
+
 ## Applied 2026-05-18 (round-1+2+3 wrap; PI-ratified)
 
 - `[x]` **bootstrap.sh — auto-isolate `KAGGLE_API_TOKEN` when it

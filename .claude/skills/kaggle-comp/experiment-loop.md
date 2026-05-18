@@ -92,6 +92,30 @@ go to Kaggle GPU notebooks (P100 / T4×2). Don't declare
 - PI declines submission.
 - LB result lands (loop completes; control returns to Day-loop step 4).
 
+## Operator-class is distinct from mechanism-class
+
+A mechanism that nulls under one meta operator may pass under
+another with the SAME OOF AUC. Operator class (LR-meta C ∈ [0.01,
+100], Path-B Compound × Stint at various τ, GBM-meta, etc.) is an
+axis distinct from mechanism class. Closed mechanism-class results
+are operator-conditional unless verified across operators.
+
+**Concrete evidence**: 2026-05-18 R5 K=11 + r4_segment_fe +
+r4_hmm_seq pool produced OOF 0.95446 under both LR-meta and
+Path-B Compound × Stint τ=100k operators, but LB differed by
++5 bp (Path-B 0.95387 vs LR-meta 0.95382). Same predictions at
+OOF, +5 bp LB transfer swing from operator choice alone.
+
+**Rule**: when retesting a previously-null mechanism, sweep at
+least two operator classes before declaring the mechanism dead.
+Specifically: LR-meta with at least one alternate C, plus Path-B
+at one τ. If both null, the mechanism is closed for that anchor;
+if either lifts, the prior closure was operator-conditional and
+the mechanism re-opens.
+
+Cost evidence: see `audit/2026-05-18-postmortem-research-improvements-jjI84-r4-r5.md`
+"What went wrong" + frictions.
+
 ## Common Experiment-loop failure modes
 
 Distilled from `audit/friction.md`. These are the patterns that have

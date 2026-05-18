@@ -87,6 +87,21 @@ else
     ls -lh data/*.csv
 fi
 
+# scripts/dgp_v3/*.py and several other paths reference the original
+# F1 strategy dataset under data/original/. Pull if absent — the
+# 2026-05-08 artifact snapshot didn't include it, and the slim-kNN
+# builders (qAT/qAV/qAO/qAF/qAK/qAB/qAC) silently fail without it.
+# Cost evidence: 2026-05-18 R5 Phase A failed for 5/6 builders.
+ORIG_CSV="data/original/f1_strategy_dataset_v4.csv"
+if [[ ! -f "$ORIG_CSV" ]]; then
+    echo "--- data: $ORIG_CSV missing; pulling aadigupta1601/f1-strategy-dataset-pit-stop-prediction ---"
+    mkdir -p data/original
+    if ! kaggle datasets download -d aadigupta1601/f1-strategy-dataset-pit-stop-prediction \
+            -p data/original/ --unzip; then
+        echo "WARN: original-dataset pull failed; dgp_v3 slim-kNN builders may break"
+    fi
+fi
+
 # ---------------------------------------------------------------------------
 # Step 4 — artifact dataset (OOF / test predictions for stacking)
 # ---------------------------------------------------------------------------
