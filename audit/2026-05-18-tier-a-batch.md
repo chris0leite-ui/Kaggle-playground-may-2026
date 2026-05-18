@@ -54,12 +54,30 @@ measures ranking.
 Distinct from EXP-A3-7's -124 bp UID smoothing (which used target
 not prediction), but reaches the same dead end.
 
-## Full 5-fold OOF + K=4+1 gate (in progress)
+## Full 5-fold OOF + K=4+1 gate
 
-[results to fill in once background jobs complete]
+### a2_2_mandatory_compound_rule — REPRODUCED (WEAK at gate)
 
-- a2_2_mandatory_compound_rule: __ (running, ~26 min CPU elapsed at audit start)
-- a3_1_rank_sorted_gaps: __ (running, ~5 min CPU elapsed at audit start)
+- 5-fold OOF AUC: **0.94577**  (fold-std 0.00052; total wall 3613s = 60 min)
+- K=4+1 LR-meta: **0.95402** (Δ **+0.302 bp** vs K=4 baseline 0.95399)
+- ρ_test vs PRIMARY (d13e C×S τ=20k): **0.983221** → REGRESSION_RISK band
+- Per-candidate weight: |w| = 0.2759 (raw -0.182, rank +0.039, logit -0.056)
+
+**Verdict:** WEAK / null. Below +0.5 bp G1 threshold; ρ_test 0.983
+is in the REGRESSION_RISK band (<0.999) so LB transfer is high-risk.
+Exact reproduction of the team's `hypothesis-board.md` entry
+"K=4+1 plain LR-meta +0.302 bp (below +0.5 PASS); G3 flip 0.195
+asymmetric; TIE_EXPECTED on 4-gate. K=4+1 Path-B C×S τ=100k
++0.26 bp; ρ 0.999893; WEAK."
+
+The standalone OOF lift (0.94577 - 0.94563 = +1.4 bp single-LGBM)
+mostly absorbs at the meta. No new information here; closed FAIL
+on this gate. Path-B refit not retried (Day-15 friction
+`path-b-amp-only-fires-on-meta-arch-not-base-add`).
+
+### a3_1_rank_sorted_gaps — running
+
+(awaiting completion)
 
 ## Operational notes
 
