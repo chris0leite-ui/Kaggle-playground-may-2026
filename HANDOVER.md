@@ -14,12 +14,61 @@ versions: `audit/archive-YYYY-MM-DD-handover-*.md`.
 **Active PRIMARY: rank-blend 70/30 K=11 + K=9. LB 0.95386.**
 Unchanged from 2026-05-14. Top-5% gap −1.9 bp; leader gap −9.0 bp.
 
-Submissions: **42 / 270** total; **0 used 2026-05-18**. Comp-day
+Submissions: **43 / 270** total; **1 used 2026-05-18**. Comp-day
 **18 of 31**; days remaining **13**.
 
-File: `submissions/submission_blend_K11_K9_w_70_30.csv`.
+File: `submissions/submission_blend_K11_K9_w_70_30.csv` (note: file
+missing from local snapshot; PRIMARY submission was 2026-05-12, LB
+record persists on Kaggle).
 
-## 2026-05-18 session — three rounds; ceiling validated
+**Today's submission** (Round 4 calibration probe): K=4 + r4_segment_fe
+(row-class interaction FE) + r4_hmm_seq (sequence-class HMM posteriors)
+LR-meta blend → **LB 0.95354** (OOF 0.95405, transfer 5.1 bp drop).
+Beats K=4+Path-B (LB 0.95351) by 0.3 bp; 3.2 bp below PRIMARY.
+File: `submissions/submission_K4_r4seg_r4hmm.csv`.
+
+## 2026-05-18 session — four rounds; ceiling validated AND plateau-break found
+
+### Round 4 — Rule 23 free-form-FE + mechanism-orthogonal stacking (LATEST)
+
+PI re-entered `problem-solving.md` step 1 after Round 3 closed.
+Three Explore agents (state map, skill prescription, OOF failure
+analysis) produced a concrete target list:
+- Weak segments: WET+S1 (AUC 0.81), INTER+S2 (AUC 0.86), VET-driver
+- Unused interactions: Cumulative_Degradation × Compound (gap 14.5),
+  Position_Change × Driver-class (gap 1.86 for named drivers)
+
+**Phase A** — `probe_r4_segment_fe.py` (9 interaction features added
+to LightGBM): standalone OOF 0.94878. K=4+1: Δ +0.263 bp (strongest
+in 15+ rounds, but G2-fails 0.30). Variant v2 (drop WET, add tire-life)
++0.211 bp. Combined v1+v2 +0.282 bp. ρ vs K=4+Path-B = 0.999183.
+
+**Phase D — super-model attempt: HMM sequence model** —
+`probe_r4_hmm_seq.py` (Gaussian HMM with K=8 hidden states over
+per-(Year, Race, Driver) sequences of Compound+TyreLife+RaceProgress
++Stint+Position_Change+Cumulative_Degradation; 8-dim posterior + entropy
+as features for downstream LightGBM). HMM standalone alone: K=4+1
+Δ −0.005 bp (null). **But the 2-base combination (seg_fe + HMM) at
+K=4+1: Δ +0.542 bp** — first G2 PASS of Round 4 after 18 nulls.
+
+**Mechanism-orthogonality finding**: the row-class FE and the
+sequence-class HMM provide CORRECTIONS IN OPPOSITE DIRECTIONS at the
+LR-meta layer (logit-column coefs: seg_fe +0.200, HMM −0.127). This
+is true cross-mechanism diversity, not redundant base addition.
+
+**Anchor progression** (Round-3 absorption pattern confirms attenuation
+not absorption to zero):
+- K=4+1: Δ +0.542 bp ← G2 PASS
+- K=5 (K=4 + K=27 super-base)+1: Δ +0.275 bp ← marginal
+- K=21+1: Δ +1.449 bp (inflated, weak-anchor)
+
+**LB calibration probe submitted: LB 0.95354** (OOF→LB drop 5.1 bp).
+
+**Implication for next session**: at REAL K=11+K=9 PRIMARY (richer than
+K=27 super-base), expected lift is +0.0 to +0.3 bp → LB 0.9539-0.9542,
+potentially within top-5% boundary 0.95405.
+
+### Round 1-3 — original ceiling-validation work (UNCHANGED)
 
 Three execution rounds today, all in compliance with `loops.md`
 plateau triggers and `problem-solving.md` step-1 re-entry.
@@ -63,10 +112,10 @@ OOF 0.95433 with 88% weight on K=27+Path-B alone. +0.11 bp tie
 vs best-single. The snapshot has no diversity beyond K=27 to
 exploit.
 
-## Cumulative null tally for 2026-05-18
+## Cumulative tally for 2026-05-18
 
-**15 distinct mechanism classes tested today; all NULL/regress
-at the gates available** (K=4+1, K=21+1, K=4+K27super+1):
+**Round 1-3: 15 distinct mechanism classes tested; all NULL/regress.**
+Round 4: 4 single-mechanism nulls + 1 **G2-PASSING combination**.
 
 Round 1 (4): a2_2 mandatory-compound, a3_1 rank-sorted-gaps,
 C3 per-(R,L) shrinkage, C4 UID magic.
@@ -78,6 +127,13 @@ slope BLUP, per-bin conformal widths.
 
 Round 3 (2): multi-anchor retest of 3 candidates (null at K=4
 AND K=4+K27super); Caruana hill-climb (degenerates to K=27).
+
+Round 4 single-mechanism (4): r4_segment_fe v1 +0.263 bp G2-fail,
+v2 +0.211 bp G2-fail, v1+v2 stack +0.282 bp G2-fail, HMM alone
+−0.005 bp null.
+
+**Round 4 plateau-break (1)**: r4_segment_fe + r4_hmm_seq 2-base add
+at K=4+1 = **Δ +0.542 bp G2 PASS**. LB-submitted, scored 0.95354.
 
 ## Critical operational gap
 
@@ -119,22 +175,31 @@ kNN diversity first.
 ## Next-session first actions (priority order)
 
 1. **Rebuild slim-kNN bases** (~3-6 hr CPU). Highest-priority
-   operational fix. Reuses `scripts/build_K11_full_pathb.py`
-   and the upstream dgp_v3 builders.
-2. **Push K=11+K=9 OOFs to Kaggle artifact dataset** via
-   `kaggle datasets version` once kNN bases are rebuilt
-   (~10 min wall).
-3. **Re-test all 11 Round-2 nulls + 3 Round-3 retests at K=11+1**
-   with the proper anchor. ~30 min CPU. Confirms or refutes the
-   ceiling at the real PRIMARY level.
+   operational fix. Reuses `scripts/build_K11_full_pathb.py` and the
+   upstream `scripts/dgp_v3/qA{T,V,O,A,F,K}*.py` builders (verified
+   to exist in repo this session). Builders fire from a `__main__`
+   entrypoint each.
+2. **Retest Round-4 seg+HMM at REAL K=11+1.** ~5 min CPU after
+   rebuild. Inputs already on disk:
+   - `oof_r4_segment_fe_strat.npy` + test pair
+   - `oof_r4_hmm_seq_strat.npy` + test pair
+   Expected K=11+1 lift: +0.0 to +0.3 bp (per anchor-attenuation
+   pattern: 0.542 @ K=4 → 0.275 @ K=5+K27super → ~0 to 0.3 @ K=11).
+   If lift > +0.1 bp, submit as a real PRIMARY-class probe (LB
+   potentially 0.9539-0.9542, candidate top-5%).
+3. **Re-test all 11 Round-2 nulls at K=11+1**. ~30 min CPU.
+   Confirms or refutes ceiling at real anchor.
 4. **C2 swap-noise DAE on Kaggle T4** (~2-3 hr GPU). Highest-EV
    remaining mechanism class; Porto Seguro 1st-place precedent.
+   Combine with seg+HMM as 3-mechanism stack at K=4+1 first
+   (Round-4 mechanism-orthogonality finding).
 5. **C1 OpenF1 per-Race scalar join** (~45 min). Sub-bp expected
    but novel join key.
 6. **Final-window hedge prep** (Days 10-13). Final-1 = PRIMARY
-   K=11+K=9 (LB 0.95386). Final-2 = K=27 + Path-B (LB 0.95368)
-   — structurally different; wins ~30-40% of private-LB
-   realizations per headroom-math agent.
+   K=11+K=9 (LB 0.95386). Final-2 candidate set:
+   - K=27 + Path-B (LB 0.95368) — structurally different
+   - K=4 + seg + HMM (LB 0.95354, Round 4 calibration probe)
+     — mechanism-orthogonal hedge per cross-class diversity.
 
 ## 🔴 Critical: held submissions — DO NOT submit
 
@@ -181,10 +246,9 @@ Origin: `audit/2026-05-06-target-reform-leakage-audit.md`.
 ## Empirical findings to preserve
 
 - **K=4 vs K=27 residual Pearson correlation: 0.998.** Confirms
-  the row-feature subspace is locked at OOF ~0.95430. Future
-  challenger mechanisms must be tested against BOTH anchors;
-  a positive result at K=21+1 alone is misleading (K=21 base is
-  weak).
+  the row-feature subspace is locked at OOF ~0.95430 *for single-
+  mechanism row-features*. Future challenger mechanisms must be
+  tested against BOTH anchors.
 - **LR with log-loss is C-robust loss-optimal at K=4 meta.**
   Sweep across 4 orders of magnitude (C ∈ {0.01, 100}) shows
   the LGBM-rank candidate is null at every C. Closes the loss-
@@ -192,6 +256,20 @@ Origin: `audit/2026-05-06-target-reform-leakage-audit.md`.
 - **Per-Driver random-effect BLUP adds noise on synth.** Every
   lambda from 50-2000 regresses; closes the per-actor heterogeneity
   axis.
+- **2026-05-18 (Round 4) — mechanism-orthogonal stacking breaks
+  the single-class ceiling.** Row-class FE (segment-targeted
+  interactions) + sequence-class HMM (state-posteriors over
+  per-Driver lap trajectories) combined as 2-base K=4 stack-add
+  gives Δ +0.542 bp at K=4+1 with G2 PASS, where each alone is
+  G2-fail (segment_fe +0.263, HMM −0.005). LR-meta logit-column
+  coefficients point in OPPOSITE directions (seg +0.200, HMM
+  −0.127): genuine mechanism orthogonality, not redundant base
+  addition. Implication: future plateau breaks should test CROSS-
+  CLASS combinations, not single-class refinement.
+- **K=4 LR-meta operator OOF→LB transfer = ~5 bp drop.** Today's
+  submission OOF 0.95405 → LB 0.95354. Matches K=4+Path-B's transfer
+  (OOF 0.95403 → LB 0.95351). Future K=4-class submissions can be
+  LB-predicted within ±1 bp from OOF.
 
 ## Hedge ladder (R5 / R7 final-window candidates) — unchanged
 

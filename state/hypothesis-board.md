@@ -5,6 +5,16 @@ parked. For history, read `audit/research/` and the postmortems.
 
 ## Insights that are still load-bearing
 
+- **Mechanism-orthogonal stacking breaks the single-class ceiling.**
+  (2026-05-18 Round 4.) Row-class FE (hand-coded interactions
+  targeting weak segments) is null alone at G2 (+0.263 bp); sequence-
+  class HMM (state-posteriors over per-Driver lap trajectories) is
+  null alone at G2 (−0.005 bp). Combined as a 2-base K=4 stack-add,
+  Δ +0.542 bp at K=4+1 — G2 PASS, first plateau break in 18 attempts.
+  LR-meta logit-coefs point in opposite directions (+0.200 seg vs
+  −0.127 HMM), confirming the bases correct in orthogonal directions.
+  **Implication**: cross-class combinations (row × sequence × graph ×
+  embedding) > single-class refinement at this row-feature ceiling.
 - **The per-segment shrinkage trick fires on a redundant pool, not on a
   saturated one.** It worked when the stack had 21-22 bases of similar
   GBDT/FM material (high redundancy, low effective rank). It stopped

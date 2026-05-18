@@ -26,17 +26,15 @@ override of Rule 27 abort threshold (ρ_test ≥ 0.999) yielded the
 +0.1 bp lift despite ρ = 0.9998 — uncorrelated-error cancellation
 at the 5-decimal Kaggle quantisation.
 
-## Today's status (2026-05-14)
+## Today's status (2026-05-18)
 
-- Submissions used this comp: **42 / 270**. Daily cap: 10
+- Submissions used this comp: **43 / 270**. Daily cap: 10
   (`comp-context.md: submission_budget`).
-- Today (2026-05-14): **4 used**, all NULL or REGRESSION:
-  - K=8 rebuilt — LB 0.95382 (ρ 0.999901, tie).
-  - Blend 70/10/20 — LB 0.95386 (tie).
-  - K=12 + control LightGBM — LB **0.95232** (-15.4 bp REGRESSION;
-    cross-val gate measured +18.194 bp; ρ_test 0.928).
-  - Blend 60/15/25 — LB 0.95386 (tie).
-- Comp-day **14 of 31**. Days remaining: **17**.
+- Today (2026-05-18): **1 used**:
+  - K=4 + r4_segment_fe + r4_hmm_seq LR-meta (R4 plateau-break
+    probe) — LB **0.95354** (OOF 0.95405, transfer −5.1 bp).
+    Beats K=4+Path-B by 0.3 bp; 3.2 bp behind PRIMARY.
+- Comp-day **18 of 31**. Days remaining: **13**.
 - Top-5% boundary: **0.95405**. Gap to PRIMARY: **−1.9 bp**.
 - Leader: **0.95476**. Gap to PRIMARY: **−9.0 bp**.
 
@@ -101,6 +99,7 @@ hedge probe:
 | 2026-05-09 PM | K=10 + K=27 + Path-B τ=100k | 0.95384 | +3.3 |
 | 2026-05-09 PM | K=9 qAX (slim-kNN) | 0.95375 | +2.4 |
 | 2026-05-09 AM | K=5 (K=4 + V4 kNN-aug) Path-B τ=100k | 0.95359 | +0.8 |
+| 2026-05-18 AM | K=4 + r4_segment_fe + r4_hmm_seq LR-meta | 0.95354 | +0.3 |
 | 2026-05-08 PM | K=4 + Path-B τ=100k | 0.95351 | 0 |
 | 2026-05-07 PM | K=27 + Path-B τ=100k | 0.95368 | (pre-sparse) |
 | 2026-05-07 AM | K=23 + d16 + d18_chain Path-B τ=20k | 0.95149 | |

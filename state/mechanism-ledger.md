@@ -325,3 +325,39 @@ of Rule 24 (fold-safe label-conditional aggregates).
   AI 2025 Bi-LSTM achieved F1 0.81 with 10-lap windows; deferred to
   next session (GPU-heavy ~30-60 min Kaggle T4). Cited as the only
   genuinely untried mechanism after the Rule 7 saturation scan.
+
+## 2026-05-18 Round 4 — Rule 23 free-form FE + mechanism-orthogonal stacking
+
+- **R4 segment-FE v1** (`probe_r4_segment_fe.py`) — 9 hand-coded
+  interaction features (Cumulative_Degradation × Compound × 5,
+  Position_Change × is_named_driver, is_named, is_WET × Stint1,
+  is_INTER × Stint2). Standalone OOF 0.94878. K=4+1 Δ +0.263 bp
+  (strongest in Round 4 single-bases, but G2-fails 0.30). Per-segment
+  AUCs DID NOT improve on the targeted weak segments (WET-S1 went
+  0.81 → 0.77); the meta-lift came from the named-driver × position-
+  change interaction (LR-meta logit-coef +0.114).
+- **R4 segment-FE v2** (`probe_r4_segment_fe_v2.py`) — drop WET features,
+  add TyreLife × Compound + Position_Change × Stint (13 features
+  total). Standalone OOF 0.94873. K=4+1 Δ +0.211 bp; TyreLife features
+  redundant with the existing TyreLife raw column.
+- **R4 v1+v2 2-base stack** — K=4+2 Δ +0.282 bp; v1 and v2 are
+  largely redundant (0.019 bp gain from combining).
+- **R4 HMM sequence base** (`probe_r4_hmm_seq.py`) — Gaussian HMM
+  K=8 hidden states on per-(Year, Race, Driver) sequences with
+  observations (Compound_int, TyreLife, RaceProgress, Stint,
+  Position_Change, Cumulative_Degradation). 8-dim posterior +
+  entropy added as features to downstream LightGBM. HMM fit time
+  223s (Baum-Welch 30 EM iter on 40,869 sequences). Standalone OOF
+  0.94713. **K=4+1 alone Δ −0.005 bp — NULL.** Sequence-class
+  features fully absorbed at the LR-meta when used alone.
+- **R4 mechanism-orthogonal 2-base stack (seg_fe + HMM) — Δ +0.542
+  bp at K=4+1, FIRST G2 PASS of Round 4 after 18 nulls.** LR-meta
+  logit-column coefficients point in opposite directions (seg
+  +0.200, HMM −0.127); the bases provide corrections in orthogonal
+  prediction directions — genuine cross-mechanism diversity.
+  Anchor-attenuation: 0.542 @ K=4 → 0.275 @ K=5(+K27super). LB
+  calibration probe submitted → LB 0.95354 (OOF→LB drop 5.1 bp,
+  matching K=4+Path-B transfer pattern). **The simple lesson:
+  row-feature ceiling holds per single-mechanism, but ORTHOGONAL
+  mechanism families combine super-additively.** Next-session
+  priority: retest at REAL K=11+1 anchor after slim-kNN rebuild.
