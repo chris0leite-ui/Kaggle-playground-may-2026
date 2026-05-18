@@ -37,12 +37,15 @@ NULL or REGRESSION (K=12 wide-ρ base, observable lead-feature,
 Strategic conclusion: K=11 + LR-meta + Path-B is at or near the
 **Bayes-optimal ceiling** for row-feature prediction on this
 synthetic dataset (synth generator decouples PitStop/PitNextLap
-with ~20% stochastic disagreement).
+with ~20% stochastic disagreement). Per Rule 4, this claim was
+re-interrogated 2026-05-18 via a formal Research-loop; result is
+4 deduped untried candidates (see "Research-loop completed"
+section below) — the "ceiling" is row-feature-exhausted but NOT
+task-framing- or information-source-exhausted.
 
-Next-session pivots to **NEW-INFORMATION mechanisms** (cross-domain
-training, multi-seed bagging of the full pipeline, Bayesian
-group-prior with smoothing) rather than weight/feature refinement
-on the existing K=11 stack.
+Next-session pivots to the **Tier-A batch** (8 unconsumed picks
+from 2026-05-08 FE research + 2 new candidates from 2026-05-18
+loop) before returning to NEW-INFORMATION mechanisms.
 
 ## 🔴 Critical: held submissions — DO NOT submit
 
@@ -75,34 +78,65 @@ For detail when needed:
 - `audit/friction-archive.md` — full historical friction (1,450 lines;
   do not read by default).
 
-## Empirical transfer bands (Rule 27, 2026-05-14)
+## Empirical transfer bands (Rule 27)
 
-Encoded in `scripts/probe_blend_harness.py::RULE_27_*_THRESHOLD`:
+See `state/current.md` for the full table. TIE_ZONE ≥ 0.9999;
+OK transfer [0.999, 0.9999); REGRESSION_RISK < 0.999.
 
-| Band | ρ_test vs PRIMARY | Expectation |
-|---|---|---|
-| TIE_ZONE | ≥ 0.9999 | LB ties within ±0.05 bp |
-| OK transfer | 0.999 ≤ ρ < 0.9999 | Sub-bp to few-bp LB movement |
-| REGRESSION_RISK | < 0.999 | Wide-ρ adds overfit CV patterns |
+## 2026-05-18 — Research-loop completed (Rule 7)
 
-The K=12 result (cross-val gate +18.194 bp; LB −15.4 bp; ρ_test
-0.928) is the cleanest demonstration of the cross-validation-gate
-transfer-trap at this saturation level.
+This session ran a fresh Research-loop on the post-2026-05-14
+plateau. Three parallel agents + dedup against the ledger. Outputs:
 
-## Next-session first actions (EV / cost order)
+- `audit/research/2026-05-18-notebooks.md` — null harvest (Kaggle
+  pages reCAPTCHA-walled; next plateau scan should use authenticated
+  `kaggle kernels list -c <slug> --sort-by voteCount`).
+- `audit/research/2026-05-18-prior-comp.md` — Porto Seguro / IEEE-CIS
+  Fraud / Otto analogues; quoted lifts (downscale for our saturation).
+- `audit/research/2026-05-18-domain.md` — arXiv 2512.00640 state-space
+  tyre-deg paper, TUM FTM features, OpenF1 per-Race aggregate join
+  is fold-safe at the (Race) level.
+- `audit/research/2026-05-18-research.md` — SYNTHESIS. 4 new
+  deduped candidates (C1-C4); 6 confirmations of Tier-A2/A3 picks
+  already on the menu.
 
-1. **Blend operator sweep** — arithmetic / geometric / log-odds /
-   trimmed mean across the 4 LB-confirmed PRIMARYs. Cost 5 min.
-2. **3-way and 4-way blends of LB-confirmed PRIMARYs** —
-   hill-climb the weights. Cost 1 min per blend.
-3. **Path-B C×S on fresh 27-base + slim-kNN union (τ=100k only)** —
-   qBG attempted this, timed out at 16+ min. Skip τ=5k / τ=20k to
-   halve compute.
-4. **R5 hedge ladder preparation** — list OOF-best candidates that
-   were rejected for LB regression. 30 min.
-5. **NEW-INFORMATION mechanism scouting** — if (1)-(3) are NULL,
-   trigger Research-loop (loops.md). Three parallel research agents
-   + grep-ledger dedup.
+Strategy-critic-loop is **still pending** (needs `data/` and
+`scripts/artifacts/` populated; this session ran in an ephemeral
+container with empty disk). The next session-with-bootstrap should
+fire it before any compute.
+
+## Next-session first actions (EV / cost order — REVISED 2026-05-18)
+
+1. **Bootstrap** (`bash bootstrap.sh`) to pull `data/` + the
+   `chrisleitescha/s6e5-artifacts` dataset into
+   `scripts/artifacts/`. Required for everything below.
+2. **Strategy-critic-loop** (`strategy-critic.md`, ~30 min) — runs
+   the 5-question template on PRIMARY OOF. May re-rank the Tier-A
+   batch below.
+3. **Tier-A feature batch** (~110 min CPU; 1-2 submission slots):
+   - C3 per-(Race, LapNumber) Bayesian shrinkage post-process (5 min).
+   - EXP-A3-1 rank-sorted gaps (18 min).
+   - EXP-A3-3 lagged DriverAheadPit + tirechange_pursuer (10 min).
+   - EXP-A3-4 Heilmeier residual (8 min + per-fold).
+   - EXP-A3-2 per-track fuel coef (6 min + per-fold).
+   - EXP-A2-3 nested-fold TE 3/4-way (12 min).
+   - C4 UID magic-features as LGBM base (25 min).
+   - EXP-A3-6 KNN-target-mean-500 (20 min).
+   - EXP-A2-7 F3 competitor field-state at K=11+1 (8 min).
+   - EXP-A3-8 quantile/histogram groupby (15 min).
+   - Each gates at K=11+1 plain LR-meta with G1-G4 + Rule-27.
+4. **Follow-ups** (only if Tier-A clears a survivor):
+   - Two-meta-in-parallel + Ridge top blend (~30 min).
+   - Caruana forward-selection-with-replacement (~10 min).
+   - C2 DAE with swap-noise (Porto Seguro pattern, ~2-3 hr T4×2).
+   - C1 per-(Race) OpenF1 aggregate join (~45 min).
+   - Cross-domain training on `d16_orig` (~30-60 min) — **first
+     check whether Aadigupta dataset is already in Path-B via
+     yekenot recipe** (see flag in `2026-05-18-research.md`).
+5. **Hedge ladder maintenance** — list R5/R7 candidates per
+   `state/current.md`. 30 min.
+6. **Final-window-only**: EXP-9 gap-aware sequence transformer
+   on Kaggle T4×2 (~4-6 hr) if Tier-A all-null and ≥5 days remain.
 
 ## Falsified / dead — do not retry
 
@@ -122,11 +156,8 @@ Highlights:
 - qBA Manhattan distance kNN (LB regress despite +0.13 bp OOF).
 - K=34 unrolled at any C-sweep value (over-parameterises LR-meta).
 
-## Today's calibration data (2026-05-14)
+## Today's calibration data (2026-05-14, see audit for full)
 
-| Probe | OOF Δ | LB | Lesson |
-|---|---:|---:|---|
-| K=8 rebuilt (3-of-6 slim-kNN + K=27) | n/a | 0.95382 | Reproduction tie (ρ 0.999901). |
-| Blend 70/10/20 K=11/K=10/K=27 | +0.065 | 0.95386 | Harness top-1 in TIE_ZONE. |
-| K=12 + control LightGBM | +18.194 | **0.95232** | Cross-val gate fooled by wide-ρ (0.928); REGRESSION_RISK band confirmed. |
-| Blend 60/15/25 K=11/K=10/K=27 | +0.059 | 0.95386 | Deeper-in-OK-zone tie. |
+See `audit/2026-05-14-overnight-iteration.md`. Headline: K=12 +
+control LightGBM regressed -15.4 bp at LB despite +18.194 bp at
+the cross-val gate (ρ_test=0.928 below the OK-transfer band).

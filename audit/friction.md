@@ -9,12 +9,15 @@ This file is ≤150 lines. The full historical detail is in
 `audit/friction-archive.md` (1,450+ lines; do not read by default).
 Pre-distillation snapshots: `audit/archive-YYYY-MM-DD-friction-*.md`.
 
-## This week (2026-05-12 → 2026-05-14)
+## This week (2026-05-12 → 2026-05-18)
 
 ```
 2026-05-14  cv-gate-misleading-wide-rho   K=12 control-LGBM cross-val +18.194 bp; ρ_test 0.928; LB -15.4 bp REGRESSION. Bands updated.
 2026-05-14  synth-label-decoupling        PitNextLap[L]=PitStop[L+1] holds only 80.95% of observable pairs; per-(D,R,Y) sum Spearman 0.60. K=11 OOF 0.95443 = Bayes-ceiling proxy.
 2026-05-14  noise-ceiling-5-null-probes   5 mechanism classes overnight all NULL/REGRESSION; PRIMARY unchanged. Pivot to NEW-INFORMATION mechanisms.
+2026-05-18  research-loop-overdue         10-day gap from prior research-loop (2026-05-08) despite plateau hitting Rule 7 thresholds on 2026-05-14. Rule 7 auto-fire not triggered; promotion candidate.
+2026-05-18  kaggle-pages-recaptcha-gated  WebFetch on Kaggle /code and /discussion returns only page title; reCAPTCHA blocks notebook scrape. Switch R22 scan to authenticated `kaggle kernels list -c <slug> --sort-by voteCount`.
+2026-05-18  tier-a3-menu-stale            10 of 13 Tier-A2/A3 picks from 2026-05-08 still pending 10 days later; menu was never executed. Rule 18 (claim-the-leaf) didn't bind because session focus drifted to K=11/Path-B variants instead.
 ```
 
 ## Last week (2026-05-08 → 2026-05-11) — one-liner summary
