@@ -1,0 +1,7 @@
+== R15 Phase 4: cb_focal_weighted (CB class-weighted Logloss) ==
+  train (439140, 16)  test (188165, 15)
+  class prior: 0.1990 (re-weighted to ~0.5)
+  feats: 93  cat: 9
+
+  --- Fold 1/5 | ti=351312 va=87828 ---
+0:	test: 0.9130634	best: 0.9130634 (0)	total: 684ms	remaining: 34m 10s
