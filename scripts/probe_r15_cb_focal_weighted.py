@@ -116,7 +116,22 @@ def main() -> None:
     fold_metrics = []
     n_eff_folds = 1 if args.smoke else N_FOLDS
 
+    # Per-fold checkpoint to survive container suspension.
+    ckpt = ART / "_ckpt_R15_cb_focal_weighted.npz"
+    done_folds = set()
+    if ckpt.exists() and not args.smoke:
+        z = np.load(ckpt)
+        oof_pred = z["oof_pred"].astype(np.float64)
+        test_pred = z["test_pred"].astype(np.float64)
+        done_folds = set(int(f) for f in z["done_folds"])
+        print(f"  RESUME: loaded checkpoint, done folds = {sorted(done_folds)}",
+              flush=True)
+
     for fold, (ti, vi) in enumerate(fold_list[:n_eff_folds], 1):
+        if fold in done_folds:
+            print(f"\n  --- Fold {fold}/{n_eff_folds} SKIP (ckpt) ---",
+                  flush=True)
+            continue
         t_f = time.time()
         print(f"\n  --- Fold {fold}/{n_eff_folds} | ti={len(ti)} va={len(vi)} ---",
               flush=True)
@@ -163,6 +178,12 @@ def main() -> None:
         ))
         print(f"    iters={m.tree_count_} wall {wall:.0f}s  "
               f"AUC={auc_va:.5f}", flush=True)
+        done_folds.add(fold)
+        if not args.smoke:
+            np.savez(ckpt, oof_pred=oof_pred, test_pred=test_pred,
+                     done_folds=np.array(sorted(done_folds), dtype=np.int32))
+            print(f"    ckpt saved ({len(done_folds)}/{n_eff_folds})",
+                  flush=True)
 
     if args.smoke:
         print(f"\n  SMOKE wall: {time.time()-t0:.0f}s; 5-fold proj "
