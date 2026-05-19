@@ -1,0 +1,46 @@
+== R10 multi-constituent alt-stack + rank-blend with R7.1 PRIMARY ==
+  rows train: 439,140  test: 188,165  pos: 87,381 (19.90%)
+
+[C1] Loading existing LambdaRank stint-grouped ...
+  C1 OOF AUC: 0.85512
+
+[C2] Training LambdaRank race-grouped (5-fold + full-fit) ...
+  C2 OOF AUC: 0.76088  wall=96.9s
+
+[C3] Building rolling features + LGBM ...
+  rolling features: 37  built wall=1430.3s
+  C3 OOF AUC: 0.90450  wall=1523.3s
+
+[C4] Kernel hazard by (Compound, Stint, TyreLife) ...
+    fold 1 2 3 4 5 done.
+  C4 OOF AUC: 0.81795  wall=4.3s
+
+[Combiners] Build alt-stack from C1..C4 ...
+  Constituent OOF AUC and ρ_OOF vs R7.1:
+  R7.1 PRIMARY OOF: 0.95447
+    C1_lrank_stint      OOF=0.85512  ρ_OOF=+0.72709  ρ_test=+0.74466
+    C2_lrank_race       OOF=0.76088  ρ_OOF=+0.51339  ρ_test=+0.58755
+    C3_rolling          OOF=0.90450  ρ_OOF=+0.86936  ρ_test=+0.86001
+    C4_kernel_haz       OOF=0.81795  ρ_OOF=+0.45354  ρ_test=+0.45213
+
+  CM-A rank-mean OOF AUC: 0.90766
+  CM-B LR-meta  OOF AUC:  0.92430
+  LR coefs: {'C1_lrank_stint': 1.02, 'C2_lrank_race': 0.106, 'C3_rolling': 8.707, 'C4_kernel_haz': 2.287, 'C1_lrank_stint_p': 1.306, 'C2_lrank_race_p': 0.058, 'C3_rolling_p': -3.219, 'C4_kernel_haz_p': 0.699}
+
+  Picked combiner: CM-B_LR_meta  OOF=0.92430  ρ_OOF=+0.88374  ρ_test=+0.88196
+
+[Blend] Rank-blend R7.1 (0.95447) with alt-stack (0.92430) ...
+
+   w(R7.1)  w(alt)  blend OOF     Δ vs R7.1   ρ_test vs R7.1
+      0.99    0.01    0.95447     -0.045 bp         0.999989 ↓
+      0.97    0.03    0.95444     -0.320 bp         0.999903 ↓
+      0.95    0.05    0.95439     -0.844 bp         0.999728 ↓
+      0.90    0.10    0.95415     -3.223 bp         0.998894 ↓
+      0.85    0.15    0.95376     -7.112 bp         0.997476 ↓
+      0.80    0.20    0.95322    -12.493 bp         0.995447 ↓
+      0.70    0.30    0.95170    -27.669 bp         0.989482 ↓
+      0.50    0.50    0.94691    -75.604 bp         0.969714 ↓
+
+  Best in ρ-band: w_R71=0.95  Δ -0.844 bp  ρ_test 0.999728  → NULL
+
+Wall 1641.5s. Wrote probe_r10_multi_alt_stack_blend.json
