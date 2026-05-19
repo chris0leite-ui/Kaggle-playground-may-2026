@@ -4,5 +4,20 @@
   feats: 93  cat: 9
 
   --- Fold 1/5 | ti=351312 va=87828 ---
-0:	test: 0.9130634	best: 0.9130634 (0)	total: 684ms	remaining: 34m 10s
-500:	test: 0.9493601	best: 0.9493601 (500)	total: 3m 46s	remaining: 18m 48s
+0:	test: 0.9130634	best: 0.9130634 (0)	total: 305ms	remaining: 15m 15s
+500:	test: 0.9493601	best: 0.9493601 (500)	total: 1m 48s	remaining: 8m 59s
+1000:	test: 0.9504323	best: 0.9504323 (1000)	total: 3m 35s	remaining: 7m 9s
+1500:	test: 0.9504722	best: 0.9506254 (1233)	total: 5m 23s	remaining: 5m 22s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.9506253513
+bestIteration = 1233
+
+Shrink model to first 1234 iterations.
+    iters=1234 wall 339s  AUC=0.95063
+
+  --- Fold 2/5 | ti=351312 va=87828 ---
+0:	test: 0.9075967	best: 0.9075967 (0)	total: 242ms	remaining: 12m 4s
+500:	test: 0.9479033	best: 0.9479033 (500)	total: 1m 48s	remaining: 8m 59s
+1000:	test: 0.9492185	best: 0.9492959 (992)	total: 3m 37s	remaining: 7m 14s
+1500:	test: 0.9494529	best: 0.9494603 (1483)	total: 5m 26s	remaining: 5m 26s

@@ -4,15 +4,64 @@
 
   --- Fold 1/5 | ti=351312 va=87828 ---
     target_ti: mean 7.011  std 8.374  target_va: mean 11.652
-0:	learn: 0.3126882	test: -0.1147258	best: -0.1147258 (0)	total: 947ms	remaining: 47m 21s
+0:	learn: 0.3126882	test: -0.1147258	best: -0.1147258 (0)	total: 568ms	remaining: 28m 22s
 Stopped by overfitting detector  (300 iterations wait)
 
 bestTest = -16.73463379
 bestIteration = 110
 
 Shrink model to first 111 iterations.
-    iters=111 wall 234s  AUC(score vs PitNextLap)=0.84148
+    iters=111 wall 109s  AUC(score vs PitNextLap)=0.84148
 
   --- Fold 2/5 | ti=351312 va=87828 ---
     target_ti: mean 7.084  std 8.458  target_va: mean 11.495
-0:	learn: 0.3086747	test: -0.1187193	best: -0.1187193 (0)	total: 478ms	remaining: 23m 54s
+0:	learn: 0.3086747	test: -0.1187193	best: -0.1187193 (0)	total: 242ms	remaining: 12m 4s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = -16.3752263
+bestIteration = 130
+
+Shrink model to first 131 iterations.
+    iters=131 wall 109s  AUC(score vs PitNextLap)=0.83989
+
+  --- Fold 3/5 | ti=351312 va=87828 ---
+    target_ti: mean 7.062  std 8.428  target_va: mean 11.588
+0:	learn: 0.3137037	test: -0.1275054	best: -0.1275054 (0)	total: 245ms	remaining: 12m 13s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = -16.56515001
+bestIteration = 104
+
+Shrink model to first 105 iterations.
+    iters=105 wall 100s  AUC(score vs PitNextLap)=0.83903
+
+  --- Fold 4/5 | ti=351312 va=87828 ---
+    target_ti: mean 7.057  std 8.413  target_va: mean 11.564
+0:	learn: 0.3105221	test: -0.1099946	best: -0.1099946 (0)	total: 220ms	remaining: 10m 58s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = -16.48716571
+bestIteration = 127
+
+Shrink model to first 128 iterations.
+    iters=128 wall 104s  AUC(score vs PitNextLap)=0.84086
+
+  --- Fold 5/5 | ti=351312 va=87828 ---
+    target_ti: mean 7.055  std 8.421  target_va: mean 11.550
+0:	learn: 0.3106554	test: -0.1196351	best: -0.1196351 (0)	total: 256ms	remaining: 12m 48s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = -16.51682819
+bestIteration = 109
+
+Shrink model to first 110 iterations.
+    iters=110 wall 101s  AUC(score vs PitNextLap)=0.84083
+
+  Standalone OOF AUC: 0.84040
+  R15 PRIMARY OOF: 0.500469
+  ρ_OOF vs R15 PRIMARY: 0.001847
+  ρ_OOF vs cb_horizon (same target, RMSE-log loss): 0.002261
+  ABSORPTION (ρ≥0.95): False
+  Saved oof_R15_cb_poisson_strat.npy + test_..._strat.npy
+  Wrote audit/2026-05-19-r15-cb_poisson.json
+  Total wall: 550s
