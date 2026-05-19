@@ -1,0 +1,20 @@
+== R11-C: Cox-PH hazard at TyreLife as base ==
+  train (439140, 16)  test (188165, 15)  prior 0.1990
+  fold 0: 45666 train stints (events=0.082)
+    fold 0 AUC: 0.65296  wall 6.9s
+  fold 1: 45618 train stints (events=0.081)
+    fold 1 AUC: 0.64640  wall 6.5s
+  fold 2: 45715 train stints (events=0.081)
+    fold 2 AUC: 0.65113  wall 6.4s
+  fold 3: 45608 train stints (events=0.083)
+    fold 3 AUC: 0.64536  wall 6.2s
+  fold 4: 45611 train stints (events=0.084)
+    fold 4 AUC: 0.65283  wall 6.3s
+
+  Standalone OOF AUC: 0.64971  (per-fold mean 0.64973)
+  Total wall: 73.0s
+  Saved: scripts/artifacts/oof_R11_C_survival_hazard_strat.npy  scripts/artifacts/test_R11_C_survival_hazard_strat.npy
+
+  G1 (>= 0.90): FAIL (standalone 0.64971)
+  rho_oof vs R7.1 PRIMARY: 0.243187
+  Wrote audit/2026-05-19-round-11-survival.json

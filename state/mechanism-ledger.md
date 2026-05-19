@@ -515,3 +515,67 @@ R9 ran dual-track on the last 2 viable research-loop candidates.
   per-(Driver, Race) lap sequences, graph mechanism with competitor
   edges, survival/hazard model on stint-life. PRIMARY R7.1 unchanged;
   3 daily slots held for R10 mechanism-expansion probes.
+
+## 2026-05-19 Round 11 — Mechanism expansion swing (C closed; A skipped; B pending)
+
+After R10 closed alt-stack as the 4th rank-lock axis, R11 ran the
+HANDOVER R10 priority queue's structurally orthogonal candidates.
+
+- **R11-A seq2seq transformer (`predict next-N PitNextLap`).
+  SKIPPED.** Mechanism-ledger lookup at session-start found R5
+  Phase F transformer v1 (standalone OOF 0.91974 absorbed at
+  K=11+Path-B) and R6 Phase C transformer v2 (D=256, 6 layers,
+  GroupKFold; standalone 0.93330, K=14+Path-B Δ=−0.014 bp absorbed)
+  both listed under HANDOVER line 134 as CLOSED. The R10 queue's
+  "predict next-N laps" twist is a head-swap, not a structural
+  pivot. PI directive: skip A, redirect T4 budget to B. This is
+  the `research-loop-dedup-miss-vs-ledger` friction firing again —
+  HANDOVER R10 queue re-listed an axis its own closed-list flagged.
+
+- **R11-C Cox-PH hazard at TyreLife as base.** Subject = per-
+  (Driver, Race, Stint); duration = max(TyreLife) in train rows;
+  event = PitStop at max-TyreLife train row; covariates = compound
+  dummies + stint + year dummies + lap_start + position + lapdelta_
+  mean + cum_deg + is_named_driver. Per-fold refit on train stints
+  (R24 safe); hazard at row's TyreLife = ΔH(t|x). Standalone OOF
+  **0.64971** G1-FAIL (covariates per-stint; row-level
+  differentiation collapses onto baseline h₀(t) which is monotone-
+  in-TyreLife). K=14 + Path-B DriverClass × Stint τ=100k: OOF
+  **0.954466**, Δ vs R7.1 PRIMARY **−0.0487 bp NULL**, ρ_OOF
+  0.99992 TIE_ZONE. Survival/hazard mechanism CLOSED at this
+  formulation. Audit: `audit/2026-05-19-round-11-survival.json`,
+  `audit/2026-05-19-round-11-C-K14-add.log`.
+
+  Notes: the Cox-PH-on-stint-summaries formulation loses row-level
+  resolution. A time-varying Cox PH (start-stop format, per-row
+  covariates) would mechanically reduce to a smooth-baseline
+  logistic regression — the orthogonality vs LGBM would shrink to
+  the monotonic h₀(t) constraint, which the K=13 pool likely
+  captures already (Day-1 LGBM with TyreLife is monotone-friendly).
+
+- **R11-B transverse cross-driver attention transformer.** Kaggle
+  T4×2 kernel `kernels/r11-graph-transverse-gpu/`. Per-(Year, Race,
+  LapNumber) group; attention over the DRIVER axis (vs R5/R6 which
+  attend over LAP axis). 4-layer × D=128 × 8 heads × 8 epochs.
+  Standalone OOF **0.62085** G1-FAIL; K=14 + Path-B DCS τ=100k
+  OOF 0.954467, **Δ vs R7.1 PRIMARY −0.0346 bp NULL**, ρ_OOF
+  0.99992 TIE_ZONE. Kernel wall 34 s on T4×2. Audit:
+  `audit/2026-05-19-round-11-B-K14-add.log`,
+  `kernels/r11-graph-transverse-gpu/` (kernel + log pulled to
+  `/tmp/r11b_pull/`).
+
+  **Structural finding (new):** the synthetic data has **887 unique
+  Drivers** (vs ~22 real F1) with **71 drivers/group median per
+  (Year, Race, LapNumber), max 373** — the synthetic generator
+  densely upsamples per (Year, Race, LapNumber). 80% of training
+  groups exceed MAX_DRIVERS=24 (the kernel's pad size); 70% of OOF
+  entries left at 0.0 due to truncation bug. Even at MAX_DRIVERS=128
+  (covers 84% of groups) the F1-style inter-driver-competition
+  signal we hoped to capture (undercut, pit window, safety-car
+  cohort) is structurally degraded by the synthetic augmentation —
+  71+ pseudo-drivers per race-lap dissolve the natural F1 cohort
+  cohesion. Cross-driver-attention-as-mechanism CLOSED at this
+  formulation; revisiting would require modeling the data's actual
+  augmentation structure (e.g., grouping by [Year, Race, Stint,
+  Compound, Lap-bin] for a finer cohort), not real-F1 dynamics.
+  Friction: `r11-b-max-drivers-truncation-bug`.

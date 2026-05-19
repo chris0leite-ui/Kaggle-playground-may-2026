@@ -1,0 +1,16 @@
+{
+  "round": "R11_C_survival_hazard",
+  "oof_auc": 0.6497113835279414,
+  "per_fold_auc": [
+    0.6529586312968794,
+    0.6463960082746184,
+    0.6511311275952159,
+    0.6453562534320436,
+    0.6528266808567849
+  ],
+  "rho_oof_vs_R71": 0.24318680403742302,
+  "wall_s": 73.100506067276,
+  "G1_PASS": false,
+  "oof_path": "scripts/artifacts/oof_R11_C_survival_hazard_strat.npy",
+  "test_path": "scripts/artifacts/test_R11_C_survival_hazard_strat.npy"
+}

@@ -58,10 +58,17 @@ at the 5-decimal Kaggle quantisation.
 ## Today's status (2026-05-19)
 
 - Submissions used this comp: **47 / 270**. Daily cap: 10.
-- Today (2026-05-19): **1 used**, 9 unused at session-end.
+- Today (2026-05-19): **1 used**, 9 unused. PI directive: spend slots
+  ONLY on a mechanism G2-clear (Δ ≥ +0.10 bp OOF vs R7.1 PRIMARY);
+  forfeit unspent slots at Kaggle UTC midnight.
   - **R10 HEDGE 3: 75/25 arith blend (R7.2 5-seed bag + K=27 wide-pool) → LB 0.95387** (-0.02 bp vs PRIMARY 0.95389). True .npy ρ=0.999882 (OK band) registered as -0.02 bp LB delta. First cross-mechanism diversity hedge confirmed; HEDGE-3 slot in final-window ladder filled.
   - R10 blend-operator sweep over {R7.1, R7.2, R5.2, R6.1, K27} × {arith, gmean, logit_mean, rank_mean}: only OK-band (ρ <0.9999) candidate was the R7.2+K27 75/25 arith blend submitted above. All others TIE_ZONE.
   - R10 multi-constituent LR-meta alt-stack (LambdaRank stint + race + rolling LGBM + kernel hazard, 4 constituents): blended w/ R7.1 returned Δ < 0 at every weight (best Δ=-0.045 bp). **Closes alt-stack as 4th rank-lock axis.** See `audit/2026-05-19-round-10-hedge-prep.md`.
+  - **R11-C survival/hazard model (Cox-PH at TyreLife as base)**: standalone OOF **0.64971** G1-FAIL (covariates per-stint; row-level differentiation collapses onto h₀(t)). K=14+Path-B DriverClass×Stint τ=100k: OOF **0.954466**, Δ vs R7.1 PRIMARY (0.954471) = **−0.0487 bp NULL**, ρ_OOF=0.99992 TIE_ZONE. Closes mechanism C in same shape as R9 NB4 (−0.022) and R9 C1 (−0.045). Per-stint Cox PH absorbed by Path-B. `audit/2026-05-19-round-11-survival.json`.
+  - **R11-A (transformer)**: DROPPED. R5/R6 transformers already CLOSED per HANDOVER line 134 (R5 v1 0.91974 absorbed; R6 v2 K=14+Path-B Δ=−0.014 bp absorbed). Multi-step head variant is a marginal twist not a structural pivot. PI directive: redirect T4 budget to B.
+  - **R11-B (transverse cross-driver attention transformer)** — Kaggle T4×2 kernel ran 34s. Standalone OOF **0.62085** G1-FAIL; K=14+Path-B DCS τ=100k Δ vs R7.1 PRIMARY **−0.0346 bp NULL**, ρ_OOF 0.99992 TIE_ZONE. **Bug + structural finding:** MAX_DRIVERS=24 truncated 80% of groups (synthetic data has 887 unique pseudo-drivers; per-(Year, Race, LapNumber) group has median 58 / mean 71 / max 373 drivers vs ~22 real F1). Even at MAX_DRIVERS=128 the inter-driver-competition cohort signal we wanted is dissolved by the synthetic augmentation. Cross-driver-attention mechanism CLOSED at this formulation. `kernels/r11-graph-transverse-gpu/`, `audit/2026-05-19-round-11-B-K14-add.log`.
+  - **R11 swing summary**: 3 of 3 R10-queue mechanism-expansion candidates closed in one session (A skipped via dedup; B NULL via data structure; C NULL via inductive-bias collapse). Same null shape as R9 NB4 (−0.022) / R9 C1 (−0.045). Rank-lock at K=13+Path-B now confirmed across FIVE axes (operator / mechanism / data / alt-stack / cross-class learned-mech). PRIMARY R7.1 unchanged at LB 0.95389.
+  - Public-notebook + discussion rescan (Rule 22; 10 days stale) running as subagent. AWAITING result.
 - Kaggle CLI auth fix (session-start blocker): KGAT_-prefixed access tokens must be exported as `KAGGLE_API_TOKEN`, NOT placed in `kaggle.json`'s `key` field (legacy HTTP Basic). Working invocation: `KAGGLE_API_TOKEN="$KaggleAPIToke" kaggle ...`.
 
 ## Today's status (2026-05-18, prior session)
