@@ -5,3 +5,4 @@
 
   --- Fold 1/5 | ti=351312 va=87828 ---
 0:	test: 0.9130634	best: 0.9130634 (0)	total: 684ms	remaining: 34m 10s
+500:	test: 0.9493601	best: 0.9493601 (500)	total: 3m 46s	remaining: 18m 48s

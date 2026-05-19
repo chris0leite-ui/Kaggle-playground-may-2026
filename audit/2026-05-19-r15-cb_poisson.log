@@ -1,2 +1,18 @@
 == R15 Phase 5: cb_poisson (CB Poisson on raw LapsUntilPit count) ==
   train (439140, 16)  test (188165, 15)
+  feats: 93  cat: 9
+
+  --- Fold 1/5 | ti=351312 va=87828 ---
+    target_ti: mean 7.011  std 8.374  target_va: mean 11.652
+0:	learn: 0.3126882	test: -0.1147258	best: -0.1147258 (0)	total: 947ms	remaining: 47m 21s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = -16.73463379
+bestIteration = 110
+
+Shrink model to first 111 iterations.
+    iters=111 wall 234s  AUC(score vs PitNextLap)=0.84148
+
+  --- Fold 2/5 | ti=351312 va=87828 ---
+    target_ti: mean 7.084  std 8.458  target_va: mean 11.495
+0:	learn: 0.3086747	test: -0.1187193	best: -0.1187193 (0)	total: 478ms	remaining: 23m 54s
