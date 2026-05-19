@@ -45,3 +45,16 @@ Shrink model to first 1177 iterations.
 0:	test: 0.9072064	best: 0.9072064 (0)	total: 246ms	remaining: 12m 16s
 500:	test: 0.9472047	best: 0.9472047 (500)	total: 1m 58s	remaining: 9m 52s
 1000:	test: 0.9484219	best: 0.9484245 (998)	total: 3m 52s	remaining: 7m 45s
+1500:	test: 0.9484289	best: 0.9485601 (1290)	total: 5m 48s	remaining: 5m 48s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.9485600526
+bestIteration = 1290
+
+Shrink model to first 1291 iterations.
+    iters=1291 wall 379s  AUC=0.94856
+
+  --- Fold 5/5 | ti=351312 va=87828 ---
+0:	test: 0.9116090	best: 0.9116090 (0)	total: 269ms	remaining: 13m 25s
+500:	test: 0.9475537	best: 0.9475537 (500)	total: 2m	remaining: 9m 59s
+1000:	test: 0.9487701	best: 0.9487765 (902)	total: 3m 54s	remaining: 7m 49s
