@@ -146,26 +146,43 @@ def main() -> None:
             X[num_cols] = X[num_cols].fillna(0).astype(np.float32)
         cat_idx = [feats.index(c) for c in cat_cols]
 
-        # Group IDs per (Year, Race) — CatBoost PairLogit requirement
-        # PairLogit expects integer group_id; rows must be grouped
-        # contiguously by group_id (CatBoost auto-sorts internally).
+        # Group IDs per (Year, Race) — CatBoost PairLogit requirement.
+        # Rows MUST be sorted by group_id (CatBoost throws
+        # "queryIds should be grouped" if not). Sort each subset
+        # stably by group_id.
         gid_tr = make_group_ids(train_ti)
         gid_va = make_group_ids(train_va)
         gid_te = make_group_ids(test_fold)
-
-        # Build CatBoost Pool with group_id for PairLogit
-        pool_tr = cb.Pool(X_tr, label=y_ti.values, cat_features=cat_idx,
-                          group_id=gid_tr)
-        pool_va = cb.Pool(X_va, label=train_va[TARGET].astype(int).values,
-                          cat_features=cat_idx, group_id=gid_va)
-        pool_te = cb.Pool(X_te, cat_features=cat_idx, group_id=gid_te)
+        sort_tr = np.argsort(gid_tr, kind="stable")
+        sort_va = np.argsort(gid_va, kind="stable")
+        sort_te = np.argsort(gid_te, kind="stable")
+        X_tr_s = X_tr.iloc[sort_tr].reset_index(drop=True)
+        X_va_s = X_va.iloc[sort_va].reset_index(drop=True)
+        X_te_s = X_te.iloc[sort_te].reset_index(drop=True)
+        y_tr_s = y_ti.values[sort_tr]
+        y_va_s = train_va[TARGET].astype(int).values[sort_va]
+        gid_tr_s = gid_tr[sort_tr]
+        gid_va_s = gid_va[sort_va]
+        gid_te_s = gid_te[sort_te]
+        # Pools with sorted group_ids
+        pool_tr = cb.Pool(X_tr_s, label=y_tr_s, cat_features=cat_idx,
+                          group_id=gid_tr_s)
+        pool_va = cb.Pool(X_va_s, label=y_va_s, cat_features=cat_idx,
+                          group_id=gid_va_s)
+        pool_te = cb.Pool(X_te_s, cat_features=cat_idx, group_id=gid_te_s)
 
         params = cb_pairlogit_params(args.max_rounds, SEED, depth=args.depth)
         m = cb.CatBoostRanker(**params)
         m.fit(pool_tr, eval_set=pool_va, use_best_model=True)
 
-        pred_va = m.predict(pool_va)
-        pred_te = m.predict(pool_te)
+        # Predict on sorted pools, then UNSORT to original index order
+        pred_va_sorted = m.predict(pool_va)
+        pred_te_sorted = m.predict(pool_te)
+        # Unsort: argsort(sort_va) gives the inverse permutation
+        inv_va = np.argsort(sort_va)
+        inv_te = np.argsort(sort_te)
+        pred_va = pred_va_sorted[inv_va]
+        pred_te = pred_te_sorted[inv_te]
         oof_pred[vi] = pred_va
         test_pred += pred_te / n_eff_folds
 
