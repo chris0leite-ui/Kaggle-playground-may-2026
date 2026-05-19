@@ -1,0 +1,23 @@
+=== Path-B sweep (K=17) τ=100000 ===
+  K=17 pool: ['yekenot', 'cb_v4', 'hgbc_deep', 'd16_orig', 'qAT', 'qAV', 'qAO', 'qAA', 'qAF', 'qAK', 'K27_100k', 'seg_fe', 'HMM', 'R12_cb_horizon', 'R13_cb_stint_completion', 'R14_tabm', 'R15_xendcg_per_seg']
+  R5.2 baseline (Compound×Stint τ=100k) OOF: 0.95446
+
+  -- segmentation: driverclass_stint --
+     DriverClass×Stint: 12 segments, 10 above MIN_ROWS=1000
+    fold 1: 31.6s  (segments used: 10/12)
+    fold 2: 27.9s  (segments used: 10/12)
+    fold 3: 35.4s  (segments used: 10/12)
+    fold 4: 29.7s  (segments used: 10/12)
+    fold 5: 32.4s  (segments used: 10/12)
+     OOF AUC: 0.95449  Δ vs R5.2 = +0.301 bp
+     ρ_test vs R5.2: 0.999507
+     Wrote submission: submissions/submission_K17_pathb_driverclass_stint_tau100000.csv
+
+=== Summary (multi-segmentation Path-B) ===
+segmentation                        OOF     Δ_bp     ρ_R52
+------------------------------------------------------------
+DriverClass×Stint             0.95449   +0.301  0.999507 ★
+
+  Survivors (Δ ≥ +0.10 bp): ['driverclass_stint']
+  Total wall: 198.0s
+  Wrote summary: audit/2026-05-18-round-8-multiseg.json

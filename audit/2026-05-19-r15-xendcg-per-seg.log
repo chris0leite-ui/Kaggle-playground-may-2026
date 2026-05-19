@@ -1,0 +1,21 @@
+== R15 Phase 1: per-segment xendcg-meta on K=16 ==
+  train (439140, 16)  test (188165, 15)
+  K=16 OOF: (439140, 16); test: (188165, 16)
+  expanded OOF: (439140, 48); test: (188165, 48)
+  DriverClass×Stint: 12 segments; 10 above MIN_ROWS=1000
+  fold 1/5: segments used 10/12  wall 115s
+  fold 2/5: segments used 10/12  wall 118s
+  fold 3/5: segments used 10/12  wall 119s
+  fold 4/5: segments used 10/12  wall 119s
+  fold 5/5: segments used 10/12  wall 117s
+
+  Per-segment xendcg-meta OOF AUC: 0.890577
+  R14 PRIMARY OOF: 0.954487
+  Δ vs R14: -639.0988 bp
+  ρ_OOF vs R14: 0.642802
+  ρ_test vs R14: 0.662771
+  Saved oof_R15_xendcg_per_seg_strat.npy + test_..._strat.npy
+
+  Gate NOT cleared (Δ -639.0988 / ρ_test 0.662771)
+  Wrote audit/2026-05-19-r15-xendcg-per-seg.json
+  Total wall: 592s
