@@ -1,0 +1,95 @@
+=== Path-B sweep (K=15) τ=100000 ===
+  K=15 pool: ['yekenot', 'cb_v4', 'hgbc_deep', 'd16_orig', 'qAT', 'qAV', 'qAO', 'qAA', 'qAF', 'qAK', 'K27_100k', 'seg_fe', 'HMM', 'R12_cb_horizon', 'R13_cb_stint_completion']
+  R5.2 baseline (Compound×Stint τ=100k) OOF: 0.95446
+
+  -- segmentation: driverclass_stint --
+     DriverClass×Stint: 12 segments, 10 above MIN_ROWS=1000
+    fold 1: 16.5s  (segments used: 10/12)
+    fold 2: 14.5s  (segments used: 10/12)
+    fold 3: 15.3s  (segments used: 10/12)
+    fold 4: 14.4s  (segments used: 10/12)
+    fold 5: 16.2s  (segments used: 10/12)
+     OOF AUC: 0.95448  Δ vs R5.2 = +0.245 bp
+     ρ_test vs R5.2: 0.999650
+     Wrote submission: submissions/submission_K15_pathb_driverclass_stint_tau100000.csv
+
+  -- segmentation: year_stint --
+     Year×Stint: 24 segments, 17 above MIN_ROWS=1000
+    fold 1: 19.2s  (segments used: 17/24)
+    fold 2: 17.9s  (segments used: 17/24)
+    fold 3: 16.3s  (segments used: 17/24)
+    fold 4: 19.7s  (segments used: 17/24)
+    fold 5: 18.1s  (segments used: 17/24)
+     OOF AUC: 0.95446  Δ vs R5.2 = +0.040 bp
+     ρ_test vs R5.2: 0.999540
+     Wrote submission: submissions/submission_K15_pathb_year_stint_tau100000.csv
+
+  -- segmentation: driver_tier_stint --
+     DriverTier×Stint: 24 segments, 20 above MIN_ROWS=1000
+    fold 1: 61.7s  (segments used: 19/24)
+    fold 2: 35.2s  (segments used: 19/24)
+    fold 3: 22.5s  (segments used: 19/24)
+    fold 4: 24.2s  (segments used: 19/24)
+    fold 5: 24.3s  (segments used: 19/24)
+     OOF AUC: 0.95448  Δ vs R5.2 = +0.168 bp
+     ρ_test vs R5.2: 0.999622
+     Wrote submission: submissions/submission_K15_pathb_driver_tier_stint_tau100000.csv
+
+  -- segmentation: race_cluster_stint --
+     RaceCluster×Stint: 12 segments, 10 above MIN_ROWS=1000
+    fold 1: 16.8s  (segments used: 10/12)
+    fold 2: 19.1s  (segments used: 10/12)
+    fold 3: 26.8s  (segments used: 10/12)
+    fold 4: 22.2s  (segments used: 10/12)
+    fold 5: 24.8s  (segments used: 10/12)
+     OOF AUC: 0.95448  Δ vs R5.2 = +0.150 bp
+     ρ_test vs R5.2: 0.999633
+     Wrote submission: submissions/submission_K15_pathb_race_cluster_stint_tau100000.csv
+
+  -- segmentation: compound_stint_lapbucket --
+     Compound×Stint×LapBucket: 120 segments, 39 above MIN_ROWS=1000
+    fold 1: 22.5s  (segments used: 34/120)
+    fold 2: 22.1s  (segments used: 33/120)
+    fold 3: 29.1s  (segments used: 34/120)
+    fold 4: 45.3s  (segments used: 34/120)
+    fold 5: 50.9s  (segments used: 34/120)
+     OOF AUC: 0.95448  Δ vs R5.2 = +0.155 bp
+     ρ_test vs R5.2: 0.999742
+     Wrote submission: submissions/submission_K15_pathb_compound_stint_lapbucket_tau100000.csv
+
+  -- segmentation: compound_firstpit_window --
+     Compound×FirstPitWindow: 20 segments, 16 above MIN_ROWS=1000
+    fold 1: 43.9s  (segments used: 16/20)
+    fold 2: 50.1s  (segments used: 16/20)
+    fold 3: 45.1s  (segments used: 16/20)
+    fold 4: 36.8s  (segments used: 16/20)
+    fold 5: 41.8s  (segments used: 16/20)
+     OOF AUC: 0.95446  Δ vs R5.2 = -0.008 bp
+     ρ_test vs R5.2: 0.999623
+     Wrote submission: submissions/submission_K15_pathb_compound_firstpit_window_tau100000.csv
+
+  -- segmentation: year_compound --
+     Year×Compound: 20 segments, 17 above MIN_ROWS=1000
+    fold 1: 47.3s  (segments used: 17/20)
+    fold 2: 37.5s  (segments used: 17/20)
+    fold 3: 36.4s  (segments used: 17/20)
+    fold 4: 40.2s  (segments used: 17/20)
+    fold 5: 50.4s  (segments used: 17/20)
+     OOF AUC: 0.95446  Δ vs R5.2 = -0.042 bp
+     ρ_test vs R5.2: 0.999471
+     Wrote submission: submissions/submission_K15_pathb_year_compound_tau100000.csv
+
+=== Summary (multi-segmentation Path-B) ===
+segmentation                        OOF     Δ_bp     ρ_R52
+------------------------------------------------------------
+DriverClass×Stint             0.95448   +0.245  0.999650 ★
+DriverTier×Stint              0.95448   +0.168  0.999622 ★
+Compound×Stint×LapBucket      0.95448   +0.155  0.999742 ★
+RaceCluster×Stint             0.95448   +0.150  0.999633 ★
+Year×Stint                    0.95446   +0.040  0.999540  
+Compound×FirstPitWindow       0.95446   -0.008  0.999623 ↓
+Year×Compound                 0.95446   -0.042  0.999471 ↓
+
+  Survivors (Δ ≥ +0.10 bp): ['driverclass_stint', 'driver_tier_stint', 'compound_stint_lapbucket', 'race_cluster_stint']
+  Total wall: 1332.8s
+  Wrote summary: audit/2026-05-18-round-8-multiseg.json

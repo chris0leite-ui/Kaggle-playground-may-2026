@@ -1,0 +1,68 @@
+== R14 Phase 5: cb_first_pit_lap (CB on log1p(first-pit lap)) ==
+  train (439140, 16)  test (188165, 15)
+  full-train target: mean 2.190 std 0.946 min 0.693 max 4.357
+  feats: 93  cat: 9
+
+  --- Fold 1/5 | ti=351312 va=87828 ---
+    target_ti: mean 2.324  std 0.951  target_va: mean 3.063
+0:	learn: 0.9204676	test: 1.1442186	best: 1.1442186 (0)	total: 432ms	remaining: 21m 35s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 1.134593254
+bestIteration = 4
+
+Shrink model to first 5 iterations.
+    iters=5 wall 187s  AUC(score vs PitNextLap)=0.53160
+
+  --- Fold 2/5 | ti=351312 va=87828 ---
+    target_ti: mean 2.324  std 0.948  target_va: mean 3.077
+0:	learn: 0.9169286	test: 1.1567317	best: 1.1567317 (0)	total: 418ms	remaining: 20m 53s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 1.147740684
+bestIteration = 4
+
+Shrink model to first 5 iterations.
+    iters=5 wall 195s  AUC(score vs PitNextLap)=0.54098
+
+  --- Fold 3/5 | ti=351312 va=87828 ---
+    target_ti: mean 2.324  std 0.954  target_va: mean 3.076
+0:	learn: 0.9233990	test: 1.1549436	best: 1.1549436 (0)	total: 377ms	remaining: 18m 50s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 1.145966967
+bestIteration = 4
+
+Shrink model to first 5 iterations.
+    iters=5 wall 185s  AUC(score vs PitNextLap)=0.54200
+
+  --- Fold 4/5 | ti=351312 va=87828 ---
+    target_ti: mean 2.317  std 0.955  target_va: mean 3.083
+0:	learn: 0.9225533	test: 1.1545365	best: 1.1545365 (0)	total: 238ms	remaining: 11m 52s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 1.14452938
+bestIteration = 4
+
+Shrink model to first 5 iterations.
+    iters=5 wall 135s  AUC(score vs PitNextLap)=0.54062
+
+  --- Fold 5/5 | ti=351312 va=87828 ---
+    target_ti: mean 2.329  std 0.950  target_va: mean 3.078
+0:	learn: 0.9191643	test: 1.1536081	best: 1.1536081 (0)	total: 178ms	remaining: 8m 55s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 1.144170374
+bestIteration = 4
+
+Shrink model to first 5 iterations.
+    iters=5 wall 131s  AUC(score vs PitNextLap)=0.53225
+
+  Standalone OOF AUC: 0.53539
+  R13 PRIMARY OOF: 0.500481
+  ρ_OOF vs R13 PRIMARY: 0.001525
+  ρ_OOF vs cb_horizon: 0.000176
+  ρ_OOF vs cb_stint_completion: 0.000419
+  Saved oof_R14_cb_first_pit_lap_strat.npy + test_..._strat.npy
+  Wrote audit/2026-05-19-r14-cb_first_pit_lap.json
+  Total wall: 928s

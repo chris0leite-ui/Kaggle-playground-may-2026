@@ -1,0 +1,17 @@
+{
+  "id": "chrisleitescha/r14-tabm-full-gpu",
+  "title": "r14-tabm-full-gpu",
+  "code_file": "r14_tabm_full_gpu.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "keywords": ["gpu"],
+  "dataset_sources": [],
+  "kernel_sources": [],
+  "competition_sources": ["playground-series-s6e5"],
+  "model_sources": [],
+  "machine_shape": "GpuT4x2"
+}
