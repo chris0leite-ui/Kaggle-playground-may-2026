@@ -81,3 +81,36 @@ Shrink model to first 1291 iterations.
   --- Fold 5/5 | ti=351312 va=87828 ---
 0:	test: 0.9116090	best: 0.9116090 (0)	total: 217ms	remaining: 10m 50s
 500:	test: 0.9475537	best: 0.9475537 (500)	total: 1m 34s	remaining: 7m 52s
+== R15 Phase 4: cb_focal_weighted (CB class-weighted Logloss) ==
+  train (439140, 16)  test (188165, 15)
+  class prior: 0.1990 (re-weighted to ~0.5)
+  feats: 93  cat: 9
+  RESUME: loaded checkpoint, done folds = [1, 2, 3, 4]
+
+  --- Fold 1/5 SKIP (ckpt) ---
+
+  --- Fold 2/5 SKIP (ckpt) ---
+
+  --- Fold 3/5 SKIP (ckpt) ---
+
+  --- Fold 4/5 SKIP (ckpt) ---
+
+  --- Fold 5/5 | ti=351312 va=87828 ---
+0:	test: 0.9116090	best: 0.9116090 (0)	total: 306ms	remaining: 15m 19s
+500:	test: 0.9475537	best: 0.9475537 (500)	total: 1m 36s	remaining: 7m 59s
+== R15 Phase 4: cb_focal_weighted (CB class-weighted Logloss) ==
+  train (439140, 16)  test (188165, 15)
+  class prior: 0.1990 (re-weighted to ~0.5)
+  feats: 93  cat: 9
+  RESUME: loaded checkpoint, done folds = [1, 2, 3, 4]
+
+  --- Fold 1/5 SKIP (ckpt) ---
+
+  --- Fold 2/5 SKIP (ckpt) ---
+
+  --- Fold 3/5 SKIP (ckpt) ---
+
+  --- Fold 4/5 SKIP (ckpt) ---
+
+  --- Fold 5/5 | ti=351312 va=87828 ---
+0:	test: 0.9116090	best: 0.9116090 (0)	total: 324ms	remaining: 16m 10s
