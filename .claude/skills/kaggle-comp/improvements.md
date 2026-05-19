@@ -189,6 +189,53 @@ Status markers: `[x]` applied · `[~]` superseded · `[ ]` open
   every Round-1+2 probe ran against K=4 proxy (3.5 bp behind
   PRIMARY) without the agent flagging.
 
+## Promoted 2026-05-19 (PI-ratified; open until implementation lands)
+
+- `[ ]` **bootstrap.sh + kickoff-runbook — KGAT_ token in kaggle.json
+  `key` field is sent as legacy HTTP-Basic password → 401.**
+  `tag: kgat-auth-detection`. Extends 2026-05-18's
+  `kggt-token-needs-isolated-auth` (which only handled the case
+  where KGAT_ was already in `KAGGLE_API_TOKEN` env). New exposure:
+  harness wrote `{"username": "<u>", "key": "KGAT_..."}` into
+  `~/.kaggle/kaggle.json`; legacy Basic auth path sent KGAT as
+  password and 401'd on every endpoint. **Edit:** bootstrap.sh
+  step 1 — after locating `kaggle.json`, parse `key`; if it starts
+  with `KGAT_`, (a) `export KAGGLE_API_TOKEN="<key>"`, (b) print a
+  loud warning that legacy `key` slot is unsafe for KGAT_ tokens,
+  and (c) optionally rewrite kaggle.json with `key` removed (so the
+  legacy Basic auth path never fires). Also: harness sometimes
+  exports `KaggleAPIToke` (typo'd, missing `n`) and `KaggleUserName`
+  — bootstrap.sh should fall back to these casings before failing.
+  Kickoff-runbook step 1 should print the working invocation
+  template `KAGGLE_API_TOKEN="$KaggleAPIToke" kaggle ...` for this
+  exact harness. **Cost evidence (2026-05-19):** 1 PI turn redirected
+  ("the issue is with you") after I escalated as a token-refresh
+  request; would have lost ≥1 LB slot at next UTC midnight per Rule
+  12 if PI hadn't corrected. Auth-mechanism diagnostic took 5 min
+  of `grep -rn "Bearer\|KGAT" /usr/local/lib/python3.11/dist-packages/kaggle/`
+  once started.
+
+- `[ ]` **scripts/pre_submit_diff.py — rank-normalize both inputs
+  before Spearman + warn on floor-rate mismatch.** `tag:
+  pre-submit-diff-rank-normalize`. Same friction surfaced 2 days
+  running (2026-05-18 `pre-submit-diff-floor-clip` + 2026-05-19
+  `csv-rho-misread-on-floor-clip`). R7.1 CSV floors 15.6 % of rows
+  at 0.001 via `np.clip`; rank-uniform blends floor 0 % → Spearman
+  on raw CSVs degrades from tie-structure mismatch, NOT actual rank
+  divergence (true .npy ρ = 0.99988 vs CSV ρ = 0.998). Misclassifies
+  OK-band candidates as REGRESSION_RISK and TIE_ZONE candidates
+  as OK-band. **Edit:** in `scripts/pre_submit_diff.py`, before
+  computing Spearman, rank-transform both prediction vectors
+  uniformly with `scipy.stats.rankdata(..., method='average')` or
+  equivalent. Compute floor-rate per CSV (`(p <= MIN_FLOOR).mean()`
+  for each); if abs-diff > 5 %, print a loud `WARNING:
+  tie-structure mismatch (floor rates X% vs Y%). CSV Spearman
+  depressed by tie-structure, not true rank divergence. Use
+  .npy-level rho for band classification.`. **Cost evidence:** 2
+  consecutive days; today nearly mis-staged HEDGE 2 under wrong-band
+  call and required a from-scratch ρ recomputation across all 6
+  staged blends ("recalibrate the bands" detour, ~15 min).
+
 ## Applied previously (kept from earlier sessions)
 
 - `[~]` **PI-protocol — Sealed-prediction protocol REMOVED (Day-19).**
