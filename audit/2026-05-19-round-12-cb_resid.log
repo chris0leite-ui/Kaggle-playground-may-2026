@@ -1,0 +1,84 @@
+== R12-1: cb_resid (CatBoost regression on R7.1 OOF residual) ==
+  train (439140, 16)  test (188165, 15)
+  R7.1 OOF AUC (verify): 0.954471 (expect 0.954471)
+  residual: min -0.992  max 1.000  mean -0.0000  std 0.2582
+  feats: 93  cat: 9
+
+  --- Fold 1/5 | ti=351312 va=87828 ---
+0:	learn: 0.2585412	test: 0.2569679	best: 0.2569679 (0)	total: 169ms	remaining: 11m 15s
+500:	learn: 0.2568932	test: 0.2571774	best: 0.2569662 (14)	total: 50.4s	remaining: 5m 51s
+Stopped by overfitting detector  (500 iterations wait)
+
+bestTest = 0.2569662156
+bestIteration = 14
+
+Shrink model to first 15 iterations.
+    iters=15  wall 63s
+    AUC R7.1 alone: 0.95545
+    AUC residual alone: 0.48020
+    AUC R7.1 + residual: 0.95547
+
+  --- Fold 2/5 | ti=351312 va=87828 ---
+0:	learn: 0.2582792	test: 0.2580174	best: 0.2580174 (0)	total: 109ms	remaining: 7m 16s
+500:	learn: 0.2567198	test: 0.2581614	best: 0.2580174 (2)	total: 48.9s	remaining: 5m 41s
+Stopped by overfitting detector  (500 iterations wait)
+
+bestTest = 0.2580173592
+bestIteration = 2
+
+Shrink model to first 3 iterations.
+    iters=3  wall 60s
+    AUC R7.1 alone: 0.95451
+    AUC residual alone: 0.48250
+    AUC R7.1 + residual: 0.95450
+
+  --- Fold 3/5 | ti=351312 va=87828 ---
+0:	learn: 0.2580928	test: 0.2587670	best: 0.2587670 (0)	total: 102ms	remaining: 6m 48s
+500:	learn: 0.2566511	test: 0.2589560	best: 0.2587664 (5)	total: 49.7s	remaining: 5m 47s
+Stopped by overfitting detector  (500 iterations wait)
+
+bestTest = 0.2587663647
+bestIteration = 5
+
+Shrink model to first 6 iterations.
+    iters=6  wall 57s
+    AUC R7.1 alone: 0.95418
+    AUC residual alone: 0.46707
+    AUC R7.1 + residual: 0.95417
+
+  --- Fold 4/5 | ti=351312 va=87828 ---
+0:	learn: 0.2581151	test: 0.2586731	best: 0.2586731 (0)	total: 108ms	remaining: 7m 11s
+500:	learn: 0.2563190	test: 0.2589048	best: 0.2586731 (0)	total: 49.2s	remaining: 5m 43s
+Stopped by overfitting detector  (500 iterations wait)
+
+bestTest = 0.2586731234
+bestIteration = 0
+
+Shrink model to first 1 iterations.
+    iters=1  wall 56s
+    AUC R7.1 alone: 0.95390
+    AUC residual alone: 0.61304
+    AUC R7.1 + residual: 0.95390
+
+  --- Fold 5/5 | ti=351312 va=87828 ---
+0:	learn: 0.2581061	test: 0.2587217	best: 0.2587217 (0)	total: 130ms	remaining: 8m 39s
+500:	learn: 0.2561957	test: 0.2589704	best: 0.2587217 (0)	total: 48.6s	remaining: 5m 39s
+Stopped by overfitting detector  (500 iterations wait)
+
+bestTest = 0.2587217227
+bestIteration = 0
+
+Shrink model to first 1 iterations.
+    iters=1  wall 55s
+    AUC R7.1 alone: 0.95432
+    AUC residual alone: 0.43869
+    AUC R7.1 + residual: 0.95432
+
+  Standalone OOF AUC (residual alone): 0.47835
+  Combined OOF AUC (R7.1 + residual): 0.95447
+  ρ_OOF residual vs R7.1: -0.064235
+  ρ_OOF residual vs cb_v4: -0.053872
+  Saved oof_R12_cb_resid_strat.npy + test_..._strat.npy (rank-normalized to (eps, 1-eps))
+  Saved oof_R12_cb_resid_raw.npy + test_..._raw.npy (raw residual predictions, diagnostics)
+  Wrote audit/2026-05-19-round-12-cb_resid.json
+  Total wall: 306s

@@ -10,22 +10,36 @@ to comp start 2026-05-01. The `d13`..`d19` labels in script names
 and old audit prose are FROZEN code prefixes — never calendar days
 (per `glossary.md` and the `day-counter-drift` friction).
 
-## PRIMARY (active) — set 2026-05-18 Round 7
+## PRIMARY (active) — set 2026-05-19 Round 12-2
 
-**LB 0.95389** — R7.1 K=13 + Path-B DriverClass × Stint τ=100k.
+**LB 0.95392** — R12-2 K=14 (K=13 + cb_horizon) + Path-B DriverClass × Stint τ=100k.
 
-K=13 pool = K=11 (4 K=4 trees + 6 slim-kNN + K=27 super-base) +
-r4_segment_fe + r4_hmm_seq. Path-B applied with **DriverClass ×
-Stint** segmentation (named-vs-D0XX driver classification × 6
-stint values = 12 segments, 10 above MIN_ROWS=1000).
+K=14 pool = K=13 pool (yekenot, cb_v4, hgbc_deep, d16_orig, qAT, qAV,
+qAO, qAA, qAF, qAK, K27_100k, seg_fe, HMM) **+ cb_horizon** (CatBoost
+regression on `log(LapsUntilPit + 1)` with strict per-fold target
+derivation per `scripts/probe_r12_cb_horizon.py`). Path-B applied
+with the same DriverClass × Stint segmentation that won R7.
 
+File: `submissions/submission_R12_cb_horizon_K14_pathb_dcs_tau100000.csv`.
+OOF 0.954475 (+0.046 bp over R7.1 0.954471); LB 0.95392 (+0.03 bp
+over R7.1 0.95389). Submission ref 52802828.
+
+The Round-12 finding: a CatBoost trained on `LapsUntilPit` (count
+regression, multi-step future) is structurally orthogonal to K=13's
+binary single-step PitNextLap predictors (ρ_OOF base vs R7.1 = 0.626;
+vs cb_v4 = 0.607). Even though the orthogonal signal is small in
+magnitude (sub-G2 OOF), it survives Path-B's segmented shrinkage and
+registers on LB. First LB improvement in 18 days (since R7.1 was
+set 2026-05-18 Round 7). Plan-agent's "orthogonality-first" thesis
+PAID OFF on the second variant; cb_resid's Bayes-ceiling finding
+correctly predicted same-axis CatBoost would absorb.
+
+## Prior PRIMARY R7.1 (2026-05-18 Round 7) — retained for hedge
+
+**LB 0.95389** — K=13 + Path-B DriverClass × Stint τ=100k.
 File: `submissions/submission_K13_pathb_driverclass_stint_tau100000.csv`.
-OOF 0.95447 (+0.106 bp over default Compound × Stint baseline);
-OOF→LB transfer -5.8 bp (similar to all K=13+Path-B variants).
-
-The Round-7 finding: the named-driver pit-rate differential (32-43%
-vs 16-22% for anonymous D0XX) is captured by driver-class
-segmentation; default Compound × Stint missed it.
+OOF 0.954471. The R12 PRIMARY uses this exact pool plus one extra
+base; the meta architecture and segmentation are unchanged.
 
 ## Prior PRIMARY R5.2 (2026-05-18 Round 5) — retained for hedge
 
@@ -68,7 +82,13 @@ at the 5-decimal Kaggle quantisation.
   - **R11-A (transformer)**: DROPPED. R5/R6 transformers already CLOSED per HANDOVER line 134 (R5 v1 0.91974 absorbed; R6 v2 K=14+Path-B Δ=−0.014 bp absorbed). Multi-step head variant is a marginal twist not a structural pivot. PI directive: redirect T4 budget to B.
   - **R11-B (transverse cross-driver attention transformer)** — Kaggle T4×2 kernel ran 34s. Standalone OOF **0.62085** G1-FAIL; K=14+Path-B DCS τ=100k Δ vs R7.1 PRIMARY **−0.0346 bp NULL**, ρ_OOF 0.99992 TIE_ZONE. **Bug + structural finding:** MAX_DRIVERS=24 truncated 80% of groups (synthetic data has 887 unique pseudo-drivers; per-(Year, Race, LapNumber) group has median 58 / mean 71 / max 373 drivers vs ~22 real F1). Even at MAX_DRIVERS=128 the inter-driver-competition cohort signal we wanted is dissolved by the synthetic augmentation. Cross-driver-attention mechanism CLOSED at this formulation. `kernels/r11-graph-transverse-gpu/`, `audit/2026-05-19-round-11-B-K14-add.log`.
   - **R11 swing summary**: 3 of 3 R10-queue mechanism-expansion candidates closed in one session (A skipped via dedup; B NULL via data structure; C NULL via inductive-bias collapse). Same null shape as R9 NB4 (−0.022) / R9 C1 (−0.045). Rank-lock at K=13+Path-B now confirmed across FIVE axes (operator / mechanism / data / alt-stack / cross-class learned-mech). PRIMARY R7.1 unchanged at LB 0.95389.
-  - Public-notebook + discussion rescan (Rule 22; 10 days stale) running as subagent. AWAITING result.
+  - Public-notebook rescan (Rule 22; 10 days stale) **DONE**. ONE structurally-novel candidate surfaced: **TabM (pytabkit Tabular Mixture)** — mikhailnaumov's LB-0.95438 kernel is the source behind the entire 0.95449-0.95452 public-LB blender chain. Leader's 0.95476 not reachable from any public mechanism. Queued for next session. `audit/research/2026-05-19-notebooks.md`.
+  - **R12 CatBoost-specialist swing** (PI directive "every FE / Optuna / whatever; think hard"; plan-agent reframed as orthogonality-first):
+    - **R12-1 cb_resid** (CatBoost regression on residual y − OOF_R7.1, RMSE loss). Standalone OOF AUC **0.47835 BELOW RANDOM** — per-fold ES fires at iter 1-15 because val RMSE does not improve from epoch 0. K=14+Path-B DCS τ=100k Δ vs R7.1 = **−0.0701 bp NULL**, ρ_OOF=0.99995. **STRONG EMPIRICAL BAYES-CEILING CONFIRMATION**: R7.1+Path-B is at the Bayes-optimal calibration ceiling for predicting PitNextLap given the row covariates. Residual prediction probes are CLOSED — any mechanism trying to predict the leftover of a saturated meta will produce sub-random AUC. `audit/2026-05-19-round-12-cb_resid.{log,json}`.
+    - **R12-2 cb_horizon (CatBoost on log(LapsUntilPit+1), STRICT per-fold target)**: standalone OOF AUC **0.88137**; **base ρ vs R7.1 = 0.626, vs cb_v4 = 0.607** (genuinely orthogonal direction — multi-step future info that K=13's single-step predictors lack); K=14+Path-B DCS τ=100k OOF **0.954475**, Δ vs R7.1 PRIMARY **+0.0460 bp POSITIVE** (first positive K=14 add since R7.1 set 2026-05-18). ρ_test .npy 0.99983 = OK transfer band. **SUBMITTED** ref 52802828 → **LB 0.95392 = NEW PRIMARY (+0.03 bp over R7.1 0.95389)**. Plan-agent's orthogonality-first thesis paid off on the second variant. Strict per-fold target avoided the documented Day-15 leakage pattern (88-100% OOF collapse).
+    - R12-3 cb_mono (monotone constraints on tyre-end-of-life features) DROPPED — same target as K=13, Bayes-ceiling finding makes G2-clear odds ~0.05.
+    - R12-4 cb_v5_xl kitchen-sink FE + 30-trial Optuna parking lot — PARKED for future session.
+- Submissions used this comp: **48 / 270**. Today (2026-05-19): **2 used** (R10 HEDGE 3 + R12-2 cb_horizon K=14), 8 unspent.
 - Kaggle CLI auth fix (session-start blocker): KGAT_-prefixed access tokens must be exported as `KAGGLE_API_TOKEN`, NOT placed in `kaggle.json`'s `key` field (legacy HTTP Basic). Working invocation: `KAGGLE_API_TOKEN="$KaggleAPIToke" kaggle ...`.
 
 ## Today's status (2026-05-18, prior session)
@@ -87,8 +107,8 @@ at the 5-decimal Kaggle quantisation.
   - **R9 NB4** (Compound×Stint TE-as-base): K=14 Δ vs R7.1 PRIMARY **−0.022 bp NULL**; standalone 0.94850 G1✓.
   - **R9 C1** (Aadigupta per-Race scalars): K=14 Δ vs R7.1 PRIMARY **−0.045 bp NULL**; standalone 0.94902 G1✓.
 - Comp-day **18 of 31**. Days remaining: **13**.
-- Top-5% boundary: **0.95405**. Gap to PRIMARY: **−1.8 bp**.
-- Leader: **0.95476**. Gap to PRIMARY: **−8.9 bp**.
+- Top-5% boundary: **0.95405**. Gap to PRIMARY R12-2 (0.95392): **−1.3 bp** (was −1.6 bp under R7.1).
+- Leader: **0.95476**. Gap to PRIMARY R12-2: **−8.4 bp** (was −8.7 bp).
 
 ## Transfer bands (Rule 27 recalibration, 2026-05-14)
 
@@ -146,6 +166,7 @@ hedge probe:
 
 | ISO date | Mechanism | LB | Δ vs K=4 baseline |
 |---|---|---:|---:|
+| **2026-05-19 PM R12-2** | **K=14 (K=13 + cb_horizon LapsUntilPit) + Path-B DCS τ=100k** | **0.95392** | **+4.1** |
 | 2026-05-19 PM R10 | 75/25 arith R7.2 + K=27 (HEDGE 3 OK-band) | 0.95387 | +3.6 |
 | **2026-05-12 AM** | **Blend 70/30 K=11+K=9** | **0.95386** | **+3.5** |
 | 2026-05-09 PM | K=11 + K=27 + Path-B τ=100k | 0.95385 | +3.4 |

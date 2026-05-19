@@ -1,0 +1,66 @@
+== R12-2: cb_horizon (CatBoost regression on log(LapsUntilPit+1)) ==
+  train (439140, 16)  test (188165, 15)
+  log(LapsUntilPit+1) full-train (ref): mean 1.417  std 1.107
+  feats: 93  cat: 9
+
+  --- Fold 1/5 | ti=351312 va=87828 ---
+    target_ti: mean 1.488  std 1.149  target_va: mean 1.819
+0:	learn: 1.1265855	test: 1.4082761	best: 1.4082761 (0)	total: 241ms	remaining: 12m 1s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 1.173694951
+bestIteration = 84
+
+Shrink model to first 85 iterations.
+    iters=85  wall 75s  AUC(proxy)=0.88450
+
+  --- Fold 2/5 | ti=351312 va=87828 ---
+    target_ti: mean 1.494  std 1.153  target_va: mean 1.813
+0:	learn: 1.1306983	test: 1.3974874	best: 1.3974874 (0)	total: 169ms	remaining: 8m 27s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 1.167645262
+bestIteration = 57
+
+Shrink model to first 58 iterations.
+    iters=58  wall 72s  AUC(proxy)=0.88198
+
+  --- Fold 3/5 | ti=351312 va=87828 ---
+    target_ti: mean 1.493  std 1.151  target_va: mean 1.816
+0:	learn: 1.1289329	test: 1.4036369	best: 1.4036369 (0)	total: 183ms	remaining: 9m 9s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 1.172414938
+bestIteration = 72
+
+Shrink model to first 73 iterations.
+    iters=73  wall 73s  AUC(proxy)=0.88127
+
+  --- Fold 4/5 | ti=351312 va=87828 ---
+    target_ti: mean 1.494  std 1.150  target_va: mean 1.814
+0:	learn: 1.1275198	test: 1.4017721	best: 1.4017721 (0)	total: 187ms	remaining: 9m 21s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 1.170716635
+bestIteration = 58
+
+Shrink model to first 59 iterations.
+    iters=59  wall 70s  AUC(proxy)=0.88115
+
+  --- Fold 5/5 | ti=351312 va=87828 ---
+    target_ti: mean 1.492  std 1.151  target_va: mean 1.814
+0:	learn: 1.1291662	test: 1.4011140	best: 1.4011140 (0)	total: 185ms	remaining: 9m 14s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 1.17576959
+bestIteration = 55
+
+Shrink model to first 56 iterations.
+    iters=56  wall 70s  AUC(proxy)=0.87900
+
+  Standalone OOF AUC (proxy = 1/(1+laps_pred)): 0.88137
+  ρ_OOF proxy vs R7.1: 0.626083
+  ρ_OOF proxy vs cb_v4: 0.606728
+  Saved oof_R12_cb_horizon_strat.npy + test_..._strat.npy
+  Wrote audit/2026-05-19-round-12-cb_horizon.json
+  Total wall: 382s

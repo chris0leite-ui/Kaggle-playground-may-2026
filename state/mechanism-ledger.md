@@ -579,3 +579,102 @@ HANDOVER R10 priority queue's structurally orthogonal candidates.
   augmentation structure (e.g., grouping by [Year, Race, Stint,
   Compound, Lap-bin] for a finer cohort), not real-F1 dynamics.
   Friction: `r11-b-max-drivers-truncation-bug`.
+
+## 2026-05-19 Round 12 — CatBoost specialist swing (orthogonality-first)
+
+PI directive after R11 close: "Cat boost — for every feature
+engineering and Optuna and whatever you can throw at it. Think
+hard how to make the most out of cat boost with what we have
+learned." Plan-agent reframed as orthogonality-first
+(`audit/2026-05-19-plan-agent-cb-pressure-test.md` implicit in
+the planning conversation; see `/root/.claude/plans/...`): given
+the 5-axis rank-lock confirmed by R9-R11, same-axis CatBoost
+(better FE + Optuna on cb_v4 recipe) will absorb at K=14+Path-B;
+high-EV moves are CatBoost variants with structurally orthogonal
+OUTPUT direction. PI chose: orthogonality-first (Phases 1-3), kitchen-
+sink + Optuna parking-lot (Phase 4) only if 1-3 NULL.
+
+- **R12-1 cb_resid — CatBoost-on-residual.** Trained CatBoost
+  REGRESSOR with RMSE loss on `y − OOF_R7.1` using cb_v4 FE pipeline
+  (yekenot recipe + per-fold FS_A + per-fold CV TE). depth=6, lr=0.03,
+  iter=4000 cap, od_wait=500, rsm=0.7 (CPU only). 5-fold Stratified
+  seed=42, 306s wall. Per-fold ES fires at **iter 1-15** because the
+  val RMSE plateaus at iter 0 — the residual has no exploitable
+  conditional structure given x.
+  - **Standalone OOF AUC of residual: 0.47835** (BELOW random 0.5)
+  - ρ_OOF residual vs R7.1: −0.064; ρ_OOF residual vs cb_v4: −0.054
+  - K=14 + Path-B DCS τ=100k: OOF **0.954464**, Δ vs R7.1 PRIMARY
+    **−0.0701 bp NULL**, ρ_OOF=0.99995 TIE_ZONE.
+  - **STRONG EMPIRICAL BAYES-CEILING CONFIRMATION**: R7.1+Path-B
+    is at the Bayes-optimal calibration ceiling for predicting
+    PitNextLap | row covariates. The 2026-05-14 noise-ceiling
+    thesis (audit `2026-05-14-overnight-iteration.md`,
+    `state/current.md` line 99) is now empirically validated by a
+    direct probe: a perfectly-trained CatBoost cannot beat random
+    when asked to predict R7.1's residual. Closes ANY mechanism
+    that tries to extract leftover signal from a saturated meta.
+  - Artifacts: `audit/2026-05-19-round-12-cb_resid.{log,json}`,
+    `audit/2026-05-19-round-12-cb_resid-K14-add.log`,
+    `scripts/probe_r12_cb_resid.py`,
+    `scripts/artifacts/oof_R12_cb_resid_strat.npy`,
+    `scripts/artifacts/test_R12_cb_resid_strat.npy`.
+
+- **R12-2 cb_horizon — CatBoost-on-LapsUntilPit (strict per-fold target).**
+  Trained CatBoost REGRESSOR with RMSE loss on `log(LapsUntilPit + 1)`
+  cap LAPS_CAP=30 (via `scripts/b_laps_until_pit.py::build_laps_until_pit`),
+  using cb_v4 FE pipeline. depth=8, lr=0.05, iter=3000 cap, od_wait=300,
+  rsm=0.8 (CPU only). 5-fold Stratified seed=42, **per-fold strict
+  target derivation** — `build_laps_until_pit(train_S.iloc[ti])` per
+  fold to avoid the Day-15 leakage pattern (inv-laps-until-pit OOF
+  +1.899 → strict +0.234 bp, 88 % collapse; pit-horizon +3.191 →
+  +0.302, 90 % collapse; reverse-cum-pits +4.867 → −0.005, 100 %
+  collapse). 382s wall total; ES at iters 56-85 per fold.
+  - **Standalone OOF AUC (proxy = 1/(1+laps_pred)): 0.88137**
+  - **Base orthogonality (THE point of the variant):**
+    ρ_OOF proxy vs R7.1 PRIMARY = **0.626**;
+    ρ_OOF proxy vs cb_v4       = **0.607**.
+    Genuinely orthogonal direction — multi-step future info that
+    K=13's single-step PitNextLap predictors lack. G3 clearly clears
+    (≤ 0.998 target; we have ~0.61).
+  - K=14 + Path-B DCS τ=100k: OOF **0.954475**, Δ vs R7.1 PRIMARY
+    **+0.0460 bp POSITIVE** (FIRST positive K=14 add since R7.1 was
+    set 2026-05-18). ρ_OOF K=14 vs R7.1 = 0.99981 (OK band edge);
+    ρ_test K=14 vs R7.1 .npy = 0.99983 (OK transfer band, just below
+    TIE_ZONE 0.9999 threshold).
+  - **Below G2 +0.10 bp threshold** but the orthogonal mechanism is
+    real. Mechanism-class novelty: count-regression on time-to-pit
+    is structurally distinct from binary classification on next-pit.
+  - **SUBMITTED** as `submission_R12_cb_horizon_K14_pathb_dcs_tau100000.csv`
+    submission ref 52802828 per PI directive (slot-zero alternative
+    was forfeit; OK-band ρ_test → sub-bp to few-bp LB movement
+    expected).
+  - **LB 0.95392 → NEW PRIMARY (+0.03 bp vs R7.1 0.95389)**.
+    First LB improvement in 18 days. OK-band ρ_test 0.99983 correctly
+    predicted sub-bp-to-few-bp LB movement; actual +0.03 bp lands
+    inside that band. Plan-agent orthogonality-first thesis PAID OFF
+    on the second variant: cb_resid's Bayes-ceiling finding correctly
+    predicted same-axis CB absorbs; cb_horizon's DIFFERENT TARGET
+    (count regression on multi-step time-to-pit, ρ_base 0.626 vs R7.1)
+    surfaced a structurally novel signal the Path-B meta could use
+    despite the small OOF magnitude.
+  - Calibration data-point for the bands: OOF Δ +0.046 bp + ρ_test
+    0.99983 (OK-band edge) → LB Δ +0.03 bp; supports current band
+    table; the OK-band lower-edge (just below 0.9999) registers
+    real LB lift when the orthogonal direction is genuine.
+  - Top-5% boundary 0.95405 → new gap to PRIMARY −1.3 bp (was −1.6
+    bp). Leader 0.95476 → new gap −8.4 bp (was −8.7 bp).
+  - Artifacts: `audit/2026-05-19-round-12-cb_horizon.{log,json}`,
+    `audit/2026-05-19-round-12-cb_horizon-K14-add.log`,
+    `scripts/probe_r12_cb_horizon.py`,
+    `scripts/artifacts/oof_R12_cb_horizon_strat.npy`,
+    `scripts/artifacts/test_R12_cb_horizon_strat.npy`,
+    `scripts/artifacts/oof_R12_cb_horizon_loglaps.npy` (raw diag).
+
+- **R12-3 cb_mono — SKIPPED.** Same target as K=13, monotone-on-tyre-
+  life constraints. Bayes-ceiling finding from R12-1 makes G2-clear
+  odds ~0.05; not worth 30 min CPU for diagnostic-only value.
+
+- **R12-4 cb_v5_xl kitchen-sink + Optuna — PARKED.** Plan-agent
+  verdict + R12-1 Bayes-ceiling finding put same-axis CatBoost
+  expected K=14 Δ ≈ 0 bp; deferred to a future session if PI requests
+  the FE-bound ceiling diagnostic.

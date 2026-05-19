@@ -7,11 +7,13 @@
       "label": "DriverClass\u00d7Stint",
       "n_seg": 12,
       "n_segments_used": 10,
-      "auc": 0.9544672139241966,
-      "delta_bp": 0.07121502465623486,
-      "rho_test": 0.9997570032490197,
-      "wall": 189.67622828483582
+      "auc": 0.9544752801170927,
+      "delta_bp": 0.1518769536168474,
+      "rho_test": 0.9996575532721336,
+      "wall": 84.14808440208435
     }
   ],
-  "survivors": []
+  "survivors": [
+    "driverclass_stint"
+  ]
 }
