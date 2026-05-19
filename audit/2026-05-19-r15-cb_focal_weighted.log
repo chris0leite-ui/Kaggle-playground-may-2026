@@ -6,3 +6,38 @@
   --- Fold 1/5 | ti=351312 va=87828 ---
 0:	test: 0.9130634	best: 0.9130634 (0)	total: 368ms	remaining: 18m 24s
 500:	test: 0.9493601	best: 0.9493601 (500)	total: 1m 48s	remaining: 9m
+== R15 Phase 4: cb_focal_weighted (CB class-weighted Logloss) ==
+  train (439140, 16)  test (188165, 15)
+  class prior: 0.1990 (re-weighted to ~0.5)
+  feats: 93  cat: 9
+
+  --- Fold 1/5 | ti=351312 va=87828 ---
+0:	test: 0.9130634	best: 0.9130634 (0)	total: 487ms	remaining: 24m 19s
+500:	test: 0.9493601	best: 0.9493601 (500)	total: 2m 11s	remaining: 10m 57s
+1000:	test: 0.9504323	best: 0.9504323 (1000)	total: 4m 17s	remaining: 8m 34s
+1500:	test: 0.9504722	best: 0.9506254 (1233)	total: 6m 25s	remaining: 6m 25s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.9506253513
+bestIteration = 1233
+
+Shrink model to first 1234 iterations.
+    iters=1234 wall 412s  AUC=0.95063
+    ckpt saved (1/5)
+
+  --- Fold 2/5 | ti=351312 va=87828 ---
+0:	test: 0.9075967	best: 0.9075967 (0)	total: 290ms	remaining: 14m 28s
+500:	test: 0.9479033	best: 0.9479033 (500)	total: 2m 9s	remaining: 10m 47s
+1000:	test: 0.9492185	best: 0.9492959 (992)	total: 4m 16s	remaining: 8m 32s
+1500:	test: 0.9494529	best: 0.9494603 (1483)	total: 6m 21s	remaining: 6m 21s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.9494602914
+bestIteration = 1483
+
+Shrink model to first 1484 iterations.
+    iters=1484 wall 468s  AUC=0.94946
+    ckpt saved (2/5)
+
+  --- Fold 3/5 | ti=351312 va=87828 ---
+0:	test: 0.9083256	best: 0.9083256 (0)	total: 320ms	remaining: 15m 58s
