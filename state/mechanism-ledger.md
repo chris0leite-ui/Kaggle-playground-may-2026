@@ -681,6 +681,63 @@ fires for cb_horizon's loss-class novelty; skill `experiment-loop.md`
   segmentation contribution). Run for data-point completeness only,
   no submission expected.
 
+## 2026-05-19 Round 14 — Dig-deeper continuation (TabM win, 4th PRIMARY swap)
+
+PI: "should submit right" → submission slot 4/10 today (Kaggle hard
+cap allows). Strategic ≤3/day cap overridden for the TabM borderline.
+
+- **R14 Phase 1 Path-B segmentation + τ sweep on K=15 pool.** 7 segs
+  at τ=100k. **NO WINNER**: vs R13 PRIMARY (0.954485), all alt-segs
+  REGRESS (best alt DriverTier×Stint at −0.078 bp; rest −0.09 to
+  −0.21 bp). DCS τ=100k confirmed optimal on K=15. Wall 22 min CPU.
+  `audit/2026-05-19-r14-pathb-seg-sweep.log`.
+
+- **R14 Phase 3 cb_next_compound — DROPPED.** 5-class CB MultiClass
+  on next-stint Compound; smoke fold-0 AUC 0.36 (anti-correlated to
+  PitNextLap). Killed before full run.
+
+- **R14 Phase 5 cb_first_pit_lap — NULL.** CB regression on
+  log1p(absolute first-pit lap per (Driver, Race)) with strict per-
+  fold target. Standalone AUC 0.535 (per-fold ES at iter 4 because
+  target is group-uniform). K=16 (R13 + cb_fpl) + Path-B DCS τ=100k:
+  Δ vs R13 = **−0.0206 bp NULL**. Below calibrated gate. Group-
+  uniform-target axis is too weak for Path-B to extract signal.
+  `scripts/probe_r14_cb_first_pit_lap.py`,
+  `audit/2026-05-19-r14-cb_first_pit_lap.{log,json}`.
+
+- **R14 Phase 2 TabM — NEW PRIMARY.** pytabkit `TabM_D_Classifier`
+  full 5-fold on Kaggle T4×2, 79 min wall. NN-class structural
+  diversity per brainstorm S2 (line 77-83). Per-fold AUCs
+  0.9355-0.9413; standalone OOF AUC **0.93856**. Base orthogonality
+  EXCELLENT: ρ_OOF vs R13 = **0.926** (more orthogonal than
+  cb_horizon's 0.626); vs cb_horizon base 0.630; vs cb_stint_
+  completion base 0.127.
+  - K=16 (R13 + TabM) + Path-B DCS τ=100k: OOF **0.954487**, Δ vs
+    R13 PRIMARY **+0.0193 bp** (just below +0.02 calibrated gate by
+    0.001 bp); ρ_test 0.999905 = OK band edge (just below TIE_ZONE).
+  - τ-sweep on K=16+TabM confirms τ=100k optimal (20k −0.255 bp /
+    50k −0.039 / 200k −0.009).
+  - **SUBMITTED** as `submission_R14_K16_tabm_pathb_dcs_tau100000.csv`
+    ref 52807696. **LB 0.95395 = NEW PRIMARY (+0.02 bp over R13
+    0.95393)**. The OK-band edge ρ_test 0.99991 was MORE forgiving
+    on LB than the predicted noise-floor estimate; calibration
+    confirms the +0.02 floor is correctly placed.
+  - Cumulative session: R7.1 0.95389 → R12-2 0.95392 → R13 0.95393
+    → R14 0.95395 = **+0.6 bp closed** against top-5% boundary
+    0.95405. Gap now −1.0 bp (was −1.6 bp at session start).
+  - **Fourth PRIMARY swap in one session** via four distinct
+    orthogonal mechanisms (count-regression LapsUntilPit, fraction-
+    regression stint-completion, NN-class TabM, all stacked into
+    Path-B K=N+).
+  - Artifacts: `kernels/r14-tabm-full-gpu/r14_tabm_full_gpu.py`,
+    `audit/2026-05-19-r14-tabm.{log,json}`,
+    `audit/2026-05-19-r14-tabm-K16-add.log`,
+    `scripts/artifacts/oof_R14_tabm_strat.npy`,
+    `scripts/artifacts/test_R14_tabm_strat.npy`,
+    `scripts/artifacts/oof_K16_tabm_pathb_dcs_tau100000.npy` (preserved
+    after τ-sweep overwrites; see friction
+    `k14-output-collision-extra-bases`).
+
 - **R12-2 cb_horizon — CatBoost-on-LapsUntilPit (strict per-fold target).**
   Trained CatBoost REGRESSOR with RMSE loss on `log(LapsUntilPit + 1)`
   cap LAPS_CAP=30 (via `scripts/b_laps_until_pit.py::build_laps_until_pit`),
