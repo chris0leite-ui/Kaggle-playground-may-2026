@@ -159,5 +159,32 @@ distribution mismatch) is the open action item from
 - 6 staged CSVs in `submissions/`
 - Plan: `/root/.claude/plans/cached-frolicking-rivest.md`
 - Hedge ladder: `state/hedge-ladder.md` (NEW, promoted from
-  state/current.md:117-127)
-- ISSUES.md leaf claim: 2h (`research-improvements-jjI84 | status: wip`)
+  state/current.md:117-127; HEDGE 3 LB-confirmed 2026-05-19 PM)
+- ISSUES.md leaf claim: 2h (`research-improvements-jjI84 | status: done`)
+
+## Phase C — HEDGE 3 submit (DONE, 2026-05-19 PM)
+
+Kaggle CLI auth restored via fix described in friction
+`kaggle-cli-kgat-auth-misdiagnosed`: `KAGGLE_API_TOKEN="$KaggleAPIToke"`
+prefix (KGAT_ access tokens use Bearer auth via env var, not legacy
+HTTP-Basic `key` field in kaggle.json).
+
+PI authorised single submit of HEDGE 3 only:
+`submission_R10_blend_R72_K27_arith_75_25.csv`. CSV-Spearman vs R7.2
+bag = 0.997936 (tie-structure-mismatch artifact; true .npy ρ=0.999882
+OK band). Submission 52798640.
+
+**Result: LB 0.95387** (-0.02 bp vs PRIMARY 0.95389, within R2d
+30-bp regression cap). First cross-mechanism diversity hedge of the
+comp at this rho band. Naive 75/25 average of constituent LBs
+predicted 0.953838 → actual 0.95387 → +0.03 bp tiny error-cancellation
+lift on public LB.
+
+**Calibration data-point**: OK-band lower boundary (ρ ≈ 0.99988)
+→ ≈ −0.02 bp LB delta. Consistent with state/current.md:84 OK-band
+expectation ("sub-bp to few-bp LB movement").
+
+PI subsequently declined to submit HEDGE 2 (R8 60/20/20, TIE_ZONE)
+or HEDGE 5 (R7.2+R6.1, TIE_ZONE) — both staged candidates have
+near-zero info-gain odds at TIE_ZONE rho band; reserved for
+final-window May 28-31 if needed.

@@ -121,13 +121,13 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
   `[owner: research-model-extensions-Ibwvn | status: null]`
 - **2h.** R10 hedge-prep: blend-operator sweep over R7-era LB-confirmed
   pool {R7.1, R7.2, R5.2, R6.1, K27} × {arith, gmean, logit_mean,
-  rank_mean} × weight grid. Hypothesis: cross-mechanism error
-  cancellation at sub-bp scale (origin: 2026-05-12 70/30 K=11+K=9
-  rank-blend +0.1 bp at ρ=0.9998). Cost ~10 min CPU OOF-only;
-  surviving candidates → PI-gated single-shot submits. Output:
-  `scripts/probe_r10_blend_operator_sweep.py`,
-  `audit/2026-05-19-round-10-hedge-prep.md`.
-  `[owner: research-improvements-jjI84 | status: wip]`
+  rank_mean} × weight grid. **PASS:** 75/25 arith R7.2+K27 surfaced
+  as sole OK-band candidate (.npy ρ=0.999882); submitted as HEDGE 3
+  on 2026-05-19, **LB-confirmed 0.95387** (-0.02 bp vs PRIMARY,
+  within R2d 30-bp cap). Fills HEDGE-3 slot in final-window ladder.
+  Output: `scripts/probe_r10_blend_operator_sweep.py`,
+  `audit/2026-05-19-round-10-hedge-prep.md`, `state/hedge-ladder.md`.
+  `[owner: research-improvements-jjI84 | status: done]`
 
 ## 3. Target reformulation upstream of K=21 pool
 

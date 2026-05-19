@@ -17,7 +17,7 @@ parsing all of `current.md`, and so PRIMARY-change rewrites of
 | **PRIMARY** | R7.1 K=13 + Path-B DC×S τ=100k | `submissions/submission_K13_pathb_driverclass_stint_tau100000.csv` | 0.954471 | **0.95389** | 1.000 | LB-confirmed |
 | HEDGE 1 | R7.2 R7.1 + 5-seed fold-fit bag | `submissions/submission_K13_dcs_pathb_foldbag.csv` | 0.954497 | **0.95389** | TIE_ZONE (tied LB) | LB-confirmed |
 | HEDGE 2 (proposed) | R8 60/20/20 blend (R7.1 + DriverTier + RaceCluster) | `submissions/submission_R8_blend_60_20_20_r71_dt_rc.csv` | 0.954548 | TBD | TIE_ZONE (.npy ρ=0.99997) | staged; Kaggle CLI 401 |
-| HEDGE 3 (proposed) | R10 R7.2 + K27 arith 75/25 | `submissions/submission_R10_blend_R72_K27_arith_75_25.csv` | 0.954489 | TBD | **OK band (.npy ρ=0.999882)** | staged; Kaggle CLI 401 |
+| HEDGE 3 | R10 R7.2 + K27 arith 75/25 | `submissions/submission_R10_blend_R72_K27_arith_75_25.csv` | 0.954489 | **0.95387** | **OK band (.npy ρ=0.999882)** | LB-confirmed 2026-05-19 |
 | HEDGE 4 | R5.2 K=13 + Path-B C×S τ=100k | `submissions/submission_K13_seghmm_pathb_tau100000.csv` | 0.954460 | 0.95387 | OK band (operator diversity) | LB-confirmed |
 | HEDGE 5 (optional) | R10 R7.2 + R6.1 arith 80/20 | `submissions/submission_R10_blend_R72_R61_arith_80_20.csv` | 0.954500 | TBD | TIE_ZONE (.npy ρ=0.999963) | staged; Kaggle CLI 401 |
 
@@ -77,3 +77,11 @@ in pool); the K=27 and K=4 are reference anchors, not active candidates.
   promoted from HANDOVER held-state to HEDGE 2 candidate (Phase A
   submit pending Kaggle CLI auth fix). R10 blend-operator sweep
   HEDGE 3 slot reserved.
+- 2026-05-19 PM: HEDGE 3 LB-confirmed **0.95387** (-0.02 bp vs
+  PRIMARY 0.95389). Single OK-band candidate now LB-validated;
+  cross-mechanism diversity slot filled. HEDGE 2 and HEDGE 5 remain
+  TIE_ZONE staged-only; submitting either deferred unless final
+  selection requires the pool-level coarse-segmentation hedge
+  (HEDGE 2). PI-authorised Kaggle CLI auth fix:
+  `KAGGLE_API_TOKEN="$KaggleAPIToke"` (KGAT access tokens need
+  Bearer auth via env var, not legacy `key` field in kaggle.json).

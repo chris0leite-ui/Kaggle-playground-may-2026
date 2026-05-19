@@ -55,7 +55,16 @@ override of Rule 27 abort threshold (ρ_test ≥ 0.999) yielded the
 +0.1 bp lift despite ρ = 0.9998 — uncorrelated-error cancellation
 at the 5-decimal Kaggle quantisation.
 
-## Today's status (2026-05-18)
+## Today's status (2026-05-19)
+
+- Submissions used this comp: **47 / 270**. Daily cap: 10.
+- Today (2026-05-19): **1 used**, 9 unused at session-end.
+  - **R10 HEDGE 3: 75/25 arith blend (R7.2 5-seed bag + K=27 wide-pool) → LB 0.95387** (-0.02 bp vs PRIMARY 0.95389). True .npy ρ=0.999882 (OK band) registered as -0.02 bp LB delta. First cross-mechanism diversity hedge confirmed; HEDGE-3 slot in final-window ladder filled.
+  - R10 blend-operator sweep over {R7.1, R7.2, R5.2, R6.1, K27} × {arith, gmean, logit_mean, rank_mean}: only OK-band (ρ <0.9999) candidate was the R7.2+K27 75/25 arith blend submitted above. All others TIE_ZONE.
+  - R10 multi-constituent LR-meta alt-stack (LambdaRank stint + race + rolling LGBM + kernel hazard, 4 constituents): blended w/ R7.1 returned Δ < 0 at every weight (best Δ=-0.045 bp). **Closes alt-stack as 4th rank-lock axis.** See `audit/2026-05-19-round-10-hedge-prep.md`.
+- Kaggle CLI auth fix (session-start blocker): KGAT_-prefixed access tokens must be exported as `KAGGLE_API_TOKEN`, NOT placed in `kaggle.json`'s `key` field (legacy HTTP Basic). Working invocation: `KAGGLE_API_TOKEN="$KaggleAPIToke" kaggle ...`.
+
+## Today's status (2026-05-18, prior session)
 
 - Submissions used this comp: **46 / 270**. Daily cap: 10.
 - Today (2026-05-18): **7 used**, 3 unused at session-end:
@@ -130,6 +139,7 @@ hedge probe:
 
 | ISO date | Mechanism | LB | Δ vs K=4 baseline |
 |---|---|---:|---:|
+| 2026-05-19 PM R10 | 75/25 arith R7.2 + K=27 (HEDGE 3 OK-band) | 0.95387 | +3.6 |
 | **2026-05-12 AM** | **Blend 70/30 K=11+K=9** | **0.95386** | **+3.5** |
 | 2026-05-09 PM | K=11 + K=27 + Path-B τ=100k | 0.95385 | +3.4 |
 | 2026-05-09 PM | K=10 + K=27 + Path-B τ=100k | 0.95384 | +3.3 |
