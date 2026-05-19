@@ -1,0 +1,41 @@
+{
+  "round": "R13_B_operator_sweep",
+  "results": {
+    "LR-meta C=0.1 on K13": {
+      "auc": 0.9544449658903327,
+      "n_features": 39
+    },
+    "LR-meta C=0.1 on K14": {
+      "auc": 0.9544604626914486,
+      "n_features": 42
+    },
+    "LR-meta C=1.0 on K13": {
+      "auc": 0.954451126012414,
+      "n_features": 39
+    },
+    "LR-meta C=1.0 on K14": {
+      "auc": 0.9544532058149126,
+      "n_features": 42
+    },
+    "LR-meta C=10.0 on K13": {
+      "auc": 0.9544456393771462,
+      "n_features": 39
+    },
+    "LR-meta C=10.0 on K14": {
+      "auc": 0.9544581009816394,
+      "n_features": 42
+    }
+  },
+  "cb_lift_bp_per_C": {
+    "C=0.1": 0.15496801115899572,
+    "C=1.0": 0.020798024985557717,
+    "C=10.0": 0.12461604493196887
+  },
+  "path_b_primary_oof": 0.9544752801170927,
+  "best_k13_lr": 0.954451126012414,
+  "best_k14_lr": 0.9544604626914486,
+  "path_b_vs_best_k14_lr_bp": 0.14817425644131355,
+  "cb_adds_at_lr": true,
+  "verdict": "cb_horizon ADDS at LR-meta \u2014 base diversity is doing the work. Scale base diversity (more orthogonal-target CBs).",
+  "wall_s": 89.85086011886597
+}

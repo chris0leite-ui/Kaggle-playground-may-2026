@@ -1,0 +1,24 @@
+== R13 Phase B: operator-class diagnostic on cb_horizon ==
+  y: 439140 rows, prior 0.1990
+  K=13 OOF matrix: (439140, 13)
+  cb_horizon OOF: (439140,) mean 0.2890
+  K=13 expanded: (439140, 39); K=14 expanded: (439140, 42)
+  R12-2 PRIMARY OOF (Path-B reference): 0.954475
+  LR-meta C=0.1 on K13:  OOF AUC = 0.954445
+  LR-meta C=0.1 on K14:  OOF AUC = 0.954460
+  LR-meta C=1.0 on K13:  OOF AUC = 0.954451
+  LR-meta C=1.0 on K14:  OOF AUC = 0.954453
+  LR-meta C=10.0 on K13:  OOF AUC = 0.954446
+  LR-meta C=10.0 on K14:  OOF AUC = 0.954458
+
+  cb_horizon lift at LR-meta per C: {'C=0.1': 0.15496801115899572, 'C=1.0': 0.020798024985557717, 'C=10.0': 0.12461604493196887}
+
+  Path-B R12-2 PRIMARY:  0.954475
+  Best K=13 LR-meta:    0.954451
+  Best K=14 LR-meta:    0.954460
+  Path-B vs best K=14 LR: Δ=+0.15 bp
+
+  VERDICT: cb_horizon ADDS at LR-meta — base diversity is doing the work. Scale base diversity (more orthogonal-target CBs).
+
+  Wrote audit/2026-05-19-r13-operator-sweep.json
+  Total wall: 90s

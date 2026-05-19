@@ -10,36 +10,45 @@ to comp start 2026-05-01. The `d13`..`d19` labels in script names
 and old audit prose are FROZEN code prefixes — never calendar days
 (per `glossary.md` and the `day-counter-drift` friction).
 
-## PRIMARY (active) — set 2026-05-19 Round 12-2
+## PRIMARY (active) — set 2026-05-19 Round 13
 
-**LB 0.95392** — R12-2 K=14 (K=13 + cb_horizon) + Path-B DriverClass × Stint τ=100k.
+**LB 0.95393** — R13 K=15 (K=13 + cb_horizon + cb_stint_completion) +
+Path-B DriverClass × Stint τ=100k.
 
-K=14 pool = K=13 pool (yekenot, cb_v4, hgbc_deep, d16_orig, qAT, qAV,
+K=15 pool = K=13 pool (yekenot, cb_v4, hgbc_deep, d16_orig, qAT, qAV,
 qAO, qAA, qAF, qAK, K27_100k, seg_fe, HMM) **+ cb_horizon** (CatBoost
-regression on `log(LapsUntilPit + 1)` with strict per-fold target
-derivation per `scripts/probe_r12_cb_horizon.py`). Path-B applied
-with the same DriverClass × Stint segmentation that won R7.
+regression on `log(LapsUntilPit+1)`, strict per-fold target,
+`scripts/probe_r12_cb_horizon.py`) **+ cb_stint_completion** (CB
+regression on `TyreLife / max(TyreLife)` within (Driver, Race, Stint)
+STRICT per fold, `scripts/probe_r13_cb_stint_completion.py`). Path-B
+DriverClass × Stint segmentation unchanged from R7.
 
+File: `submissions/submission_R13_K15_cbh_cbsc_pathb_dcs_tau100000.csv`.
+OOF 0.954485 (+0.0934 bp over R12-2 0.954475); LB 0.95393 (+0.01 bp
+over R12-2 0.95392; +0.04 bp cumulative over R7.1 0.95389 in one
+session). Submission ref 52804605.
+
+Round-13 finding: STACKING two orthogonal-target CatBoosts works.
+cb_stint_completion's base column is near-PERFECTLY orthogonal to
+R12-2 (ρ_OOF = 0.0006) — even cleaner than cb_horizon (ρ 0.626).
+Two distinct count-regression target reformulations both survive
+Path-B's segmented shrinkage and stack on LB. Plan-agent's "scale
+base diversity at K=N+" thesis confirmed for two consecutive variants.
+
+## Prior PRIMARY R12-2 (2026-05-19 Round 12-2) — retained for hedge
+
+**LB 0.95392** — K=14 (K=13 + cb_horizon) + Path-B DCS τ=100k.
 File: `submissions/submission_R12_cb_horizon_K14_pathb_dcs_tau100000.csv`.
-OOF 0.954475 (+0.046 bp over R7.1 0.954471); LB 0.95392 (+0.03 bp
-over R7.1 0.95389). Submission ref 52802828.
-
-The Round-12 finding: a CatBoost trained on `LapsUntilPit` (count
-regression, multi-step future) is structurally orthogonal to K=13's
-binary single-step PitNextLap predictors (ρ_OOF base vs R7.1 = 0.626;
-vs cb_v4 = 0.607). Even though the orthogonal signal is small in
-magnitude (sub-G2 OOF), it survives Path-B's segmented shrinkage and
-registers on LB. First LB improvement in 18 days (since R7.1 was
-set 2026-05-18 Round 7). Plan-agent's "orthogonality-first" thesis
-PAID OFF on the second variant; cb_resid's Bayes-ceiling finding
-correctly predicted same-axis CatBoost would absorb.
+OOF 0.954475. R12-2's pool is exactly the same as R13 except
+cb_stint_completion is removed; mechanically a "remove one base"
+ablation hedge.
 
 ## Prior PRIMARY R7.1 (2026-05-18 Round 7) — retained for hedge
 
 **LB 0.95389** — K=13 + Path-B DriverClass × Stint τ=100k.
 File: `submissions/submission_K13_pathb_driverclass_stint_tau100000.csv`.
-OOF 0.954471. The R12 PRIMARY uses this exact pool plus one extra
-base; the meta architecture and segmentation are unchanged.
+OOF 0.954471. The R13 PRIMARY uses this exact pool plus two extra
+bases; the meta architecture and segmentation are unchanged.
 
 ## Prior PRIMARY R5.2 (2026-05-18 Round 5) — retained for hedge
 
@@ -107,8 +116,8 @@ at the 5-decimal Kaggle quantisation.
   - **R9 NB4** (Compound×Stint TE-as-base): K=14 Δ vs R7.1 PRIMARY **−0.022 bp NULL**; standalone 0.94850 G1✓.
   - **R9 C1** (Aadigupta per-Race scalars): K=14 Δ vs R7.1 PRIMARY **−0.045 bp NULL**; standalone 0.94902 G1✓.
 - Comp-day **18 of 31**. Days remaining: **13**.
-- Top-5% boundary: **0.95405**. Gap to PRIMARY R12-2 (0.95392): **−1.3 bp** (was −1.6 bp under R7.1).
-- Leader: **0.95476**. Gap to PRIMARY R12-2: **−8.4 bp** (was −8.7 bp).
+- Top-5% boundary: **0.95405**. Gap to PRIMARY R13 (0.95393): **−1.2 bp** (was −1.6 bp at session start; closed +0.4 bp today across two consecutive PRIMARY swaps).
+- Leader: **0.95476**. Gap to PRIMARY R13: **−8.3 bp** (was −8.7 bp).
 
 ## Transfer bands (Rule 27 recalibration, 2026-05-14)
 
@@ -166,7 +175,8 @@ hedge probe:
 
 | ISO date | Mechanism | LB | Δ vs K=4 baseline |
 |---|---|---:|---:|
-| **2026-05-19 PM R12-2** | **K=14 (K=13 + cb_horizon LapsUntilPit) + Path-B DCS τ=100k** | **0.95392** | **+4.1** |
+| **2026-05-19 PM R13** | **K=15 (K=13 + cb_horizon + cb_stint_completion) + Path-B DCS τ=100k** | **0.95393** | **+4.2** |
+| 2026-05-19 PM R12-2 | K=14 (K=13 + cb_horizon LapsUntilPit) + Path-B DCS τ=100k | 0.95392 | +4.1 |
 | 2026-05-19 PM R10 | 75/25 arith R7.2 + K=27 (HEDGE 3 OK-band) | 0.95387 | +3.6 |
 | **2026-05-12 AM** | **Blend 70/30 K=11+K=9** | **0.95386** | **+3.5** |
 | 2026-05-09 PM | K=11 + K=27 + Path-B τ=100k | 0.95385 | +3.4 |

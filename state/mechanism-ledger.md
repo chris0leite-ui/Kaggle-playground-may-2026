@@ -619,6 +619,68 @@ sink + Optuna parking-lot (Phase 4) only if 1-3 NULL.
     `scripts/artifacts/oof_R12_cb_resid_strat.npy`,
     `scripts/artifacts/test_R12_cb_resid_strat.npy`.
 
+## 2026-05-19 Round 13 — Dig-deeper after the cb_horizon win
+
+PI: "dig deeper. Use what our skill says about this now." Skill auto-
+trigger (`strategy-critic.md` §14 "before adding new mechanism family")
+fires for cb_horizon's loss-class novelty; skill `experiment-loop.md`
+§95-114 requires operator-class sweep before scaling.
+
+- **R13 Phase A strategy-critique** (`audit/2026-05-19-strategy-critique.md`).
+  Section 5 only; sections 1-4 skipped (+0.046 bp OOF shift from R7.1
+  → R12-2 leaves segment failure map unchanged below ±0.5 bp
+  resolution). Verdict: queue × discount (+0.035 bp) < headroom
+  (+1.3 bp); top-5% unreachable from this swing alone. Continue for
+  slot-spending discipline + calibration data.
+
+- **R13 Phase B operator-class diagnostic on cb_horizon.** LR-meta
+  C ∈ {0.1, 1, 10} on K=13 vs K=14 (K=13 + cb_horizon).
+  Δ K=14 vs K=13 at LR-meta: **+0.155 bp at C=0.1**, +0.021 bp at
+  C=1.0, **+0.125 bp at C=10.0**. cb_horizon ADDS at LR-meta across
+  all C values → base diversity is doing real work, not just Path-B.
+  Path-B segmentation adds an ADDITIONAL +0.15 bp on top of best
+  K=14 LR-meta. Both axes contribute. Implication: scale base
+  diversity (more orthogonal-target CBs at K=N+).
+  `audit/2026-05-19-r13-operator-sweep.json`.
+
+- **R13 Phase D cb_stint_completion — second orthogonal-target CB.**
+  Target = `TyreLife / max(TyreLife)` within (Driver, Race, Stint)
+  STRICT per fold. RMSE loss, cb_v4 FE, 931s wall. Standalone AUC
+  **0.63466** (moderate). Rank-normalized base column:
+  **ρ_OOF vs R12-2 = 0.000584 / ρ_OOF vs cb_horizon = −0.000248**
+  — NEAR-PERFECT orthogonality (much cleaner than cb_horizon's
+  0.626 vs R7.1).
+  - K=15 + Path-B DCS τ=100k: OOF **0.954485**, **Δ vs R12-2 PRIMARY
+    +0.0934 bp** (just below strict G2 +0.10 bp but cleanly above
+    the calibrated +0.02 bp floor); ρ_test 0.999927 OK transfer band.
+  - **Gate cleared via calibrated path** (OOF Δ ≥ +0.02 + ρ_test
+    OK band). **SUBMITTED** (slot 3/10 today). **LB 0.95393 = NEW
+    PRIMARY (+0.01 bp over R12-2 0.95392)**. Top-5% gap now −1.2 bp
+    (was −1.6 bp at session start; closed +0.4 bp today across two
+    consecutive PRIMARY swaps R7.1 → R12-2 → R13).
+  - Two orthogonal-target CBs stacked successfully — the swing's
+    central thesis (base diversity in DIFFERENT target-class scales)
+    is now empirically confirmed for TWO variants.
+  - Artifacts: `audit/2026-05-19-r13-cb_stint_completion.{log,json}`,
+    `audit/2026-05-19-r13-K15-add.log`,
+    `scripts/probe_r13_cb_stint_completion.py`,
+    `scripts/artifacts/oof_R13_cb_stint_completion_strat.npy`,
+    `scripts/artifacts/test_R13_cb_stint_completion_strat.npy`,
+    `scripts/artifacts/oof_K15_pathb_driverclass_stint_tau100000.npy`.
+
+- **R13 Phase E C4 UID-aggregates — NOT FIRED.** Per plan, only
+  if Phase D nulled. Phase D cleared the calibrated gate, so C4
+  parked. Plan-agent ranked it lowest base-rate (base-class is the
+  saturated axis); deferring to future session.
+
+- **R13 Phase C S4 xendcg-meta — TO RUN POST-LB.** Authored at
+  `scripts/probe_r13_xendcg_meta.py` (rank-loss meta with per-
+  (Year, Race) group; rank_xendcg upper limit 10k per group → grouped
+  by race). Plan-agent priority 1 originally; Phase B's read suggests
+  it'll regress vs Path-B (global xendcg loses the +0.15 bp
+  segmentation contribution). Run for data-point completeness only,
+  no submission expected.
+
 - **R12-2 cb_horizon — CatBoost-on-LapsUntilPit (strict per-fold target).**
   Trained CatBoost REGRESSOR with RMSE loss on `log(LapsUntilPit + 1)`
   cap LAPS_CAP=30 (via `scripts/b_laps_until_pit.py::build_laps_until_pit`),

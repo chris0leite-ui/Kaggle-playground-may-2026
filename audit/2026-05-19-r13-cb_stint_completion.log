@@ -1,0 +1,75 @@
+== R13 Phase D: cb_stint_completion (1 - TyreLife/stint_max) ==
+  train (439140, 16)  test (188165, 15)
+  full-train target: mean 0.4998 std 0.2982 pct-zero 0.0000
+  feats: 93  cat: 9
+
+  --- Fold 1/5 | ti=351312 va=87828 ---
+    target_ti: mean 0.5165  std 0.3044  target_va: mean 0.6596
+0:	learn: 0.2940719	test: 0.3520066	best: 0.3520066 (0)	total: 236ms	remaining: 11m 48s
+500:	learn: 0.0962853	test: 0.2419588	best: 0.2419588 (500)	total: 1m 19s	remaining: 6m 38s
+1000:	learn: 0.0895766	test: 0.2418418	best: 0.2418266 (724)	total: 2m 36s	remaining: 5m 12s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.2418266136
+bestIteration = 724
+
+Shrink model to first 725 iterations.
+    iters=725 wall 175s  AUC(pred)=0.63686
+
+  --- Fold 2/5 | ti=351312 va=87828 ---
+    target_ti: mean 0.5165  std 0.3047  target_va: mean 0.6597
+0:	learn: 0.2943384	test: 0.3513940	best: 0.3513940 (0)	total: 265ms	remaining: 13m 14s
+500:	learn: 0.0965329	test: 0.2415110	best: 0.2414847 (498)	total: 1m 18s	remaining: 6m 30s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.2413756326
+bestIteration = 666
+
+Shrink model to first 667 iterations.
+    iters=667 wall 160s  AUC(pred)=0.63531
+
+  --- Fold 3/5 | ti=351312 va=87828 ---
+    target_ti: mean 0.5163  std 0.3044  target_va: mean 0.6597
+0:	learn: 0.2939563	test: 0.3523369	best: 0.3523369 (0)	total: 181ms	remaining: 9m 4s
+500:	learn: 0.0969065	test: 0.2416749	best: 0.2415975 (470)	total: 1m 18s	remaining: 6m 31s
+1000:	learn: 0.0898446	test: 0.2411063	best: 0.2410823 (906)	total: 2m 37s	remaining: 5m 15s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.2410409655
+bestIteration = 1093
+
+Shrink model to first 1094 iterations.
+    iters=1094 wall 231s  AUC(pred)=0.63075
+
+  --- Fold 4/5 | ti=351312 va=87828 ---
+    target_ti: mean 0.5166  std 0.3047  target_va: mean 0.6597
+0:	learn: 0.2943110	test: 0.3516544	best: 0.3516544 (0)	total: 185ms	remaining: 9m 14s
+500:	learn: 0.0967373	test: 0.2408946	best: 0.2408699 (498)	total: 1m 19s	remaining: 6m 36s
+1000:	learn: 0.0899842	test: 0.2405992	best: 0.2405386 (967)	total: 2m 42s	remaining: 5m 24s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.2405386415
+bestIteration = 967
+
+Shrink model to first 968 iterations.
+    iters=968 wall 221s  AUC(pred)=0.63490
+
+  --- Fold 5/5 | ti=351312 va=87828 ---
+    target_ti: mean 0.5169  std 0.3046  target_va: mean 0.6592
+0:	learn: 0.2941849	test: 0.3516195	best: 0.3516195 (0)	total: 170ms	remaining: 8m 30s
+500:	learn: 0.0966296	test: 0.2425343	best: 0.2424425 (434)	total: 1m 20s	remaining: 6m 42s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.2424424958
+bestIteration = 434
+
+Shrink model to first 435 iterations.
+    iters=435 wall 126s  AUC(pred)=0.63554
+
+  Standalone OOF AUC (proxy): 0.63466
+  R12-2 PRIMARY OOF: 0.500468
+  ρ_OOF (stint base) vs R12-2: 0.000584
+  ρ_OOF (stint base) vs cb_horizon base: -0.000248
+  Saved oof_R13_cb_stint_completion_strat.npy + test_..._strat.npy
+  Wrote audit/2026-05-19-r13-cb_stint_completion.json
+  Total wall: 931s
