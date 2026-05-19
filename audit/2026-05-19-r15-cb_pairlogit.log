@@ -1,0 +1,7 @@
+== R15 Phase 2: cb_pairlogit (CB pairwise ranking on PitNextLap) ==
+  train (439140, 16)  test (188165, 15)
+  feats: 93  cat: 9
+
+  --- Fold 1/5 | ti=351312 va=87828 ---
+0:	learn: 0.6316368	test: 0.6409576	best: 0.6409576 (0)	total: 700ms	remaining: 34m 59s
+500:	learn: 0.1148249	test: 0.2319707	best: 0.2319648 (498)	total: 3m 29s	remaining: 17m 25s

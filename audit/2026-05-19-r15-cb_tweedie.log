@@ -1,0 +1,66 @@
+== R15 Phase 3: cb_tweedie (CB Tweedie on raw LapsUntilPit count) ==
+  train (439140, 16)  test (188165, 15)
+  feats: 93  cat: 9
+
+  --- Fold 1/5 | ti=351312 va=87828 ---
+    target_ti: mean 7.011  std 8.374  target_va: mean 11.652
+0:	learn: 15.5565160	test: 24.5185860	best: 24.5185860 (0)	total: 241ms	remaining: 12m 3s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 13.78502359
+bestIteration = 96
+
+Shrink model to first 97 iterations.
+    iters=97 wall 81s  AUC(score vs PitNextLap)=0.84845
+
+  --- Fold 2/5 | ti=351312 va=87828 ---
+    target_ti: mean 7.084  std 8.458  target_va: mean 11.495
+0:	learn: 15.6981870	test: 24.2077020	best: 24.2077020 (0)	total: 182ms	remaining: 9m 5s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 13.67907773
+bestIteration = 101
+
+Shrink model to first 102 iterations.
+    iters=102 wall 79s  AUC(score vs PitNextLap)=0.84343
+
+  --- Fold 3/5 | ti=351312 va=87828 ---
+    target_ti: mean 7.062  std 8.428  target_va: mean 11.588
+0:	learn: 15.6566998	test: 24.3885640	best: 24.3885640 (0)	total: 192ms	remaining: 9m 34s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 13.73701784
+bestIteration = 97
+
+Shrink model to first 98 iterations.
+    iters=98 wall 80s  AUC(score vs PitNextLap)=0.84378
+
+  --- Fold 4/5 | ti=351312 va=87828 ---
+    target_ti: mean 7.057  std 8.413  target_va: mean 11.564
+0:	learn: 15.6460471	test: 24.3504589	best: 24.3504589 (0)	total: 190ms	remaining: 9m 30s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 13.73478018
+bestIteration = 85
+
+Shrink model to first 86 iterations.
+    iters=86 wall 78s  AUC(score vs PitNextLap)=0.83991
+
+  --- Fold 5/5 | ti=351312 va=87828 ---
+    target_ti: mean 7.055  std 8.421  target_va: mean 11.550
+0:	learn: 15.6426126	test: 24.3180694	best: 24.3180694 (0)	total: 206ms	remaining: 10m 18s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 13.71731678
+bestIteration = 96
+
+Shrink model to first 97 iterations.
+    iters=97 wall 81s  AUC(score vs PitNextLap)=0.84266
+
+  Standalone OOF AUC: 0.84365
+  R15 PRIMARY OOF: 0.500469
+  ρ_OOF vs R15 PRIMARY: 0.001728
+  ρ_OOF vs cb_horizon (same target, RMSE loss): 0.002204
+  Saved oof_R15_cb_tweedie_strat.npy + test_..._strat.npy
+  Wrote audit/2026-05-19-r15-cb_tweedie.json
+  Total wall: 416s

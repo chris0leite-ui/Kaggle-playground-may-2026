@@ -1,20 +1,20 @@
-"""scripts/probe_r15_cb_pairlogit.py — R15 Phase 2: CB PairLogit on PitNextLap.
+"""scripts/probe_r15_cb_focal_weighted.py — R15 Phase 4: CB class-weighted Logloss.
 
-BASE pairwise-ranking-loss alternative to cb_v4's pointwise Logloss.
-Same target (PitNextLap binary) but trained via CatBoost's native
-`PairLogit` objective — within each group (Year, Race), the model
-learns to rank PitNextLap=1 rows above PitNextLap=0 rows. Directly
-optimizes pairwise AUC; no logloss bias.
+BASE rebalance-hard-rows variant. CatBoost native Logloss with
+`auto_class_weights='Balanced'` (inverse-frequency per-class weights).
+PitNextLap prior 0.199 → re-weighted to 0.5 effective. Approximates
+focal-loss intent (down-weight easy majority, up-weight rare class).
 
-Reuses cb_v4 FE pipeline (yekenot recipe + per-fold FS_A + per-fold
-CV TE).
+Different gradient profile from cb_v4's unweighted Logloss: same loss
+function but the per-row gradient magnitudes shift by ≥2.5× for the
+positive class.
 
-Output: predicted ranking score per row (CB PairLogit returns
-real-valued scores). Rank-normalized to (eps, 1-eps) for Path-B
-K=17 stack-add.
+Target: PitNextLap binary (same as cb_v4).
+
+Output: predicted probability → rank-normalized for Path-B K=N+ stack.
 
 Usage:
-  python scripts/probe_r15_cb_pairlogit.py [--smoke] [--max-rounds 3000]
+  python scripts/probe_r15_cb_focal_weighted.py [--smoke] [--max-rounds 3000]
 """
 from __future__ import annotations
 import argparse
@@ -42,10 +42,11 @@ TARGET, ID_COL = "PitNextLap", "id"
 SEED, N_FOLDS = 42, 5
 
 
-def cb_pairlogit_params(max_iters: int, seed: int, depth: int = 8) -> dict:
+def cb_focal_params(max_iters: int, seed: int, depth: int = 8) -> dict:
     return dict(
-        loss_function="PairLogit",
-        eval_metric="PairLogit",
+        loss_function="Logloss",
+        eval_metric="AUC",
+        auto_class_weights="Balanced",  # the rebalance lever
         iterations=max_iters,
         learning_rate=0.05,
         depth=depth,
@@ -61,19 +62,8 @@ def cb_pairlogit_params(max_iters: int, seed: int, depth: int = 8) -> dict:
         allow_writing_files=False,
         task_type="CPU",
         thread_count=-1,
+        rsm=0.8,
     )
-
-
-def make_group_ids(df_subset: pd.DataFrame) -> np.ndarray:
-    """Return per-row integer group_id from (Year, Race, Driver).
-    Tight grouping avoids CatBoost's pair-count cap (per-(Year, Race)
-    groups have ~770 rows = ~300k pairs which trips the limit;
-    per-(Year, Race, Driver) groups are ~11 rows = ~55 pairs)."""
-    keys = (df_subset["Year"].astype(str) + "|" +
-            df_subset["Race"].astype(str) + "|" +
-            df_subset["Driver"].astype(str)).values
-    cat = pd.Categorical(keys)
-    return cat.codes.astype(np.int32)
 
 
 def main() -> None:
@@ -84,7 +74,7 @@ def main() -> None:
     args = ap.parse_args()
 
     t0 = time.time()
-    print("== R15 Phase 2: cb_pairlogit (CB pairwise ranking on PitNextLap) ==",
+    print("== R15 Phase 4: cb_focal_weighted (CB class-weighted Logloss) ==",
           flush=True)
     train = pd.read_csv("data/train.csv")
     test = pd.read_csv("data/test.csv")
@@ -98,10 +88,12 @@ def main() -> None:
 
     train_S, state = make_features_static(train, fit=True)
     test_S, _ = make_features_static(test, fit=False, state=state)
-    y = train_S[TARGET].astype(int).reset_index(drop=True)
+    y_pn = train_S[TARGET].astype(int).reset_index(drop=True)
+    print(f"  class prior: {y_pn.mean():.4f} (re-weighted to ~0.5)",
+          flush=True)
 
     skf = StratifiedKFold(N_FOLDS, shuffle=True, random_state=SEED)
-    fold_list = list(skf.split(np.zeros(len(y)), y))
+    fold_list = list(skf.split(np.zeros(len(y_pn)), y_pn))
     sample_ti = fold_list[0][0]
     sample_fs_a = fit_fs_a(train_S.iloc[sample_ti])
     sample_train = apply_fs_a(train_S, sample_fs_a)
@@ -119,7 +111,7 @@ def main() -> None:
     test_orig_ids = test[ID_COL].values
     test_id_to_sorted_pos = {tid: i for i, tid in enumerate(test_sorted_ids)}
 
-    oof_pred = np.zeros(len(y), dtype=np.float64)
+    oof_pred = np.zeros(len(y_pn), dtype=np.float64)
     test_pred = np.zeros(len(test_S), dtype=np.float64)
     fold_metrics = []
     n_eff_folds = 1 if args.smoke else N_FOLDS
@@ -134,6 +126,7 @@ def main() -> None:
         test_fold = apply_fs_a(test_S, fs_a)
 
         y_ti = train_ti[TARGET].astype(int).reset_index(drop=True)
+        y_va = train_va[TARGET].astype(int).reset_index(drop=True)
         fold_safe_te_for_fold(train_ti, train_va, test_fold,
                               y_ti, fold, N_FOLDS)
 
@@ -149,49 +142,18 @@ def main() -> None:
             X[num_cols] = X[num_cols].fillna(0).astype(np.float32)
         cat_idx = [feats.index(c) for c in cat_cols]
 
-        # Group IDs per (Year, Race) — CatBoost PairLogit requirement.
-        # Rows MUST be sorted by group_id (CatBoost throws
-        # "queryIds should be grouped" if not). Sort each subset
-        # stably by group_id.
-        gid_tr = make_group_ids(train_ti)
-        gid_va = make_group_ids(train_va)
-        gid_te = make_group_ids(test_fold)
-        sort_tr = np.argsort(gid_tr, kind="stable")
-        sort_va = np.argsort(gid_va, kind="stable")
-        sort_te = np.argsort(gid_te, kind="stable")
-        X_tr_s = X_tr.iloc[sort_tr].reset_index(drop=True)
-        X_va_s = X_va.iloc[sort_va].reset_index(drop=True)
-        X_te_s = X_te.iloc[sort_te].reset_index(drop=True)
-        y_tr_s = y_ti.values[sort_tr]
-        y_va_s = train_va[TARGET].astype(int).values[sort_va]
-        gid_tr_s = gid_tr[sort_tr]
-        gid_va_s = gid_va[sort_va]
-        gid_te_s = gid_te[sort_te]
-        # Pools with sorted group_ids
-        pool_tr = cb.Pool(X_tr_s, label=y_tr_s, cat_features=cat_idx,
-                          group_id=gid_tr_s)
-        pool_va = cb.Pool(X_va_s, label=y_va_s, cat_features=cat_idx,
-                          group_id=gid_va_s)
-        pool_te = cb.Pool(X_te_s, cat_features=cat_idx, group_id=gid_te_s)
+        params = cb_focal_params(args.max_rounds, SEED, depth=args.depth)
+        m = cb.CatBoostClassifier(**params)
+        m.fit(X_tr, y_ti, eval_set=(X_va, y_va),
+              cat_features=cat_idx, use_best_model=True)
 
-        params = cb_pairlogit_params(args.max_rounds, SEED, depth=args.depth)
-        m = cb.CatBoostRanker(**params)
-        m.fit(pool_tr, eval_set=pool_va, use_best_model=True)
-
-        # Predict on sorted pools, then UNSORT to original index order
-        pred_va_sorted = m.predict(pool_va)
-        pred_te_sorted = m.predict(pool_te)
-        # Unsort: argsort(sort_va) gives the inverse permutation
-        inv_va = np.argsort(sort_va)
-        inv_te = np.argsort(sort_te)
-        pred_va = pred_va_sorted[inv_va]
-        pred_te = pred_te_sorted[inv_te]
+        pred_va = m.predict_proba(X_va)[:, 1]
+        pred_te = m.predict_proba(X_te)[:, 1]
         oof_pred[vi] = pred_va
         test_pred += pred_te / n_eff_folds
 
-        y_va = train_va[TARGET].astype(int).values
         try:
-            auc_va = float(roc_auc_score(y_va, pred_va))
+            auc_va = float(roc_auc_score(y_va.values, pred_va))
         except ValueError:
             auc_va = float("nan")
         wall = time.time() - t_f
@@ -199,67 +161,62 @@ def main() -> None:
             fold=fold, iters=int(m.tree_count_),
             wall_s=float(wall), auc_va=auc_va,
         ))
-        print(f"    iters={m.tree_count_} wall {wall:.0f}s  AUC={auc_va:.5f}",
-              flush=True)
+        print(f"    iters={m.tree_count_} wall {wall:.0f}s  "
+              f"AUC={auc_va:.5f}", flush=True)
 
     if args.smoke:
         print(f"\n  SMOKE wall: {time.time()-t0:.0f}s; 5-fold proj "
               f"~{(time.time()-t0)*N_FOLDS:.0f}s", flush=True)
         return
 
-    auc_full = float(roc_auc_score(y.values, oof_pred))
+    auc_full = float(roc_auc_score(y_pn.values, oof_pred))
     print(f"\n  Standalone OOF AUC: {auc_full:.5f}", flush=True)
 
-    # ρ vs R14 PRIMARY
-    r14_oof = np.load(ART / "oof_K16_tabm_pathb_dcs_tau100000.npy")
-    auc_r14 = float(roc_auc_score(y.values, r14_oof))
-    rho_vs_r14, _ = spearmanr(oof_pred, r14_oof)
-    print(f"  R14 PRIMARY OOF: {auc_r14:.6f}", flush=True)
-    print(f"  ρ_OOF vs R14 PRIMARY: {rho_vs_r14:.6f}", flush=True)
+    # ρ vs R15 PRIMARY (K=17 xendcg base column added)
+    r15_oof = np.load(ART / "oof_K17_xendcg_pathb_dcs_tau100000.npy")
+    auc_r15 = float(roc_auc_score(y_pn.values, r15_oof))
+    rho_vs_r15, _ = spearmanr(oof_pred, r15_oof)
+    print(f"  R15 PRIMARY OOF: {auc_r15:.6f}", flush=True)
+    print(f"  ρ_OOF vs R15 PRIMARY: {rho_vs_r15:.6f}", flush=True)
 
-    # ρ vs cb_v4 (the pointwise Logloss reference)
-    cb_v4 = np.load(ART / "oof_p1_single_cb_v4_gpu_strat.npy")
-    cb_v4_p = cb_v4[:, 1] if cb_v4.ndim == 2 else cb_v4
-    # cb_v4 is in original order; oof_pred is in sorted order — align via id
-    cb_v4_sorted = np.array([cb_v4_p[orig_train_ids.tolist().index(t)]
-                              if t in orig_train_ids else np.nan
-                              for t in sorted_ids[:100]])  # quick sample
-    # Use index map for full ρ
-    id_to_orig = {tid: i for i, tid in enumerate(orig_train_ids)}
-    cb_v4_sorted_full = np.array([cb_v4_p[id_to_orig[t]] for t in sorted_ids])
-    rho_vs_cbv4, _ = spearmanr(oof_pred, cb_v4_sorted_full)
-    print(f"  ρ_OOF vs cb_v4 base: {rho_vs_cbv4:.6f}", flush=True)
+    # ρ vs cb_v4 (same target, unweighted Logloss)
+    try:
+        cb_v4_oof = np.load(ART / "oof_p1_single_cb_v4_strat.npy")
+        rho_vs_cbv4, _ = spearmanr(oof_pred, cb_v4_oof)
+        print(f"  ρ_OOF vs cb_v4 (same target, unweighted): {rho_vs_cbv4:.6f}",
+              flush=True)
+    except FileNotFoundError:
+        rho_vs_cbv4 = float("nan")
+        print(f"  cb_v4 OOF not found; skipping ρ vs cb_v4", flush=True)
 
-    # Rank-normalize for Path-B add
+    # Rank-normalize and save (Path-B expand() needs uniform input)
     combined = np.concatenate([oof_pred, test_pred])
     ranks = rankdata(combined)
     eps = 1.0 / (2 * len(ranks))
     uniform = np.clip((ranks - 0.5) / len(ranks), eps, 1 - eps)
     oof_uniform = uniform[:len(oof_pred)]
     test_uniform = uniform[len(oof_pred):]
-
     order_back_train = np.array([id_to_sorted_pos[t] for t in orig_train_ids])
     order_back_test = np.array([test_id_to_sorted_pos[t]
                                  for t in test_orig_ids])
-    np.save(ART / "oof_R15_cb_pairlogit_strat.npy",
+    np.save(ART / "oof_R15_cb_focal_weighted_strat.npy",
             oof_uniform[order_back_train].astype(np.float32))
-    np.save(ART / "test_R15_cb_pairlogit_strat.npy",
+    np.save(ART / "test_R15_cb_focal_weighted_strat.npy",
             test_uniform[order_back_test].astype(np.float32))
-    print(f"  Saved oof_R15_cb_pairlogit_strat.npy + test_..._strat.npy",
+    print(f"  Saved oof_R15_cb_focal_weighted_strat.npy + test_..._strat.npy",
           flush=True)
 
     summary = dict(
-        round="R15_Phase2_cb_pairlogit",
+        round="R15_Phase4_cb_focal_weighted",
         oof_auc=auc_full,
-        r14_primary_oof=auc_r14,
-        rho_vs_r14=float(rho_vs_r14),
+        r15_primary_oof=auc_r15,
+        rho_vs_r15=float(rho_vs_r15),
         rho_vs_cb_v4=float(rho_vs_cbv4),
         fold_metrics=fold_metrics,
         wall_total_s=time.time() - t0,
-        depth=args.depth,
-        max_rounds=args.max_rounds,
+        depth=args.depth, max_rounds=args.max_rounds,
     )
-    out_json = Path("audit/2026-05-19-r15-cb_pairlogit.json")
+    out_json = Path("audit/2026-05-19-r15-cb_focal_weighted.json")
     out_json.write_text(json.dumps(summary, indent=2))
     print(f"  Wrote {out_json}", flush=True)
     print(f"  Total wall: {time.time()-t0:.0f}s", flush=True)
