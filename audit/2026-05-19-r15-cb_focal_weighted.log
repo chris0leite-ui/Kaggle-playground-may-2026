@@ -151,3 +151,36 @@ Shrink model to first 1291 iterations.
   --- Fold 5/5 | ti=351312 va=87828 ---
 0:	test: 0.9116090	best: 0.9116090 (0)	total: 447ms	remaining: 22m 20s
 500:	test: 0.9475537	best: 0.9475537 (500)	total: 1m 50s	remaining: 9m 10s
+== R15 Phase 4: cb_focal_weighted (CB class-weighted Logloss) ==
+  train (439140, 16)  test (188165, 15)
+  class prior: 0.1990 (re-weighted to ~0.5)
+  feats: 93  cat: 9
+  RESUME: loaded checkpoint, done folds = [1, 2, 3, 4]
+
+  --- Fold 1/5 SKIP (ckpt) ---
+
+  --- Fold 2/5 SKIP (ckpt) ---
+
+  --- Fold 3/5 SKIP (ckpt) ---
+
+  --- Fold 4/5 SKIP (ckpt) ---
+
+  --- Fold 5/5 | ti=351312 va=87828 ---
+1000:	test: 0.9487701	best: 0.9487765 (902)	total: 3m 51s	remaining: 8m 9s
+1500:	test: 0.9488492	best: 0.9489086 (1333)	total: 5m 53s	remaining: 6m 6s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.9489086466
+bestIteration = 1333
+
+Shrink model to first 1334 iterations.
+    iters=1334 wall 287s  AUC=0.94891
+    ckpt saved (5/5)
+
+  Standalone OOF AUC: 0.94929
+  R15 PRIMARY OOF: 0.500469
+  ρ_OOF vs R15 PRIMARY: 0.001813
+  cb_v4 OOF not found; skipping ρ vs cb_v4
+  Saved oof_R15_cb_focal_weighted_strat.npy + test_..._strat.npy
+  Wrote audit/2026-05-19-r15-cb_focal_weighted.json
+  Total wall: 319s
