@@ -1,0 +1,18 @@
+{
+  "round": "R15_Phase4_cb_focal_weighted",
+  "oof_auc": 0.9492864321468206,
+  "r15_primary_oof": 0.5004687375011552,
+  "rho_vs_r15": 0.00181291162084476,
+  "rho_vs_cb_v4": NaN,
+  "fold_metrics": [
+    {
+      "fold": 5,
+      "iters": 1334,
+      "wall_s": 286.5141770839691,
+      "auc_va": 0.9489086466112152
+    }
+  ],
+  "wall_total_s": 319.41638803482056,
+  "depth": 8,
+  "max_rounds": 3000
+}
