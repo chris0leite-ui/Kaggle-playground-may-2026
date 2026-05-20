@@ -1,0 +1,44 @@
+{
+  "round": "R17_inventor_listwise_race_lap_cohort",
+  "oof_auc": 0.9432635621949775,
+  "auc_r15_baseline": 0.9544902344133723,
+  "delta_bp_vs_r15": -112.26672218394795,
+  "rho_oof_vs_r15": 0.7398008506126073,
+  "rho_test_vs_r15": 0.7546656980046832,
+  "verdict_band": "REGRESSION_RISK",
+  "fold_aucs": [
+    0.9440202280747366,
+    0.941706521892749,
+    0.9441319655682445,
+    0.9419241885801682,
+    0.9445939258300139
+  ],
+  "fold_walls_s": [
+    64.22092008590698,
+    67.55680131912231,
+    68.08124566078186,
+    68.00637698173523,
+    68.55606484413147
+  ],
+  "wall_total_s": 340.7580578327179,
+  "max_rounds": 2000,
+  "bases": [
+    "yekenot",
+    "cb_v4",
+    "hgbc_deep",
+    "d16_orig",
+    "qAT",
+    "qAV",
+    "qAO",
+    "qAA",
+    "qAF",
+    "qAK",
+    "K27_100k",
+    "seg_fe",
+    "HMM",
+    "R12_cb_horizon",
+    "R13_cb_stint_completion",
+    "R14_tabm",
+    "R15_xendcg_per_seg"
+  ]
+}

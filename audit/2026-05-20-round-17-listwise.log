@@ -1,0 +1,24 @@
+== R17 inventor-track: listwise xendcg on (Year, Race, LapNumber) ==
+  train (439140, 16)  test (188165, 15)
+  K=17 OOF: (439140, 17); bases: 17
+  expanded OOF: (439140, 51); test: (188165, 51)
+  cohort (Y,R,L) count: 6182 median=58 mean=71.0 max=373
+  fold 1/5: ti=351312 sorted, 6110 cohorts (min=1 max=300 median=47)
+    iter_final=2000 AUC(val)=0.94402 wall=64s
+  fold 2/5: ti=351312 sorted, 6111 cohorts (min=1 max=310 median=47)
+    iter_final=2000 AUC(val)=0.94171 wall=68s
+  fold 3/5: ti=351312 sorted, 6098 cohorts (min=1 max=295 median=46)
+    iter_final=2000 AUC(val)=0.94413 wall=68s
+  fold 4/5: ti=351312 sorted, 6106 cohorts (min=1 max=280 median=47)
+    iter_final=2000 AUC(val)=0.94192 wall=68s
+  fold 5/5: ti=351312 sorted, 6098 cohorts (min=1 max=307 median=46)
+    iter_final=2000 AUC(val)=0.94459 wall=69s
+
+  R17 listwise (Y,R,L) meta OOF AUC: 0.943264
+  R15 PRIMARY OOF: 0.954490
+  Δ vs R15: -112.2667 bp
+  ρ_OOF vs R15: 0.739801
+  ρ_test vs R15: 0.754666
+  Band verdict: REGRESSION_RISK
+  Saved oof_R17_listwise_race_lap_strat.npy + test_..._strat.npy
+  Wrote audit/2026-05-20-round-17-listwise.json  total wall 341s

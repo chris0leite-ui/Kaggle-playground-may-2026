@@ -10,11 +10,12 @@ PRIMARY swap chain R7.1 → R12-2 → R13 → R14 → R15. Today's R7d
 session added 4 LB-confirmed hedges from the blend-op sweep
 (`audit/2026-05-20-blend-sweep.log`).
 
-## Ladder slate (snapshot 2026-05-20)
+## Ladder slate (snapshot 2026-05-20 — R17 inventor win added)
 
 | Rank | Mechanism | Submission CSV | OOF | LB | ρ_test vs R15 | Status |
 |------|-----------|----|----|----|--------|--------|
-| **PRIMARY** | R15 K=17 + Path-B DC×S τ=100k | `submission_R15_K17_xendcgbase_pathb_dcs_tau100000.csv` | 0.954490 | **0.95397** | 1.000 | LB-confirmed |
+| **HEDGE 0** | **R17/R18 K=18 + R17 listwise (Y,R,L) base + Path-B DCS** | `submission_K18_pathb_driverclass_stint_tau100000.csv` | 0.954499 | **0.95398** | **0.999888 OK** | **LB-confirmed 2026-05-20 PM**; **+0.10 bp LB lift vs R15**; flip 122 → HEDGE per R7d (PI option) |
+| **PRIMARY** | R15 K=17 + Path-B DC×S τ=100k | `submission_R15_K17_xendcgbase_pathb_dcs_tau100000.csv` | 0.954490 | 0.95397 | 1.000 | LB-confirmed (PRIMARY per R7d <200-flip rule; R18 K=18 is HEDGE) |
 | HEDGE 1 | R14 K=16 (+ TabM) + Path-B DC×S | `submission_R14_K16_tabm_pathb_dcs_tau100000.csv` | 0.954487 | 0.95395 | 0.9999 TIE | LB-confirmed; "remove xendcg" ablation |
 | HEDGE 2 | R13 K=15 (+ cb_stint_completion) + Path-B DC×S | `submission_R13_K15_cbh_cbsc_pathb_dcs_tau100000.csv` | 0.954485 | 0.95393 | 0.9998 OK edge | LB-confirmed; "remove TabM+xendcg" ablation |
 | HEDGE 3 | R12-2 K=14 (+ cb_horizon) + Path-B DC×S | `submission_R12_cb_horizon_K14_pathb_dcs_tau100000.csv` | 0.954475 | 0.95392 | 0.9998 OK edge | LB-confirmed; ablation chain |
