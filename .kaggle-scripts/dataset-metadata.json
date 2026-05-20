@@ -1,0 +1,13 @@
+{
+  "title": "Playground Series s6e5 — scripts source",
+  "id": "chrisleitescha/s6e5-scripts",
+  "subtitle": "Python source modules for the s6e5 stacking pipeline (private)",
+  "description": "Source .py files from the s6e5 project's scripts/ directory. Used by GPU kernels via sys.path.insert(\"/kaggle/input/s6e5-scripts\") so they can reuse local helpers (p1_features, fold-safe TE, aux-target builders, probe utilities) without inlining 1500+ lines per kernel.",
+  "isPrivate": true,
+  "licenses": [
+    {"name": "CC0-1.0"}
+  ],
+  "keywords": ["kaggle-internal", "source", "stacking"],
+  "collaborators": [],
+  "data": []
+}
