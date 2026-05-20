@@ -1,0 +1,22 @@
+{
+  "date": "2026-05-20",
+  "primary_oof_auc": 0.9544902344133723,
+  "auc_internal": 0.5731769012273666,
+  "auc_external_alpha_sweep": {
+    "10.0": 0.47904171563719966,
+    "25.0": 0.47893044957079817,
+    "50.0": 0.47877648796711275,
+    "100.0": 0.4786922154122613
+  },
+  "best_alpha": 10.0,
+  "auc_external": 0.47904171563719966,
+  "auc_internal_lr": 0.9544656363494136,
+  "auc_joint_lr": 0.9544655554698319,
+  "delta_standalone": -0.09413518559016698,
+  "delta_joint": -8.087958169866738e-08,
+  "alive_standalone": false,
+  "alive_joint": false,
+  "verdict": "DEAD",
+  "external_coverage_real_pct": 45.39365465648167,
+  "wall_s": 6.601741075515747
+}

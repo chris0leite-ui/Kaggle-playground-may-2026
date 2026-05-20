@@ -1,0 +1,25 @@
+PRIMARY OOF AUC: 0.95449
+Real-F1 rows: 177516 (40.4%)
+
+=== INTERNAL TE (alpha=20) ===
+  auc_internal (standalone OOF): 0.57318
+
+=== EXTERNAL TE alpha sweep ===
+  External coverage on real-F1 rows: 45.4% (80581/177516)
+  alpha=   10  AUC=0.47904  ext_global_mean=2.136
+  alpha=   25  AUC=0.47893  ext_global_mean=2.136
+  alpha=   50  AUC=0.47878  ext_global_mean=2.136
+  alpha=  100  AUC=0.47869  ext_global_mean=2.136
+  best alpha=10.0 AUC=0.47904
+
+=== LR-META combinations ===
+  internal-only LR-meta:  0.95447
+  joint LR-meta:          0.95447
+
+=== VERDICT ===
+  Δ standalone (ext-int): -0.09414  (fail, thresh 0.005)
+  Δ joint LR-meta:        -0.00000  (fail, thresh 0.003)
+  VERDICT: DEAD
+
+Wall: 6.6s
+Wrote audit/2026-05-20-external-driver-te-killprobe.json
