@@ -1,0 +1,25 @@
+== R16 Phase 3a: real-F1 specialist sub-model ==
+  train (439140, 16)  is_real=1: 168324 (38.3%)
+  test  (188165, 15)  is_real=1: 72649 (38.6%)
+  is_real_S=1 in sorted: 168324 (38.3%)
+  is_real_test_S=1 in sorted: 72649
+  feats: 93  cat: 9
+
+  --- Fold 1/5 | ti=351312 ti_real=134757 va=87828 va_real=33567 ---
+0:	test: 0.9008174	best: 0.9008174 (0)	total: 232ms	remaining: 11m 36s
+500:	test: 0.9402394	best: 0.9402394 (500)	total: 46s	remaining: 3m 49s
+1000:	test: 0.9412563	best: 0.9413012 (962)	total: 1m 34s	remaining: 3m 8s
+1500:	test: 0.9413958	best: 0.9414299 (1433)	total: 2m 22s	remaining: 2m 22s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.9414353525
+bestIteration = 1644
+
+Shrink model to first 1645 iterations.
+    iters=1645  wall 193s
+    real-F1 slice AUC: sub=0.94144  R15=0.94834  Δ=-69.030 bp
+
+  --- Fold 2/5 | ti=351312 ti_real=134675 va=87828 va_real=33649 ---
+0:	test: 0.8999682	best: 0.8999682 (0)	total: 104ms	remaining: 5m 12s
+500:	test: 0.9379347	best: 0.9379382 (498)	total: 48.2s	remaining: 4m
+1000:	test: 0.9390135	best: 0.9390654 (957)	total: 1m 36s	remaining: 3m 12s
