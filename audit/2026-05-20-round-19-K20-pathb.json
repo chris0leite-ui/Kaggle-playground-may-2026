@@ -1,0 +1,17 @@
+{
+  "round": "R19_aleatoric_K20_LR_meta_gate",
+  "date": "2026-05-20",
+  "baseline_pool_label": "K=18",
+  "baseline_pool": ["yekenot", "cb_v4", "hgbc_deep", "d16_orig", "qAT", "qAV", "qAO", "qAA", "qAF", "qAK", "K27_100k", "seg_fe", "HMM", "R12_horizon", "R13_stint_compl", "R14_tabm", "R15_xendcg_seg", "R17_listwise"],
+  "auc_baseline_K18": 0.954478,
+  "runs": {
+    "K=19_+R19_mean":  {"auc": 0.954473, "delta_bp": -0.046},
+    "K=19_+R19_sigma": {"auc": 0.954473, "delta_bp": -0.048},
+    "K=20_+both":      {"auc": 0.954469, "delta_bp": -0.084}
+  },
+  "wall_s": 310.6,
+  "r19_direct_oof_auc_mean_head": 0.9372,
+  "r19_sigma_oof_stats": {"mean": 0.0075, "std": 0.0039},
+  "verdict": "NULL on direct AUC and Path-B-base LR-meta gate. Sigma head collapsed (near-constant column); mean head underfits PitNextLap (0.937 vs single-CB 0.961). Closed null - do not promote to full Path-B build.",
+  "next_inventor_probe": "TBD - NN-family Path-B-base pattern is now 1-lifted (R14 TabM) / 2-null (R18 multitask, R19 aleatoric). Consider non-NN mechanisms."
+}
