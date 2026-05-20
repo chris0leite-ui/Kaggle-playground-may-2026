@@ -1,0 +1,31 @@
+train (439140, 16)  test (188165, 15)
+PRIMARY OOF AUC: 0.95449
+
+=== FEATURE STATS (train) ===
+  needs_2nd: mean=0.4862 std=0.4998 min=0 max=1
+  laps_remaining: mean=46.1426 std=17.2018 min=0 max=77
+  pressure: mean=27.2304 std=29.3948 min=0 max=77
+  pressure_ratio: mean=0.3934 std=0.4227 min=0 max=0.9872
+  unique_compounds_so_far: mean=1.5551 std=0.5762 min=1 max=5
+  is_wet_or_inter: mean=0.0427 std=0.2021 min=0 max=1
+
+=== G1 STANDALONE AUCs ===
+  needs_2nd: AUC 0.37451
+  pressure: AUC 0.34832
+  pressure_ratio: AUC 0.34366
+  laps_remaining: AUC 0.30084
+  unique_compounds_so_far: AUC 0.62991
+
+=== G2 LR-META vs K17 PRIMARY ===
+  base (K17-only LR-meta) AUC: 0.95447
+  + lapsremain feats   AUC:    0.95447
+  Δ vs base: -0.027 bp
+  Δ vs PRIMARY R15 (.95449): -0.235 bp
+
+  Real-F1 Δ:  -0.072 bp
+  Synth Δ:    +0.006 bp
+
+  G2 gate (+0.02 bp floor): fail
+
+Wall: 9.7s
+Wrote audit/2026-05-20-laps-remain-probe.json

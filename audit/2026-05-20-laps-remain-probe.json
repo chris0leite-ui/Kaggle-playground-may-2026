@@ -1,0 +1,17 @@
+{
+  "date": "2026-05-20",
+  "primary_oof_auc": 0.9544902344133723,
+  "g1_aucs": {
+    "needs_2nd": 0.3745139685467569,
+    "pressure": 0.34832292243990326,
+    "pressure_ratio": 0.34365967983283613,
+    "laps_remaining": 0.3008442826691574,
+    "unique_compounds_so_far": 0.629910164069603
+  },
+  "auc_lr_base": 0.9544694658642117,
+  "auc_lr_full": 0.9544667725351045,
+  "delta_bp": -0.02693329107184006,
+  "delta_vs_primary_bp": -0.23461878267849734,
+  "g2_passed": false,
+  "wall_s": 9.666638851165771
+}
