@@ -1,0 +1,11 @@
+== R18 inventor: multi-task joint NN ==
+  train (439140, 16)  test (188165, 15)
+  feats: 93  cat: 9
+
+  --- Fold 1/5 | ti=351312 va=87828 ---
+  fold 1/5 ep 1/30 loss 0.91228 val AUC 0.92180
+  fold 1/5 ep 5/30 loss 0.68464 val AUC 0.93561
+  fold 1/5 ep 10/30 loss 0.64227 val AUC 0.93896
+  fold 1/5 ep 15/30 loss 0.62282 val AUC 0.94003
+  fold 1/5 ep 20/30 loss 0.61350 val AUC 0.94078
+  fold 1/5 ep 25/30 loss 0.60836 val AUC 0.94109
