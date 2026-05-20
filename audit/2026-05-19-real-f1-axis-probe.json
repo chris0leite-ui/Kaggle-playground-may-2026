@@ -1,0 +1,11 @@
+{
+  "primary_auc": 0.9544902344133723,
+  "primary_real_auc": 0.9467213966538301,
+  "primary_synth_auc": 0.9587352908380622,
+  "probe_A_per_stratum_rank": 0.9504537260084363,
+  "probe_B_lr_meta": 0.9544658134321016,
+  "probe_B_real_auc": 0.9466933267308159,
+  "probe_B_synth_auc": 0.9587101577838906,
+  "probe_C_drv_te_only": 0.5731769012273666,
+  "wall_s": 7.61390233039856
+}

@@ -1,0 +1,18 @@
+PRIMARY OOF AUC overall:  0.95449
+  Real-F1 (n=168324): 0.94672
+  Synth   (n=270816): 0.95874
+
+=== PROBE A: per-stratum rank realignment ===
+  Per-stratum-rank AUC:  0.95045  (Δ vs PRIMARY: -40.37 bp)
+
+=== PROBE B: LR meta with is_real + Driver TE ===
+  Driver TE built (fold-safe). Mean=0.2007
+  LR-meta AUC:          0.95447  (Δ vs PRIMARY: -0.24 bp)
+  Meta on Real-F1:   0.94669
+  Meta on Synth:     0.95871
+
+=== PROBE C: drv_te alone OOF AUC (sanity) ===
+  Driver-TE-only AUC: 0.57318
+
+Wall: 7.6s
+Wrote audit/2026-05-19-real-f1-axis-probe.json
