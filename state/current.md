@@ -109,6 +109,22 @@ at the 5-decimal Kaggle quantisation.
 - Submissions used this comp: **48 / 270**. Today (2026-05-19): **2 used** (R10 HEDGE 3 + R12-2 cb_horizon K=14), 8 unspent.
 - Kaggle CLI auth fix (session-start blocker): KGAT_-prefixed access tokens must be exported as `KAGGLE_API_TOKEN`, NOT placed in `kaggle.json`'s `key` field (legacy HTTP Basic). Working invocation: `KAGGLE_API_TOKEN="$KaggleAPIToke" kaggle ...`.
 
+## Today's status (2026-05-19/20 PM — post-plateau saturation pass)
+
+- Submissions used this comp: **48 / 270**. Today's PM session: **0 used** (no G2-clearer surfaced; PI directive "G2-clear only" honored). All 8 unspent slots forfeit at Kaggle UTC midnight per slot-discipline rule.
+- **R15 PRIMARY unchanged** at LB 0.95397 / OOF 0.954490. Top-5% gap **+0.08 bp**; leader gap **+0.79 bp**.
+- **Plateau trigger (4 nulls before pivot)**:
+  - R11-B transverse-attention transformer: Δ −0.0346 bp NULL.
+  - R11-C survival/hazard Cox-PH: Δ −0.0487 bp NULL.
+  - R12-1 cb_resid (RMSE on R7.1 residual): standalone AUC 0.478 BELOW RANDOM (Bayes-ceiling confirmation).
+  - R15 Phase 4 cb_focal_weighted (`auto_class_weights='Balanced'`): standalone 0.94929, G1 FAIL **−52 bp** vs R15 PRIMARY 0.95449, ρ=0.982 redundant. Note: initial script bug reported ρ=0.002 due to misaligned arrays (`oof_pred` in sorted order vs `r15_oof` in original order); independent re-check showed true ρ=0.975 → ρ correction friction.
+- **Strategy-critic-loop** (`audit/2026-05-19-strategy-critique-plateau.md`): identified **120 bp real-F1 driver gap** (38% rows / 46% positives / AUC 0.94672 vs synthetic D### 0.95874). Calibration ECE 0.0012 (perfect). WET-specialist trap (0.31% rows, 0.04% positives → too small to move overall AUC).
+- **Research-loop**: prior-comp + domain agents (`audit/research/2026-05-19-{prior-comp,domain}.md`). Bank-Churn S4E1 Surname-TE precedent for per-Driver external TE. Critical endpoint correction: Ergast dead end-2024; Jolpica-F1 is the live mirror.
+- **Synthesis Phase A external Driver-TE kill-probe** (`audit/2026-05-20-external-driver-te-killprobe.json`): **DEAD**. Rohan Rao 1950-2024 coverage on real-F1 rows only **45.4%** (`code` field misses many of our 3-letter codes); external pit_rate standalone AUC **0.479** below random (career pit-counts diverge from synthetic per-lap pit pattern); LR-meta joint Δ = 0.00000. Mechanisms #1/#3/#4 (Driver-aggregate axis) COLLAPSED.
+- **Phase C laps_remaining_no_pit (FIA 2-compound rule)** (`audit/2026-05-20-laps-remain-probe.json`): **NULL** Δ −0.027 bp G2. needs_2nd / pressure inversely correlated standalone. unique_compounds_so_far AUC 0.630 but absorbed by K17 Stint feature.
+- **Phase B2-cheap (Race,Compound) quantile, fold-safe internal labels** (`audit/2026-05-20-racecomp-quantile-probe.json`): **NULL** Δ −0.074 bp G2. Standalone lap_vs_median AUC 0.638. WET subgroup Δ **+1.336 bp** (n=1355, too small to move overall). Predicts FastF1 external version of B2 would fail (same key, same axis).
+- **Saturation finding (7 consecutive nulls)**: Internal mechanism stacking confirmed at Bayes ceiling; external aggregate joins fail at synthetic-augmentation transfer boundary. Posture pivots from lift-seeking to **hedge-ladder construction (R7d)** for remaining 11 days. Final-window R7d ladder reserves ≥5 slots for days 29-31.
+
 ## Today's status (2026-05-18, prior session)
 
 - Submissions used this comp: **46 / 270**. Daily cap: 10.
