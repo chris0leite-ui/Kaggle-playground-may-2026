@@ -1,0 +1,49 @@
+PRIMARY OOF AUC: 0.95449
+len=439140, prior=0.1990
+
+=== BOTTOM 8 SEGMENTS ===
+     seg level    n      auc     delta_bp
+Compound   WET 1355 0.844392 -1100.987307
+  Driver   VET  359 0.852817 -1016.735109
+  Driver   MSC  355 0.876814  -776.758723
+  Driver   COL  657 0.894748  -597.421222
+  Driver   DEV  282 0.901978  -525.118171
+  Driver   ALO 1386 0.902761  -517.292138
+  Driver   RIC  975 0.903781  -507.097159
+  Driver   BEA  555 0.903890  -505.998576
+
+=== TOP 5 SEGMENTS ===
+   seg level   n      auc   delta_bp
+Driver  D304 200 0.978333 238.430989
+Driver  D240 380 0.979055 245.646384
+Driver  D278 248 0.979725 252.344680
+Driver  D303 214 0.980670 261.798687
+Driver  D300 210 0.989072 345.820744
+
+=== CALIBRATION ===
+Brier: 0.06667  (worst-case 0.25)
+ECE-15: 0.00120
+Reliability table:
+  bin0: n=286664  pred=0.012  emp=0.012  gap=-0.000
+  bin1: n= 23365  pred=0.146  emp=0.146  gap=+0.000
+  bin2: n= 16811  pred=0.248  emp=0.251  gap=-0.002
+  bin3: n= 14205  pred=0.349  emp=0.350  gap=-0.001
+  bin4: n= 13065  pred=0.450  emp=0.448  gap=+0.002
+  bin5: n= 13339  pred=0.550  emp=0.548  gap=+0.002
+  bin6: n= 14374  pred=0.651  emp=0.643  gap=+0.008
+  bin7: n= 17114  pred=0.752  emp=0.757  gap=-0.005
+  bin8: n= 21425  pred=0.852  emp=0.856  gap=-0.004
+  bin9: n= 18778  pred=0.940  emp=0.936  gap=+0.003
+  missing oof_K13_seghmm_pathb_tau100000.npy
+  missing oof_K14_dae_pathb_compound_stint_tau100000.npy
+  missing oof_K14_dae_pathb_driverclass_stint_tau100000.npy
+  missing oof_K14_seghmm_trf_pathb_tau100000.npy
+
+=== DISAGREEMENT (2 bases) ===
+99th percentile row-stdev: 0.3024
+residual-difficulty rows (>p99 stdev): 4392
+On residual-difficulty subset (n=4392, prior=0.083):
+  K17_xendcg_pathb: AUC 0.6750
+  R15_cb_focal_weighted: AUC 0.6682
+
+Wrote audit/2026-05-19-strategy-critique.json
