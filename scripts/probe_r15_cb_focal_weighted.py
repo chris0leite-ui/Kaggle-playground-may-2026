@@ -158,9 +158,13 @@ def main() -> None:
         cat_idx = [feats.index(c) for c in cat_cols]
 
         params = cb_focal_params(args.max_rounds, SEED, depth=args.depth)
+        params["allow_writing_files"] = True
         m = cb.CatBoostClassifier(**params)
+        snap_path = f"scripts/artifacts/_cbsnap_R15_fold{fold}.cbsnapshot"
         m.fit(X_tr, y_ti, eval_set=(X_va, y_va),
-              cat_features=cat_idx, use_best_model=True)
+              cat_features=cat_idx, use_best_model=True,
+              save_snapshot=True, snapshot_file=snap_path,
+              snapshot_interval=60)
 
         pred_va = m.predict_proba(X_va)[:, 1]
         pred_te = m.predict_proba(X_te)[:, 1]
