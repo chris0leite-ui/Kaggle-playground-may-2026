@@ -5,3 +5,10 @@
   --- Fold 1/5 | ti=351312 va=87828 ---
   fold 1/5 ep 1/20 loss 0.91446 val AUC 0.92065
   fold 1/5 ep 5/20 loss 0.68466 val AUC 0.93506
+  fold 1/5 ep 10/20 loss 0.64384 val AUC 0.93858
+  fold 1/5 ep 15/20 loss 0.63011 val AUC 0.93959
+  fold 1/5 ep 20/20 loss 0.62680 val AUC 0.93980
+    fold 1 wall 416s AUC(val PitNextLap)=0.93980
+
+  --- Fold 2/5 | ti=351312 va=87828 ---
+  fold 2/5 ep 1/20 loss 0.90826 val AUC 0.91932
