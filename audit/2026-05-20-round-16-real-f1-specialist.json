@@ -1,0 +1,101 @@
+{
+  "round": "R16_Phase3a_real_f1_specialist",
+  "n_train_real": 168324,
+  "n_test_real": 72649,
+  "auc_r15_baseline": 0.9544902344133723,
+  "auc_combined_replace": 0.9518388784904279,
+  "auc_combined_lrmeta": 0.9544876695611224,
+  "delta_replace_bp": -26.513559229444095,
+  "delta_lrmeta_bp": -0.0256485224991998,
+  "auc_real_r15": 0.9467213966538301,
+  "auc_real_submodel": 0.9396647253195817,
+  "slice_delta_bp": -70.56671334248476,
+  "auc_synth_r15": 0.9587352908380622,
+  "rho_test_vs_r15": 0.9999971334619511,
+  "verdict_band": "TIE_ZONE",
+  "fold_metrics": [
+    {
+      "fold": 1,
+      "n_ti_real": 134757,
+      "n_va_real": 33567,
+      "iters": 1645,
+      "wall_s": 192.73895931243896,
+      "auc_va_real_submodel": 0.9414353525445354,
+      "auc_va_real_R15": 0.94833836200772,
+      "slice_delta_bp": -69.03009463184672
+    },
+    {
+      "fold": 2,
+      "n_ti_real": 134675,
+      "n_va_real": 33649,
+      "iters": 1554,
+      "wall_s": 185.23900842666626,
+      "auc_va_real_submodel": 0.9395157557500831,
+      "auc_va_real_R15": 0.9466543634555142,
+      "slice_delta_bp": -71.38607705431177
+    },
+    {
+      "fold": 3,
+      "n_ti_real": 134543,
+      "n_va_real": 33781,
+      "iters": 1148,
+      "wall_s": 142.6487295627594,
+      "auc_va_real_submodel": 0.9378103763411889,
+      "auc_va_real_R15": 0.9449542738380925,
+      "slice_delta_bp": -71.43897496903584
+    },
+    {
+      "fold": 4,
+      "n_ti_real": 134583,
+      "n_va_real": 33741,
+      "iters": 1219,
+      "wall_s": 147.7752583026886,
+      "auc_va_real_submodel": 0.9397948657894503,
+      "auc_va_real_R15": 0.9466039481303814,
+      "slice_delta_bp": -68.09082340931138
+    },
+    {
+      "fold": 5,
+      "n_ti_real": 134738,
+      "n_va_real": 33586,
+      "iters": 1462,
+      "wall_s": 169.78806471824646,
+      "auc_va_real_submodel": 0.939884734268126,
+      "auc_va_real_R15": 0.9471129998323877,
+      "slice_delta_bp": -72.28265564261704
+    }
+  ],
+  "lr_meta_coefs": [
+    {
+      "fold": 1,
+      "intercept": 0.0002654228330242446,
+      "coef_r15": 0.9792542953620095,
+      "coef_sub": 0.015790252461344172
+    },
+    {
+      "fold": 2,
+      "intercept": -0.014717405405423961,
+      "coef_r15": 0.9815414101026577,
+      "coef_sub": 0.022443162819673568
+    },
+    {
+      "fold": 3,
+      "intercept": -0.007263655046755132,
+      "coef_r15": 0.9840172562710393,
+      "coef_sub": 0.01812420151224566
+    },
+    {
+      "fold": 4,
+      "intercept": -0.007397737489889575,
+      "coef_r15": 0.9835816931369941,
+      "coef_sub": 0.01710290340708168
+    },
+    {
+      "fold": 5,
+      "intercept": -0.010344209963511142,
+      "coef_r15": 0.9785751377952497,
+      "coef_sub": 0.018820236491359346
+    }
+  ],
+  "wall_total_s": 857.7119748592377
+}

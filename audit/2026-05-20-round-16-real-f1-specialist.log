@@ -23,3 +23,66 @@ Shrink model to first 1645 iterations.
 0:	test: 0.8999682	best: 0.8999682 (0)	total: 104ms	remaining: 5m 12s
 500:	test: 0.9379347	best: 0.9379382 (498)	total: 48.2s	remaining: 4m
 1000:	test: 0.9390135	best: 0.9390654 (957)	total: 1m 36s	remaining: 3m 12s
+1500:	test: 0.9394649	best: 0.9395077 (1449)	total: 2m 24s	remaining: 2m 24s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.9395157558
+bestIteration = 1553
+
+Shrink model to first 1554 iterations.
+    iters=1554  wall 185s
+    real-F1 slice AUC: sub=0.93952  R15=0.94665  Δ=-71.386 bp
+
+  --- Fold 3/5 | ti=351312 ti_real=134543 va=87828 va_real=33781 ---
+0:	test: 0.8984806	best: 0.8984806 (0)	total: 125ms	remaining: 6m 14s
+500:	test: 0.9364987	best: 0.9364987 (500)	total: 48.6s	remaining: 4m 2s
+1000:	test: 0.9376359	best: 0.9376690 (955)	total: 1m 35s	remaining: 3m 11s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.9378103763
+bestIteration = 1147
+
+Shrink model to first 1148 iterations.
+    iters=1148  wall 143s
+    real-F1 slice AUC: sub=0.93781  R15=0.94495  Δ=-71.439 bp
+
+  --- Fold 4/5 | ti=351312 ti_real=134583 va=87828 va_real=33741 ---
+0:	test: 0.8981885	best: 0.8981885 (0)	total: 98.8ms	remaining: 4m 56s
+500:	test: 0.9385144	best: 0.9385268 (499)	total: 48s	remaining: 3m 59s
+1000:	test: 0.9395872	best: 0.9395872 (1000)	total: 1m 34s	remaining: 3m 9s
+1500:	test: 0.9396168	best: 0.9397949 (1218)	total: 2m 21s	remaining: 2m 21s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.9397948658
+bestIteration = 1218
+
+Shrink model to first 1219 iterations.
+    iters=1219  wall 148s
+    real-F1 slice AUC: sub=0.93979  R15=0.94660  Δ=-68.091 bp
+
+  --- Fold 5/5 | ti=351312 ti_real=134738 va=87828 va_real=33586 ---
+0:	test: 0.8984076	best: 0.8984076 (0)	total: 81.3ms	remaining: 4m 3s
+500:	test: 0.9381681	best: 0.9381681 (500)	total: 46.4s	remaining: 3m 51s
+1000:	test: 0.9395163	best: 0.9395163 (1000)	total: 1m 34s	remaining: 3m 7s
+1500:	test: 0.9398465	best: 0.9398847 (1461)	total: 2m 20s	remaining: 2m 20s
+Stopped by overfitting detector  (300 iterations wait)
+
+bestTest = 0.9398847343
+bestIteration = 1461
+
+Shrink model to first 1462 iterations.
+    iters=1462  wall 170s
+    real-F1 slice AUC: sub=0.93988  R15=0.94711  Δ=-72.283 bp
+
+  Slice analysis:
+  Overall OOF R15 baseline:       0.954490
+  Overall OOF replace-at-slice:   0.951839  Δ -26.5136 bp
+  real-F1 slice AUC: R15=0.94672  sub=0.93966  Δ -70.567 bp
+  synthetic slice AUC: R15=0.95874
+  Overall OOF LR-meta blend:      0.954488  Δ -0.0256 bp
+  LR-meta coefs (per fold): [{'fold': 1, 'intercept': 0.0002654228330242446, 'coef_r15': 0.9792542953620095, 'coef_sub': 0.015790252461344172}, {'fold': 2, 'intercept': -0.014717405405423961, 'coef_r15': 0.9815414101026577, 'coef_sub': 0.022443162819673568}, {'fold': 3, 'intercept': -0.007263655046755132, 'coef_r15': 0.9840172562710393, 'coef_sub': 0.01812420151224566}, {'fold': 4, 'intercept': -0.007397737489889575, 'coef_r15': 0.9835816931369941, 'coef_sub': 0.01710290340708168}, {'fold': 5, 'intercept': -0.010344209963511142, 'coef_r15': 0.9785751377952497, 'coef_sub': 0.018820236491359346}]
+  Pre-submit ρ_test vs R15 PRIMARY (.npy): 0.999997
+  Band verdict: TIE_ZONE
+  Wrote submissions/R16_real_f1_specialist_lrmeta.csv
+  Wrote audit/2026-05-20-round-16-real-f1-specialist.json
+  Total wall: 858s

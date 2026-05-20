@@ -100,7 +100,7 @@ at the 5-decimal Kaggle quantisation.
 - **Blend-op axis CLOSED**: 4 OK-band LB candidates all regressed −0.3 to −0.8 bp. R10 HEDGE 3's −0.02 bp at ρ=0.99988 was a quantization outlier, not a transferable lift pattern. No further blend-op probes expected to lift beyond R15 at 5-decimal LB.
 - **R7d ladder now well-populated**: 11 LB-confirmed hedges across 5 diversity axes (pool size, segmentation, mechanism, variance, loss). Provisional final pair: PRIMARY R15 (0.95397) + HEDGE R7d_1 (0.95392, three-axis distinctness).
 - **R12-4 cb_v5_xl DROPPED** per existing strategy-critic verdict (CB axis closed by 4 nulls).
-- **Real-F1 specialist (Phase 3)**: design deferred; cheap-row-level already NULL; sub-model never tested. EV +0.05-0.15 bp per strategy-critic. PI hold/proceed decision pending.
+- **Real-F1 specialist (Phase 3a) NULL** (`audit/2026-05-20-round-16-real-f1-specialist.json`): CB classifier trained on 168k is_real=1 train rows. Per-fold sub-model AUC on real-F1 slice 0.937-0.940 vs R15 0.943-0.947 → **−7.1 bp slice REGRESS** instead of strategy-critic's expected +2 bp lift. Replace-at-slice blend Δ −26.5 bp (catastrophic), LR-meta blend Δ −0.026 bp (null at TIE_ZONE ρ=0.999997). LR-meta coefs: coef_r15=0.98, coef_sub=0.018 (meta absorbs sub-model entirely). Third confirmation of "more data > more specialization" axis (after K=N+1 rank-lock R9-R15 + external-data 45% coverage cap). 120 bp real-vs-synth AUC gap is intrinsic to data distribution, not a model deficiency. NOT submitted. R16 closes Phase 3.
 
 ## Today's status (2026-05-19)
 
