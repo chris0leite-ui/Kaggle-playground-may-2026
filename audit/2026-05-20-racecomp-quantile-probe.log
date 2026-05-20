@@ -1,0 +1,29 @@
+PRIMARY OOF AUC: 0.95449
+Race-total laps: mean=69.2 min=45 max=78
+
+=== BUILDING FOLD-SAFE QUANTILES ===
+  median fill rate: 100.0%
+
+=== G1 STANDALONE AUCs ===
+  lap_vs_median: AUC 0.63824
+  lap_vs_median_norm: AUC 0.63827
+  in_iqr: AUC 0.55527
+  dist_to_window: AUC 0.43238
+  median: AUC 0.62749
+
+=== G2 LR-META ===
+  base (K17-only)    AUC: 0.95447
+  + racecomp quantile AUC:0.95446
+  Δ vs K17-only base: -0.074 bp
+  Δ vs PRIMARY R15: -0.281 bp
+
+  Real-F1 Δ: -0.116 bp
+  Synth Δ:   -0.048 bp
+
+  WET Δ:           +1.336 bp (n=1355)
+  INTERMEDIATE Δ:  -0.171 bp (n=17382)
+
+  G2 gate (+0.02 bp): fail
+
+Wall: 9.3s
+Wrote audit/2026-05-20-racecomp-quantile-probe.json
