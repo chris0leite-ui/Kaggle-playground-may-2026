@@ -44,3 +44,28 @@ Pairwise diagnostics:
 Best individual OOF: 0.95450  (+0.069 bp vs proxy)
 
 Grid-searching blends...
+
+Grid total: 13720 candidates. t=3033.9s
+
+Top-10 blends by OOF AUC:
+ k                                                            ingredients         weights        op  oof_auc  delta_vs_proxy_bp  delta_vs_best_indiv_bp
+ 3  R7.2_K13_pathb_DCS_foldbag+R12_K14_pathb_DCS+R15_K17_xendcg_pathb_DCS (0.6, 0.0, 0.4) rank_mean 0.954506           0.157130                0.088497
+ 3     R7.2_K13_pathb_DCS_foldbag+R15_K17_xendcg_pathb_DCS+K27_pathb_100k (0.6, 0.4, 0.0) rank_mean 0.954506           0.157130                0.088497
+ 3 R7.1_K13_pathb_DCS+R7.2_K13_pathb_DCS_foldbag+R15_K17_xendcg_pathb_DCS (0.0, 0.6, 0.4) rank_mean 0.954506           0.157130                0.088497
+ 3  R7.2_K13_pathb_DCS_foldbag+R14_K16_pathb_DCS+R15_K17_xendcg_pathb_DCS (0.6, 0.0, 0.4) rank_mean 0.954506           0.157130                0.088497
+ 3  R7.2_K13_pathb_DCS_foldbag+R5.2_K13_pathb_CS+R15_K17_xendcg_pathb_DCS (0.6, 0.0, 0.4) rank_mean 0.954506           0.157130                0.088497
+ 2                    R7.2_K13_pathb_DCS_foldbag+R15_K17_xendcg_pathb_DCS      (0.6, 0.4) rank_mean 0.954506           0.157130                0.088497
+ 3  R7.2_K13_pathb_DCS_foldbag+R13_K15_pathb_DCS+R15_K17_xendcg_pathb_DCS (0.6, 0.0, 0.4) rank_mean 0.954506           0.157130                0.088497
+ 3  R7.2_K13_pathb_DCS_foldbag+R12_K14_pathb_DCS+R15_K17_xendcg_pathb_DCS (0.6, 0.0, 0.4)     gmean 0.954506           0.155547                0.086915
+ 3 R7.1_K13_pathb_DCS+R7.2_K13_pathb_DCS_foldbag+R15_K17_xendcg_pathb_DCS (0.0, 0.6, 0.4)     gmean 0.954506           0.155547                0.086915
+ 2                    R7.2_K13_pathb_DCS_foldbag+R15_K17_xendcg_pathb_DCS      (0.6, 0.4)     gmean 0.954506           0.155547                0.086915
+
+Top-1 pre-submit:
+  rho_OOF  vs proxy = 0.999854
+  rho_TEST vs proxy = 0.999911
+  thresholds: lift floor 0.999, tie 0.9999
+  flip_diff vs proxy (add / drop): 381 / 381
+  verdict: TIE_ZONE (LB likely == proxy at 5-decimal precision)
+  wrote blend_harness_top1_rank_mean.csv (188165 rows)
+
+Wrote probe_blend_harness.json  t=3036.2s
