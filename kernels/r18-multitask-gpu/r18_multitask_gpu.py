@@ -51,6 +51,26 @@ def gpu_boot():
         print(f"[boot] nvidia-smi failed: {e}", flush=True)
 
 
+def install_torch():
+    print("[setup] force-reinstall torch 2.4 (T4 sm_75 support) ...",
+          flush=True)
+    subprocess.check_call([
+        sys.executable, "-m", "pip", "install", "--quiet",
+        "--force-reinstall", "--no-deps",
+        "torch==2.4.*", "torchvision==0.19.*",
+    ])
+    import importlib
+    for m in ("torch", "torchvision"):
+        if m in sys.modules:
+            importlib.reload(sys.modules[m])
+    import torch
+    print(f"[setup] torch version: {torch.__version__}", flush=True)
+    if torch.cuda.is_available():
+        print(f"[setup] CUDA: {torch.version.cuda}, "
+              f"dev: {torch.cuda.get_device_name(0)}, "
+              f"cap: {torch.cuda.get_device_capability(0)}", flush=True)
+
+
 def find_data_dir():
     base = Path("/kaggle/input")
     matches = list(base.rglob("train.csv"))
@@ -71,6 +91,7 @@ def main():
     t0 = time.time()
     print("== R18 multi-task NN (Kaggle GPU port) ==", flush=True)
     gpu_boot()
+    install_torch()
 
     scripts_dir = find_scripts_dir()
     sys.path.insert(0, str(scripts_dir))
