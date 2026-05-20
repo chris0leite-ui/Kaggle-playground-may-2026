@@ -1,0 +1,7 @@
+
+=== GATE: R15_cb_focal_weighted ===
+  candidate OOF: 0.94929  vs PRIMARY 0.95449  Δ -52.04bp
+  ρ vs PRIMARY:  0.982025
+  pred LB Δ:     -57.04bp
+  G3 flip ratio (top-1%): 0.003  (+→−: 21, −→+: 6009)
+  verdict: FAIL
