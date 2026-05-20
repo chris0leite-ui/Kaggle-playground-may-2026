@@ -1,2 +1,5 @@
 == R18 inventor: multi-task joint NN ==
   train (439140, 16)  test (188165, 15)
+  feats: 93  cat: 9
+
+  --- Fold 1/5 | ti=351312 va=87828 ---
