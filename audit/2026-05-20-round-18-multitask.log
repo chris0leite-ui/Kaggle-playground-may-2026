@@ -3,3 +3,4 @@
   feats: 93  cat: 9
 
   --- Fold 1/5 | ti=351312 va=87828 ---
+  fold 1/5 ep 1/20 loss 0.91446 val AUC 0.92065
