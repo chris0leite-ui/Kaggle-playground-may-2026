@@ -87,6 +87,21 @@ override of Rule 27 abort threshold (ρ_test ≥ 0.999) yielded the
 +0.1 bp lift despite ρ = 0.9998 — uncorrelated-error cancellation
 at the 5-decimal Kaggle quantisation.
 
+## Today's status (2026-05-20 — R7d hedge-ladder build, blend-op axis closed)
+
+- Submissions used this comp: **52 / 270**. Today: **4 used**, 6 unspent. PI directive: aggressive R7d ladder build (4-5 slots).
+- **PRIMARY R15 unchanged** at LB 0.95397. Top-5% gap **−0.8 bp**; leader gap **−7.9 bp**.
+- **Blend-op sweep** (`audit/2026-05-20-blend-sweep.log`, `scripts/artifacts/probe_blend_harness.json`): 13,720 candidates across 8 ingredients (R7.1/R7.2/R5.2/R12/R13/R14/R15/K27) × 4 operators × 2-to-4-way simplex grid. Pairwise diagnostics confirm K=27 is unique low-ρ leg (ρ=0.9979 vs R15, 1595 flips) — standalone REGRESSION_RISK but blends pull into OK band. R5.2 (Compound×S Path-B) is only OK-band operator-diversity ingredient (ρ=0.9994).
+- **R7d submits today** (4 slots):
+  - **R7d #1** R15+R7.2+K27 (0.5/0.3/0.2) rank_mean → **LB 0.95392** (−0.5 bp); OOF +0.120 bp; ρ_test=0.99985. HEDGE 4 in ladder.
+  - **R7d #2** R15+R5.2+K27 (0.6/0.3/0.1) arith → **LB 0.95394** (−0.3 bp); OOF +0.066 bp; ρ_test=0.99990. HEDGE 5.
+  - **R7d #3** R15+K27 75/25 rank_mean → **LB 0.95394** (−0.3 bp); OOF +0.049 bp; ρ_test=0.99989. HEDGE 6.
+  - **R7d #4** R8 60/20/20 multi-seg (staged 2026-05-18, never LB'd) → **LB 0.95389** (−0.8 bp); ties R7.1. HEDGE 9.
+- **Blend-op axis CLOSED**: 4 OK-band LB candidates all regressed −0.3 to −0.8 bp. R10 HEDGE 3's −0.02 bp at ρ=0.99988 was a quantization outlier, not a transferable lift pattern. No further blend-op probes expected to lift beyond R15 at 5-decimal LB.
+- **R7d ladder now well-populated**: 11 LB-confirmed hedges across 5 diversity axes (pool size, segmentation, mechanism, variance, loss). Provisional final pair: PRIMARY R15 (0.95397) + HEDGE R7d_1 (0.95392, three-axis distinctness).
+- **R12-4 cb_v5_xl DROPPED** per existing strategy-critic verdict (CB axis closed by 4 nulls).
+- **Real-F1 specialist (Phase 3)**: design deferred; cheap-row-level already NULL; sub-model never tested. EV +0.05-0.15 bp per strategy-critic. PI hold/proceed decision pending.
+
 ## Today's status (2026-05-19)
 
 - Submissions used this comp: **47 / 270**. Daily cap: 10.
