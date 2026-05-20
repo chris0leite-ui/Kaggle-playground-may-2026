@@ -1,0 +1,46 @@
+y train: n=439140 base_rate=0.1990
+  + R7.1_K13_pathb_DCS             OOF AUC=0.95447  LB=0.95389
+  + R7.2_K13_pathb_DCS_foldbag     OOF AUC=0.95450  LB=0.95389
+  + R5.2_K13_pathb_CS              OOF AUC=0.95446  LB=0.95387
+  + R12_K14_pathb_DCS              OOF AUC=0.95448  LB=0.95392
+  + R13_K15_pathb_DCS              OOF AUC=0.95448  LB=0.95393
+  + R14_K16_pathb_DCS              OOF AUC=0.95449  LB=0.95395
+  + R15_K17_xendcg_pathb_DCS       OOF AUC=0.95449  LB=0.95397
+  + K27_pathb_100k                 OOF AUC=0.95432  LB=0.95368
+
+PRIMARY proxy: R15_K17_xendcg_pathb_DCS  OOF=0.95449
+
+Pairwise diagnostics:
+  pair                                                             rho  flips_add flips_drop
+  R7.1_K13_pathb_DCS_vs_R7.2_K13_pathb_DCS_foldbag              0.9999        213        213
+  R7.1_K13_pathb_DCS_vs_R5.2_K13_pathb_CS                       0.9998        348        348
+  R7.1_K13_pathb_DCS_vs_R12_K14_pathb_DCS                       0.9998        389        389
+  R7.1_K13_pathb_DCS_vs_R13_K15_pathb_DCS                       0.9998        468        468
+  R7.1_K13_pathb_DCS_vs_R14_K16_pathb_DCS                       0.9997        545        545
+  R7.1_K13_pathb_DCS_vs_R15_K17_xendcg_pathb_DCS                0.9997        611        611
+  R7.1_K13_pathb_DCS_vs_K27_pathb_100k                          0.9985       1477       1477
+  R7.2_K13_pathb_DCS_foldbag_vs_R5.2_K13_pathb_CS               0.9997        374        374
+  R7.2_K13_pathb_DCS_foldbag_vs_R12_K14_pathb_DCS               0.9997        432        432
+  R7.2_K13_pathb_DCS_foldbag_vs_R13_K15_pathb_DCS               0.9997        497        497
+  R7.2_K13_pathb_DCS_foldbag_vs_R14_K16_pathb_DCS               0.9997        567        567
+  R7.2_K13_pathb_DCS_foldbag_vs_R15_K17_xendcg_pathb_DCS        0.9996        626        626
+  R7.2_K13_pathb_DCS_foldbag_vs_K27_pathb_100k                  0.9987       1485       1485
+  R5.2_K13_pathb_CS_vs_R12_K14_pathb_DCS                        0.9996        533        533
+  R5.2_K13_pathb_CS_vs_R13_K15_pathb_DCS                        0.9996        601        601
+  R5.2_K13_pathb_CS_vs_R14_K16_pathb_DCS                        0.9995        663        663
+  R5.2_K13_pathb_CS_vs_R15_K17_xendcg_pathb_DCS                 0.9994        724        724
+  R5.2_K13_pathb_CS_vs_K27_pathb_100k                           0.9986       1475       1475
+  R12_K14_pathb_DCS_vs_R13_K15_pathb_DCS                        0.9999        287        287
+  R12_K14_pathb_DCS_vs_R14_K16_pathb_DCS                        0.9998        381        381
+  R12_K14_pathb_DCS_vs_R15_K17_xendcg_pathb_DCS                 0.9998        468        468
+  R12_K14_pathb_DCS_vs_K27_pathb_100k                           0.9981       1528       1528
+  R13_K15_pathb_DCS_vs_R14_K16_pathb_DCS                        0.9999        276        276
+  R13_K15_pathb_DCS_vs_R15_K17_xendcg_pathb_DCS                 0.9998        413        413
+  R13_K15_pathb_DCS_vs_K27_pathb_100k                           0.9982       1553       1553
+  R14_K16_pathb_DCS_vs_R15_K17_xendcg_pathb_DCS                 0.9999        314        314
+  R14_K16_pathb_DCS_vs_K27_pathb_100k                           0.9983       1558       1558
+  R15_K17_xendcg_pathb_DCS_vs_K27_pathb_100k                    0.9979       1595       1595
+
+Best individual OOF: 0.95450  (+0.069 bp vs proxy)
+
+Grid-searching blends...

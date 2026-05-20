@@ -35,43 +35,55 @@ DATA = ROOT / "data"
 OUT_JSON = ART / "probe_blend_harness.json"
 
 # Each entry: (display_name, oof_npy, test_npy, lb_or_None).
-# Updated 2026-05-14 after K=12 regression confirmed only rho_test > 0.999
-# additions transfer. New tau-variant K=11 stacks added for tight-rho blending.
+# Updated 2026-05-20 R7d ladder rebuild: PRIMARY swapped 5 times this comp
+# (R7.1 → R12-2 → R13 → R14 → R15). Ingredients are the LB-confirmed
+# Path-B DC×S chain + R5.2 (operator diversity, Compound×Stint segmentation)
+# + K=27 (wide-pool mechanism diversity).
 INGREDIENTS = [
-    # K=11 tau=100k  (PRIMARY proxy; predicted LB ~0.95385)
-    ("K11_pathb_100k",
-     "K11_full_pathb_tau100000_oof.npy",
-     "K11_full_pathb_tau100000_test.npy",
-     None),
-    # K=11 tau=20k  (more-local shrinkage on same 11 bases)
-    ("K11_pathb_20k",
-     "K11_full_pathb_tau20000_oof.npy",
-     "K11_full_pathb_tau20000_test.npy",
-     None),
-    # K=11 tau=5k  (very-local shrinkage on same 11 bases)
-    ("K11_pathb_5k",
-     "K11_full_pathb_tau5000_oof.npy",
-     "K11_full_pathb_tau5000_test.npy",
-     None),
-    # K=8 = K=4 + qAT/qAV/qAO + K=27 + Path-B  (LB-confirmed 0.95382)
-    ("K8_qATqAVqAO_K27_pathb",
-     "K8_qAT_qAV_qAO_K27_pathb_tau100000_oof.npy",
-     "K8_qAT_qAV_qAO_K27_pathb_tau100000_test.npy",
-     0.95382),
-    # K=10 slim-kNN-only = K=4 + all 6 slim-kNN + Path-B  (no K=27; diversity leg)
-    ("K10_slim_pathb",
-     "K10_slim_pathb_tau100000_oof.npy",
-     "K10_slim_pathb_tau100000_test.npy",
-     None),
-    # K=27 super-base + Path-B  (LB-confirmed 0.95368)
+    # R7.1 K=13 + Path-B DriverClass×Stint τ=100k (LB 0.95389)
+    ("R7.1_K13_pathb_DCS",
+     "oof_K13_pathb_driverclass_stint_tau100000.npy",
+     "test_K13_pathb_driverclass_stint_tau100000.npy",
+     0.95389),
+    # R7.2 5-seed fold-fit bag of R7.1 (LB 0.95389 tied)
+    ("R7.2_K13_pathb_DCS_foldbag",
+     "oof_K13_dcs_pathb_foldbag_strat.npy",
+     "test_K13_dcs_pathb_foldbag_strat.npy",
+     0.95389),
+    # R5.2 K=13 + Path-B Compound×Stint τ=100k (LB 0.95387) — segmentation diversity
+    ("R5.2_K13_pathb_CS",
+     "K13_seghmm_pathb_tau100000_oof.npy",
+     "K13_seghmm_pathb_tau100000_test.npy",
+     0.95387),
+    # R12-2 K=14 (K=13 + cb_horizon) + Path-B DCS τ=100k (LB 0.95392)
+    ("R12_K14_pathb_DCS",
+     "oof_K14_pathb_driverclass_stint_tau100000.npy",
+     "test_K14_pathb_driverclass_stint_tau100000.npy",
+     0.95392),
+    # R13 K=15 (+ cb_stint_completion) + Path-B DCS τ=100k (LB 0.95393)
+    ("R13_K15_pathb_DCS",
+     "oof_K15_pathb_driverclass_stint_tau100000.npy",
+     "test_K15_pathb_driverclass_stint_tau100000.npy",
+     0.95393),
+    # R14 K=16 (+ TabM) + Path-B DCS τ=100k (LB 0.95395)
+    ("R14_K16_pathb_DCS",
+     "oof_K16_pathb_driverclass_stint_tau100000.npy",
+     "test_K16_pathb_driverclass_stint_tau100000.npy",
+     0.95395),
+    # R15 K=17 (+ xendcg-meta-output as base) + Path-B DCS τ=100k (LB 0.95397) — PRIMARY
+    ("R15_K17_xendcg_pathb_DCS",
+     "oof_K17_xendcg_pathb_dcs_tau100000.npy",
+     "test_K17_xendcg_pathb_dcs_tau100000.npy",
+     0.95397),
+    # K=27 super-base + Path-B τ=100k (LB 0.95368) — wide-pool mechanism diversity
     ("K27_pathb_100k",
      "oof_d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000_strat.npy",
      "test_d18_path_b_K27_v4h1d_d16_d18_e2_f2_tau100000_strat.npy",
      0.95368),
 ]
 
-# Reference PRIMARY for Rule 27 (K=11 tau=100k is the closest LB analogue).
-PRIMARY_PROXY = "K11_pathb_100k"
+# Reference PRIMARY for Rule 27 (R15 is current PRIMARY LB 0.95397, 2026-05-19 PM).
+PRIMARY_PROXY = "R15_K17_xendcg_pathb_DCS"
 RULE_27_TIE_THRESHOLD = 0.9999       # >= this: near-cert LB tie
 RULE_27_LIFT_FLOOR = 0.999           # < this on test: K=12-class LB regression risk
 
@@ -204,10 +216,12 @@ def main() -> None:
     print("\nGrid-searching blends...", flush=True)
 
     rows: list[dict] = []
-    # 2-way to 5-way blends.
-    # Step schedule: coarser as dimension grows (keeps total evals near 2 min CPU).
-    step_by_k = {2: 0.05, 3: 0.1, 4: 0.2, 5: 0.25}
-    for k in range(2, min(5, len(available)) + 1):
+    # 2-way to 4-way blends.
+    # Step schedule: 2026-05-20 coarsened for 8 ingredients (was {2:0.05, 3:0.1,
+    # 4:0.2, 5:0.25} for 6 ingredients) to keep wall time under 5 min CPU.
+    # 5-way dropped: contribution at this redundancy level negligible vs cost.
+    step_by_k = {2: 0.1, 3: 0.2, 4: 0.25}
+    for k in range(2, min(4, len(available)) + 1):
         step = step_by_k[k]
         grid = simplex_grid(k, step=step)
         for combo in combinations(available, k):
