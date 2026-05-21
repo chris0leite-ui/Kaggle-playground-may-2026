@@ -1,0 +1,49 @@
+{
+  "round": "R20_inventor_listwise_yrl_lambdarank",
+  "cohort_cols": [
+    "Year",
+    "Race",
+    "LapNumber"
+  ],
+  "loss": "lambdarank",
+  "oof_auc": 0.9516514841437266,
+  "auc_r15_baseline": 0.9544902344133723,
+  "delta_bp_vs_r15": -28.38750269645751,
+  "rho_oof_vs_r15": 0.9651282960132118,
+  "rho_test_vs_r15": 0.9783254073624745,
+  "fold_aucs": [
+    0.9526683759004326,
+    0.9504717779757136,
+    0.9515564415434314,
+    0.9510254556910642,
+    0.9527112767225704
+  ],
+  "fold_walls_s": [
+    363.9740707874298,
+    117.58327054977417,
+    123.28707385063171,
+    131.92041206359863,
+    118.81663274765015
+  ],
+  "wall_total_s": 879.6001918315887,
+  "max_rounds": 2000,
+  "bases": [
+    "yekenot",
+    "cb_v4",
+    "hgbc_deep",
+    "d16_orig",
+    "qAT",
+    "qAV",
+    "qAO",
+    "qAA",
+    "qAF",
+    "qAK",
+    "K27_100k",
+    "seg_fe",
+    "HMM",
+    "R12_cb_horizon",
+    "R13_cb_stint_completion",
+    "R14_tabm",
+    "R15_xendcg_per_seg"
+  ]
+}

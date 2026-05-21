@@ -1,0 +1,19 @@
+{
+  "tau": 100000,
+  "ref_auc": 0.954460092421731,
+  "results": [
+    {
+      "name": "driverclass_stint",
+      "label": "DriverClass\u00d7Stint",
+      "n_seg": 12,
+      "n_segments_used": 10,
+      "auc": 0.9545005476661801,
+      "delta_bp": 0.40455244449066896,
+      "rho_test": 0.9992867367203353,
+      "wall": 577.148515701294
+    }
+  ],
+  "survivors": [
+    "driverclass_stint"
+  ]
+}
