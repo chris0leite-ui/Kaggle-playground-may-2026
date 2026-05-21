@@ -74,3 +74,6 @@ scripts/artifacts/d18_*_done.flag
 
 # CatBoost runtime artifacts (large snapshots)
 catboost_info/
+
+# Per-run training logs (large, runtime-only)
+logs/
