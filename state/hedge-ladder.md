@@ -5,17 +5,19 @@ Rule R5d (final-window OOF-best regression probe) and prior-comp
 postmortem default R2d (PRIMARY = best public LB; HEDGE = best OOF
 regressed ≤30 bp on public).
 
-Re-anchored 2026-05-20 on R15 PRIMARY (LB 0.95397) after Day-19 PM
-PRIMARY swap chain R7.1 → R12-2 → R13 → R14 → R15. Today's R7d
-session added 4 LB-confirmed hedges from the blend-op sweep
-(`audit/2026-05-20-blend-sweep.log`).
+Re-anchored 2026-05-21 PM on **R25 PRIMARY** (LB 0.95402) after Day-21
+inventor track. PRIMARY swap chain R7.1 → R12-2 → R13 → R14 → R15 → R25.
+Day-21 lifted +0.05 bp via submission-level rank-blend (K=18 0.89 + R21
+0.11), bypassing the Path-B LR-meta saturation on cohort-listwise.
 
-## Ladder slate (snapshot 2026-05-20 — R17 inventor win added)
+## Ladder slate (snapshot 2026-05-21 PM — R25 PRIMARY set)
 
-| Rank | Mechanism | Submission CSV | OOF | LB | ρ_test vs R15 | Status |
+| Rank | Mechanism | Submission CSV | OOF | LB | ρ_test vs R25 | Status |
 |------|-----------|----|----|----|--------|--------|
-| **HEDGE 0** | **R17/R18 K=18 + R17 listwise (Y,R,L) base + Path-B DCS** | `submission_K18_pathb_driverclass_stint_tau100000.csv` | 0.954499 | **0.95398** | **0.999888 OK** | **LB-confirmed 2026-05-20 PM**; **+0.10 bp LB lift vs R15**; flip 122 → HEDGE per R7d (PI option) |
-| **PRIMARY** | R15 K=17 + Path-B DC×S τ=100k | `submission_R15_K17_xendcgbase_pathb_dcs_tau100000.csv` | 0.954490 | 0.95397 | 1.000 | LB-confirmed (PRIMARY per R7d <200-flip rule; R18 K=18 is HEDGE) |
+| **PRIMARY** | **R25 rank-mean: K=18 × 0.89 + R21 CB YetiRank × 0.11** | `submission_R25_K18_R21_rankmean_w89.csv` | **0.954508** | **0.95402** | 1.000 | **LB-confirmed 2026-05-21** PRIMARY; +0.05 bp vs R15; 351 flips vs K=18 (R7d-eligible) |
+| **HEDGE 0** | **R27 4-way: K=18 0.70 + R21 0.12 + K=27 0.10 + R7.2 0.08 rank-mean** | `submission_R27_4way_K18_R21_K27_R72_70_12_10_08.csv` | 0.954519 | 0.95402 | 0.9999 TIE | **LB-confirmed 2026-05-21** TIED PRIMARY; structurally distinct 4-way; final-day hedge candidate |
+| HEDGE 1 | R17/R18 K=18 + R17 listwise + Path-B DCS | `submission_K18_pathb_driverclass_stint_tau100000.csv` | 0.954499 | 0.95398 | 0.99988 vs R25 | LB-confirmed; pre-blend K=18 anchor |
+| Prior PRIMARY | R15 K=17 + Path-B DC×S τ=100k | `submission_R15_K17_xendcgbase_pathb_dcs_tau100000.csv` | 0.954490 | 0.95397 | 0.99967 vs R25 | LB-confirmed; pure Path-B without R21 leg |
 | HEDGE 1 | R14 K=16 (+ TabM) + Path-B DC×S | `submission_R14_K16_tabm_pathb_dcs_tau100000.csv` | 0.954487 | 0.95395 | 0.9999 TIE | LB-confirmed; "remove xendcg" ablation |
 | HEDGE 2 | R13 K=15 (+ cb_stint_completion) + Path-B DC×S | `submission_R13_K15_cbh_cbsc_pathb_dcs_tau100000.csv` | 0.954485 | 0.95393 | 0.9998 OK edge | LB-confirmed; "remove TabM+xendcg" ablation |
 | HEDGE 3 | R12-2 K=14 (+ cb_horizon) + Path-B DC×S | `submission_R12_cb_horizon_K14_pathb_dcs_tau100000.csv` | 0.954475 | 0.95392 | 0.9998 OK edge | LB-confirmed; ablation chain |

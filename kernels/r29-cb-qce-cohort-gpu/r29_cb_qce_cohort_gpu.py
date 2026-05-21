@@ -145,7 +145,7 @@ def main():
     fold_aucs, walls = [], []
 
     cb_params = dict(
-        loss_function="QueryCrossEntropy",
+        loss_function="YetiRankPairwise",
         eval_metric="AUC",
         iterations=3000,
         learning_rate=0.04,
