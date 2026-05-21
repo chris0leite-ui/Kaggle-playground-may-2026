@@ -9,6 +9,21 @@ This file is ≤150 lines. The full historical detail is in
 `audit/friction-archive.md` (1,450+ lines; do not read by default).
 Pre-distillation snapshots: `audit/archive-YYYY-MM-DD-friction-*.md`.
 
+## 2026-05-21 (Day 22 PM)
+
+```
+2026-05-21  cb-gpu-yetirank-max-query-1023  CB GPU YetiRank errors at max group size > 1023. R32 (Y,R,Stint max=5621) and R33 (Y,R max=7908) blocked. Supersedes 2026-05-21 friction `cb-gpu-query-cross-entropy-size-limit` which claimed YetiRank had no limit. **Fix:** cap any cohort definition to max-size ≤ 1023; for larger cohorts use CPU or sub-bin.
+2026-05-21  public-LB-gap-stale-in-handover HANDOVER said "top-5% gap -0.7 bp" but actual gap was -4.7 bp (top-5% boundary 0.95449). Stale because computed at earlier LB stage. Cost: spent first half of session on rank-blend lifts assuming top-5% was 1 bp away. **Fix:** session-start downloads full public LB CSV (`kaggle competitions leaderboard --download`), recomputes percentile gaps before any compute plan.
+2026-05-21  per-cohort-isotonic-needs-explicit-block  30 min spent prototyping per-cohort isotonic of R25 despite 2026-05-08 friction `isotonic-overfits-when-base-calibrated`. The friction wasn't checked first because cohort was (Year,Race) not Compound/per-gap. Mechanism class is the same. **Fix:** add per-cohort isotonic to a permanently-closed mechanisms list with cohort-agnostic note.
+2026-05-21  monitor-until-loop-empty-status-false-positive  until-loop condition `[[ "$(kaggle ...)" != *RUNNING* ]]` becomes true when CLI returns empty/error string. Monitor falsely fired "BOTH_DONE" while kernels still running. **Fix:** require non-empty status via `grep -oE 'KernelWorkerStatus\.[A-Z_]+' | head -1` before exit.
+2026-05-21  rank-blend-ceiling-at-LB  3 submits (R25, R27, R31) with OOF +0.013-0.021 bp vs R25 all LB-tied 0.95402. Confirmed TIE_ZONE-extended (ρ_PRIMARY > 0.9998) doesn't transfer. **Fix:** rank-blend axis closed when best candidate ρ_PRIMARY > 0.9998; further blend search wastes slots.
+2026-05-21  pseudo-label-breaks-cohort-listwise-signal  R34 pseudo-label CB YetiRank: OOF 0.953709 (-25 bp vs R21). Extreme-threshold pseudo-labels (>=0.85 / ≤0.02) inject biased rows into (Y,R,L) cohorts, breaking within-cohort label distribution. **Fix:** don't pseudo-label cohort listwise models; pseudo-labels suit pointwise classifiers.
+2026-05-21  listwise-cohort-cant-use-cohort-constant-features  R38 K=17 + 15 pilkwang domain features regressed -14 bp vs R21. Listwise ranker on (Y,R,L) cohort needs within-cohort discriminative features; domain priors (Compound, EstimatedRaceLaps, etc.) are near-constant within tight cohorts. **Fix:** use domain features with POINTWISE classifiers (R39 path) not listwise rankers.
+2026-05-21  domain-features-no-blend-orthogonality  R39 pointwise CB on K=17 + domain + crossings + original-data concat: OOF 0.954043 (comparable to R30) but ρ_K18 = 0.9893 (less orthogonal than R30 = 0.9795). Domain features don't add structural diversity once K=17 logits are present. **Fix:** at K=N+1 saturation, adding feature breadth to bases produces orthogonality below R30 5-seed bag baseline; not worth the GPU.
+2026-05-21  r22-ideascan-public-ceiling-is-itself-blender safar1's 0.95449 (top-5% boundary itself) is JUST a blend of two public sources (nina2025 0.95439 + mikhailnaumov 0.95438). The "0.95449 ceiling" is not a novel single-model mechanism. **Fix:** R22 IDEA-scan should target the SOURCE kernels of public blenders, not the blender kernels themselves.
+2026-05-21  hedge-ladder-redundant-LB-tied-not-diversified  R25/R27/R31 all LB-tied 0.95402 with pairwise ρ > 0.9999 — three versions of essentially identical predictions. Using any of them as HEDGE alongside R25 gives ZERO structural diversification. Only K=18 (ρ=0.99774) is a meaningful HEDGE. **Fix:** hedge selection must use TEST .npy ρ analysis, not just "different mechanism family" assumption.
+```
+
 ## This week (2026-05-12 → 2026-05-18)
 
 ```
