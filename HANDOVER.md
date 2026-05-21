@@ -56,8 +56,10 @@ Submissions: **53 / 270** total; **3 used 2026-05-21** (R25, R27, R31);
 8. **R37 CB PairLogit cohort YetiRank**: OOF 0.951919 — WEAK NULL. ρ vs
    R21=0.9499 (most-orthogonal cohort base ever) but standalone gap kills
    blend utility. Closes CB ranking-loss-variant axis.
-9. **R36 10-seed R21 bag**: RUNNING at session-end. Expect OOF ~0.95405
-   (R30 was 0.95403; doubled seeds gives marginal variance reduction).
+9. **R36 10-seed R21 bag**: OOF **0.954039** (+0.012 bp vs R30, +0.083 bp
+   vs R21). ρ vs R30 = 0.99979 — indistinguishable at LB resolution. Best
+   R36-blend nested OOF 0.954557 vs R31's 0.954558 — no improvement.
+   No additional submit; PI directive met (nothing above TIE_ZONE).
 
 ## Key finding
 

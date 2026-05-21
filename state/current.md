@@ -43,7 +43,7 @@ critic Section 5 (2026-05-21 PM): own-bases discounted lift ~0.30 bp —
 | R34 | Pseudo-label CB YetiRank K=17 (Y,R,L) | 0.953709 | n/a | NULL (cohort contamination) |
 | R35 | FT-Transformer (3L×96D, num+cat+K17 tokens) | **0.954086** | n/a | STRONGEST NN ever; ρ vs K18=0.9832; blend regression |
 | R37 | CB PairLogit cohort K=17 (Y,R,L) | 0.951919 | n/a | NULL (ρ vs R21=0.9499 most-orthogonal cohort but standalone gap) |
-| R36 | 10-seed bag of R21 (variance reduction) | RUNNING | n/a | pending at session-end |
+| R36 | 10-seed bag of R21 (variance reduction) | 0.954039 | n/a | +0.012 bp vs R30; indistinguishable in blends |
 
 ## Submissions
 
