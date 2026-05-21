@@ -42,7 +42,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import (
-    KBinsDiscretizer, OneHotEncoder, StandardScaler,
+    KBinsDiscretizer, MaxAbsScaler, OneHotEncoder, StandardScaler,
 )
 
 warnings.filterwarnings("ignore")
@@ -240,7 +240,12 @@ def main():
                                  threeway_oof[va], new_te_oof[va], rule_va])
         num_te_full = np.hstack([Xstatic_te, te_test_arr,
                                  threeway_test, new_te_test, rule_te])
-        sc = StandardScaler()
+        # MaxAbsScaler instead of StandardScaler: smoke v2 with Std got
+        # 0.893 (worse than lr_mega 0.928) because std-scaled dense (σ=1)
+        # mixed with binary sparse (σ≈0.05) gives ill-conditioned Hessian
+        # for lbfgs. MaxAbs keeps dense in [-1,1], same range as binary
+        # → uniform-scale matrix, clean lbfgs convergence.
+        sc = MaxAbsScaler()
         num_tr_s = sc.fit_transform(num_tr_full).astype(np.float32)
         num_va_s = sc.transform(num_va_full).astype(np.float32)
         num_te_s = sc.transform(num_te_full).astype(np.float32)
