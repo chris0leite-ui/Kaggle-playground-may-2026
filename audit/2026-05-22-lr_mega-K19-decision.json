@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-05-21T17:31:04",
+  "k18_oof_auc": 0.9544994390693409,
+  "k19_oof_auc": 0.954507970238496,
+  "delta_bp": 0.0853116915511265,
+  "rho_oof_k19_k18": 0.9999181553049721,
+  "rho_test_k19_k18": 0.9999430227852627,
+  "decision": "NARROW_PHASE_B",
+  "why": "\u0394 +0.085 bp \u2208 [0, +0.30) \u2014 fund Phase B without per-segment specialist arm",
+  "probe": {
+    "standalone_oof_auc": 0.9277632768154569,
+    "standalone_gap_vs_k18_bp": -267.36162253883975,
+    "rho_oof_vs_k18": 0.9012192081261756,
+    "rho_test_vs_k18": 0.9045897051332626
+  }
+}
