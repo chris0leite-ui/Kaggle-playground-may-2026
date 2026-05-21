@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-05-21T16:23:44",
+  "k18_oof_auc": 0.9544994390693409,
+  "k19_oof_auc": 0.9544945659932159,
+  "delta_bp": -0.04873076124956022,
+  "rho_oof_k19_k18": 0.9999292520467801,
+  "rho_test_k19_k18": 0.999955894330766,
+  "decision": "KILL_PIVOT",
+  "why": "\u0394 -0.049 bp < 0 \u2014 redirect to R22 + R5d/R7d",
+  "probe": {
+    "standalone_oof_auc": 0.8863388903726503,
+    "standalone_gap_vs_k18_bp": -681.6054869669052,
+    "rho_oof_vs_k18": 0.7847897027967683,
+    "rho_test_vs_k18": 0.883248000251283
+  }
+}
