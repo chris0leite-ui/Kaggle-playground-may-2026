@@ -89,6 +89,11 @@ def main():
                     help="Skip CB leaves (just lr_mega + extra TEs).")
     ap.add_argument("--lr-c", type=float, default=1.0)
     ap.add_argument("--lr-max-iter", type=int, default=2000)
+    ap.add_argument("--penalty", choices=["l1", "l2"], default="l2",
+                    help="L1 (with liblinear) lets useful leaf cols through "
+                         "while zeroing the long tail; L2 shrinks all uniformly.")
+    ap.add_argument("--solver", default=None,
+                    help="Override solver; defaults: l2→lbfgs, l1→liblinear.")
     args = ap.parse_args()
     t0_total = time.time()
 
@@ -328,13 +333,16 @@ def main():
 
         # 5g) Fit LR (no test matrix yet)
         t_lr = time.time()
+        solver = args.solver or ("liblinear" if args.penalty == "l1" else "lbfgs")
         lr = LogisticRegression(C=args.lr_c, max_iter=args.lr_max_iter,
-                                solver="lbfgs", penalty="l2",
+                                solver=solver, penalty=args.penalty,
                                 random_state=SEED)
         lr.fit(Xtr, y[tr])
         val_p = lr.predict_proba(Xva)[:, 1]
         val_auc = float(roc_auc_score(y[va], val_p))
-        print(f"    LR fit: AUC_va={val_auc:.5f} n_iter={lr.n_iter_} "
+        nz = int(np.sum(lr.coef_ != 0))
+        print(f"    LR fit ({solver}/{args.penalty}): AUC_va={val_auc:.5f} "
+              f"n_iter={lr.n_iter_} nonzero_coefs={nz}/{lr.coef_.size} "
               f"wall={time.time()-t_lr:.1f}s", flush=True)
 
         # Free train + val matrices before building test
