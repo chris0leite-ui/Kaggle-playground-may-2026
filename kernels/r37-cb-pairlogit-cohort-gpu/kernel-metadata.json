@@ -1,0 +1,17 @@
+{
+  "id": "chrisleitescha/r37-cb-pairlogit-cohort-gpu",
+  "title": "r37-cb-pairlogit-cohort-gpu",
+  "code_file": "r37_cb_pairlogit_cohort_gpu.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "keywords": ["gpu"],
+  "dataset_sources": ["chrisleitescha/s6e5-artifacts"],
+  "kernel_sources": [],
+  "competition_sources": ["playground-series-s6e5"],
+  "model_sources": [],
+  "machine_shape": "GpuT4x2"
+}

@@ -7,99 +7,73 @@ changes** — do not tail-append. Prior versions live in
 
 **Date convention:** ISO dates ("2026-05-21") or comp-day-N anchored
 to comp start 2026-05-01. The `d13`..`d19` labels in script names
-and old audit prose are FROZEN code prefixes — never calendar days
-(per `glossary.md` and the `day-counter-drift` friction).
+and old audit prose are FROZEN code prefixes — never calendar days.
 
 ## PRIMARY (active) — set 2026-05-21 Round 25
 
-**LB 0.95402** — R25 rank-mean blend: K=18 × 0.89 + R21 (CB YetiRank
-standalone OOF on (Year, Race, LapNumber) cohort) × 0.11.
+**LB 0.95402** — R25 rank-mean blend: K=18 × 0.89 + R21 × 0.11.
 
 File: `submissions/submission_R25_K18_R21_rankmean_w89.csv`. OOF
-**0.954508** (+0.179 bp vs R15 PRIMARY 0.954490; +0.087 bp vs K=18
-0.954499). .npy ρ_test vs K=18 = 0.99981 (OK band), vs R15 = 0.99967
-(OK band). **Flips vs K=18: 351**; **vs R15: 865** (both ≥200 → R7d
-PRIMARY-swap eligible). Submission ref 52882020.
+0.954508. ρ_test vs K=18 = 0.99981 (OK band); vs R15 = 0.99967 (OK band).
 
-**Top-5% gap: −0.7 bp** (from R15's −0.8 bp). Leader gap: −7.4 bp.
+**Realistic LB position: rank 297 / 2063 — top-14.4%.** Top-5% boundary
+0.95449 (+4.7 bp gap); top-10% boundary 0.9420 (+1.8 bp gap). Strategy-
+critic Section 5 (2026-05-21 PM): own-bases discounted lift ~0.30 bp —
+**top-10% unreachable without R22 public-notebook scout or external help**.
 
-Round-25 finding: cohort-listwise axis was structurally CLOSED at
-Path-B base-add layer today (R20 lambdarank K=19 +0.011 bp sub-G2; R21
-YetiRank K=19 -0.061 bp regression; R23 cohort-aggregate K=24 -0.054
-bp regression; K=20 R20+R21 combo -0.086 bp). **BUT the rank-blend
-of K=18 PRIMARY-equivalent + R21 standalone OOF (the orthogonal base
-that didn't survive Path-B's L1-meta) extracted +0.179 bp OOF /
-+0.05 bp LB**. Mechanism: Path-B LR-meta absorbs cohort-listwise as
-one direction; submission-level rank-blend bypasses this by combining
-PRE-LR-meta R21 with POST-LR-meta K=18.
+## Hedge ladder candidates (LB-confirmed)
 
-R26 stacker swap also tested: XGB meta -6.79 bp / LGB meta -2.78 bp
-vs Path-B K=20. Path-B's LR-meta + per-segment shrinkage is BETTER
-than non-linear stackers — not the bottleneck.
+| Rank | File | LB | Mechanism |
+|------|------|-----|-----------|
+| PRIMARY | `submission_R25_K18_R21_rankmean_w89.csv` | 0.95402 | K=18 × 0.89 + R21 × 0.11 rank-mean |
+| HEDGE 0 | `submission_R31_K18_R30_R72_rankmean_50_15_35.csv` | 0.95402 | 3-way K=18 + R30 + R7.2 rank-mean (different structure) |
+| HEDGE 1 | `submission_R27_4way_K18_R21_K27_R72_70_12_10_08.csv` | 0.95402 | 4-way K=18 + R21 + K=27 + R7.2 rank-mean |
+| HEDGE 2 | `submission_K18_pathb_driverclass_stint_tau100000.csv` | 0.95398 | Pure K=18 Path-B (no rank-blend) |
+| HEDGE 3 | `submission_R15_K17_xendcgbase_pathb_dcs_tau100000.csv` | 0.95397 | K=17 + R17 listwise xendcg + Path-B |
 
-## Prior PRIMARY R15 (2026-05-19 Round 15) — retained for hedge
+## Today's R-series catalog (2026-05-21 PM)
 
-**LB 0.95397** — K=17 = R14 K=16 pool + R15_xendcg_per_seg base +
-Path-B DCS τ=100k. File:
-`submissions/submission_R15_K17_xendcgbase_pathb_dcs_tau100000.csv`.
-OOF 0.954490. Hedge: pure Path-B without R21 ingredient.
-
-## Prior PRIMARY R14 (2026-05-19 Round 14) — retained for hedge
-
-**LB 0.95395** — K=16 (K=13 + cb_horizon + cb_stint_completion + TabM) +
-Path-B DCS τ=100k. OOF 0.954487. Hedge: "remove xendcg-base" ablation.
-
-## Prior PRIMARY R13 (2026-05-19 Round 13) — retained for hedge
-
-**LB 0.95393** — K=15 (K=13 + cb_horizon + cb_stint_completion) +
-Path-B DCS τ=100k. OOF 0.954485.
-
-## Prior PRIMARY R12-2 (2026-05-19 Round 12-2) — retained for hedge
-
-**LB 0.95392** — K=14 (K=13 + cb_horizon) + Path-B DCS τ=100k. OOF
-0.954475.
-
-## Prior PRIMARY R7.1 (2026-05-18 Round 7) — retained for hedge
-
-**LB 0.95389** — K=13 + Path-B DriverClass × Stint τ=100k. OOF
-0.954471.
-
-## Today's R-series catalog (2026-05-21)
-
-| Round | Mechanism | OOF Δ vs R15 | Verdict |
-|-------|-----------|--------------|---------|
-| **R25** | **K=18 + R21 rank-mean 0.89/0.11** | **+0.179 bp** | **LB 0.95402 PRIMARY** |
-| R20 | LGB lambdarank meta on (Y,R,L) cohort, K=19 add | +0.103 bp OOF / +0.011 vs K=18 | sub-G2, TIE_ZONE vs K=18 |
-| R21 | CB YetiRank standalone on (Y,R,L) cohort, K=19 add | +0.031 bp / -0.061 vs K=18 | K-add NULL; standalone became R25 ingredient |
-| R23 | 5 cohort-aggregate features (mean/max/std/rank/centered), K=24 | -0.054 vs K=18 | NULL — LR-meta confused |
-| K=20 | R17 + R20 + R21 combo | -0.086 vs K=18 | combo NULL |
-| R26 | XGB / LGB meta swap on K=20 | -6.79 / -2.78 vs Path-B | stacker-swap axis CLOSED |
+| Round | Mechanism | OOF | LB | Verdict |
+|-------|-----------|-----|----|---------|
+| R30 | 5-seed bag of R21 YetiRank cohort | 0.954027 | n/a | LIFT INGREDIENT (+0.07 bp vs R21) |
+| R31 (cohort) | (Driver,Y,R) CB YetiRank K=17 | 0.951779 | n/a | WEAK NULL (cohort too fine) |
+| R32 (cohort) | (Y,R,Stint) CB YetiRank K=17 | ERROR | n/a | CB GPU 1023 max-query limit blocked |
+| R31 (submit) | 3-way K=18+R30+R7.2 rank-mean 0.50/0.15/0.35 | 0.954529 | **0.95402** | LB TIE — rank-blend ceiling confirmed |
+| R33 | Per-cohort isotonic of R25 (R33 inner-CV) | -13 to -44 bp | n/a | NULL across 3 cohort defs |
+| R34 | Pseudo-label CB YetiRank K=17 (Y,R,L) | 0.953709 | n/a | NULL (cohort contamination) |
+| R35 | FT-Transformer (3L×96D, num+cat+K17 tokens) | **0.954086** | n/a | STRONGEST NN ever; ρ vs K18=0.9832; blend regression |
+| R37 | CB PairLogit cohort K=17 (Y,R,L) | 0.951919 | n/a | NULL (ρ vs R21=0.9499 most-orthogonal cohort but standalone gap) |
+| R36 | 10-seed bag of R21 (variance reduction) | RUNNING | n/a | pending at session-end |
 
 ## Submissions
 
-- 50 of 270 total; **1 used 2026-05-21** (R25); **9 daily slots
-  available** at writing.
-- Comp-day **21 of 31**; days remaining **10**. Final-3-day lock
-  window opens **2026-05-29** (8 days out).
+- 53 of 270 total; **3 used 2026-05-21** (R25, R27, R31); **7 daily slots
+  available** at session-end.
+- Comp-day **21 of 31**; days remaining **10**. Final-3-day lock window
+  opens **2026-05-29** (8 days out).
 
 ## Active axes
 
 | Axis | Status | Last probe |
 |------|--------|------------|
-| **Submission-level rank-blend** | **OPEN, lifted** | R25 K=18+R21 w=0.89 → LB 0.95402 |
-| Path-B K-add (cohort-listwise) | CLOSED | 4 nulls today: R20/R21/R23/K=20 combo |
+| Submission-level rank-blend | **SATURATED at LB 0.95402** | R31 3-way TIE; R30/R35/R37/R34 all blend-NULL |
+| Path-B K-add (cohort-listwise) | CLOSED | R20/R21/R23/K=20 combo all sub-G2 (Day 21) |
+| Cohort-listwise (Y,R,L) sweet spot | UNIQUE — alternate cohorts/losses all sub-R21 | R31 (Driver,Y,R), R37 (PairLogit), R32 (Y,R,Stint blocked) |
+| Per-cohort isotonic | CLOSED | -13 to -44 bp on all 3 cohort defs (Day 22) |
+| Pseudo-label cohort YetiRank | CLOSED | R34 -0.025 bp vs R21 standalone |
+| NN-class FT-Transformer | OPEN as orthogonality | R35 OOF 0.954086, ρ_K18=0.9832 — strongest NN ever |
 | Non-linear stacker swap | CLOSED | R26 XGB -6.79 / LGB -2.78 bp |
-| Cross-family standalone bases | OPEN | R21 CB YetiRank produced strong standalone (OOF 0.95396, ρ 0.978 vs R15) |
-| Wide-pool blending (K=27) | OPEN | K27 ρ 0.998 vs R15; not yet blended w/ K=18 |
-| Inventor track NN family | 1 lift (TabM) / 2 nulls (R18 multitask, R19 aleatoric) | R19 K=20 LR-meta -0.084 bp |
+| Final-window hedge ladder | OPEN — build by 2026-05-29 | 4 LB-confirmed candidates ready |
+| R22 public-notebook IDEA-scan | DEFERRED | PI authorization pending |
 
-## Next-experiment shortlist
+## Next-experiment priorities
 
-1. **More 2-/3-way rank-blends** with K=18 anchor + diverse standalone
-   ingredients (R21, K=27 wide-pool, K=19_R20, R7.2 fold-bag). Cheap;
-   each LB-submittable as a hedge or PRIMARY-swap candidate.
-2. **More cross-family standalone bases** via Kaggle GPU (XGBoost
-   rank:ndcg, CatBoost QueryCrossEntropy) — each new standalone is a
-   fresh blend ingredient. Same axis as R21 worked.
-3. **Different blend operators** on the same K=18 + R21 pair: arith,
-   gmean, logit_mean (R25 used rank_mean).
+1. **R36 result + final blend search** (in-progress).
+2. **Hedge-ladder validation** (R5d / R7d): private-LB regression-risk
+   probe at Day 28 (3 days before close). Verify PRIMARY+HEDGE pair
+   doesn't both regress on the same private-LB perturbation.
+3. **R22 public-notebook IDEA-scan** if PI authorizes — extract structural
+   ideas from `safar1/lb-score-0-95449`, `cdeotte EDA`, `leonchani 02_NN`
+   (READ ONLY — no CSV blending per PI directive).
+4. **Strategic accept**: top-5% (+4.7 bp) and top-10% (+1.8 bp)
+   unreachable on own bases. Aim for stable top-15% (current rank ~297).
