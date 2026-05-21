@@ -1,0 +1,17 @@
+{
+  "id": "chrisleitescha/r33-cb-yetirank-race-cohort-gpu",
+  "title": "r33-cb-yetirank-race-cohort-gpu",
+  "code_file": "r33_cb_yetirank_race_cohort_gpu.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "keywords": ["gpu"],
+  "dataset_sources": ["chrisleitescha/s6e5-artifacts"],
+  "kernel_sources": [],
+  "competition_sources": ["playground-series-s6e5"],
+  "model_sources": [],
+  "machine_shape": "GpuT4x2"
+}

@@ -1,0 +1,36 @@
+[{"stream_name":"stdout","time":3.503658383,"data":"== R32 inventor: CatBoost YetiRank META on (Year,Race,Stint) cohort ==\n"}
+,{"stream_name":"stdout","time":3.5258860690000002,"data":"[boot] GPU: Tesla P100-PCIE-16GB, 16384 MiB\n"}
+,{"stream_name":"stdout","time":5.404269643,"data":"[setup] CatBoost 1.2.10\n"}
+,{"stream_name":"stdout","time":6.666494019,"data":"[setup] data at /kaggle/input/competitions/playground-series-s6e5\n"}
+,{"stream_name":"stdout","time":6.666530217,"data":"[setup] artifacts at /kaggle/input/datasets/chrisleitescha/s6e5-artifacts\n"}
+,{"stream_name":"stdout","time":8.023317684,"data":"[data] train (439140, 16)  test (188165, 15)\n"}
+,{"stream_name":"stdout","time":8.821877973,"data":"[data] K=17 OOF: (439140, 17)  test: (188165, 17)\n"}
+,{"stream_name":"stdout","time":10.017639866,"data":"[data] expanded OOF: (439140, 51)  test: (188165, 51)\n"}
+,{"stream_name":"stdout","time":10.412551444,"data":"[cohort] (Y,R,Stint) count: 528 median=358 mean=831.7 max=5621 min=1\n"}
+,{"stream_name":"stdout","time":11.27866232,"data":"\n"}
+,{"stream_name":"stdout","time":11.278701644,"data":"--- Fold 1/5 | ti=351312 groups=522 ---\n"}
+,{"stream_name":"stderr","time":12.352008258,"data":"Default metric period is 5 because AUC, PFound is/are not implemented for GPU\n"}
+,{"stream_name":"stderr","time":12.387881138000001,"data":"Metric PFound is not implemented on GPU. Will use CPU for metric computation, this could significantly affect learning time\n"}
+,{"stream_name":"stderr","time":12.388485587,"data":"AUC is not implemented on GPU. Will use CPU for metric computation, this could significantly affect learning time\n"}
+,{"stream_name":"stderr","time":12.783752227,"data":"Traceback (most recent call last):\n"}
+,{"stream_name":"stderr","time":12.783777849,"data":"  File \"/kaggle/src/script.py\", line 213, in \u003cmodule\u003e\n"}
+,{"stream_name":"stderr","time":12.783986382,"data":"    main()\n"}
+,{"stream_name":"stderr","time":12.784059401,"data":"  File \"/kaggle/src/script.py\", line 175, in main\n"}
+,{"stream_name":"stderr","time":12.784201664,"data":"    booster.fit(train_pool)\n"}
+,{"stream_name":"stderr","time":12.784258852,"data":"  File \"/usr/local/lib/python3.12/dist-packages/catboost/core.py\", line 2895, in fit\n"}
+,{"stream_name":"stderr","time":12.784876295,"data":"    return self._fit(X, y, cat_features, text_features, embedding_features, pairs, graph, sample_weight, group_id, group_weight, subgroup_id,\n"}
+,{"stream_name":"stderr","time":12.785177516,"data":"           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n"}
+,{"stream_name":"stderr","time":12.785227069,"data":"  File \"/usr/local/lib/python3.12/dist-packages/catboost/core.py\", line 2716, in _fit\n"}
+,{"stream_name":"stderr","time":12.785798364,"data":"    self._train(\n"}
+,{"stream_name":"stderr","time":12.785820353,"data":"  File \"/usr/local/lib/python3.12/dist-packages/catboost/core.py\", line 1824, in _train\n"}
+,{"stream_name":"stderr","time":12.786184216,"data":"    self._object._train(train_pool, test_pool, params, allow_clear_pool, init_model._object if init_model else None)\n"}
+,{"stream_name":"stderr","time":12.786230839,"data":"  File \"_catboost.pyx\", line 5430, in _catboost._CatBoost._train\n"}
+,{"stream_name":"stderr","time":12.787740002,"data":"  File \"_catboost.pyx\", line 5479, in _catboost._CatBoost._train\n"}
+,{"stream_name":"stderr","time":12.78785945,"data":"_catboost.CatBoostError: catboost/cuda/targets/querywise_targets_impl.h:319: Error: max query size supported on GPU is 1023, got 2437\n"}
+,{"stream_name":"stderr","time":15.232813139,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":15.232856484,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":15.450084097,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":15.450115387,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":16.676782407,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":17.452396402,"data":"[NbConvertApp] Writing 315648 bytes to __results__.html\n"}
+]
