@@ -1,0 +1,27 @@
+{
+  "pathb_K20_auc": 0.9544908244829503,
+  "R15_auc": 0.9544902344133723,
+  "stacker_results": {},
+  "K20_bases": [
+    "yekenot",
+    "cb_v4",
+    "hgbc_deep",
+    "d16_orig",
+    "qAT",
+    "qAV",
+    "qAO",
+    "qAA",
+    "qAF",
+    "qAK",
+    "K27_100k",
+    "seg_fe",
+    "HMM",
+    "R12_cb_horizon",
+    "R13_cb_stint_completion",
+    "R14_tabm",
+    "R15_xendcg_per_seg",
+    "R17_listwise_race_lap",
+    "R20_listwise_yrl_lambdarank",
+    "R21_yetirank_yrl"
+  ]
+}

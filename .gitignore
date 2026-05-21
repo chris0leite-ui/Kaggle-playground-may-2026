@@ -77,3 +77,6 @@ catboost_info/
 
 # Per-run training logs (large, runtime-only)
 logs/
+
+# Kaggle kernel run outputs (downloadable from Kaggle on demand)
+kernels/*/output/
