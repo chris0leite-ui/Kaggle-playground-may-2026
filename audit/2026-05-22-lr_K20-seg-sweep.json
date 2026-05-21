@@ -1,0 +1,74 @@
+{
+  "tau": 100000,
+  "ref_auc": 0.954460092421731,
+  "results": [
+    {
+      "name": "driver_tier_stint",
+      "label": "DriverTier\u00d7Stint",
+      "n_seg": 24,
+      "n_segments_used": 20,
+      "auc": 0.954511659141246,
+      "delta_bp": 0.5156671951500602,
+      "rho_test": 0.9993029344371251,
+      "wall": 1366.3572120666504
+    },
+    {
+      "name": "compound_stint_lapbucket",
+      "label": "Compound\u00d7Stint\u00d7LapBucket",
+      "n_seg": 120,
+      "n_segments_used": 39,
+      "auc": 0.9545066564170386,
+      "delta_bp": 0.4656399530755806,
+      "rho_test": 0.9994424552878994,
+      "wall": 1049.3615171909332
+    },
+    {
+      "name": "race_cluster_stint",
+      "label": "RaceCluster\u00d7Stint",
+      "n_seg": 12,
+      "n_segments_used": 10,
+      "auc": 0.9545052290843746,
+      "delta_bp": 0.4513666264360783,
+      "rho_test": 0.9993046807047292,
+      "wall": 915.6979956626892
+    },
+    {
+      "name": "year_stint",
+      "label": "Year\u00d7Stint",
+      "n_seg": 24,
+      "n_segments_used": 17,
+      "auc": 0.9544986697698293,
+      "delta_bp": 0.38577348098312036,
+      "rho_test": 0.9993082646336433,
+      "wall": 1127.2170643806458
+    },
+    {
+      "name": "year_compound",
+      "label": "Year\u00d7Compound",
+      "n_seg": 20,
+      "n_segments_used": 17,
+      "auc": 0.9544930565772113,
+      "delta_bp": 0.3296415548026399,
+      "rho_test": 0.9992440680756177,
+      "wall": 1027.792545557022
+    },
+    {
+      "name": "compound_firstpit_window",
+      "label": "Compound\u00d7FirstPitWindow",
+      "n_seg": 20,
+      "n_segments_used": 16,
+      "auc": 0.9544917824797963,
+      "delta_bp": 0.3169005806524794,
+      "rho_test": 0.9993906451557873,
+      "wall": 786.1600255966187
+    }
+  ],
+  "survivors": [
+    "driver_tier_stint",
+    "compound_stint_lapbucket",
+    "race_cluster_stint",
+    "year_stint",
+    "year_compound",
+    "compound_firstpit_window"
+  ]
+}
