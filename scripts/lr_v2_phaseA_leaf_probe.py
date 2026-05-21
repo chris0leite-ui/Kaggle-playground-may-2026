@@ -310,15 +310,19 @@ def main():
         print(f"    full sparse X: {Xtr.shape}  "
               f"nnz={Xtr.nnz} ({Xtr.data.nbytes/1e9:.2f} GB)", flush=True)
 
-        # 2h) Fit L2 LR (liblinear; single-thread but fast on sparse)
+        # 2h) Fit L2 LR. lbfgs is 5-10× faster than liblinear on this
+        # sparse problem (batch gradient is O(nnz)/iter vs liblinear's
+        # coord-descent O(nnz × iter)). C=10 reduces L2 shrinkage —
+        # smoke v2 with C=1.0/liblinear got AUC 0.892 (5.7 bp below CB),
+        # diagnosing as over-regularization on 59k leaf features.
         t_lr = time.time()
-        lr = LogisticRegression(C=1.0, max_iter=400, solver="liblinear",
-                                penalty="l2", random_state=SEED)
+        lr = LogisticRegression(C=10.0, max_iter=200, solver="lbfgs",
+                                penalty="l2", n_jobs=-1, random_state=SEED)
         lr.fit(Xtr, y_tr_arr)
         lr_va_proba = lr.predict_proba(Xva)[:, 1]
         lr_te_proba = lr.predict_proba(Xte)[:, 1]
         lr_va_auc = float(roc_auc_score(y_va_arr, lr_va_proba))
-        print(f"    LR fit: AUC_va={lr_va_auc:.5f} | "
+        print(f"    LR fit (lbfgs C=10): AUC_va={lr_va_auc:.5f} | "
               f"wall={time.time()-t_lr:.1f}s", flush=True)
 
         # 2i) Stash OOF + accumulate test
