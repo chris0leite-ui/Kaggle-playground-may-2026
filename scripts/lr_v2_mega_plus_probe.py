@@ -72,11 +72,12 @@ NUM_COLS = [
 ]
 CAT_COLS = ["Driver", "Compound", "Race"]
 
-# Probe CB for leaf extraction (Phase A used iters=800; bump to 1500
-# for stronger leaves now that we know the recipe works).
-PROBE_ITERS = 1500
+# Probe CB for leaf extraction. Sized for 15GB RAM budget under the
+# combined matrix: 800 trees × depth=8 with strict min_freq=500 keeps
+# leaf cols ≤ ~32k → leaves CSR ~1.4 GB, total combined ~4 GB.
+PROBE_ITERS = 800
 PROBE_DEPTH = 8
-LEAF_MIN_FREQ = 200
+LEAF_MIN_FREQ = 500
 
 
 def main():
@@ -304,48 +305,52 @@ def main():
             print(f"    leaves CSR: tr={leaves_csr_tr.shape} "
                   f"({leaves_csr_tr.data.nbytes/1e9:.2f} GB)", flush=True)
 
-        # 5f) Stack EVERYTHING as sparse CSR: dense + KBins + OHE-cats + leaves
-        blocks_tr = [csr_matrix(num_tr_s),
-                     Bk_tr[tr],
-                     Oc_tr[tr]]
-        blocks_va = [csr_matrix(num_va_s),
-                     Bk_tr[va],
-                     Oc_tr[va]]
-        blocks_te = [csr_matrix(num_te_s),
-                     Bk_te,
-                     Oc_te]
+        # 5f) Stack TRAIN + VAL only (defer test to after LR fit to save RAM).
+        import gc
+        blocks_tr = [csr_matrix(num_tr_s), Bk_tr[tr], Oc_tr[tr]]
+        blocks_va = [csr_matrix(num_va_s), Bk_tr[va], Oc_tr[va]]
         if leaves_csr_tr is not None:
             blocks_tr.append(leaves_csr_tr)
             blocks_va.append(leaves_csr_va)
-            blocks_te.append(leaves_csr_te)
         Xtr = sp_hstack(blocks_tr, format="csr")
         Xva = sp_hstack(blocks_va, format="csr")
-        Xte = sp_hstack(blocks_te, format="csr")
-        del blocks_tr, blocks_va, blocks_te
+        del blocks_tr, blocks_va, num_tr_s, num_va_s
         if leaves_csr_tr is not None:
-            del leaves_csr_tr, leaves_csr_va, leaves_csr_te
-        import gc; gc.collect()
-        print(f"    full sparse X: tr={Xtr.shape}  "
+            del leaves_csr_tr, leaves_csr_va
+        gc.collect()
+        print(f"    sparse X tr/va: tr={Xtr.shape}  "
               f"nnz={Xtr.nnz} ({Xtr.data.nbytes/1e9:.2f} GB)", flush=True)
 
-        # 5g) Fit LR
+        # 5g) Fit LR (no test matrix yet)
         t_lr = time.time()
         lr = LogisticRegression(C=args.lr_c, max_iter=args.lr_max_iter,
                                 solver="lbfgs", penalty="l2",
                                 random_state=SEED)
         lr.fit(Xtr, y[tr])
         val_p = lr.predict_proba(Xva)[:, 1]
-        test_p = lr.predict_proba(Xte)[:, 1]
         val_auc = float(roc_auc_score(y[va], val_p))
         print(f"    LR fit: AUC_va={val_auc:.5f} n_iter={lr.n_iter_} "
               f"wall={time.time()-t_lr:.1f}s", flush=True)
+
+        # Free train + val matrices before building test
+        del Xtr, Xva; gc.collect()
+
+        # 5h) Build test matrix and predict
+        blocks_te = [csr_matrix(num_te_s), Bk_te, Oc_te]
+        if leaves_csr_te is not None:
+            blocks_te.append(leaves_csr_te)
+        Xte = sp_hstack(blocks_te, format="csr")
+        del blocks_te, num_te_s
+        if leaves_csr_te is not None:
+            del leaves_csr_te
+        gc.collect()
+        test_p = lr.predict_proba(Xte)[:, 1]
+        del Xte, lr; gc.collect()
 
         oof[va] = val_p
         test_pred += test_p / n_eff_folds
         fold_aucs.append(val_auc)
         fold_walls.append(time.time() - t0)
-
-        del Xtr, Xva, Xte, lr; gc.collect()
 
     if args.smoke:
         print(f"\n  SMOKE fold-0 AUC: {fold_aucs[0]:.5f}  "
