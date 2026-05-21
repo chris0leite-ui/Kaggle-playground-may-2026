@@ -1,0 +1,17 @@
+{
+  "id": "chrisleitescha/r38-cb-yetirank-domain-feats-gpu",
+  "title": "r38-cb-yetirank-domain-feats-gpu",
+  "code_file": "r38_cb_yetirank_domain_feats_gpu.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "keywords": ["gpu"],
+  "dataset_sources": ["chrisleitescha/s6e5-artifacts"],
+  "kernel_sources": [],
+  "competition_sources": ["playground-series-s6e5"],
+  "model_sources": [],
+  "machine_shape": "GpuT4x2"
+}
