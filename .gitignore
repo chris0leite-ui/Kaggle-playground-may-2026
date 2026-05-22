@@ -80,3 +80,4 @@ logs/
 
 # Kaggle kernel run outputs (downloadable from Kaggle on demand)
 kernels/*/output/
+notebooks-scan/
