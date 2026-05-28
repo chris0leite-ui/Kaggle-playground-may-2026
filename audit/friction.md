@@ -9,6 +9,14 @@ This file is ≤150 lines. The full historical detail is in
 `audit/friction-archive.md` (1,450+ lines; do not read by default).
 Pre-distillation snapshots: `audit/archive-YYYY-MM-DD-friction-*.md`.
 
+## 2026-05-22 (Day 22 AM — R22 pivot session)
+
+```
+2026-05-22  r22-finding-overlooked-r16-precedent  R22 public-notebook scan extracted real-driver cohort specialist as candidate new lever (+0.3-1.5 bp EV). R16 already ran a real-F1 specialist 2 days prior (2026-05-20): -0.025 bp at LR-meta blend, TIE_ZONE band. Cost: PI made 2 decisions (initial go + pivot) instead of 1; nearly burned 1h CPU on a 2-axis variation of dead axis. **Fix:** before proposing any new "specialist" / "cohort" / "real_F1" / "subset model" mechanism, grep scripts/probe_*.py + audit/*-round-*-real* + ISSUES.md falsified-dead list for the exact mechanism class. Add to pre-flight Q1 (family-explored check).
+2026-05-22  pi-vs-agent-bote-7x-gap-on-ext-aug  Sealed-prediction calibration recorded PI +0.30 bp vs agent +0.04 bp on ext-aug LGBM K=19 stack-add. 7× optimism gap, driven by R16 precedent the PI didn't have at the moment of pivot. Agent re-escalated with 4-option AskUserQuestion; PI returned "no preference" → circular decision flow. **Fix:** when BOTE returns SKIP immediately after PI pivots INTO that path, default to the cheapest information-bearing diagnostic (≤15 min) and report result vs re-asking. Treat "no preference" as agent-discretion grant.
+2026-05-22  wrapup-step-3-CLAUDE-md-current-state-stale  WRAPUP.md step 3 says "Update CLAUDE.md ## Current state YAML"; that section no longer exists in CLAUDE.md (lean rewrite kept rules + pointers only; state moved to state/current.md). Wrap skipped step 3. **Fix:** edit WRAPUP.md step 3 to point at state/current.md OR remove step 3 entirely if state/current.md is the canonical state surface.
+```
+
 ## 2026-05-21 (Day 22 PM)
 
 ```
