@@ -9,35 +9,48 @@ changes** — do not tail-append. Prior versions live in
 to comp start 2026-05-01. The `d13`..`d22` labels in script names
 and old audit prose are FROZEN code prefixes — never calendar days.
 
-## PRIMARY (active) — set 2026-05-29 Day-29 (C5)
+## PRIMARY (active) — set 2026-05-29 Day-29 PM (R22-V4)
 
-**LB 0.95404** — C5 4-way rank-mean: K=20 PathB (DriverClass×Stint,
-τ=100k) × 0.82 + R21 YetiRank × 0.08 + K=27 PathB × 0.10.
+**LB 0.95446** — R22-V4 public-blend rank-mean:
+0.70 raunakdey07_95454 (public LB 0.95454)
++ 0.15 arunklenin_solo (most-diverse public ρ_anchor=0.974)
++ 0.15 PRIMARY_C5 (original-work hedge, LB 0.95404).
 
+File: `submissions/submission_d29_R22V4_raunakdey70_arunsolo15_C5_15.csv`.
+ρ_test vs C5 (prev PRIMARY) = 0.99476 (R27 OK band).
+100% rows differ; mean rank shift 3764 positions.
+
+**+42 bp LB lift in 1 submission** — PI authorized 2026-05-29 R22
+CSV-blend reversal of Day-8/Day-22 'original work only' directive.
+Predicted band was +3 to +5 bp → realized +42 bp (8.4× upper-band
+break). Mechanism: public-cluster signal (raunakdey lineage) sat at
++50 bp above K=18/K=20 stack ceiling; our PRIMARY had never tapped
+that signal.
+
+**R22 distinct-lineage finding:** 38 scraped public submissions reduce
+to 16 distinct lineages. Of those 16, only `arunklenin_solo` (ρ ~0.974
+vs anchor) is materially orthogonal to the raunakdey-blender cluster.
+All other 15 sources are mutually ρ ≥ 0.997 — same upstream signal
+re-blended. Our PRIMARY C5 sits at ρ ~0.992 vs the public cluster
+(orthogonal enough to add hedge value).
+
+## PREV PRIMARY (C5) — held as HEDGE candidate
+
+**C5 LB 0.95404** — K=20 PathB × 0.82 + R21 × 0.08 + K=27 × 0.10.
 File: `submissions/submission_d21_d22_C5_K20_R21_K27_rankmean_82_08_10.csv`.
-OOF 0.954534. ρ_test vs C1 (LB 0.95403) = 0.999930.
-ρ_test vs R25 (LB 0.95402) = 0.999897.
-
-**+2 bp cumulative LB gain Day-29 vs R25 0.95402.** Probe.py "TIE_EXPECTED"
-warning broken twice today by membership-inference axis (d21, d22).
-Realized OOF→LB amp factor on d22 path: 10× (OOF +0.10 → LB +1 bp from
-C1→C5).
-
-**K=20 pool composition (20 bases):** K=18 set (yekenot, cb_v4, hgbc_deep,
-d16_orig, qAT, qAV, qAO, qAA, qAF, qAK, K27_100k, seg_fe, HMM, R12, R13,
-R14_tabm, R15_xendcg, R17_listwise) + d21_membership_inference (k=5 NN,
-ρ_test_vs_K18 = 0.7453) + d22_membership_exact_k1 (k=1 NN exact-copy,
-ρ_test_vs_K18 = 0.7014 — lowest ever).
+K=20 = K=18 set + d21_mem_inf + d22_mem_inf (lowest ρ_vs_K18 ever 0.7014).
+Most likely FINAL_HEDGE per R2d (best OOF, original work, ≤30 bp behind
+new PRIMARY 0.95446).
 
 ## Hedge ladder candidates (LB-confirmed) — Day-29 PM
 
 | Rank | File | LB | Mechanism |
 |------|------|-----|-----------|
-| **PRIMARY** | `submission_d21_d22_C5_K20_R21_K27_rankmean_82_08_10.csv` | **0.95404** | K=20 × 0.82 + R21 × 0.08 + K=27 × 0.10 (d21+d22 mem-inf in K=20) |
-| HEDGE 0 | `submission_d21_d22_C7_K20_R21_K27_R28_renorm.csv` | 0.95404 | C5 + R28 xgb-ndcg @ 0.05 (TIE — adds nothing but doesn't hurt) |
-| HEDGE 1 | `submission_d21_C1_K19_R21_rankmean_89_11.csv` | 0.95403 | K=19 PathB × 0.89 + R21 × 0.11 (K=19 = K=18+d21) |
-| HEDGE 2 | `submission_R25_K18_R21_rankmean_w89.csv` | 0.95402 | K=18 × 0.89 + R21 × 0.11 (prior PRIMARY) |
-| HEDGE 3 | `submission_R31_K18_R30_R72_rankmean_50_15_35.csv` | 0.95402 | 3-way K=18 + R30 + R7.2 (structurally diverse) |
+| **PRIMARY** | `submission_d29_R22V4_raunakdey70_arunsolo15_C5_15.csv` | **0.95446** | 0.7 raunakdey + 0.15 arunsolo + 0.15 C5 (R22 public-blend) |
+| HEDGE 1 (best-original) | `submission_d21_d22_C5_K20_R21_K27_rankmean_82_08_10.csv` | 0.95404 | C5 K=20 + R21 + K=27 82/8/10 (best original-work LB) |
+| HEDGE 2 (TIE family) | `submission_d21_d22_C7_K20_R21_K27_R28_renorm.csv` | 0.95404 | C5 + R28 xgb-ndcg @ 0.05 (TIE) |
+| HEDGE 3 (d21-only mem-inf) | `submission_d21_C1_K19_R21_rankmean_89_11.csv` | 0.95403 | K=19 PathB × 0.89 + R21 × 0.11 |
+| HEDGE 4 (R25 prior PRIMARY) | `submission_R25_K18_R21_rankmean_w89.csv` | 0.95402 | K=18 × 0.89 + R21 × 0.11 |
 
 **Flip counts C5 vs R25:** 577 raw (sign at 0.5), 274 top-5% rank flips.
 R7d threshold >200 — would need explicit PI sign-off for HEDGE pick,
@@ -53,9 +66,9 @@ but C5 IS the PRIMARY so this is informational only.
 | 4 | C5 K=20 + R21 + K=27 82/8/10 | 0.954534 | **0.95404** | +1 bp vs C1 — d22 axis activated |
 | 5 | C7 C5 + R28 xgb-ndcg @ 0.05 | 0.954537 | 0.95404 | TIE — xgb-ndcg adds nothing |
 | 6 | C8 C5 + R20 listwise-lambdarank @ 0.05 | 0.954539 | 0.95402 | REGRESSED 2 bp — OOF-grinding overfit |
+| 7 | R22-V4 raunakdey70+arunsolo15+C5_15 | n/a | **0.95446** | **+42 bp — public-blend axis activated** |
 
-**6 of 7 daily slots used. 1 slot remains** (preserve for Day-30 anchor
-verification or hedge probe).
+**All 7 daily slots used.** Day-30 + Day-31 = ~14 more probes available.
 
 ## Active axes — Day-29 PM
 
@@ -70,36 +83,54 @@ verification or hedge probe).
 | Per-cohort isotonic | CLOSED (Day-22) | -13 to -44 bp |
 | NN-class FT-Transformer (R35) | OPEN-as-orthogonality | OOF 0.954086, ρ_K18=0.9832 |
 | Final-window hedge ladder | LOCKED — 5 LB-confirmed candidates | C5 PRIMARY, C7 HEDGE_0 |
-| R22 public-notebook IDEA-scan | DEFERRED | PI authorization pending |
+| R22 public-blend (PI-reauthorized 2026-05-29 PM) | **ACTIVE — +42 bp Day-29 PM** | V4 = raunakdey + arunsolo + C5 → LB 0.95446; +42 bp largest-single-slot lift this comp |
 
-## Day-30 (tomorrow) priorities
+## Day-30 (tomorrow) priorities — R22 public-blend axis ACTIVE
 
-1. **Hold C5 as PRIMARY.** Don't ladder-grind further (C7 TIE, C8 -2 bp
-   confirms OOF-grinding fails past C5).
-2. **Final-3-day lock window opens 2026-05-29 EOD.** Day-30 + Day-31 are
-   verification + hedge selection.
-3. **Verify C5 vs alternate seed/fold of K=20** (anti-overfit probe) — 1
-   slot.
-4. **Hedge selection:** C5 PRIMARY, C7 HEDGE (LB-tied 0.95404 same family),
-   C1 HEDGE_2 (different structure, ρ 0.999930). R2d: best public + best
-   OOF regressed ≤30 bp.
-5. **Avoid:** more OOF-grinding 4-way/5-way (C7/C8 falsified this
-   direction); more weight sweeps in (K=20, R21, K=27) basin (local-best).
+Realized V4 +42 bp blows past every prior single-slot lift in this
+comp. Top-5% boundary (0.95449) is 3 bp above current PRIMARY (0.95446).
+Top public LB 0.95454 = 8 bp above. ~14 slots over Day-30 + Day-31.
+
+1. **V0/V1 — pure raunakdey passthrough probe.** Confirm the public
+   ceiling 0.95454. If so, defines our upper bound; weight sweeps then
+   place V4 on a known interpolation curve. 1 slot.
+2. **Weight sweep around V4** — A75+B15+P10, A80+B10+P10, A60+B20+P20,
+   A65+B20+P15 — find the marginal-curve optimum. 3-4 slots Day-30.
+3. **V2 (A70+B30) no-PRIMARY variant** — measures whether arunsolo
+   alone (without our hedge) lifts further on public. 1 slot.
+4. **V9 5-equal incl ours** — most-diversified bet; private-LB hedge.
+   1 slot.
+5. **Day-31:** narrow on the 2 best LB candidates as FINAL_PRIMARY
+   (highest public LB) and FINAL_HEDGE (most robust per R2d ≤30 bp).
+   Most likely C5 stays as FINAL_HEDGE (original work, -42 bp from
+   V4 PRIMARY = within R2d 30 bp cap? **NO** — 42 bp > 30 bp, so C5
+   would violate R2d cap. Pick a heavier-PRIMARY blend as hedge.)
+6. **Avoid:** scouting more public sources (16 distinct lineages done;
+   no other diverse axis); rebuilding K=20 pool variants (V4 dominates).
 
 ## Strategic posture
 
-**Top-15% achieved.** R25 LB 0.95402 was top-14.4% (rank ~297/2063);
-C5 LB 0.95404 likely improves rank by ~30-50 places (top-12-13%
-estimated; verify via LB download Day-30 AM).
+**Top-12% → within 3 bp of top-5% boundary in 1 submission.**
+V4 LB 0.95446 vs top-5% boundary 0.95449. Top public LB 0.95454.
+Highest realistic ceiling: ~0.95455-0.95460 if blend optimum sits
+slightly above pure raunakdey.
 
-Top-10% boundary 0.9420 — still ~+1.6 bp away. Top-5% boundary
-0.95449 — +4.5 bp away. **C5 ladder closed.** Further lift requires
-R22 public-notebook scout (PI authorization gated) or a new mechanism
-family not yet tried (e.g., structured graph model on Race × Driver
-× Compound co-occurrence).
+**R2d hedge constraint check:** V4 PRIMARY at 0.95446; C5 at 0.95404.
+Gap = 42 bp > 30 bp R2d cap. **C5 cannot be FINAL_HEDGE under R2d.**
+Need a hedge ≥ 0.95416. Likely candidates: V5 (heavy hedge 0.50 ours)
+or V6 (0.80 anchor + 0.10 each) or similar interpolation.
 
 ## Key learnings Day-29
 
+0. **R22 public-blend axis: +42 bp single-slot lift.** PI 2026-05-29 PM
+   authorized scrape+blend (reversing Day-8/Day-22 'original work only'
+   directive). V4 = 0.7 raunakdey + 0.15 arunsolo + 0.15 C5 → LB 0.95446.
+   Distinct-lineage scan (38 → 16 distinct → only 1 truly orthogonal:
+   `arunklenin_solo`, ρ=0.974). Public-blender cloud is mutually
+   ρ ≥ 0.997 — blending more than 1 cluster member is a no-op. Predicted
+   band +3 to +5 bp; realized +42 bp = 8.4× upper-band break. Mechanism:
+   the public cluster sat at +50 bp above our K=18/K=20 stack ceiling
+   that no in-pool axis ever tapped.
 1. **Membership-inference axis is real and large.** d21 (k=5 NN) and
    d22 (k=1 NN exact-copy) each delivered +1 bp at LB despite probe.py
    "TIE_EXPECTED" warning at ρ=0.9999. The K=18 pool did NOT route
