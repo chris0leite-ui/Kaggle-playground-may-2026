@@ -1,0 +1,41 @@
+[d20 chain-LL-only]  loading data
+  train (439140, 16)  test (188165, 15)  orig (99614, 16)
+
+[fit chain on orig n=99614]
+  step  1/13 Year   marginal logp over 4 levels
+  step  2/13 Race                     multiclass | 1 feats | σ=       - | 12.0s
+  step  3/13 Compound                 multiclass | 3 feats | σ=       - | 5.2s
+  step  4/13 Stint                    multiclass | 3 feats | σ=       - | 5.5s
+  step  5/13 LapNumber                gauss      | 4 feats | σ=9.758392394520959 | 1.3s
+  step  6/13 TyreLife                 gauss      | 5 feats | σ=3.7109546732790872 | 1.5s
+  step  7/13 RaceProgress             gauss      | 3 feats | σ=0.02941307816425309 | 1.6s
+  step  8/13 Position                 gauss      | 6 feats | σ=4.2124901286185965 | 1.5s
+  step  9/13 LapTime (s)              gauss      | 7 feats | σ=5.89145362119545 | 1.6s
+  step 10/13 LapTime_Delta            gauss      | 5 feats | σ=34.403309709450106 | 1.4s
+  step 11/13 Cumulative_Degradation   gauss      | 5 feats | σ=50.380758222479756 | 1.6s
+  step 12/13 Position_Change          gauss      | 4 feats | σ=2.844325639605425 | 1.1s
+  step 13/13 PitStop                  binary     | 8 feats | σ=       - | 1.4s
+  fit_chain wall: 35.6s
+
+[apply chain → train 439140]
+  chain features (23): ['chain_ll_Year', 'chain_ll_Race', 'chain_ll_Compound', 'chain_ll_Stint', 'chain_z_LapNumber', 'chain_ll_LapNumber', 'chain_z_TyreLife', 'chain_ll_TyreLife', 'chain_z_RaceProgress', 'chain_ll_RaceProgress', 'chain_z_Position', 'chain_ll_Position', 'chain_z_LapTime_s', 'chain_ll_LapTime_s', 'chain_z_LapTime_Delta', 'chain_ll_LapTime_Delta', 'chain_z_Cumulative_Degradation', 'chain_ll_Cumulative_Degradation', 'chain_z_Position_Change', 'chain_ll_Position_Change', 'chain_ll_PitStop', 'chain_anomaly_L1', 'chain_total_ll']
+  apply_chain wall: 157.5s
+
+[downstream LGBM on CHAIN-ONLY features (no raw)]
+    fold 1: AUC=0.94287  best_iter=600
+    fold 2: AUC=0.94101  best_iter=602
+    fold 3: AUC=0.94144  best_iter=605
+    fold 4: AUC=0.94108  best_iter=636
+    fold 5: AUC=0.94216  best_iter=515
+    OOF AUC = 0.94170
+  downstream_lgbm wall: 94.3s
+  saved oof_d20_chain_ll_stream_strat.npy  ((439140, 2))  test_d20_chain_ll_stream_strat.npy ((188165, 2))
+
+  K=18 PRIMARY OOF AUC  : 0.95450
+  d20 standalone OOF AUC : 0.94170
+  gap                    : -128.00 bp
+  ρ_OOF  d20↔K18         : 0.93770
+  ρ_test d20↔K18         : 0.94471
+
+[done]  total wall: 290.5s
+  → next: python scripts/probe.py gate d20_chain_ll_stream --oof scripts/artifacts/oof_d20_chain_ll_stream_strat.npy --test scripts/artifacts/test_d20_chain_ll_stream_strat.npy --primary-oof scripts/artifacts/oof_K18_pathb_driverclass_stint_tau100000.npy --primary-test scripts/artifacts/test_K18_pathb_driverclass_stint_tau100000.npy
