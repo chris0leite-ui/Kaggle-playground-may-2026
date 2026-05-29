@@ -212,11 +212,18 @@ of (Driver×Race×Year), (Driver×Race), (Driver×Compound), (Race×Compound),
 - **6a.** Replace 3 most leakage-eating GBDTs with FM-class bases.
   cb_slow-wide-bag (-17 GKF rank), e5_optuna_lgbm (-13 rank).
   Risk: public-LB row-iid leak-eaters carry signal (d13c T2/T3).
-  `[owner: research-improvements-jjI84 | status: wip]` Synthetic-only
-  plan reframes as "Mechanism 1": drop pool members with pairwise
-  ρ ≥ 0.997, forward-greedy re-add from reserves; target eff-rank
-  +0.15. Manifest: 18 base OOFs identified per
-  `audit/2026-05-20-round-19-K20-pathb.json` (`baseline_pool`).
+  `[owner: research-improvements-jjI84 | status: null]` Reframed as
+  Mechanism 1 of synthetic-only plan. Result 2026-05-29: **no pair
+  at ρ ≥ 0.997 or even ≥ 0.995** (tightest pair yekenot↔K27_100k
+  ρ=0.9877). Eff-rank K=18 = 7.30 (rank-transformed centered) —
+  pool is already structurally diverse; plan's "2.0–2.19" was the
+  LR-bank-only ceiling, not K=18. LOO LR-meta sweep: every drop
+  hurts (range −0.020 to −1.784 bp). Cheapest: hgbc_deep −0.020,
+  yekenot −0.023, qAA −0.035. K27_100k is most load-bearing
+  (−1.784 bp if dropped) because it carries d18 chain decomp + d16
+  orig signal through K=27 Path-B amplification. **K=18 forward-
+  greedy is empirically lean — no surgical lift available.**
+  Friction candidate `forward-greedy-pool-lean-no-surgery-lift`.
 
 ## 8. Gauge p_synth (overnight research sweep, 2026-05-06/07)
 
