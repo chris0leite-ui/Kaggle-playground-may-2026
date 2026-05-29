@@ -95,29 +95,30 @@ but C5 IS the PRIMARY so this is informational only.
 | Final-window hedge ladder | LOCKED — 5 LB-confirmed candidates | C5 PRIMARY, C7 HEDGE_0 |
 | R22 public-blend (PI-reauthorized 2026-05-29 PM) | **ACTIVE — +42 bp Day-29 PM** | V4 = raunakdey + arunsolo + C5 → LB 0.95446; +42 bp largest-single-slot lift this comp |
 
-## Day-30 priorities — V8 axis EXTENDS, arunsolo CLOSED
+## Day-30 queue (built 2026-05-29 evening, fire at UTC reset)
 
-V8 PRIMARY 0.95456 is +3 bp above public top. V8 vs V0 +3 bp = the
-PRIMARY hedge at 10% extracts membership-inference signal not in
-public stack. V8 vs V10 +6 bp = arunsolo is fully absorbed.
+20 candidates pre-built in `submissions/public_scrape/_blends_d30/`.
+**R27 caveat: ALL Day-30 candidates ρ_vs_V8 ∈ [0.99981, 1.00000].** Every
+single one trips TIE_EXPECTED on the standard threshold. Override
+authorization is per-slot, justified by today's V4/V8/V10 axis
+activations that broke similar bands by +42 bp and +3 bp.
 
-**Day-30 sweep direction: extend P weight in V8.** Hypothesis: 0.10 P
-gave +3 bp, so 0.15 / 0.20 P may give +5 / +7 bp. Beyond that,
-diminishing returns or regression as the anchor weight drops too far.
+Sharpened 8-slot priority (PI authorizes at fire-time):
 
-Concrete candidates (sweep_*.csv generator queued):
-1. **A=0.85 + P=0.15** — extend V8 hedge by +5 pp. 1 slot.
-2. **A=0.80 + P=0.20** — heavier hedge, test monotonicity. 1 slot.
-3. **A=0.75 + P=0.25** — deeper hedge probe. 1 slot.
-4. **A=0.95 + P=0.05** — minimum hedge, near-anchor. 1 slot.
-5. **A=0.90 + C7=0.10** (TIE-family) — does the choice of "ours" matter? 1 slot.
-6. **A=0.90 + R31=0.10** (3-way K=18+R30+R7.2) — diversification of "ours". 1 slot.
-7. **A=0.85 + P=0.10 + C7=0.05** — multi-our hedge. 1 slot.
+| Slot | Cand | Mechanism | ρ_vs_V8 |
+|------|------|-----------|---------|
+| 1 | W3 A=0.80 P=0.20 | More-ours monotonicity | 0.99992 |
+| 2 | O2 A=0.90 R31=0.10 | R31 vs C5 as "ours" | 1.00000 |
+| 3 | M1 A=0.85 + 3-way ours (C5+C7+R31) | Multi-ours diversification | 0.99998 |
+| 4 | E1 q=2 power-mean | Quadratic mean curvature | 0.99995 |
+| 5 | E3 q=3 power-mean | Cubic mean (most curvature) | 0.99984 |
+| 6 | L1 logit-space V8 | Logit-space blend | 0.99999 |
+| 7 | C1 confidence-conditional | Mid-range up-weight ours, tails down | 0.99995 |
+| 8 | W1 A=0.95 P=0.05 | Min-ours calibration | 0.99998 |
 
-**Avoid:**
-- arunsolo at any weight (V4 / V10 both regressed)
-- raunakdey-cluster duplicates (sarvesh / kalyan / etc — all ρ ≥ 0.997)
-- C5/R25/R7d family original-stack-only candidates (out of R2d hedge)
+Reserve (2 slots): W2 A=0.85 P=0.15, M3 A=0.90 C5_07 R31_03.
+
+**Generator:** `scripts/r22_d30_candidates.py`.
 
 ## Strategic posture
 
