@@ -212,7 +212,11 @@ of (Driver×Race×Year), (Driver×Race), (Driver×Compound), (Race×Compound),
 - **6a.** Replace 3 most leakage-eating GBDTs with FM-class bases.
   cb_slow-wide-bag (-17 GKF rank), e5_optuna_lgbm (-13 rank).
   Risk: public-LB row-iid leak-eaters carry signal (d13c T2/T3).
-  `[owner: unclaimed | status: open]`
+  `[owner: research-improvements-jjI84 | status: wip]` Synthetic-only
+  plan reframes as "Mechanism 1": drop pool members with pairwise
+  ρ ≥ 0.997, forward-greedy re-add from reserves; target eff-rank
+  +0.15. Manifest: 18 base OOFs identified per
+  `audit/2026-05-20-round-19-K20-pathb.json` (`baseline_pool`).
 
 ## 8. Gauge p_synth (overnight research sweep, 2026-05-06/07)
 
