@@ -295,6 +295,14 @@ prediction signal. 5 phases × 19 probes. CPU-only. 0 submits. Audit at
 - **7l.** Per-Year DGP heterogeneity / specialists test under K=27
   pool. Cost ~30 min CPU.
   `[owner: unclaimed | status: open]`
+- **7m.** Chain-LL-only variant of 7g (Mechanism 2 of synthetic-only
+  plan). Strip raw features from d18_chain_decomp downstream LGBM —
+  train on chain_ll_* / chain_z_* / chain_anomaly_L1 / chain_total_ll
+  only. Hypothesis: lower standalone OOF but ρ-vs-K18 < 0.9914 (d18
+  baseline), unlocks min-meta gain via off-axis routing. Reuse
+  fit_chain / apply_chain from `scripts/d18_chain_decomp.py`. Cost
+  ~30 min CPU. Gate: standalone OOF ≥ 0.940, ρ ≤ 0.985, min-meta
+  K=4 +0.40 bp. `[owner: research-improvements-jjI84 | status: wip]`
 
 ## 9. Day-17 PM strategy-critic top-3 hypotheses (Rule 14 + Rule 7)
 
