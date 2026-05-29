@@ -8,3 +8,16 @@
     fold 2: 67.7s  (segments used: 10/12)
     fold 3: 58.3s  (segments used: 10/12)
     fold 4: 64.2s  (segments used: 10/12)
+    fold 5: 63.1s  (segments used: 10/12)
+     OOF AUC: 0.95452  Δ vs R5.2 = +0.552 bp
+     ρ_test vs R5.2: 0.999343
+     Wrote submission: submissions/submission_K19_pathb_driverclass_stint_tau100000.csv
+
+=== Summary (multi-segmentation Path-B) ===
+segmentation                        OOF     Δ_bp     ρ_R52
+------------------------------------------------------------
+DriverClass×Stint             0.95452   +0.552  0.999343 ★
+
+  Survivors (Δ ≥ +0.10 bp): ['driverclass_stint']
+  Total wall: 410.8s
+  Wrote summary: audit/2026-05-29-K19-pathb-d21.json
