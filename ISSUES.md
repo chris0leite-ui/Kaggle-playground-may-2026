@@ -298,11 +298,18 @@ prediction signal. 5 phases × 19 probes. CPU-only. 0 submits. Audit at
 - **7m.** Chain-LL-only variant of 7g (Mechanism 2 of synthetic-only
   plan). Strip raw features from d18_chain_decomp downstream LGBM —
   train on chain_ll_* / chain_z_* / chain_anomaly_L1 / chain_total_ll
-  only. Hypothesis: lower standalone OOF but ρ-vs-K18 < 0.9914 (d18
-  baseline), unlocks min-meta gain via off-axis routing. Reuse
-  fit_chain / apply_chain from `scripts/d18_chain_decomp.py`. Cost
-  ~30 min CPU. Gate: standalone OOF ≥ 0.940, ρ ≤ 0.985, min-meta
-  K=4 +0.40 bp. `[owner: research-improvements-jjI84 | status: wip]`
+  only. Result 2026-05-29: standalone OOF 0.94170 (-128 bp vs K=18);
+  ρ_test 0.9447 (LOWEST ρ ever seen on this comp, beats R37's 0.9499).
+  K=4 min-meta Δ +0.048 bp NULL; K=18+1 LR-meta Δ +0.009 bp (ρ_OOF
+  0.999852 TIE_ZONE). Mechanism absorbed by existing pool — parent-
+  DGP archaeology axis already routed via d16_orig + K27_100k (which
+  contains d18_chain_decomp raw+chain). 6th confirmation of friction
+  `rho-alone-insufficient-for-meta-utility`. Refined finding: chain-
+  LL feature class is fully absorbed at K=18; no chain-LL variant
+  will lift further. `scripts/d20_chain_ll_stream.py`,
+  `scripts/artifacts/oof_d20_chain_ll_stream_strat.npy`,
+  `audit/2026-05-29-d20-full.log`.
+  `[owner: research-improvements-jjI84 | status: null]`
 
 ## 9. Day-17 PM strategy-critic top-3 hypotheses (Rule 14 + Rule 7)
 
