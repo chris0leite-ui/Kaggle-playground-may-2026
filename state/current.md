@@ -95,6 +95,42 @@ but C5 IS the PRIMARY so this is informational only.
 | Final-window hedge ladder | LOCKED — 5 LB-confirmed candidates | C5 PRIMARY, C7 HEDGE_0 |
 | R22 public-blend (PI-reauthorized 2026-05-29 PM) | **ACTIVE — +42 bp Day-29 PM** | V4 = raunakdey + arunsolo + C5 → LB 0.95446; +42 bp largest-single-slot lift this comp |
 
+## ACTUAL LB RANK (pulled 2026-05-29 19:15 UTC)
+
+**Rank 21 of 2791 teams (top-0.76%)** at V8 LB 0.95456.
+- Rank 1: 0.95494 (+38 bp gap to leader)
+- Rank 8 / 0.95470: Don Mani (+14 bp gap)
+- Rank 10 / 0.95466: Andreas Palmgren (top-10 boundary, +10 bp gap)
+- Rank 16 / 0.95459: Ravi Ramakrishnan + `arunklenin` + `ravi20076` (uses
+  arunsolo successfully — proof arunsolo IS valuable when blended right)
+- **Rank 21 (us): 0.95456 — V8**
+- Rank 22-56: 35 teams clustered at 0.95454-0.95455 (public-blender ceiling)
+
+V8's +3 bp put us above 35 teams sitting at the raunakdey-cluster ceiling.
+
+## HIDDEN AXIS — d22 raw orthogonality
+
+Found 2026-05-29 PM by inspecting blend dilution:
+- ρ_d22_vs_anchor = **0.682** (k=1 NN exact-copy raw)
+- ρ_d21_vs_anchor = **0.727** (k=5 NN membership raw)
+- ρ_C5_vs_anchor  = 0.991
+- ρ_K20_alone_vs_anchor = 0.990
+
+V8 dilutes d22 to ~0.4% effective weight (10% C5 × 82% K=20 × ~5% d22 share).
+Pure d22 raw at 10% blend weight = **25× more concentrated** — this is
+our most-orthogonal axis sitting under-used.
+
+Built I1/I2/I3 isolation probes for Day-30 slot 1-3:
+
+| Slot | File | ρ_vs_V8 |
+|------|------|---------|
+| 1 | `submission_d30_R22I2_raunakdey90_d22raw_10.csv` (d22 raw @ 10%) | 0.99744 |
+| 2 | `submission_d30_R22I3_raunakdey90_d21raw_10.csv` (d21 raw @ 10%) | 0.99779 |
+| 3 | `submission_d30_R22I1_raunakdey90_K20pathb_10.csv` (K=20 alone @ 10%) | 0.99999 |
+
+I2/I3 are well below the 0.9990 TIE band — structural LB delta plausible.
+I1 will likely tie V8 (control probe).
+
 ## Day-30 queue (built 2026-05-29 evening, fire at UTC reset)
 
 20 candidates pre-built in `submissions/public_scrape/_blends_d30/`.
