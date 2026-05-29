@@ -69,18 +69,40 @@ boundary 0.95449 — V4 is 3 bp below this. The "carefully blend to
 get on top" objective is now: close the remaining 8 bp gap to public
 top + cross top-5% boundary.
 
-## Day-30 queue (PI to approve slot-by-slot)
+## Day-29 PM slots 8/9/10 (executed)
 
-1. **V0 raw raunakdey** — confirm public ceiling 0.95454. Defines
-   upper bound + verifies pipeline reproducibility.
-2. **V8 A=0.9 + P=0.1** — minimum deviation from anchor; bridges V4
-   to public top.
-3. **V6 A=0.8 + B=0.1 + P=0.1** — arunklenin's exact published recipe.
-4. **A=0.75 + B=0.15 + P=0.10** — V4 weight-sweep down toward anchor.
-5. **A=0.65 + B=0.20 + P=0.15** — V4 weight-sweep up toward diversity.
-6. **V2 A=0.7 + B=0.3** — no-PRIMARY-hedge variant; tests whether
-   arunsolo alone (no ours) lifts public.
-7. **V9 5-equal incl ours** — most diversified bet.
+PI direction: "be aggressive, get on top of leaderboard." Swapped V5
+heavy-hedge for V10 (A=0.9 + B=0.1, no PRIMARY) to run sharp anchor-
+vs-blend A/B test.
+
+| Slot | Cand | Weights | LB | Note |
+|------|------|---------|----|------|
+| 8 | V0 | A only | 0.95453 | public ceiling confirmed |
+| 9 | V8 | A=0.9 + P=0.1 | **0.95456** | **+3 bp above public top — NEW PRIMARY** |
+| 10 | V10 | A=0.9 + B=0.1 | 0.95450 | arunsolo at 10% costs -6 bp |
+
+**A/B finding (V8 vs V10):** at fixed A=0.9, the 0.10 hedge slot's
+contribution: PRIMARY +3 bp vs anchor; arunsolo -3 bp vs anchor.
+Net +6 bp swing. arunsolo signal was already in raunakdey's blender;
+PRIMARY's K=20 membership-inference stack carries genuinely new info.
+
+V4's regression vs V8 (-10 bp) is attributable to the 15% arunsolo
+drag, not to the 15% PRIMARY (which we now know is positive).
+
+## Day-30 queue
+
+PRIMARY axis: extend V8 PRIMARY-weight sweep.
+
+1. **A=0.85 + P=0.15** — extend V8 by +5 pp PRIMARY
+2. **A=0.80 + P=0.20** — heavier hedge, test monotonicity
+3. **A=0.75 + P=0.25** — deeper hedge probe
+4. **A=0.95 + P=0.05** — minimum hedge, near-anchor calibration
+5. **A=0.90 + C7=0.10** — substitute C7 (LB-tied C5) for "ours"
+6. **A=0.90 + R31=0.10** — substitute R31 (different K=18 mechanism)
+7. **A=0.85 + P=0.10 + C7=0.05** — multi-our hedge
+
+Closed: arunsolo at any weight (V4 + V10 both regressed); public-
+cluster duplicates; original-stack-only (out of R2d 30 bp cap).
 
 ## R2d hedge constraint
 
