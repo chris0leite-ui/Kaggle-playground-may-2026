@@ -1,0 +1,39 @@
+[d21 membership-inference]  loading data
+  train (439140, 16)  test (188165, 15)  orig (99614, 16)
+  orig after NaN drop: 99614 (lost 0)
+
+[build global BallTree on orig (fallback)]
+  built (0.1s)
+
+[per-cell NN on synth train]
+    cells 50/98  fallback rows so far: 23  (4.3s)
+    cells 98/98  fallback rows so far: 23  (7.6s)
+  train fallback rows: 23 / 439140 (0.0%)
+
+[per-cell NN on synth test]
+    cells 50/94  fallback rows so far: 8  (1.9s)
+    cells 94/94  fallback rows so far: 8  (3.3s)
+  test fallback rows: 8 / 188165 (0.0%)
+
+[feature stats]
+  nn_mean_y_top5          train mean=+0.1992 std=0.3593  test mean=+0.1992 std=0.3591
+  nn_min_dist             train mean=+0.7029 std=0.8910  test mean=+0.7011 std=0.7988
+  nn_mean_dist_top5       train mean=+0.8009 std=0.8944  test mean=+0.7992 std=0.8033
+  KS nn_mean_y_top5  y=1 vs y=0  stat=0.5615
+
+[downstream LGBM on 3-feat NN block]
+    fold 1: AUC=0.86649  best_iter=137
+    fold 2: AUC=0.86096  best_iter=170
+    fold 3: AUC=0.86487  best_iter=190
+    fold 4: AUC=0.86049  best_iter=147
+    fold 5: AUC=0.86483  best_iter=155
+    OOF AUC = 0.86345
+  saved oof_d21_membership_inference_strat.npy (439140, 2)  test_d21_membership_inference_strat.npy (188165, 2)
+
+  K=18 PRIMARY OOF AUC : 0.95450
+  d21 standalone OOF   : 0.86345
+  gap                  : -910.46 bp
+  ρ_OOF  d21↔K18       : 0.74175
+  ρ_test d21↔K18       : 0.74532
+
+[done]  total wall: 32.4s

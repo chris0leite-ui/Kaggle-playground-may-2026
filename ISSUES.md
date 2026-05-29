@@ -299,7 +299,11 @@ prediction signal. 5 phases × 19 probes. CPU-only. 0 submits. Audit at
 - **7j.** Membership inference + exact-row copy detection. Per synth
   row, min-distance to orig over all 16 columns; below ε, predicted
   P(y=1) = orig's actual y (leak-free). Cost ~1 h CPU.
-  `[owner: unclaimed | status: open]`
+  `[owner: research-improvements-jjI84 | status: wip]` Post-M1+M2-NULL
+  pivot (2026-05-29). Generalized softer version: k=5 NN to orig in
+  standardized-numeric space, features = (mean-y-top5, min-dist,
+  mean-dist-top5), LGBM downstream. Cell-conditioning by Compound ×
+  Race to enforce structural plausibility.
 - **7k.** Class-conditional CTGAN replay with explicit cond-vector
   spec [PitStop, Compound, Stint, Year]. Cost ~3 h Kaggle GPU.
   `[owner: unclaimed | status: open]`
