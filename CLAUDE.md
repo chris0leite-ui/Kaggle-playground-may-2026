@@ -25,6 +25,9 @@ on first use.
 - **R27.** Pre-submit `scripts/pre_submit_diff.py` against the
   previous submit. Spearman > 0.999 → REGRESSION_RISK or TIE_ZONE
   (band table in `state/current.md`); abort or PI-authorise override.
+  4th band BATCH_AUTHORIZED: a multi-slot plan with ≥3 R27-trippers
+  ratified by PI in advance grants per-slot override at fire-time;
+  agent logs outcome instead of re-asking. (Day-30 s6e5 origin.)
 
 ### Leakage & validation
 

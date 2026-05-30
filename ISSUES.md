@@ -299,11 +299,17 @@ prediction signal. 5 phases × 19 probes. CPU-only. 0 submits. Audit at
 - **7j.** Membership inference + exact-row copy detection. Per synth
   row, min-distance to orig over all 16 columns; below ε, predicted
   P(y=1) = orig's actual y (leak-free). Cost ~1 h CPU.
-  `[owner: research-improvements-jjI84 | status: wip]` Post-M1+M2-NULL
+  `[owner: research-improvements-jjI84 | status: done]` Post-M1+M2-NULL
   pivot (2026-05-29). Generalized softer version: k=5 NN to orig in
   standardized-numeric space, features = (mean-y-top5, min-dist,
   mean-dist-top5), LGBM downstream. Cell-conditioning by Compound ×
   Race to enforce structural plausibility.
+  **2026-05-30 closure:** d22 (k=1 exact-copy NN) + d21 (k=5 NN) productively
+  absorbed via K=20 PathB chassis filter → C5 LB 0.95404 (Day-29) → V8/W2
+  family LB 0.95457 (Day-30 plateau, rank 20/2791). Day-30 ablation
+  confirmed raw d22/d21 at 10% direct blend regresses -72 to -77 bp;
+  the K=20 PathB chassis IS the necessary noise-filter. Mechanism class
+  closed: structural lift extracted, no further upside in raw-axis blending.
 - **7k.** Class-conditional CTGAN replay with explicit cond-vector
   spec [PitStop, Compound, Stint, Year]. Cost ~3 h Kaggle GPU.
   `[owner: unclaimed | status: open]`

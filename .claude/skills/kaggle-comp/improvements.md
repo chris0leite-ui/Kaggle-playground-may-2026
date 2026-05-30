@@ -300,6 +300,27 @@ Status markers: `[x]` applied · `[~]` superseded · `[ ]` open
   Build cross-comp recipe library. Promote durable patterns to
   `examples/` or `recipes/` at end-of-comp (R8d trigger).
 
+## Applied 2026-05-30 (Day-30 s6e5 — V8-family plateau day)
+
+- `[x]` **mechanism-ledger — raw-orthogonal-axis-direct-blend → FALSIFIED.**
+  `tag: raw-NN-axis-needs-chassis-filter`. When a candidate axis has
+  ρ_vs_anchor < 0.9 AND standalone OOF < anchor − 50 bp, the axis is
+  NOISY. Do not blend raw at >5% weight; route through a chassis
+  (PathB/LR-meta) first. Direct 10% blend will regress 50-80 bp.
+  Evidence: Day-30 d22 raw and d21 raw at 10% combined -149 bp; same
+  signals via K=20 PathB chassis (C5, V8, W2) lifted +1 to +3 bp.
+  The chassis IS the noise filter, not a packaging convenience.
+  Closes mechanism class for direct-blend treatment.
+
+- `[x]` **R27 4th band — BATCH_AUTHORIZED.** `tag:
+  R27-batch-override-justified-by-prior-day-band-break`. When a
+  multi-slot plan with ≥3 R27-trippers is PI-ratified in advance,
+  individual per-slot overrides do not need re-authorization. Plan
+  ratification grants batch override; agent fires per-slot and logs
+  outcome. Day-30 fired 9 R27-trippers across one PI-approved plan;
+  per-slot ritual would have been redundant. Documents existing
+  practice rather than introducing new behavior.
+
 ## How the skill knows it's getting better
 
 - **Friction-tag entropy decreasing.** Same tags comp-after-comp =

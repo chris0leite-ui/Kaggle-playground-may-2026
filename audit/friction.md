@@ -9,6 +9,15 @@ This file is ≤150 lines. The full historical detail is in
 `audit/friction-archive.md` (1,450+ lines; do not read by default).
 Pre-distillation snapshots: `audit/archive-YYYY-MM-DD-friction-*.md`.
 
+## 2026-05-30 (Day 30 — V8-family plateau day)
+
+```
+2026-05-30  raw-NN-axis-needs-chassis-filter  I2 (d22 raw @ 10%) and I3 (d21 raw @ 10%) both regressed 70+ bp at LB despite ρ_vs_V8 ∈ [0.9974, 0.9978] (cleanly inside OK band per R27). Same d22/d21 axis routed through K=20 PathB chassis (V8/W2) delivers +1 to +3 bp. The chassis IS the necessary noise filter; raw NN axes at high concentration (10%+ blend weight) exceed the noise-tolerance band of the public anchor by ~25×. **Fix:** any new orthogonal mechanism (ρ_vs_anchor < 0.95) needs a chassis-filter route through PathB or LR-meta before LB submission; direct 10% raw blends are FALSIFIED. Promote to mechanism-ledger as "raw-axis-no-direct-blend" closure.
+2026-05-30  curvature-blends-no-lift-on-AUC-plateau  E3 (cubic power-mean q=3) and C1 (confidence-conditional mid-up/tails-down) both tied V8 at LB 0.95456 while linear-space W2/W3/W4/M1/L1 all hit 0.95457 plateau. Non-linear rank-curve manipulations cost 0-1 bp vs linear rank-mean at the V8 weight family. **Fix:** sophistication slate (logit-space, power-mean, conf-cond) is FALSIFIED for top-line LB lift on this AUC metric; reserve only as private-LB hedge with structurally distinct rank curves. Closes curvature-blend mechanism class.
+2026-05-30  V8-family-plateau-at-+1bp  9 Day-30 candidates probed; 5 candidates (W2 P=0.15, W3 P=0.20, W4 P=0.25, M1 multi-ours, L1 logit) tied at LB 0.95457. The 1-bp lift over V8 (P=0.10) is the structural ceiling of the V8 weight family. **Fix:** stop sweeping V8-family weight curves once 2 adjacent P-values tie at the plateau LB; the plateau is flat across [P=0.15, P=0.25] and any V0-family multi-ours variant. Next mechanism class needs to be genuinely orthogonal (e.g., a new original-work base with ρ_vs_anchor < 0.99), not a V8 reweighting.
+2026-05-30  R27-batch-override-justified-by-prior-day-band-break  All 9 Day-30 candidates fired with ρ_vs_V8 ∈ [0.99744, 1.00000] — every one tripped R27 TIE_EXPECTED. Override authorization carried by plan-level PI approval + Day-29's V8 itself breaking a similar 0.99993 band by +3 bp. 5 of 9 came in +1 bp (50%+ break rate), 2 of 9 cleanly regressed (the raw-NN ablation), 2 of 9 came in flat. **Fix:** R27 ρ-band table needs a 4th band: "BATCH_AUTHORIZED — fire as informational calibration; override pre-paid by plan-level PI approval." Current bands assume single-shot per-slot approval; multi-slot plans need explicit override-authorization scope. Promotion candidate to rule augmentation.
+```
+
 ## 2026-05-22 (Day 22 AM — R22 pivot session)
 
 ```
