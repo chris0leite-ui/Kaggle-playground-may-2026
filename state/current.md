@@ -9,14 +9,27 @@ changes** — do not tail-append. Prior versions live in
 to comp start 2026-05-01. The `d13`..`d22` labels in script names
 and old audit prose are FROZEN code prefixes — never calendar days.
 
-## PRIMARY (active) — set 2026-05-29 Day-29 PM late (R22-V8)
+## PRIMARY (active) — set 2026-05-30 Day-30 (R22-W2 / plateau pick)
 
-**LB 0.95456** — R22-V8 rank-mean:
-0.90 raunakdey07_95454 (public top, LB 0.95453 confirmed via V0)
-+ 0.10 PRIMARY_C5 (K=20 mem-inf stack, LB 0.95404).
+**LB 0.95457** — R22-W2 rank-mean:
+0.85 raunakdey07_95454 (public anchor)
++ 0.15 PRIMARY_C5 (K=20 mem-inf stack).
 
-File: `submissions/submission_d29_R22V8_raunakdey90_C5_10.csv`.
-**+3 bp ABOVE PUBLIC TOP 0.95453. +52 bp vs prior PRIMARY C5 0.95404.**
+File: `submissions/public_scrape/_blends_d30/D30_W2_A85_P15.csv`.
+**Rank 20 / 2791 (top-0.72%) — was 21.**
+
+5-way TIE plateau at 0.95457: W2 (P=0.15), W3 (P=0.20), W4 (P=0.25),
+M1 (multi-ours), L1 (logit-space V8). W2 picked as least-perturbation
+from known-V8.
+
+## FINAL pick set (Day-31 lock)
+
+- **FINAL_PRIMARY (proposed):** W2 LB 0.95457
+- **FINAL_HEDGE (proposed):** V0 raw raunakdey LB 0.95453 (4 bp below,
+  R2d-compliant, structurally distinct, hedges "our K=20 doesn't
+  generalize" scenario).
+
+Both LB-confirmed. Day-31 task: re-verify W2 with 1 slot, then lock.
 
 ## V0/V4/V8/V10 day-29 result table
 
