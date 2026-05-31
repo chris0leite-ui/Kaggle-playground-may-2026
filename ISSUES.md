@@ -174,15 +174,24 @@ Status values: `open`, `wip`, `done`, `null` (falsified), `parked`.
 - **5a.** d13e Compound×Stint τ=20k vs τ=100k HEDGE. Flip ratio
   55/98 < 200; HEDGE-eligible per R7. Decide at start of final
   window.
-  `[owner: unclaimed | status: open]`
+  `[owner: research-improvements-jjI84 | status: parked]` PARKED
+  2026-05-31: outcompeted by R22-axis W2_R31 (LB 0.95457, ties
+  PRIMARY). The d13e/path_b_K22 candidates were the pre-R22-axis
+  HEDGE plan; once W2_R31 emerged with same LB as PRIMARY and
+  structurally-distinct ours-backbone, the R5-HEDGE ladder became
+  obsolete.
 - **5b.** path_b_K22_invlaps τ=20k as PRIMARY-replacement candidate.
   OOF 0.95110, ρ=0.99753 vs PRIMARY, 53% rows differ >1e-3, flip
   ratio 0.594. Submission held pending PI decision.
-  `[owner: unclaimed | status: open]`
+  `[owner: research-improvements-jjI84 | status: parked]` PARKED
+  2026-05-31: outcompeted by R22-axis W2 family at LB 0.95457
+  (path_b_K22_invlaps OOF/LB level was sub-V8). Not selected as
+  FINAL_PRIMARY.
 - **5c.** path_b_K22_invlaps τ=100k as HEDGE candidate (asymmetric
   flips 45/189 echoes d13 Stint Path B which lifted +7 bp despite
   G3 fail). Hold for final-window decision.
-  `[owner: unclaimed | status: open]`
+  `[owner: research-improvements-jjI84 | status: parked]` PARKED
+  2026-05-31: see 5b. W2_R31 selected as FINAL_HEDGE.
 
 ## 6. Single-model path (PI hypothesis P1)
 

@@ -22,14 +22,20 @@ File: `submissions/public_scrape/_blends_d30/D30_W2_A85_P15.csv`.
 M1 (multi-ours), L1 (logit-space V8). W2 picked as least-perturbation
 from known-V8.
 
-## FINAL pick set (Day-31 lock)
+## FINAL pick set (Day-31 lock — LOCKED 2026-05-31)
 
-- **FINAL_PRIMARY (proposed):** W2 LB 0.95457
-- **FINAL_HEDGE (proposed):** V0 raw raunakdey LB 0.95453 (4 bp below,
-  R2d-compliant, structurally distinct, hedges "our K=20 doesn't
-  generalize" scenario).
+- **FINAL_PRIMARY:** **W2** — `D30_W2_A85_P15.csv` (Kaggle ref 53180053).
+  0.85 raunakdey + 0.15 C5 (K=20+R21+K=27). LB **0.95457**.
+- **FINAL_HEDGE:** **W2_R31** — `D31_W2R31_A85_R31_15.csv` (Kaggle ref 53216236).
+  0.85 raunakdey + 0.15 R31 (K=18+R30+R7.2). LB **0.95457**.
 
-Both LB-confirmed. Day-31 task: re-verify W2 with 1 slot, then lock.
+Both at plateau max (0.95457). HEDGE uses entirely-distinct ours-backbone
+(K=18+R30+R7.2 vs K=20+R21+K=27) — diversifies the C5-specific-private-bias
+failure mode without sacrificing public LB. Selected over V0 (0.95453, -4 bp)
+because private LB is row-iid (per comp-context) → V0's "blends don't
+generalize" tail hedge is low-probability and not worth the 4 bp deficit.
+
+PI lock-in confirmed by user via Kaggle UI.
 
 ## V0/V4/V8/V10 day-29 result table
 
