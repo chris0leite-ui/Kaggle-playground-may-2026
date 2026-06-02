@@ -5,6 +5,19 @@ status, and submission count. **Rewrite this file when PRIMARY
 changes** — do not tail-append. Prior versions live in
 `audit/archive-YYYY-MM-DD-current-md-*.md`.
 
+## COMP CLOSED — private reveal 2026-06-02
+
+- **Final standing: rank 148 / 3023 → top 4.90%** (cleared top-5%).
+- **Official score:** 0.95461 (HEDGE W2_R31 scored as best-of-selected).
+- **PRIMARY W2 private:** 0.95460 ; **HEDGE W2_R31 private:** 0.95461
+  (hedge beat primary +1 bp — distinct-backbone logic validated).
+- **Best of all our submissions (not selected):** W6 (P=0.35) and E3
+  PMEAN q=3 both at private 0.95466 ≈ top-2.5%. ~5–6 bp left on table.
+- **Closing postmortem:** `audit/2026-06-02-postmortem-research-improvements-jjI84.md`.
+- **R8d log:** end-of-comp percentile appended to
+  `.claude/skills/kaggle-comp/improvements.md`.
+
+
 **Date convention:** ISO dates ("2026-05-29") or comp-day-N anchored
 to comp start 2026-05-01. The `d13`..`d22` labels in script names
 and old audit prose are FROZEN code prefixes — never calendar days.

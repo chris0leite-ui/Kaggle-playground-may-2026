@@ -9,6 +9,14 @@ This file is ≤150 lines. The full historical detail is in
 `audit/friction-archive.md` (1,450+ lines; do not read by default).
 Pre-distillation snapshots: `audit/archive-YYYY-MM-DD-friction-*.md`.
 
+## 2026-06-02 (private reveal — comp closed)
+
+```
+2026-06-02  private-reveal-W-curve-monotonic  Public LB plateaued at 0.95457 across W2(P=0.15)/W3(P=0.20)/W4(P=0.25) then dipped to 0.95456 at W5(P=0.30) and W6(P=0.35). Private LB monotonically rose through the entire range: W2 0.95460 → W3 0.95462 → W4 0.95464 → W5 0.95465 → W6 0.95466. Picking W2 (plateau-center, public-confirmed safe) cost ~6 bp on private vs W6. Final standing: rank 148/3023 = top 4.90%. Top-5% target cleared regardless. Candidate rule `public-plateau-hides-monotonic-private-trend` drafted, PI declined promotion to improvements.md. Calibration data point logged for cross-comp memory.
+2026-06-02  L1-logit-private-down  L1 (logit-space V8 with 0.90 raun + 0.10 C5 transformed) tied W2 on public LB at 0.95457 but came in 0.95456 on private — 4 bp below W2. Only TIE-band candidate that broke down on private. Consistent with Day-30 friction `curvature-blends-no-lift-on-AUC-plateau`: non-linear rank-curve manipulations at the public TIE band can move either direction on private and add no expected lift. Confirms curvature-blend mechanism class closure (already in ledger).
+2026-06-02  hedge-logic-validated  HEDGE W2_R31 (structurally-distinct ours-backbone K=18+R30+R7.2 vs PRIMARY W2's K=20+R21+K=27) beat PRIMARY by +1 bp on private (0.95461 vs 0.95460) while tying on public. Targets the C5-specific-private-bias failure mode. Kaggle scored on best-of-selected → official 0.95461. Validates R7d-style "distinct-mechanism HEDGE" as price-of-insurance worth paying when public TIE preserves cost. Promote-eligible per criteria (cross-comp pattern), but PI declined this session.
+```
+
 ## 2026-05-31 (Day 31 — final day, lock-in)
 
 ```

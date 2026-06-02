@@ -321,6 +321,34 @@ Status markers: `[x]` applied · `[~]` superseded · `[ ]` open
   per-slot ritual would have been redundant. Documents existing
   practice rather than introducing new behavior.
 
+## End-of-comp 2026-06-02 (s6e5 final — R8d log)
+
+- **Comp:** playground-series-s6e5 (Predicting F1 Pit Stops, row-AUC).
+- **Final standing:** **rank 148 / 3023 → top 4.90%** (cleared top-5%).
+- **Selected pair:** PRIMARY W2 (0.85 raunakdey + 0.15 C5) at private
+  0.95460 ; HEDGE W2_R31 (0.85 raunakdey + 0.15 R31) at private 0.95461.
+  Kaggle scored on best-of-selected → official **0.95461**.
+- **Hedge validated:** W2_R31's structurally-distinct ours-backbone
+  (K=18+R30+R7.2 vs K=20+R21+K=27) bought +1 bp on private while
+  tying on public. R7d-style "distinct-mechanism HEDGE at public-TIE
+  cost" cleanly justified.
+- **Public-vs-private headroom forfeited:** ~5–6 bp by picking
+  plateau-center (W2 P=0.15) over plateau-extreme (W6 P=0.35) when
+  public was tied at 0.95457 and silently turning down at the
+  extreme. Best-possible-in-our-submissions: W6 / E3-PMEAN at private
+  0.95466 ≈ top-2.5%.
+- **Sub-rule candidate seen but PI declined to promote:**
+  `public-plateau-hides-monotonic-private-trend` — when ≥3 same-family
+  candidates share the public-LB max AND form a monotonic trend in a
+  single hyperparameter, the public TIE band may be structurally
+  bandwidth-limited and not reflect private ordering. Documented in
+  `audit/2026-06-02-postmortem-research-improvements-jjI84.md` for
+  next-comp re-evaluation.
+- **Friction-tag entropy this comp:** see `audit/friction.md` +
+  `audit/friction-archive.md`. Recurring tags worth tracking
+  cross-comp: `gate-probe-oof-not-persisted`, `raw-NN-axis-needs-chassis-filter`,
+  `curvature-blends-no-lift-on-AUC-plateau`, `R27-batch-override-justified-by-prior-day-band-break`.
+
 ## How the skill knows it's getting better
 
 - **Friction-tag entropy decreasing.** Same tags comp-after-comp =
